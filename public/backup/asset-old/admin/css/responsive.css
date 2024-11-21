@@ -1,0 +1,38 @@
+@media screen and (max-width: 1024px){
+.login-sec form {
+    max-width: 100%;
+}
+.login-sec .login-form {
+    padding: 30px;
+}
+}
+
+@media screen and (max-width: 768px){
+.login-sec .logo-desc-outer {
+    border-radius: 16px 16px 0 0;
+}
+.login-sec .login-form {
+    border-radius: 0 0 16px 16px;
+}
+}
+
+@media screen and (max-width: 600px){
+.login-sec {
+    height: unset;
+}
+.login-sec .logo-desc p{
+    font-size: 18px;
+}
+.login-sec .stay-login {
+    font-size: 14px;
+}
+}
+
+@media screen and (max-width: 360px){
+.login-sec .logo-desc p {
+    font-size: 15px;
+}
+.login-sec .stay-login {
+    flex-direction: column;
+}
+}

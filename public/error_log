@@ -1,0 +1,9 @@
+[11-Apr-2024 10:32:11 America/Chicago] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 7.4.33. in /home3/winecnds/testdev/vendor/composer/platform_check.php on line 24
+[11-Apr-2024 10:32:53 America/Chicago] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 7.4.33. in /home3/winecnds/testdev/vendor/composer/platform_check.php on line 24
+[06-Jul-2024 14:40:31 America/Chicago] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/winecnds/devwine-2/vendor/composer/../ramsey/uuid/src/functions.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home3/winecnds/devwine-2/vendor/composer/autoload_real.php:41
+Stack trace:
+#0 /home3/winecnds/devwine-2/vendor/composer/autoload_real.php(45): {closure}('e39a8b23c42d4e1...', '/home3/winecnds...')
+#1 /home3/winecnds/devwine-2/vendor/autoload.php(25): ComposerAutoloaderInit6370d98559af051e41cacb1ec1c5d72a::getLoader()
+#2 /home3/winecnds/devwine-2/public/index.php(34): require('/home3/winecnds...')
+#3 {main}
+  thrown in /home3/winecnds/devwine-2/vendor/composer/autoload_real.php on line 41

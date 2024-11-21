@@ -1,0 +1,1 @@
+<h2 class="mb-0">{{ !empty($vendor) ? 'Edit' : 'Create' }} {{ucfirst($type)}}</h2>
