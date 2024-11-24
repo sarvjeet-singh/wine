@@ -732,7 +732,7 @@ input[type="search" i]::-webkit-search-cancel-button {
     right: 15px;
     z-index: 2;
 }
-.listing-outer .property-box.wine.has-after:after {
+.listing-outer .property-box.wine.after:after {
     content: "";
     background-image: url(/images/guest-reward-badge.png);
     background-size: contain;

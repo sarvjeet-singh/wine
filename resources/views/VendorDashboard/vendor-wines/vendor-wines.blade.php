@@ -463,29 +463,29 @@
                 $('#dynamic-fields-container .dynamic-field .add-field').remove();
 
                 let newField = `
-        <div class="dynamic-field">
-            <div class="d-flex align-items-center gap-2 mt-2">
-                <button type="button" class="btn btn-outline-success add-field"><i class="fa-solid fa-circle-plus"></i></button>
-                <div class="w-75">
-                    <select class="form-select" name="varietal_type[]">
-                        <option value="">Select</option>
-                        @if (count(getGrapeVarietals()) > 0)
-                            @foreach (getGrapeVarietals() as $grapeVarietal)
-                                <option value="{{ $grapeVarietal->id }}">{{ $grapeVarietal->name }}
-                                </option>
-                            @endforeach
-                        @endif
-                    </select>
-                </div>
-                <div class="w-75">
-                    <div class="input-group">
-                        <input type="text" class="form-control percent" name="varietal_blend[]" placeholder="Varietal/Blend">
-                        <span class="input-group-text">%</span>
+                <div class="dynamic-field">
+                    <div class="d-flex align-items-center gap-2 mt-2">
+                        <button type="button" class="btn btn-outline-success add-field"><i class="fa-solid fa-circle-plus"></i></button>
+                        <div class="w-75">
+                            <select class="form-select" name="varietal_type[]">
+                                <option value="">Select</option>
+                                @if (count(getGrapeVarietals()) > 0)
+                                    @foreach (getGrapeVarietals() as $grapeVarietal)
+                                        <option value="{{ $grapeVarietal->id }}">{{ $grapeVarietal->name }}
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        <div class="w-75">
+                            <div class="input-group">
+                                <input type="text" class="form-control percent" name="varietal_blend[]" placeholder="Varietal/Blend">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        
                     </div>
-                </div>
-                
-            </div>
-        </div>`;
+                </div>`;
 
                 // Append new field to the container
                 let $newField = $(newField);

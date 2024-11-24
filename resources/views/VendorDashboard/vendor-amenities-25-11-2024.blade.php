@@ -20,8 +20,8 @@
                             <tr>
                                 <td>{{ $key + 1 }}</td>
                                 <td>
-                                    <div class="amenties-name d-flex align-items-center text-start gap-2">
-                                        <i class="fw-bold {{ $amenity->amenity_icons }}"></i>
+                                    <div class="amenties-name d-flex align-items-center text-start">
+                                        <i class="{{ $amenity->amenity_icons }}"></i>
                                         {{ $amenity->amenity_name }}
                                     </div>
                                 </td>

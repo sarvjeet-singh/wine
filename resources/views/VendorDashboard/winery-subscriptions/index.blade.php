@@ -107,7 +107,10 @@
                                             </ul>
                                             <div class="buy-btn text-center">
 
-                                                @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_QUARTERLY') == $activeSubscription['stripe_price_id'])
+                                                @if (
+                                                    $activeSubscription &&
+                                                        env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_QUARTERLY') == $activeSubscription['stripe_price_id']
+                                                )
                                                     <button type="button" class="btn btn-primary">Active Plan</button>
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
@@ -155,7 +158,10 @@
                                             </ul>
                                             <div class="buy-btn text-center">
 
-                                                @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_SEMI_ANNUAL') == $activeSubscription['stripe_price_id'])
+                                                @if (
+                                                    $activeSubscription &&
+                                                        env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_SEMI_ANNUAL') == $activeSubscription['stripe_price_id']
+                                                )
                                                     <button type="button" class="btn btn-primary">Active Plan</button>
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
@@ -195,9 +201,11 @@
                                                 <li class="position-relative mb-2">Guest Support (Resolve Issues)</li>
                                                 <li class="position-relative mb-2">Promotional Videos (i.e. Property
                                                     Highlights)</li>
-                                                <li class="position-relative mb-2">Generic SEO & SMO (i.e. Promote Catch All
+                                                <li class="position-relative mb-2">Generic SEO & SMO (i.e. Promote Catch
+                                                    All
                                                     Platform)</li>
-                                                <li class="position-relative mb-2">Content Creation (i.e. Product Placement,
+                                                <li class="position-relative mb-2">Content Creation (i.e. Product
+                                                    Placement,
                                                     Mentions, etc.)</li>
                                                 <li class="position-relative mb-2">Getaway Packages</li>
                                             </ul>
@@ -469,22 +477,24 @@
                                             <p class="fw-bold mb-2">What Winery Vendor Gets:</p>
 
                                             <ul class="list-unstyled p-0 mb-4">
-                                                <li class="position-relative mb-2">Account upgrade to “Partner/Full”
+                                                <li class="position-relative mb-2">Profile upgraded to “Partner/Full”
                                                     <ul>
                                                         <li class="p-0">Media Gallery</li>
                                                         <li class="p-0">Dedicated Vendor Page</li>
                                                         <li class="p-0">Own Payment Gateway</li>
                                                     </ul>
                                                 </li>
-                                                <li class="position-relative mb-2">Wines Featured in B2B Catalogue</li>
-                                                <li class="position-relative mb-2">Product Featured on Wine Menu Inserts
+                                                <li class="position-relative mb-2">Next available position</li>
+                                                <li class="position-relative mb-2">Product placement w/ reseller vendors
                                                 </li>
-                                                <li class="position-relative mb-2">Promotional Videos (i.e. Property
-                                                    Highlights)</li>
-                                                <li class="position-relative mb-2">Generic SEO & SMO (i.e. Promote Catch
-                                                    All Platform)</li>
-                                                <li class="position-relative mb-2">Content Creation (i.e. Product
-                                                    Placement, Mentions, etc.)</li>
+                                                <li class="position-relative mb-2">Wines sales transacted via B2B catalogue
+                                                </li>
+                                                <li class="position-relative mb-2">Product featured on Wine Menu Inserts
+                                                </li>
+                                                <li class="position-relative mb-2">Guest Rewards Program (i.e. register and
+                                                    engage members)</li>
+                                                <li class="position-relative mb-2">Support Local Initiative (i.e. outreach
+                                                    and promote)</li>
                                             </ul>
 
                                             <div class="buy-btn text-center">
@@ -528,22 +538,24 @@
                                             <p class="fw-bold mb-2">What Winery Vendor Gets:</p>
 
                                             <ul class="list-unstyled p-0 mb-4">
-                                                <li class="position-relative mb-2">Account upgrade to “Partner/Full”
+                                                <li class="position-relative mb-2">Profile upgraded to “Partner/Full”
                                                     <ul>
                                                         <li class="p-0">Media Gallery</li>
                                                         <li class="p-0">Dedicated Vendor Page</li>
                                                         <li class="p-0">Own Payment Gateway</li>
                                                     </ul>
                                                 </li>
-                                                <li class="position-relative mb-2">Wines Featured in B2B Catalogue</li>
-                                                <li class="position-relative mb-2">Product Featured on Wine Menu Inserts
+                                                <li class="position-relative mb-2">Next available position</li>
+                                                <li class="position-relative mb-2">Product placement w/ reseller vendors
                                                 </li>
-                                                <li class="position-relative mb-2">Promotional Videos (i.e. Property
-                                                    Highlights)</li>
-                                                <li class="position-relative mb-2">Generic SEO & SMO (i.e. Promote Catch
-                                                    All Platform)</li>
-                                                <li class="position-relative mb-2">Content Creation (i.e. Product
-                                                    Placement, Mentions, etc.)</li>
+                                                <li class="position-relative mb-2">Wines sales transacted via B2B catalogue
+                                                </li>
+                                                <li class="position-relative mb-2">Product featured on Wine Menu Inserts
+                                                </li>
+                                                <li class="position-relative mb-2">Guest Rewards Program (i.e. register and
+                                                    engage members)</li>
+                                                <li class="position-relative mb-2">Support Local Initiative (i.e. outreach
+                                                    and promote)</li>
                                             </ul>
 
                                             <div class="buy-btn text-center">
@@ -588,22 +600,24 @@
                                             <p class="fw-bold mb-2">What Winery Vendor Gets:</p>
 
                                             <ul class="list-unstyled p-0 mb-4">
-                                                <li class="position-relative mb-2">Account upgrade to “Partner/Full”
+                                                <li class="position-relative mb-2">Profile upgraded to “Partner/Full”
                                                     <ul>
                                                         <li class="p-0">Media Gallery</li>
                                                         <li class="p-0">Dedicated Vendor Page</li>
                                                         <li class="p-0">Own Payment Gateway</li>
                                                     </ul>
                                                 </li>
-                                                <li class="position-relative mb-2">Wines Featured in B2B Catalogue</li>
-                                                <li class="position-relative mb-2">Product Featured on Wine Menu Inserts
+                                                <li class="position-relative mb-2">Next available position</li>
+                                                <li class="position-relative mb-2">Product placement w/ reseller vendors
                                                 </li>
-                                                <li class="position-relative mb-2">Promotional Videos (i.e. Property
-                                                    Highlights)</li>
-                                                <li class="position-relative mb-2">Generic SEO & SMO (i.e. Promote Catch
-                                                    All Platform)</li>
-                                                <li class="position-relative mb-2">Content Creation (i.e. Product
-                                                    Placement, Mentions, etc.)</li>
+                                                <li class="position-relative mb-2">Wines sales transacted via B2B catalogue
+                                                </li>
+                                                <li class="position-relative mb-2">Product featured on Wine Menu Inserts
+                                                </li>
+                                                <li class="position-relative mb-2">Guest Rewards Program (i.e. register and
+                                                    engage members)</li>
+                                                <li class="position-relative mb-2">Support Local Initiative (i.e. outreach
+                                                    and promote)</li>
                                             </ul>
 
                                             <div class="buy-btn text-center">
@@ -647,22 +661,24 @@
                                             <p class="fw-bold mb-2">What Winery Vendor Gets:</p>
 
                                             <ul class="list-unstyled p-0 mb-4">
-                                                <li class="position-relative mb-2">Account upgrade to “Partner/Full”
+                                                <li class="position-relative mb-2">Profile upgraded to “Partner/Full”
                                                     <ul>
                                                         <li class="p-0">Media Gallery</li>
                                                         <li class="p-0">Dedicated Vendor Page</li>
                                                         <li class="p-0">Own Payment Gateway</li>
                                                     </ul>
                                                 </li>
-                                                <li class="position-relative mb-2">Wines Featured in B2B Catalogue</li>
-                                                <li class="position-relative mb-2">Product Featured on Wine Menu Inserts
+                                                <li class="position-relative mb-2">Next available position</li>
+                                                <li class="position-relative mb-2">Product placement w/ reseller vendors
                                                 </li>
-                                                <li class="position-relative mb-2">Promotional Videos (i.e. Property
-                                                    Highlights)</li>
-                                                <li class="position-relative mb-2">Generic SEO & SMO (i.e. Promote Catch
-                                                    All Platform)</li>
-                                                <li class="position-relative mb-2">Content Creation (i.e. Product
-                                                    Placement, Mentions, etc.)</li>
+                                                <li class="position-relative mb-2">Wines sales transacted via B2B catalogue
+                                                </li>
+                                                <li class="position-relative mb-2">Product featured on Wine Menu Inserts
+                                                </li>
+                                                <li class="position-relative mb-2">Guest Rewards Program (i.e. register and
+                                                    engage members)</li>
+                                                <li class="position-relative mb-2">Support Local Initiative (i.e. outreach
+                                                    and promote)</li>
                                             </ul>
 
                                             <div class="buy-btn text-center">

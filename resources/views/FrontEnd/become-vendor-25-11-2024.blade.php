@@ -60,12 +60,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <h5 class="fw-bold theme-color">Business/Vendor Details</h5>
-                        </div>
-                    </div>
-                    <div class="row">
+                    <div class="row mt-3">
                         <div class="col-12">
                             <label class="form-label">Business/Vendor Name</label>
                             <input type="text" id="vendor_name" class="form-control" name="vendor_name"

@@ -1429,3 +1429,14 @@ a.dlt-icon {
 .batch-sec img {
     width: 180px;
 }
+
+.fa-picnic {
+    width: 24px;
+    height: 24px;
+    background-image: url('../../../images/picnic-table.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+    color: #000;
+}
+

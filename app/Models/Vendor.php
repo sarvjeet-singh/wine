@@ -139,4 +139,8 @@ class Vendor extends Model
     public function pricePoint() {
         return $this->belongsTo(PricePoint::class, 'price_point');
     }
+
+    public function accountStatus() {
+        return $this->belongsTo(AccountStatus::class, 'account_status');
+    }
 }

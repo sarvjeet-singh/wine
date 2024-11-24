@@ -72,16 +72,15 @@
                 <div class="col-md-8">
 
                     <div id="dynamic-fields-container">
-
-                        <div class="dynamic-field">
-                            <div class="d-flex align-items-between gap-2">
-                                <div class="w-75">
-                                    <label for="varietal_type" class="form-label">Grape Varietals</label>
-                                </div>
-                                <div class="w-75" style="width: 61.5% !important">
-                                    <label for="varietal_blend" class="form-label">Varietal/Blend</label>
-                                </div>
+                        <div class="d-flex align-items-between gap-2">
+                            <div class="w-75">
+                                <label for="varietal_type" class="form-label">Grape Varietals</label>
                             </div>
+                            <div class="w-75" style="width: 61.5% !important">
+                                <label for="varietal_blend" class="form-label">Varietal/Blend</label>
+                            </div>
+                        </div>
+                        <div class="dynamic-field">
                             <div class="d-flex align-items-center gap-2">
                                 <button type="button" class="btn btn-outline-success add-field"><i
                                         class="fa-solid fa-circle-plus"></i></button>
@@ -96,7 +95,6 @@
                                         @endif
                                     </select>
                                 </div>
-
                                 <div class="w-75">
                                     <div class="input-group">
                                         <input type="text" class="form-control percent" name="varietal_blend[]"
@@ -104,13 +102,7 @@
                                         <span class="input-group-text">%</span>
                                     </div>
                                 </div>
-
-
-
-
-
                             </div>
-
                         </div>
 
                     </div>

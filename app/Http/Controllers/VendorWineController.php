@@ -35,7 +35,8 @@ class VendorWineController extends Controller
     public function index($vendor_id)
     {
         $wines = VendorWine::where('vendor_id', $vendor_id)
-            ->orderBy('id', 'desc')
+            ->orderBy('delisted', 'asc') // Non-delisted first
+            ->orderBy('id', 'desc') // Then sort by ID descending within each group
             ->get();
         return view('VendorDashboard.vendor-wines.vendor-wines', compact('wines', 'vendor_id'));
     }
@@ -80,7 +81,7 @@ class VendorWineController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust image validation as needed
         ]);
         $rs_value = null;
-        
+
         if (!empty($request->input('rs')) && !empty($request->input('rs_values'))) {
             $rs = $request->input('rs');
             $rs_values = $request->input('rs_values');

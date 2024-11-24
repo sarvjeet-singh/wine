@@ -750,11 +750,11 @@ class VendorController extends Controller
 			return response()->json(["status" => true]);
 		}
 	}
-	public function getVendorsocialmedia($vendorid)
+	public function vendorSocialMedia($vendorid)
 	{
 		$vendor = Vendor::find($vendorid);
 		$Vendorsocial = VendorSocialMedia::where('vendor_id', $vendorid)->get();
-		return view('accommodation-details', compact('vendor', 'Vendorsocial'));
+		return view('VendorDashboard.vendor-social-media', compact('vendor', 'Vendorsocial'));
 	}
 	public function updateQuestionnaireMedia(Request $request)
 	{

@@ -24,7 +24,7 @@
             @endphp
         @endif
         <div class="col-lg-6">
-            <div class="property-box {{strtolower($vendor->vendor_type) == 'winery' ? 'wine' : ''}} {{strtolower($vendor->vendor_type) == 'accommodation' ? 'accommodation' : ''}}  {{ $vendor->account_status == '2' ? 'has-after' : '' }}">
+            <div class="property-box {{ $vendor->account_status == '2' ? 'has-after' : '' }}">
                 <div class="property-slider">
                     @if ($vendor->mediaGallery->isNotEmpty())
                         @foreach ($vendor->mediaGallery as $media)
@@ -137,44 +137,44 @@
                     {{-- Accommodation Details --}}
                     @if (strtolower($vendor->vendor_type) == 'accommodation')
                         <li>
-                            {{ !empty($vendor->accommodationMetadata->bedrooms) ? $vendor->accommodationMetadata->bedrooms : '-' }}
+                            {{ !empty($vendor->accommodationMetadata->bedrooms) ? $vendor->accommodationMetadata->bedrooms : '' }}
                         </li>
                         <li>
-                            {{ !empty($vendor->accommodationMetadata->washrooms) ? $vendor->accommodationMetadata->washrooms : '-' }}
+                            {{ !empty($vendor->accommodationMetadata->washrooms) ? $vendor->accommodationMetadata->washrooms : '' }}
                         </li>
                         <li>
                             {{ !empty($vendor->accommodationMetadata->beds) && !empty($vendor->accommodationMetadata->sleeps)
                                 ? $vendor->accommodationMetadata->beds . ' / ' . $vendor->accommodationMetadata->sleeps
-                                : '-' }}
+                                : '' }}
                         </li>
                     @endif
 
                     {{-- Winery Farming Practices --}}
                     @if (strtolower($vendor->vendor_type) == 'winery')
                         <li>
-                            {{ !empty($vendor->wineryMetadata->farmingPractices->name) ? $vendor->wineryMetadata->farmingPractices->name : '-' }}
+                            {{ !empty($vendor->wineryMetadata->farmingPractices->name) ? $vendor->wineryMetadata->farmingPractices->name : '' }}
                         </li>
                     @endif
 
                     {{-- Max Group Size for Winery or Excursion --}}
                     @if (strtolower($vendor->vendor_type) == 'winery' || strtolower($vendor->vendor_type) == 'excursion')
                         <li>
-                            {{ !empty($vendor->wineryMetadata->maxGroup->name) ? $vendor->wineryMetadata->maxGroup->name : '-' }}
-                            {{ !empty($vendor->excursionMetadata->maxGroup->name) ? $vendor->excursionMetadata->maxGroup->name : '-' }}
+                            {{ !empty($vendor->wineryMetadata->maxGroup->name) ? $vendor->wineryMetadata->maxGroup->name : '' }}
+                            {{ !empty($vendor->excursionMetadata->maxGroup->name) ? $vendor->excursionMetadata->maxGroup->name : '' }}
                         </li>
                     @endif
 
                     {{-- Excursion Establishment --}}
                     @if (strtolower($vendor->vendor_type) == 'excursion')
                         <li>
-                            {{ !empty($vendor->excursionMetadata->establishments->name) ? $vendor->excursionMetadata->establishments->name : '-' }}
+                            {{ !empty($vendor->excursionMetadata->establishments->name) ? $vendor->excursionMetadata->establishments->name : '' }}
                         </li>
                     @endif
 
                     {{-- Winery Tasting Options --}}
                     @if (strtolower($vendor->vendor_type) == 'winery')
                         <li>
-                            {{ !empty($vendor->wineryMetadata->tastingOptions->name) ? $vendor->wineryMetadata->tastingOptions->name : '-' }}
+                            {{ !empty($vendor->wineryMetadata->tastingOptions->name) ? $vendor->wineryMetadata->tastingOptions->name : '' }}
                         </li>
                     @endif
 

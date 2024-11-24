@@ -154,7 +154,7 @@
             <!-- Parent Menu 6 -->
             <li class="nav-item my-1">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menu6" role="button"
-                    aria-expanded="{{ request()->routeIs('reviews-testimonial', 'vendor-faqs') ? 'true' : 'false' }}"
+                    aria-expanded="{{ request()->routeIs('reviews-testimonial') ? 'true' : 'false' }}"
                     aria-controls="menu6">
                     <div><i class="fas fa-cogs menu-icon"></i> Manage Engagements</div>
                     <i
@@ -191,7 +191,7 @@
                     <i
                         class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-settings', 'business-hours.index') ? 'rotate' : '' }}"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('vendor-settings', 'business-hours.index', 'stripe.details.show') ? 'show' : '' }}"
+                <div class="collapse {{ request()->routeIs('vendor-settings', 'business-hours.index', 'stripe.details.show','vendor-social-media') ? 'show' : '' }}"
                     id="menu8">
                     <ul class="nav flex-column sub-menu mt-2">
                         <li class="nav-item">
@@ -220,7 +220,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link {{ request()->routeIs('vendor-social-media') ? 'active' : '' }}""  href="{{ route('vendor-social-media', ['vendorid' => $id]) }}">
                                 <i class="fas fa-wrench menu-icon"></i>Social Media
                             </a>
                         </li>

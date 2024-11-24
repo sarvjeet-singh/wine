@@ -261,6 +261,7 @@ Route::group(['middleware' => ['auth', 'check.vendorid']], function () {
     Route::put('vendor-metadata/update/{vendorid?}', [VendorController::class, 'updateMetadata'])->name('vendor.metadata.update');
     Route::put('vendor/user-details-update/{vendorid?}', [VendorController::class, 'userDetailsUpdate'])->name('user.details.update');
     Route::get('vendor-faqs/{vendorid?}', [VendorController::class, 'vendorFaqs'])->name('vendor-faqs');
+    Route::get('vendor/social-media/{vendorid?}', [VendorController::class, 'vendorSocialMedia'])->name('vendor-social-media');
 
     // Subscription Routes
     Route::get('/subscription/list/{vendorid?}', [SubscriptionController::class, 'index'])->name('subscription.index');

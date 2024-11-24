@@ -110,36 +110,32 @@
 
                             $varietal_blends = json_decode($wine->varietal_blend, true);
                         @endphp
-
-                        @if ($varietal_blends > 0)
-                            <div class="dynamic-field">
-                                <div class="d-flex align-items-between gap-2">
-                                    <div class="w-75">
-                                        <label for="varietal_type" class="form-label">Grape Varietals</label>
-                                    </div>
-                                    <div class="w-75" style="width: 61.5% !important">
-                                        <label for="varietal_blend" class="form-label">Varietal/Blend</label>
-                                    </div>
-                                </div>
-                                @php $usedVarietal = []; @endphp
-                                @foreach ($varietal_blends as $key => $varietal_blend)
+                        <div class="d-flex align-items-between gap-2">
+                            <div class="w-75">
+                                <label for="varietal_type" class="form-label">Grape Varietals</label>
+                            </div>
+                            <div class="w-75" style="width: 61.5% !important">
+                                <label for="varietal_blend" class="form-label">Varietal/Blend</label>
+                            </div>
+                        </div>
+                        @php $usedVarietal = []; @endphp
+                        @if (count($varietal_blends) > 0)
+                            @foreach ($varietal_blends as $key => $varietal_blend)
+                                <div class="dynamic-field">
                                     <div class="d-flex align-items-center gap-2 {{ $key > 0 ? 'mt-2' : '' }}">
-                                        @if ($key == 0)
-                                            <button type="button" class="btn btn-outline-danger remove-field"><i
-                                                    class="fa-solid fa-circle-minus"></i>
-                                            </button>
-                                        @else
-                                            <button type="button" class="btn btn-outline-success add-field"><i
-                                                    class="fa-solid fa-circle-plus"></i></button>
-                                        @endif
+                                        <button type="button" class="btn btn-outline-danger remove-field">
+                                            <i class="fa-solid fa-circle-minus"></i>
+                                        </button>
                                         <div class="w-75">
                                             <select class="form-select" name="varietal_type[]">
                                                 <option value="">Select</option>
                                                 @if (count(getGrapeVarietals()) > 0)
                                                     @foreach (getGrapeVarietals() as $grapeVarietal)
-                                                        @if(in_array($grapeVarietal->id, $usedVarietal)) @continue @endif
+                                                        @if (in_array($grapeVarietal->id, $usedVarietal))
+                                                            @continue
+                                                        @endif
                                                         <option value="{{ $grapeVarietal->id }}"
-                                                            @if (isset($varietal_blend['type']) && $varietal_blend['type'] == $grapeVarietal->id) {{ 'selected' }}
+                                                            @if (isset($varietal_blend['type']) && $varietal_blend['type'] == $grapeVarietal->id) selected
                                                             @php $usedVarietal[] = $grapeVarietal->id; @endphp @endif>
                                                             {{ $grapeVarietal->name }}
                                                         </option>
@@ -147,24 +143,47 @@
                                                 @endif
                                             </select>
                                         </div>
-
                                         <div class="w-75">
-
                                             <div class="input-group">
                                                 <input type="text" class="form-control percent"
                                                     name="varietal_blend[]" placeholder="Varietal/Blend"
-                                                    value="{{ $varietal_blend['blend'] }}">
-                                                <varietal_type class="input-group-text">%</varietal_type[]>
+                                                    value="{{ $varietal_blend['blend'] ?? '' }}">
+                                                <span class="input-group-text">%</span>
                                             </div>
-
                                         </div>
-
                                     </div>
-                                @endforeach
-                            </div>
-
+                                </div>
+                            @endforeach
                         @endif
-
+                        <!-- Extra empty select row for adding new varietal -->
+                        <div class="dynamic-field">
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <button type="button" class="btn btn-outline-success add-field">
+                                    <i class="fa-solid fa-circle-plus"></i>
+                                </button>
+                                <div class="w-75">
+                                    <select class="form-select" name="varietal_type[]">
+                                        <option value="">Select</option>
+                                        @if (count(getGrapeVarietals()) > 0)
+                                            @foreach (getGrapeVarietals() as $grapeVarietal)
+                                                @if (in_array($grapeVarietal->id, $usedVarietal))
+                                                    @continue
+                                                @endif
+                                                <option value="{{ $grapeVarietal->id }}">{{ $grapeVarietal->name }}
+                                                </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="w-75">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control percent" name="varietal_blend[]"
+                                            placeholder="Varietal/Blend">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                 </div>

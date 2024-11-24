@@ -252,3 +252,9 @@ if(! function_exists('getEstablishmentById')) {
         return \App\Models\Establishment::find($id)->pluck('name')->first();
     }
 }
+
+if(! function_exists('getAccountStatusById')) {
+    function getAccountStatusById($id) {
+        return \App\Models\AccountStatus::find($id)->pluck('name')->first();
+    }
+}
