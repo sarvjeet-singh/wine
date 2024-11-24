@@ -207,6 +207,7 @@
                         <th scope="col">Inventory</th>
 
                         <th scope="col">Price</th>
+                        <th scope="col">Delisted</th>
 
                         <th scope="col">Action</th>
 
@@ -233,6 +234,7 @@
                             <td>{{ $wine->inventory }}</td>
 
                             <td>${{ $wine->price }}</td>
+                            <td>{{ $wine->delisted == 1 ? 'Yes' : 'No' }}</td>
 
                             <td>
 
@@ -374,63 +376,60 @@
 
     <script>
         $(document).ready(function() {
-
             // Handle click on delete button
-
             $(document).on('click', '.btn-delete', function(e) {
-
+                e.preventDefault(); // Prevent the default form submission
                 var url = $(this).attr('href');
 
-                e.preventDefault(); // Prevent the default form submission
-
-
-
-                // Confirm before sending the AJAX request
-
-                if (confirm('Are you sure you want to delete this wine?')) {
-
-                    $.ajax({
-
-                        url: url,
-
-                        type: 'POST',
-
-                        data: {
-
-                            _token: '{{ csrf_token() }}'
-
-                        },
-
-                        success: function(response) {
-
-                            if (response.success) {
-
-                                alert(response.message); // Show success message
-
-                                // Optionally, remove the item from the DOM
-
-                                location.reload();
-
-                            } else {
-
-                                alert(response.message); // Show error message
-
-                            }
-
-                        },
-
-                        error: function() {
-
-                            alert('An error occurred. Please try again.');
-
-                        }
-
-                    });
-
-                }
-
+                // Use SweetAlert2 for confirmation
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You can revert this later!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delist it!',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // If confirmed, send the AJAX request
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: 'Delisted!',
+                                        text: response.message,
+                                        icon: 'success',
+                                        confirmButtonText: 'OK',
+                                    }).then(() => {
+                                        location.reload(); // Reload the page
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: response.message,
+                                        icon: 'error',
+                                        confirmButtonText: 'OK',
+                                    });
+                                }
+                            },
+                            error: function() {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'An error occurred. Please try again.',
+                                    icon: 'error',
+                                    confirmButtonText: 'OK',
+                                });
+                            },
+                        });
+                    }
+                });
             });
-
         });
     </script>
 
@@ -453,50 +452,38 @@
                 // Get all selected options in existing dropdowns
                 let selectedOptions = [];
                 $('#dynamic-fields-container .dynamic-field select[name="varietal_type[]"]').each(
-            function() {
-                    let value = $(this).val();
-                    if (value) {
-                        selectedOptions.push(value);
-                    }
-                });
+                    function() {
+                        let value = $(this).val();
+                        if (value) {
+                            selectedOptions.push(value);
+                        }
+                    });
 
                 // Remove add buttons from all other fields to ensure only the last one has the add button
                 $('#dynamic-fields-container .dynamic-field .add-field').remove();
 
                 let newField = `
         <div class="dynamic-field">
-            <div class="d-flex align-items-between gap-2">
-                <div class="w-75" style="width: 61.5% !important">
-                    <label for="varietal_blend" class="form-label">Varietal/Blend</label>
-                </div>
+            <div class="d-flex align-items-center gap-2 mt-2">
+                <button type="button" class="btn btn-outline-success add-field"><i class="fa-solid fa-circle-plus"></i></button>
                 <div class="w-75">
-                    <label for="varietal_type" class="form-label">Grape Varietals</label>
+                    <select class="form-select" name="varietal_type[]">
+                        <option value="">Select</option>
+                        @if (count(getGrapeVarietals()) > 0)
+                            @foreach (getGrapeVarietals() as $grapeVarietal)
+                                <option value="{{ $grapeVarietal->id }}">{{ $grapeVarietal->name }}
+                                </option>
+                            @endforeach
+                        @endif
+                    </select>
                 </div>
-            </div>
-
-            <div class="d-flex align-items-center gap-2">
                 <div class="w-75">
                     <div class="input-group">
                         <input type="text" class="form-control percent" name="varietal_blend[]" placeholder="Varietal/Blend">
                         <span class="input-group-text">%</span>
                     </div>
                 </div>
-
-                <div class="w-75">
-                    <select class="form-select" name="varietal_type[]">
-                        <option value="">Select</option>
-                        <option value="1">Cabernet Franc</option>
-                        <option value="2">Cabernet Sauvignon</option>
-                        <option value="3">Chardonnay</option>
-                        <option value="4">Gamay Noir</option>
-                        <option value="5">Gewürztraminer</option>
-                        <option value="6">Merlot</option>
-                        <option value="7">Pinot Noir</option>
-                        <option value="8">Riesling</option>
-                    </select>
-                </div>
-
-                <button type="button" class="btn btn-outline-success add-field"><i class="fa-solid fa-circle-plus"></i></button>
+                
             </div>
         </div>`;
 
@@ -515,7 +502,7 @@
                     function() {
                         $(this).find('.add-field').remove(); // Remove add buttons
                         if (!$(this).find('.remove-field').length) {
-                            $(this).append(`
+                            $(this).prepend(`
                     <button type="button" class="btn btn-outline-danger remove-field"><i class="fa-solid fa-circle-minus"></i></button>
                 `);
                         }

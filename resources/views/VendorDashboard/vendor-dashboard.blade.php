@@ -10,8 +10,8 @@
                     <div class="box-image">
                         <img src="{{asset('images/icons/total_booking_icon.png')}}">
                     </div>
-                    <div class="box-points">200</div>
-                    <div class="box-text mt-1">Total Booking</div>
+                    <div class="box-points">{{ $usersCount }}</div>
+                    <div class="box-text mt-1">Guest Rewards</div>
                 </div>
             </div>
             <div class="col-sm-3">
@@ -19,8 +19,8 @@
                     <div class="box-image">
                         <img src="{{asset('images/icons/Inquiries-box-icon.png')}}">
                     </div>
-                    <div class="box-points">400</div>
-                    <div class="box-text">Inquiries</div>
+                    <div class="box-points">{{ $mostCommonLocation->city }}, {{ucwords($mostCommonLocation->country)}}</div>
+                    <div class="box-text">Guest Origins</div>
                 </div>
             </div>
             <div class="col-sm-3">
@@ -28,8 +28,8 @@
                     <div class="box-image">
                         <img src="{{asset('images/icons/vendor-reviews-box-icon.png')}}">
                     </div>
-                    <div class="box-points">500</div>
-                    <div class="box-text">Reviews</div>
+                    <div class="box-points">{{ $reviewData->review_count }}, {{ round($reviewData->average_rating, 1) }}</div>
+                    <div class="box-text">What People Think</div>
                 </div>
             </div>
             <div class="col-sm-3">

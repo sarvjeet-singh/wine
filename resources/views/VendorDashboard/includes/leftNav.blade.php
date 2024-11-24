@@ -17,40 +17,18 @@
 
             <!-- Overview Menu -->
             <li class="nav-item my-1">
-                <a class="nav-link" data-bs-toggle="collapse" href="#overview" role="button"
-                    aria-expanded="{{ request()->routeIs('vendor-dashboard') ? 'true' : 'false' }}"
-                    aria-controls="overview">
-                    <div><i class="fas fa-folder-open menu-icon"></i> Overview</div>
-                    <i
-                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-dashboard') ? 'rotate' : '' }}"></i>
+                <a class="nav-link {{ request()->routeIs('vendor-dashboard') ? 'active' : '' }}"
+                    href="{{ route('vendor-dashboard', ['vendorid' => $id]) }}">
+                    <div><i class="fas fa-folder-open menu-icon"></i> Profile Summary</div>
                 </a>
-                <div class="collapse {{ request()->routeIs('vendor-dashboard') ? 'show' : '' }}" id="overview">
-                    <ul class="nav flex-column sub-menu mt-2">
-                        <li class="nav-item"><a
-                                class="nav-link {{ request()->routeIs('vendor-dashboard') ? 'active' : '' }}"
-                                href="{{ route('vendor-dashboard', ['vendorid' => $id]) }}">
-                                <i class="fas fa-file-alt menu-icon"></i> Dashboard</a></li>
-                    </ul>
-                </div>
             </li>
 
             <!-- Content Management Menu -->
             <li class="nav-item my-1">
-                <a class="nav-link" data-bs-toggle="collapse" href="#menu2" role="button"
-                    aria-expanded="{{ request()->routeIs('vendor-media-gallary') ? 'true' : 'false' }}"
-                    aria-controls="menu2">
-                    <div><i class="fas fa-cogs menu-icon"></i> Content Management</div>
-                    <i
-                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-media-gallary') ? 'rotate' : '' }}"></i>
+                <a class="nav-link {{ request()->routeIs('vendor-media-gallary') ? 'active' : '' }}"
+                    href="{{ route('vendor-media-gallary', ['vendorid' => $id]) }}">
+                    <div><i class="fas fa-cogs menu-icon"></i> Media Gallery</div>
                 </a>
-                <div class="collapse {{ request()->routeIs('vendor-media-gallary') ? 'show' : '' }}" id="menu2">
-                    <ul class="nav flex-column sub-menu mt-2">
-                        <li class="nav-item"><a
-                                class="nav-link {{ request()->routeIs('vendor-media-gallary') ? 'active' : '' }}"
-                                href="{{ route('vendor-media-gallary', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i> Media Gallery</a></li>
-                    </ul>
-                </div>
             </li>
 
             <!-- Accommodation Inventory Menu -->
@@ -91,6 +69,40 @@
                 </li>
             @endif
 
+            <!-- Parent Menu 5 -->
+            <li class="nav-item my-1">
+                <a class="nav-link" data-bs-toggle="collapse" href="#menu5" role="button"
+                    aria-expanded="{{ request()->routeIs('vendor-amenities', 'vendor-curated-experience') ? 'true' : 'false' }}"
+                    aria-controls="menu5">
+                    <div><i class="fas fa-cogs menu-icon"></i> Guest Services</div>
+                    <i
+                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-amenities', 'vendor-curated-experience') ? 'rotate' : '' }}"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('vendor-amenities', 'vendor-curated-experience') ? 'show' : '' }}"
+                    id="menu5">
+                    <ul class="nav flex-column sub-menu mt-2">
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('vendor-amenities') ? 'active' : '' }}"
+                                href="{{ route('vendor-amenities', ['vendorid' => $id]) }}">
+                                <i class="fas fa-wrench menu-icon"></i> Amenities
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('vendor-curated-experience') ? 'active' : '' }}"
+                                href="{{ route('vendor-curated-experience', ['vendorid' => $id]) }}">
+                                <i class="fas fa-wrench menu-icon"></i> Curated Experiences
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <li class="nav-item my-1">
+                <a class="nav-link" href="#">
+                    <div><i class="fas fa-cogs menu-icon"></i> Manage Transactions</div>
+                </a>
+            </li>
+
             <!-- Sales & Orders Menu -->
             <li class="nav-item my-1">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menu4" role="button"
@@ -107,7 +119,7 @@
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('vendor-wines.index') ? 'active' : '' }}"
                                     href="{{ route('vendor-wines.index', ['vendorid' => $id]) }}">
-                                    <i class="fas fa-wrench menu-icon"></i> Inventory
+                                    <i class="fas fa-wrench menu-icon"></i> Manage Inventory
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -120,7 +132,7 @@
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('winery-shop.index') ? 'active' : '' }}"
                                     href="{{ route('winery-shop.index', ['vendorid' => $id]) }}">
-                                    <i class="fas fa-wrench menu-icon"></i> Purchase
+                                    <i class="fas fa-wrench menu-icon"></i> Purchases
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -133,86 +145,42 @@
                     </ul>
                 </div>
             </li>
-            <!-- Parent Menu 5 -->
             <li class="nav-item my-1">
-                <a class="nav-link" data-bs-toggle="collapse" href="#menu5" role="button"
-                    aria-expanded="{{ request()->routeIs('vendor-amenities', 'vendor-curated-experience') ? 'true' : 'false' }}"
-                    aria-controls="menu5">
-                    <div><i class="fas fa-cogs menu-icon"></i> Amenities & Experiences</div>
-                    <i
-                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-amenities', 'vendor-curated-experience') ? 'rotate' : '' }}"></i>
+                <a class="nav-link {{ request()->routeIs('subscription.index') ? 'active' : '' }}"
+                    href="{{ route('subscription.index', ['vendorid' => $id]) }}">
+                    <i class="fas fa-wrench menu-icon"></i> Subscription Plans
                 </a>
-                <div class="collapse {{ request()->routeIs('vendor-amenities', 'vendor-curated-experience') ? 'show' : '' }}"
-                    id="menu5">
-                    <ul class="nav flex-column sub-menu mt-2">
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('vendor-amenities') ? 'active' : '' }}"
-                                href="{{ route('vendor-amenities', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i> Amenities
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('vendor-curated-experience') ? 'active' : '' }}"
-                                href="{{ route('vendor-curated-experience', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i> Curated Experience
-                            </a>
-                        </li>
-                    </ul>
-                </div>
             </li>
-
             <!-- Parent Menu 6 -->
             <li class="nav-item my-1">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menu6" role="button"
                     aria-expanded="{{ request()->routeIs('reviews-testimonial', 'vendor-faqs') ? 'true' : 'false' }}"
                     aria-controls="menu6">
-                    <div><i class="fas fa-cogs menu-icon"></i> Vendor Interaction</div>
+                    <div><i class="fas fa-cogs menu-icon"></i> Manage Engagements</div>
                     <i
-                        class="fas fa-angle-right expand-icon {{ request()->routeIs('reviews-testimonial', 'vendor-faqs') ? 'rotate' : '' }}"></i>
+                        class="fas fa-angle-right expand-icon {{ request()->routeIs('reviews-testimonial') ? 'rotate' : '' }}"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('reviews-testimonial', 'vendor-faqs') ? 'show' : '' }}"
-                    id="menu6">
+                <div class="collapse {{ request()->routeIs('reviews-testimonial') ? 'show' : '' }}" id="menu6">
                     <ul class="nav flex-column sub-menu mt-2">
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('reviews-testimonial') ? 'active' : '' }}"
-                                href="{{ route('reviews-testimonial', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i> Reviews & Testimonials
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-wrench menu-icon"></i>Referrals
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('vendor-faqs') ? 'active' : '' }}"
-                                href="{{ route('vendor-faqs', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i> FAQ
+                            <a class="nav-link {{ request()->routeIs('reviews-testimonial') ? 'active' : '' }}"
+                                href="{{ route('reviews-testimonial', ['vendorid' => $id]) }}">
+                                <i class="fas fa-wrench menu-icon"></i>Testimonials & Reviews
                             </a>
                         </li>
                     </ul>
                 </div>
             </li>
-
-            <!-- Parent Menu 7 -->
             <li class="nav-item my-1">
-                <a class="nav-link" data-bs-toggle="collapse" href="#menu7" role="button"
-                    aria-expanded="{{ request()->routeIs('subscription.index') ? 'true' : 'false' }}"
-                    aria-controls="menu7">
-                    <div><i class="fas fa-cogs menu-icon"></i> Subscription Management</div>
-                    <i
-                        class="fas fa-angle-right expand-icon {{ request()->routeIs('subscription.index') ? 'rotate' : '' }}"></i>
+                <a class="nav-link {{ request()->routeIs('vendor-faqs') ? 'active' : '' }}"
+                    href="{{ route('vendor-faqs', ['vendorid' => $id]) }}">
+                    <i class="fas fa-wrench menu-icon"></i>User FAQs
                 </a>
-                <div class="collapse {{ request()->routeIs('subscription.index') ? 'show' : '' }}" id="menu7">
-                    <ul class="nav flex-column sub-menu mt-2">
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('subscription.index') ? 'active' : '' }}"
-                                href="{{ route('subscription.index', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i> Subscription Plans
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-wrench menu-icon"></i> Active Subscriptions
-                            </a>
-                        </li>
-                    </ul>
-                </div>
             </li>
             <!-- Parent Menu 8 -->
             <li class="nav-item my-1">
@@ -229,13 +197,13 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('vendor-settings') ? 'active' : '' }}"
                                 href="{{ route('vendor-settings', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i> General Settings
+                                <i class="fas fa-wrench menu-icon"></i> Vendor Details
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('stripe.details.show') ? 'active' : '' }}"
                                 href="{{ route('stripe.details.show', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i>Vendor Stripe Details
+                                <i class="fas fa-wrench menu-icon"></i>Payment Details
                             </a>
                         </li>
                         @if (strtolower($vendor->vendor_type) != 'accommodation')
@@ -246,6 +214,16 @@
                                 </a>
                             </li>
                         @endif
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-wrench menu-icon"></i>Vendor Contacts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-wrench menu-icon"></i>Social Media
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </li>

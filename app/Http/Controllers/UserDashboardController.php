@@ -34,28 +34,34 @@ class UserDashboardController extends Controller
         $this->middleware('auth');
     }
 
-    public function userDashboard(){
+    public function userDashboard()
+    {
         $first_login = false;
-        if(Auth::user()->first_login == 1){
+        if (Auth::user()->first_login == 1) {
             // exit;
             $first_login = true;
             Auth::user()->update(['first_login' => false]);
         }
-        return view('UserDashboard.index',compact('first_login'));
+        return view('UserDashboard.index', compact('first_login'));
     }
 
-    public function userSettings(){
+    public function userSettings()
+    {
         return view('UserDashboard.user-settings');
     }
-    public function vendorsuggest(){
+    public function vendorsuggest()
+    {
         return view('UserDashboard.vendor-suggest');
     }
-    public function becomevendor(){
-        return view('FrontEnd.become-vendor');
+    public function becomevendor()
+    {
+        $user = Auth::user();
+        return view('FrontEnd.become-vendor', compact('user'));
     }
 
-    public function userSettingsAccountUpdate(Request $request){
-        
+    public function userSettingsAccountUpdate(Request $request)
+    {
+
         $userId = Auth::id();
         // Validation rules
         $rules = [
@@ -80,13 +86,13 @@ class UserDashboardController extends Controller
             'gender.in' => 'Gender must be either Male, Female, or other.',
             'age_range.required' => 'Age range is required.',
             'age_range.in' => 'Age range must be one of the specified values.'
-        
+
         ];
 
         // Validate the request
         $validatedData = $request->validate($rules, $messages);
         $user = Auth::user();
-        if($request->profile_image){
+        if ($request->profile_image) {
             list($type, $data) = explode(';', $request->profile_image);
             list(, $data)      = explode(',', $data);
             $data = base64_decode($data);
@@ -114,7 +120,8 @@ class UserDashboardController extends Controller
         return back()->with('profile-success', 'Profile updated successfully.');
     }
 
-    public function userSettingsEmergencyUpdate(Request $request){
+    public function userSettingsEmergencyUpdate(Request $request)
+    {
         $rules = [
             'emergency_contact_name' => 'required|string|regex:/^[a-zA-Z\s]*$/|max:255',
             'emergency_contact_relation' => 'required|string|regex:/^[a-zA-Z\s]*$/|max:255',
@@ -124,7 +131,7 @@ class UserDashboardController extends Controller
             'alternate_contact_full_name' => 'required|string|max:255|regex:/^[a-zA-Z\s]*$/|max:255',
             'alternate_contact_relation' => 'required|string|max:255|regex:/^[a-zA-Z\s]*$/|max:255',
             'alternate_contact_relation' => 'required|string|max:255'
-            
+
         ];
 
         // Custom validation messages (optional)
@@ -136,7 +143,7 @@ class UserDashboardController extends Controller
             'medical_physical_concerns' => 'Medical/Physical Concern is required.',
             'alternate_contact_full_name' => 'Alternate Contact’s Full Name is required.',
             'alternate_contact_relation' => 'Alternate Contact’s Relation is required.'
-            
+
         ];
 
         // Validate the request
@@ -159,9 +166,23 @@ class UserDashboardController extends Controller
     public function userSettingsUpdatePassword(Request $request)
     {
         // Validation rules
+        // Validation rules
         $rules = [
             'current_password' => 'required|string',
-            'new_password' => 'required|string|min:8|confirmed',
+            'new_password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@$!%*#?&])[A-Za-z0-9@$!%*#?&]{8,}$/',
+                'confirmed',
+                // Custom rule to check that the new password is not the same as the current one
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value === $request->current_password) {
+                        $fail('New password cannot be the same as the current password.');
+                    }
+                }
+            ],
+            'new_password_confirmation' => 'required|same:new_password',
         ];
 
         // Custom validation messages (optional)
@@ -169,7 +190,9 @@ class UserDashboardController extends Controller
             'current_password.required' => 'Current password is required.',
             'new_password.required' => 'New password is required.',
             'new_password.min' => 'New password must be at least 8 characters.',
+            'new_password.regex' => 'New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
             'new_password.confirmed' => 'New password confirmation does not match.',
+            'new_password_confirmation.same' => 'New password confirmation does not match the new password.',
         ];
 
         // Validate the request
@@ -187,38 +210,26 @@ class UserDashboardController extends Controller
         $user->password = Hash::make($request->new_password);
         $user->save();
 
-        // Log the user out
-        Auth::logout();
+        // Check if the user wants to log out after updating the password
+        if ($request->has('logout_after_change')) {
+            // Log the user out
+            Auth::logout();
+            // Redirect to the login page with a success message
+            return redirect('/login')->with('success', 'Password updated successfully. Please log in with your new password.');
+        }
 
-        // Redirect to the login page with a success message
-        return redirect('/login')->with('password-success', 'Password updated successfully. Please log in with your new password.');
+        // If no logout option was selected, redirect back with a success message
+        return redirect()->back()->with('password-success', 'Password updated successfully.');
     }
 
-    public function userSettingsSocialUpdate(Request $request){
 
-        // Retrieve the authenticated user
-        $user = Auth::user();
-
-        // Update the social media fields based on the checkboxes and inputs
-        $user->facebook =  $request->facebook;
-        $user->instagram = $request->instagram;
-        $user->youtube = $request->youtube;
-        $user->tiktok =  $request->tiktok;
-        $user->twitter = $request->twitter;
-        $user->linkedin = $request->linkedin;
-
-        // Save the updated user information
-        $user->save();
-
-        // Redirect back with a success message
-        return back()->with('social-success', 'Social media links updated successfully.');
-    }
-
-    public function userReviews() {
+    public function userReviews()
+    {
         $vendors = Vendor::get();
         return view('UserDashboard.submit-reviews', compact('vendors'));
     }
-    public function userReviewsSubmit(Request $request){
+    public function userReviewsSubmit(Request $request)
+    {
         // Custom validation messages
         $messages = [
             'vendor_id.required' => 'Please select any vendor.',
@@ -240,7 +251,7 @@ class UserDashboardController extends Controller
         $request->validate($rules, $messages);
 
         // Check if the validation fails
-        
+
 
         // Proceed with storing the review
         // Assuming you have a Review model
@@ -259,30 +270,33 @@ class UserDashboardController extends Controller
 
     }
 
-    public function userReviewsManage(){
+    public function userReviewsManage()
+    {
         $reviews = Review::with('vendor')->where('user_id', Auth::id())->get();
         return view('UserDashboard.manage-review', compact('reviews'));
     }
 
-    public function userGuestRegistry(){
+    public function userGuestRegistry()
+    {
         return view('UserDashboard.guest-registry-edit');
     }
-    
-    public function userAddressUpdate(Request $request){
+
+    public function userAddressUpdate(Request $request)
+    {
         $messages = [
             'city.required' => 'The city field is required.',
             'state.required' => 'The state field is required.',
             'postal_code.required' => 'The postal code field is required.'
         ];
-    
+
         $request->validate([
             'city' => 'required',
             'state' => 'required',
             'postal_code' => 'required',
         ], $messages);
-    
+
         $user = auth()->user();
-    
+
         // Update user details
         $user->contact_number = $request->contact_number;
         $user->street_address = $request->street_address;
@@ -295,9 +309,10 @@ class UserDashboardController extends Controller
         return redirect()->back()->with('success', 'Guest Registry updated successfully.');
     }
 
-    public function userGovermentUpdate(Request $request){
+    public function userGovermentUpdate(Request $request)
+    {
         $user = Auth::user();
-        if($request->government_proof_front){
+        if ($request->government_proof_front) {
             list($type, $data) = explode(';', $request->government_proof_front);
             list(, $data)      = explode(',', $data);
             $data = base64_decode($data);
@@ -311,7 +326,7 @@ class UserDashboardController extends Controller
             $user->government_proof_front = $filename;
             $user->save();
         }
-        if($request->government_proof_back){
+        if ($request->government_proof_back) {
             list($type, $data) = explode(';', $request->government_proof_back);
             list(, $data)      = explode(',', $data);
             $data = base64_decode($data);
@@ -351,35 +366,53 @@ class UserDashboardController extends Controller
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Referral settings updated successfully.');
     }
-    public function vendor_list(Request $request){
+    public function vendor_list(Request $request)
+    {
         $query = $request->input('q');
         $options = Vendor::where('vendor_name', 'LIKE', '%' . $query . '%')
-        ->get() // Get both columns
-        ->map(function ($vendor) {
-            return [
-              "id" => $vendor->id,
-              "text" => $vendor->vendor_name ]; // remove for now. ' - '.$vendor->buisnessstreet_address . ", " . $vendor->buisness_vendor_city
-        });
+            ->get() // Get both columns
+            ->map(function ($vendor) {
+                return [
+                    "id" => $vendor->id,
+                    "text" => $vendor->vendor_name
+                ]; // remove for now. ' - '.$vendor->buisnessstreet_address . ", " . $vendor->buisness_vendor_city
+            });
         return response()->json($options);
     }
     public function StoreVendorSuggest(Request $request)
     {
+        // print_r($request->all()); die;
         // Validate the request
         $validated = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'user_city' => 'nullable|string|max:255',
+            'user_state' => 'nullable|string|max:255',
+            'user_email' => 'required|email|max:255',
+            'user_phone' => 'nullable|string|max:255',
+            'relationship' => 'nullable|string|max:255',
             'vendor_name' => 'required|string|max:255',
             'street_address' => 'nullable|string|max:255',
             'unit_suite' => 'nullable|string|max:255',
             'city_town' => 'nullable|string|max:255',
             'province_state' => 'nullable|string|max:255',
             'postal_zip' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:255',
             'vendor_phone' => 'required|string|max:255',
             'vendor_category' => 'nullable|string|max:255',
-            'vendor_sub_type' => 'nullable|string|max:255',
+            'vendor_sub_category' => 'nullable|string|max:255',
             'establishment_facility' => 'nullable|string|max:255',
         ]);
-
         // Add user ID to the validated data
         $validated['user_id'] = Auth::id();
+        if(isset($validated['vendor_category']) && $validated['vendor_category'] != null){
+            $validated['vendor_category'] = getCategoryById($validated['vendor_category']);
+        }
+        if(isset($validated['vendor_sub_category']) && $validated['vendor_sub_category'] != null){
+            $validated['vendor_sub_category'] = getSubCategoryById($validated['vendor_sub_category']);
+        }
+        if(isset($validated['establishment_facility']) && $validated['establishment_facility'] != null){
+            $validated['establishment_facility'] = getEstablishmentById($validated['establishment_facility']);
+        }
 
         // Fetch user details
         $user = Auth::user();
@@ -388,7 +421,7 @@ class UserDashboardController extends Controller
         VendorSuggest::create($validated);
 
         // Define email parameters
-        $to = "hkamboj116@gmail.com";
+        $to = "sarvjeetsingh.slinfy@gmail.com";
         $subject = 'New Vendor Suggestion';
         $emailContent = view('emails.vendor_suggestion', [
             'validated' => $validated,
@@ -402,32 +435,36 @@ class UserDashboardController extends Controller
         return redirect()->back()->with('success', 'Form submitted successfully!');
     }
 
-    public function orders() {
+    public function orders()
+    {
         $orders = Order::with('vendor')->where('user_id', Auth::user()->id)->get();
         return view('UserDashboard.my-transactions', compact('orders'));
     }
 
-    public function orderDetail($id) {
+    public function orderDetail($id)
+    {
         $order = Order::where('id', $id)->first();
         $vendor = Vendor::find($order->vendor_id);
         return view('UserDashboard.order-detail', compact('order', 'vendor'));
     }
 
-    public function inquiries() {
+    public function inquiries()
+    {
         $inquiries = Inquiry::with('vendor')->where('user_id', Auth::user()->id)->get();
         return view('UserDashboard.my-inquiries', compact('inquiries'));
     }
 
-    public function inquiryDetail($id) {
+    public function inquiryDetail($id)
+    {
         $inquiry = Inquiry::where('id', $id)->first();
         $vendor = Vendor::find($inquiry->vendor_id);
         return view('UserDashboard.inquiry-detail', compact('inquiry', 'vendor'));
     }
 
-    public function userFaqs() {
+    public function userFaqs()
+    {
         $user_faqs = FaqSection::with('questions')->where('account_type', 'user')->get();
         // print_r($user_faqs); die;
         return view('UserDashboard.user-faq', compact('user_faqs'));
     }
-
 }

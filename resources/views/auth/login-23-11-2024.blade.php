@@ -24,7 +24,7 @@
                                 <form action="{{ route('verification.resend') }}" method="POST" class="d-inline">
                                     @csrf
                                     <input type="hidden" name="email" value="{{ session('unverified_email') }}">
-                                    <button type="submit" class="btn btn-link text-decoration-none theme-btn">Resend Verification Email</button>
+                                    <button type="submit" class="btn btn-link">Resend Verification Email</button>
                                 </form>
                             @endif
                         </div>

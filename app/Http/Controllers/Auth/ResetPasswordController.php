@@ -4,26 +4,42 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 
 class ResetPasswordController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Password Reset Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling password reset requests
-    | and uses a simple trait to include this behavior. You're free to
-    | explore this trait and override any methods you wish to tweak.
-    |
-    */
-
     use ResetsPasswords;
 
+    protected $redirectTo = '/login';  // Redirect to login after reset
+
+    public function __construct()
+    {
+        $this->middleware('guest');
+    }
+
     /**
-     * Where to redirect users after resetting their password.
+     * Handle a reset password request.
      *
-     * @var string
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    protected $redirectTo = '/';
+    protected function reset(Request $request)
+    {
+        // Perform the password reset logic
+        $response = $this->broker()->reset(
+            $this->credentials($request), function ($user, $password) {
+                $user->password = bcrypt($password);
+                $user->save();
+            }
+        );
+
+        // Check if the reset was successful, redirect to login
+        if ($response == Password::PASSWORD_RESET) {
+            return redirect()->route('login')->with('success', 'Password has been reset. Please login.');
+        }
+
+        // If not successful, redirect back to reset form
+        return redirect()->back()->withErrors(['email' => 'The provided password reset token is invalid.']);
+    }
 }

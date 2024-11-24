@@ -20,6 +20,7 @@ use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RegionController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\VendorStripeDetailController;
 // use App\Http\Controllers\MigrationController;
 use illuminate\Support\Facades\Auth;
@@ -102,7 +103,16 @@ Route::get('/', [FrontEndController::class, 'home'])->name('home');
 Route::get('/login/{token}', [LoginController::class, 'loginWithToken'])->name('login-with-token');
 Route::post('/customlogin', [LoginController::class, 'process_login'])->name('custom_login');
 Route::post('/login-ajax', [LoginController::class, 'loginAjax'])->name('login.ajax');
+Route::get('check-login', function () {
+    if (!auth()->check()) {
+        // If not logged in, flash an error message and redirect to login
+        session()->flash('error', 'You must be logged in to submit a business.');
+        return redirect()->route('login');
+    }
 
+    // If logged in, redirect to the original action (e.g., the form to promote a business)
+    return redirect()->route('become-vendor');
+})->name('check-login');
 // Route::get('/accommodations', [FrontEndController::class, 'getAccommodations'])->name('accommodations');
 Route::post('/get-accommodations', [FrontEndController::class, 'getAccommodationsList'])->name('get.accommodation');
 Route::post('/accommodation/inquiry', [FrontEndController::class, 'AccommodationsInquiry'])->name('accommodation.inquiry')->middleware('auth');
@@ -397,6 +407,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 Route::get('/get-subregions/{regionId}', [RegionController::class, 'getSubRegions']);
+Route::get('/get-subcategories/{categoryId}', [CategoryController::class, 'getSubcategories'])->name('getSubcategories');
 Route::post('/webhook/stripe', [StripeWebhookController::class, 'handleWebhook']);
 
 

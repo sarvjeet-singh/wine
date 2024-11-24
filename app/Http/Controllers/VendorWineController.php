@@ -79,9 +79,14 @@ class VendorWineController extends Controller
             'inventory' => 'nullable|integer',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust image validation as needed
         ]);
-        $rs = $request->input('rs');
-        $rs_values = $request->input('rs_values');
-        $rs_value = $rs_values[$rs];
+        $rs_value = null;
+        
+        if (!empty($request->input('rs')) && !empty($request->input('rs_values'))) {
+            $rs = $request->input('rs');
+            $rs_values = $request->input('rs_values');
+            $rs_value = $rs_values[$rs];
+        }
+
 
         // Process varietal_blend and varietal_type
         $varietalBlends = $request->input('varietal_blend');
@@ -128,6 +133,12 @@ class VendorWineController extends Controller
             'inventory' => $request->input('inventory') ?? 0,
             'image' => $imagePath,
         ];
+
+        if (!empty($data['cost'])) {
+            $calculations = $this->calculateStockingFeeAndPrice($data['cost']);
+            $data['commission_delivery_fee'] = $calculations['stocking_fee'];
+            $data['price'] = $calculations['final_price'];
+        }
 
         VendorWine::create($data);
 
@@ -231,7 +242,14 @@ class VendorWineController extends Controller
             'inventory' => $request->input('inventory') ?? 0,
             'image' => $imagePath,
         ];
-        
+
+        // Use the private method to calculate stocking fee and final price
+        if (!empty($data['cost'])) {
+            $calculations = $this->calculateStockingFeeAndPrice($data['cost']);
+            $data['commission_delivery_fee'] = $calculations['stocking_fee'];
+            $data['price'] = $calculations['final_price'];
+        }
+
         $wine->update($data);
 
         return response()->json(['success' => true, 'message' => 'Wine updated successfully']);
@@ -244,20 +262,66 @@ class VendorWineController extends Controller
         try {
             // Find the wine entry by ID
             $wine = VendorWine::findOrFail($id);
-            $imagePath = $wine->image;
+            if ($wine) {
+                if ($wine->delisted == 1) {
+                    $wine->delisted = 0; // Mark as listed
+                    $message = 'Wine listed successfully.';
+                } else {
+                    $wine->delisted = 1; // Mark as delisted
+                    $message = 'Wine delisted successfully.';
+                }
 
-            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
+                $wine->save();
+            } else {
+                return response()->json(['success' => false, 'message' => 'Wine not found.']);
             }
+            // $imagePath = $wine->image;
 
-            // Delete the wine entry
-            $wine->delete();
+            // if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+            //     Storage::disk('public')->delete($imagePath);
+            // }
+
+            // // Delete the wine entry
+            // $wine->delete();
 
             // Return a JSON response
-            return response()->json(['success' => true, 'message' => 'Wine deleted successfully.']);
+            return response()->json(['success' => true, 'message' => $message]);
         } catch (\Exception $e) {
             // Return a JSON response for errors
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Calculate stocking fee and final price based on the cost and price.
+     *
+     * @param float $cost
+     * @param float $price
+     * @return array
+     */
+    private function calculateStockingFeeAndPrice(float $cost)
+    {
+        // Calculate stocking fee
+        $stockingFee = 0;
+
+        if ($cost <= 20) {
+            $stockingFee = 3;
+        } elseif ($cost <= 40) {
+            $stockingFee = 4;
+        } elseif ($cost <= 60) {
+            $stockingFee = 6;
+        } elseif ($cost <= 80) {
+            $stockingFee = 8;
+        } else {
+            $stockingFee = 10;
+        }
+
+        // Calculate final price
+        $finalPrice = $cost + $stockingFee;
+
+        return [
+            'stocking_fee' => $stockingFee,
+            'final_price' => $finalPrice,
+        ];
     }
 }

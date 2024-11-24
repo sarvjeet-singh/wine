@@ -13,7 +13,6 @@
         .error {
             color: red;
             font-size: 14px;
-            font-weight: 400;
         }
     </style>
     <div class="container-fluid over-flow-register">
@@ -141,13 +140,17 @@
 
                         <ul>
 
-                            <li>Receive <b>$25</b> in bonus <b>Bottle Bucks</b> rewards just for registering.</li>
-                            <li>Earn additional cash back reward dollars for submitting verifiable testimonials & reviews.</li>
-                            <li>Save third-party booking fees and win periodic getaways to wine country.</li>
+                            <li>Get $25 in bonus Bottle Bucks rewards just for joining our Guest Rewards program.</li>
+
+                            <li>Save third-party booking fees, win prizes and earn more rewards.</li>
+
                             <li>Get access to exclusive guest lists, special events and functions.</li>
-                            <li>Book a minimum of six (6) nights’ accommodations and get two (2) complimentary excursion activities. Only with participating vendors. Subject to availability.</li>
+
+                            <li>Book a minimum of six (6) nights’ accommodations and get two (2) complimentary excursion
+                                activities. Only with participating vendors. Subject to availability.</li>
+
                         </ul>
-                        <div class="text-center mt-2"><b>Some benefits may not be valid in conjunction with other offers.</div>
+                        <!-- <div class="text-left mt-4"><b>Some benefits may not be valid in conjunction with other offers.</div> -->
                     </div>
                 </div>
             </div>
@@ -192,14 +195,14 @@
                         reason.
                     </p>
                     <br>
-                    <label class="form-check-label fw-normal" for="agreeterms">
+                    <label class="form-check-label" for="agreeterms">
                         <input type="checkbox" class="form-check-input required" id="agreeterms" name="terms"
-                            required> I Agree to the stated Terms of Participation
+                            required> <b>I Agree to the stated Terms of Participation</b>
                     </label>
                     <br>
                     <div class="row enablecaptha mt-4">
                         <div class="col-sm-3">
-                            <label class="pe-2 pb-2" style="font-weight: 600;">Skill Testing: </label><i id="refresh-captcha"
+                            <label style="font-weight: 600;">Skill Testing: </label><i id="refresh-captcha"
                                 class="fas fa-sync-alt" style="cursor: pointer; font-size: 20px;"></i><br>
                             <img id="captcha-image" src="{{ captcha_src('default') }}" alt="CAPTCHA">
                         </div>
@@ -326,7 +329,7 @@
                         if ($('#terms-error').length === 0) {
                             // Append the error message next to the label, not the checkbox
                             $('#agreeterms').closest('label').append(
-                                '<div id="terms-error" class="error-message" style="color:red; font-weight:400; margin-left: 10px;">Please agree to the terms</div>'
+                                '<div id="terms-error" class="error-message" style="color:red; margin-left: 10px;">Please agree to the terms</div>'
                             );
                         }
                         $("#terms-error").show();
@@ -337,7 +340,7 @@
                     if ($('#captcha').val().length === 0) {
                         if ($('#captcha-error').length === 0) {
                             $('#captcha').after(
-                                '<div id="captcha-error" class="error-message" style="color:red;font-weight:400;">Please complete the CAPTCHA</div>'
+                                '<div id="captcha-error" class="error-message" style="color:red;">Please complete the CAPTCHA</div>'
                             );
                         }
                         isValid = false;

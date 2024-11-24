@@ -42,6 +42,18 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    // public function login(Request $request)
+    // {
+    //     // Check if there's an error message to be flashed
+    //     if ($request->has('error_message')) {
+    //         session()->flash('error', $request->input('error_message'));
+    //     }
+
+    //     // Your login logic here (authenticating the user)
+
+    //     return view('auth.login');
+    // }
+
     protected function authenticated(Request $request, $user)
     {
         if (!$user->hasVerifiedEmail() && strtolower($user->role) === 'member') {
@@ -59,7 +71,7 @@ class LoginController extends Controller
             $vendor = Vendor::where('user_id', $user->id)->first();
 
             if ($vendor) {
-                if($user->password_updated == 0){
+                if ($user->password_updated == 0) {
                     return redirect()->intended('/vendor-change-password/' . $vendor->id);
                 }
                 return redirect()->intended('/vendor-dashboard/' . $vendor->id);

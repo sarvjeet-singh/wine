@@ -190,10 +190,11 @@
                             Hour’s
                         </button>
                     @endif
-                    @if(!Auth::check())
-                        <button type="button" class="btn book-btn" id="login_form_btn"
-                            data-bs-toggle="modal" data-bs-target="#loginPopup">Login</button>
-                    @elseif ($vendor->account_status == '1')
+                    {{-- @if(!Auth::check())
+                    <button type="button" class="btn book-btn" id="login_form_btn"
+                        data-bs-toggle="modal" data-bs-target="#loginPopup">Login</button>
+                @else --}}
+                    @if ($vendor->account_status == '1')
                         <a href="{{ $urll }}" class="text-decoration-none text-white btn book-btn">Book Now</a>
                     @else
                         <button class="btn book-btn vendorinqurey text-white" data-id="{{ $vendor->id }}">

@@ -1,4 +1,4 @@
-listing-outer .property-box@font-face {
+@font-face {
     font-family: "icomoon";
     src: url("fonts/icomoon.eot?c1auct");
     src: url("fonts/icomoon.eot?c1auct#iefix") format("embedded-opentype"),
@@ -950,11 +950,6 @@ button#confirm_booking_btn:hover {
 }
 .single-main-slider .synch-carousels .right {
     margin-bottom: 20px;
-    border: 1px solid #00000024;
-    border-radius: 20px;
-}
-.single-main-slider .slick-list {
-    border-radius: 20px;
 }
 .single-main-slider .synch-carousels .slick-slide {
   outline: none;
@@ -1426,16 +1421,6 @@ button#confirm_booking_btn:hover {
 .forgot-pwd-sec .back-btn:hover a {
     color: #c0a144;
 }
-.forgot-pwd-sec form input#password,
-.forgot-pwd-sec form input#password-confirm {
-    padding-right: 55px;
-}
-.forgot-pwd-sec form div svg {
-    right: 12px;
-}
-.forgot-pwd-sec form > div:has(.error) svg {
-    right: 32px;
-}
 /* ================== FORGOT PWD PAGE END ================== */
 
 
@@ -1519,19 +1504,3 @@ footer .copyright p {
     font-size: 13px;
 }
 /* ================== FOOTER END ================== */
-
-.age-verify-modal .modal-body img {
-    width: 80px;
-}
-.age-verify-modal.show {
-    backdrop-filter: blur(2px);
-}
-.age-verify-modal h3 {
-    color: #000;
-    max-width: 320px;
-    margin-inline: auto;
-    line-height: 26px;
-}
-.age-verify-modal h4 {
-    color: #000;
-}

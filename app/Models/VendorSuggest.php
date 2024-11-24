@@ -12,6 +12,13 @@ class VendorSuggest extends Model
     protected $table = 'vendor_suggest';
 
     protected $fillable = [
+        'full_name',
+        'user_city',
+        'user_state',
+        'user_email',
+        'user_phone',
+        'relationship',
+        'country',
         'user_id',
         'vendor_name',
         'street_address',
@@ -20,5 +27,8 @@ class VendorSuggest extends Model
         'province_state',
         'postal_zip',
         'vendor_phone',
+        'vendor_category',
+        'vendor_sub_category',
+        'establishment_facility',
     ];
 }

@@ -75,14 +75,27 @@
 
                         <div class="dynamic-field">
                             <div class="d-flex align-items-between gap-2">
-                                <div class="w-75" style="width: 61.5% !important">
-                                    <label for="varietal_blend" class="form-label">Varietal/Blend</label>
-                                </div>
                                 <div class="w-75">
                                     <label for="varietal_type" class="form-label">Grape Varietals</label>
                                 </div>
+                                <div class="w-75" style="width: 61.5% !important">
+                                    <label for="varietal_blend" class="form-label">Varietal/Blend</label>
+                                </div>
                             </div>
                             <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-outline-success add-field"><i
+                                        class="fa-solid fa-circle-plus"></i></button>
+                                <div class="w-75">
+                                    <select class="form-select" name="varietal_type[]">
+                                        <option value="">Select</option>.
+                                        @if (count(getGrapeVarietals()) > 0)
+                                            @foreach (getGrapeVarietals() as $grapeVarietal)
+                                                <option value="{{ $grapeVarietal->id }}">{{ $grapeVarietal->name }}
+                                                </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
 
                                 <div class="w-75">
                                     <div class="input-group">
@@ -92,22 +105,9 @@
                                     </div>
                                 </div>
 
-                                <div class="w-75">
-                                    <select class="form-select" name="varietal_type[]">
-                                        <option value="">Select</option>
-                                        <option value="1">Cabernet Franc</option>
-                                        <option value="2">Cabernet Sauvignon</option>
-                                        <option value="3">Chardonnay</option>
-                                        <option value="4">Gamay Noir</option>
-                                        <option value="5">Gewürztraminer</option>
-                                        <option value="6">Merlot</option>
-                                        <option value="7">Pinot Noir</option>
-                                        <option value="8">Riesling</option>
-                                    </select>
-                                </div>
 
-                                <button type="button" class="btn btn-outline-success add-field"><i
-                                        class="fa-solid fa-circle-plus"></i></button>
+
+
 
                             </div>
 
@@ -117,45 +117,6 @@
 
                 </div>
 
-            </div>
-
-        </div>
-
-        <div class="col-12 cellaring-value-sec">
-
-            <label for="" class="form-label">Cellaring Value</label>
-
-            <div class="row g-2">
-                <div class="col-lg-4 col-sm-6">
-                    <div class="form-check cellaring-value-1 d-flex align-items-center gap-2 position-relative">
-                        <input class="form-check-input" type="radio" name="cellar" id="cellar1" value="Drink Now"
-                            {{ old('cellar') == 'Drink Now' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="cellar1">
-                            <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
-                            <p>Drink Now</p>
-                        </label>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-sm-6">
-                    <div class="form-check cellaring-value-2 d-flex align-items-center gap-2 position-relative">
-                        <input class="form-check-input" type="radio" name="cellar" id="cellar2"
-                            value="Drink or Cellar" {{ old('cellar') == 'Drink or Cellar' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="cellar2">
-                            <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
-                            <p>Drink or Hold</p>
-                        </label>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-sm-6">
-                    <div class="form-check cellaring-value-3 d-flex align-items-center gap-2 position-relative">
-                        <input class="form-check-input" type="radio" name="cellar" id="cellar3" value="Cellar"
-                            {{ old('cellar') == 'Cellar' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="cellar3">
-                            <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
-                            <p>Cellar</p>
-                        </label>
-                    </div>
-                </div>
             </div>
 
         </div>
@@ -235,8 +196,7 @@
                         <input type="number" step="0.01" min="{{ $rs_value_mix_max[0] }}"
                             max="{{ $rs_value_mix_max[1] }}" class="form-control rs-values mt-1"
                             id="rs-value-{{ $value }}" name="rs_values[{{ $value }}]"
-                            value="{{ old('rs_values.' . $value) }}"
-                            placeholder="Enter value for {{ $label }}">
+                            value="{{ old('rs_values.' . $value) }}" placeholder="g/l">
                     </div>
                 @endforeach
             </div>
@@ -289,8 +249,8 @@
 
             <label for="" class="form-label">Stocking Fee</label>
 
-            <input type="text" name="commission" placeholder="0.00" onkeypress="return handleInput(event, this)"
-                id="commission" class="form-control" id="">
+            <input type="text" name="commission" placeholder="0.00" readonly
+                onkeypress="return handleInput(event, this)" id="commission" class="form-control" id="">
 
         </div>
 
@@ -308,7 +268,44 @@
             </div>
 
         </div>
+        <div class="col-12 cellaring-value-sec">
 
+            <label for="" class="form-label">Cellaring Value</label>
+
+            <div class="row g-2">
+                <div class="col-lg-4 col-sm-6">
+                    <div class="form-check cellaring-value-1 d-flex align-items-center gap-2 position-relative">
+                        <input class="form-check-input" type="radio" name="cellar" id="cellar1"
+                            value="Drink Now" {{ old('cellar') == 'Drink Now' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="cellar1">
+                            <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
+                            <p>Drink Now</p>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                    <div class="form-check cellaring-value-2 d-flex align-items-center gap-2 position-relative">
+                        <input class="form-check-input" type="radio" name="cellar" id="cellar2"
+                            value="Drink or Cellar" {{ old('cellar') == 'Drink or Cellar' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="cellar2">
+                            <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
+                            <p>Drink or Hold</p>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                    <div class="form-check cellaring-value-3 d-flex align-items-center gap-2 position-relative">
+                        <input class="form-check-input" type="radio" name="cellar" id="cellar3" value="Cellar"
+                            {{ old('cellar') == 'Cellar' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="cellar3">
+                            <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
+                            <p>Cellar</p>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
         <div class="col-md-12">
 
             <label for="" class="form-label">Bottle Notes</label>

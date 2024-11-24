@@ -11,11 +11,13 @@
          </div>
          <div class="benefits">           
             <ul class="list-unstyled">
-                  <li class="position-relative mb-3"><i class="fa-regular fa-circle-check"></i> Get $25 in bonus Bottle Bucks rewards just for joining our Guest Rewards program.</li>
-                  <li class="position-relative mb-3"><i class="fa-regular fa-circle-check"></i> Save third-party booking fees, win prizes and earn more rewards.</li>
+                  <li class="position-relative mb-3"><i class="fa-regular fa-circle-check"></i> Receive <b>$25</b> in bonus <b>Bottle Bucks</b> rewards just for registering.</li>
+                  <li class="position-relative mb-3"><i class="fa-regular fa-circle-check"></i> Earn additional cash back reward dollars for submitting verifiable testimonials & reviews.</li>
+                  <li class="position-relative mb-3"><i class="fa-regular fa-circle-check"></i> Save third-party booking fees and win periodic getaways to wine country.</li>
                   <li class="position-relative mb-3"><i class="fa-regular fa-circle-check"></i> Get access to exclusive guest lists, special events and functions.</li>
-                  <li class="position-relative mb-3"><i class="fa-regular fa-circle-check"></i> Book a minimum of six (6) nights’ accommodations and get two (2) complimentary excursion activities.  Only with participating vendors.  Subject to availability.</li>
+                  <li class="position-relative mb-3"><i class="fa-regular fa-circle-check"></i> Book a minimum of six (6) nights’ accommodations and get two (2) complimentary excursion activities. Only with participating vendors. Subject to availability.</li>
                </ul>
+               <p class="fw-bold">Some benefits may not be valid in conjunction with other offers.</p>
          </div>
       </div>
    </div>

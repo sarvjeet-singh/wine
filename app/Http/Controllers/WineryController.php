@@ -74,6 +74,7 @@ class WineryController extends Controller
 
         // Fetch the results with ordering
         $wines = $query->orderByRaw('CASE WHEN grape_varietals IS NULL THEN 1 ELSE 0 END, grape_varietals ASC')
+            ->where('delisted', 0)
             ->orderBy('id', 'desc')
             ->paginate(10);
         $vendor = Vendor::where('id', $shopid)->first();

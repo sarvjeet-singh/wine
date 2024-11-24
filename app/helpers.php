@@ -117,6 +117,15 @@ if (! function_exists('getInventoryTypes')) {
     }
 }
 
+if (! function_exists('getGrapeVarietals')) {
+    function getGrapeVarietals()
+    {
+        return \App\Models\GrapeVarietal::where('status', 1)
+            ->orderBy('name', 'asc')
+            ->get();
+    }
+}
+
 if (! function_exists('getRegions')) {
     function getRegions()
     {
@@ -134,7 +143,7 @@ if (! function_exists('getSubRegions')) {
     }
 }
 
-if(! function_exists('getEstablishments')) {
+if (! function_exists('getEstablishments')) {
     function getEstablishments()
     {
         return \App\Models\Establishment::where('status', 1)
@@ -142,7 +151,7 @@ if(! function_exists('getEstablishments')) {
     }
 }
 
-if(! function_exists('getCuisines')) {
+if (! function_exists('getCuisines')) {
     function getCuisines()
     {
         return \App\Models\Cuisine::where('status', 1)
@@ -150,7 +159,7 @@ if(! function_exists('getCuisines')) {
     }
 }
 
-if(! function_exists('getFarmingPractices')) {
+if (! function_exists('getFarmingPractices')) {
     function getFarmingPractices()
     {
         return \App\Models\FarmingPractice::where('status', 1)
@@ -158,7 +167,7 @@ if(! function_exists('getFarmingPractices')) {
     }
 }
 
-if(! function_exists('getMaxGroups')) {
+if (! function_exists('getMaxGroups')) {
     function getMaxGroups()
     {
         return \App\Models\MaxGroup::where('status', 1)
@@ -166,7 +175,7 @@ if(! function_exists('getMaxGroups')) {
     }
 }
 
-if(! function_exists('getTastingOptions')) {
+if (! function_exists('getTastingOptions')) {
     function getTastingOptions()
     {
         return \App\Models\TastingOption::where('status', 1)
@@ -223,5 +232,23 @@ if (!function_exists('getResidualSugars')) {
         }
 
         return $options[$key] ?? null; // Return the specific value or null if the key doesn't exist
+    }
+}
+
+if(! function_exists('getCategoryById')) {
+    function getCategoryById($id) {
+        return \App\Models\Category::find($id)->pluck('name')->first();
+    }
+}
+
+if(! function_exists('getSubCategoryById')) {
+    function getSubCategoryById($id) {
+        return \App\Models\SubCategory::find($id)->pluck('name')->first();
+    }
+}
+
+if(! function_exists('getEstablishmentById')) {
+    function getEstablishmentById($id) {
+        return \App\Models\Establishment::find($id)->pluck('name')->first();
     }
 }

@@ -29,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'first_login',
         'contact_number',
         'password_updated',
+        'medical_physical_concerns'
     ];
 
     /**

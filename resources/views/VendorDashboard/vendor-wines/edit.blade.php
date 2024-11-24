@@ -70,7 +70,7 @@
                 {{ $wine->custom_region ? 'disabled' : '' }} required>
                 <option value="">Select Region</option>
                 @foreach (getRegions() as $region)
-                    <option value="{{ $region->id }}" {{ $wine->region == $region->id ? 'selected' : ''; }}>
+                    <option value="{{ $region->id }}" {{ $wine->region == $region->id ? 'selected' : '' }}>
                         {{ $region->name }}
                     </option>
                 @endforeach
@@ -112,18 +112,41 @@
                         @endphp
 
                         @if ($varietal_blends > 0)
-
-                            @foreach ($varietal_blends as $key => $varietal_blend)
-                                <div class="dynamic-field">
-                                    <div class="d-flex align-items-between gap-2">
-                                        <div class="w-75" style="width: 61.5% !important">
-                                            <label for="varietal_blend" class="form-label">Varietal/Blend</label>
-                                        </div>
-                                        <div class="w-75">
-                                            <label for="varietal_type" class="form-label">Grape Varietals</label>
-                                        </div>
+                            <div class="dynamic-field">
+                                <div class="d-flex align-items-between gap-2">
+                                    <div class="w-75">
+                                        <label for="varietal_type" class="form-label">Grape Varietals</label>
                                     </div>
-                                    <div class="d-flex align-items-center gap-2">
+                                    <div class="w-75" style="width: 61.5% !important">
+                                        <label for="varietal_blend" class="form-label">Varietal/Blend</label>
+                                    </div>
+                                </div>
+                                @php $usedVarietal = []; @endphp
+                                @foreach ($varietal_blends as $key => $varietal_blend)
+                                    <div class="d-flex align-items-center gap-2 {{ $key > 0 ? 'mt-2' : '' }}">
+                                        @if ($key == 0)
+                                            <button type="button" class="btn btn-outline-danger remove-field"><i
+                                                    class="fa-solid fa-circle-minus"></i>
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn btn-outline-success add-field"><i
+                                                    class="fa-solid fa-circle-plus"></i></button>
+                                        @endif
+                                        <div class="w-75">
+                                            <select class="form-select" name="varietal_type[]">
+                                                <option value="">Select</option>
+                                                @if (count(getGrapeVarietals()) > 0)
+                                                    @foreach (getGrapeVarietals() as $grapeVarietal)
+                                                        @if(in_array($grapeVarietal->id, $usedVarietal)) @continue @endif
+                                                        <option value="{{ $grapeVarietal->id }}"
+                                                            @if (isset($varietal_blend['type']) && $varietal_blend['type'] == $grapeVarietal->id) {{ 'selected' }}
+                                                            @php $usedVarietal[] = $grapeVarietal->id; @endphp @endif>
+                                                            {{ $grapeVarietal->name }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
 
                                         <div class="w-75">
 
@@ -136,64 +159,9 @@
 
                                         </div>
 
-                                        <div class="w-75">
-
-                                            <select class="form-select" name="varietal_type[]">
-                                                <option value="">Select</option>
-                                                <option value="1"
-                                                    {{ isset($varietal_blend['type']) && $varietal_blend['type'] == '1' ? 'selected' : '' }}>
-                                                    Varietal
-                                                </option>
-                                                <option value="2"
-                                                    {{ isset($varietal_blend['type']) && $varietal_blend['type'] == '2' ? 'selected' : '' }}>
-                                                    Riesling
-                                                </option>
-                                                <option value="3"
-                                                    {{ isset($varietal_blend['type']) && $varietal_blend['type'] == '3' ? 'selected' : '' }}>
-                                                    Chardonnay
-                                                </option>
-                                                <option value="4"
-                                                    {{ isset($varietal_blend['type']) && $varietal_blend['type'] == '4' ? 'selected' : '' }}>
-                                                    Gewürztraminer
-                                                </option>
-                                                <option value="5"
-                                                    {{ isset($varietal_blend['type']) && $varietal_blend['type'] == '5' ? 'selected' : '' }}>
-                                                    Merlot
-                                                </option>
-                                                <option value="6"
-                                                    {{ isset($varietal_blend['type']) && $varietal_blend['type'] == '6' ? 'selected' : '' }}>
-                                                    Gamay Noir
-                                                </option>
-                                                <option value="7"
-                                                    {{ isset($varietal_blend['type']) && $varietal_blend['type'] == '7' ? 'selected' : '' }}>
-                                                    Pinot Noir
-                                                </option>
-                                                <option value="8"
-                                                    {{ isset($varietal_blend['type']) && $varietal_blend['type'] == '8' ? 'selected' : '' }}>
-                                                    Cabernet Franc
-                                                </option>
-                                                <option value="9"
-                                                    {{ isset($varietal_blend['type']) && $varietal_blend['type'] == '9' ? 'selected' : '' }}>
-                                                    Cabernet Sauvignon
-                                                </option>
-                                            </select>
-
-                                        </div>
-
-                                        @if ($key == 0)
-                                            <button type="button" class="btn btn-outline-success add-field"><i
-                                                    class="fa-solid fa-circle-plus"></i></button>
-                                        @else
-                                            <button type="button" class="btn btn-outline-danger remove-field"><i
-                                                    class="fa-solid fa-circle-minus"></i>
-
-                                            </button>
-                                        @endif
-
                                     </div>
-
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
 
                         @endif
 
@@ -203,43 +171,6 @@
 
             </div>
 
-        </div>
-
-        <div class="col-12 cellaring-value-sec">
-            <label for="" class="form-label">Cellaring Value</label>
-            <div class="row g-2">
-                <div class="col-lg-4 col-sm-6">
-                    <div class="form-check cellaring-value-1 d-flex align-items-center gap-2 position-relative">
-                        <input class="form-check-input" type="radio" name="cellar" id="cellar1"
-                            value="Drink Now" {{ old('cellar', $wine->cellar) == 'Drink Now' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="cellar1">
-                            <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
-                            <p>Drink Now</p>
-                        </label>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-sm-6">
-                    <div class="form-check cellaring-value-2 d-flex align-items-center gap-2 position-relative">
-                        <input class="form-check-input" type="radio" name="cellar" id="cellar2"
-                            value="Drink or Cellar"
-                            {{ old('cellar', $wine->cellar) == 'Drink or Cellar' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="cellar2">
-                            <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
-                            <p>Drink or Hold</p>
-                        </label>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-sm-6">
-                    <div class="form-check cellaring-value-3 d-flex align-items-center gap-2 position-relative">
-                        <input class="form-check-input" type="radio" name="cellar" id="cellar3" value="Cellar"
-                            {{ old('cellar', $wine->cellar) == 'Cellar' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="cellar3">
-                            <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
-                            <p>Cellar</p>
-                        </label>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="col-md-6">
@@ -320,7 +251,7 @@
                             max="{{ $rs_value_mix_max[1] }}" class="form-control rs-values mt-1"
                             id="rs-value-{{ $value }}" name="rs_values[{{ $value }}]"
                             value="{{ isset($wine->rs_value) && $wine->rs == $value ? $wine->rs_value : old('rs_value') }}"
-                            placeholder="Enter value for {{ $label }}">
+                            placeholder="g/l">
                     </div>
                 @endforeach
             </div>
@@ -366,10 +297,10 @@
 
         <div class="col-md-4">
 
-            <label for="commission" class="form-label">Stocking/Delivery Fee</label>
+            <label for="commission" class="form-label">Stocking Fee</label>
 
-            <input type="text" name="commission" placeholder="0.00" onkeypress="return handleInput(event, this)"
-                id="commission" class="form-control"
+            <input type="text" name="commission" readonly placeholder="0.00"
+                onkeypress="return handleInput(event, this)" id="commission" class="form-control"
                 value="{{ old('commission', $wine->commission_delivery_fee) }}">
 
         </div>
@@ -387,6 +318,43 @@
 
             </div>
 
+        </div>
+
+        <div class="col-12 cellaring-value-sec">
+            <label for="" class="form-label">Cellaring Value</label>
+            <div class="row g-2">
+                <div class="col-lg-4 col-sm-6">
+                    <div class="form-check cellaring-value-1 d-flex align-items-center gap-2 position-relative">
+                        <input class="form-check-input" type="radio" name="cellar" id="cellar1"
+                            value="Drink Now" {{ old('cellar', $wine->cellar) == 'Drink Now' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="cellar1">
+                            <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
+                            <p>Drink Now</p>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                    <div class="form-check cellaring-value-2 d-flex align-items-center gap-2 position-relative">
+                        <input class="form-check-input" type="radio" name="cellar" id="cellar2"
+                            value="Drink or Cellar"
+                            {{ old('cellar', $wine->cellar) == 'Drink or Cellar' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="cellar2">
+                            <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
+                            <p>Drink or Hold</p>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                    <div class="form-check cellaring-value-3 d-flex align-items-center gap-2 position-relative">
+                        <input class="form-check-input" type="radio" name="cellar" id="cellar3" value="Cellar"
+                            {{ old('cellar', $wine->cellar) == 'Cellar' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="cellar3">
+                            <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
+                            <p>Cellar</p>
+                        </label>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="col-md-12">
@@ -509,6 +477,7 @@
     </script>
     <script>
         document.getElementById('cost').addEventListener('input', calculateFees);
+
         function calculateFees() {
             // Get the cost input value
             const costInput = document.getElementById('cost').value;
@@ -655,6 +624,7 @@
                 loadSubRegions(regionId);
             });
         });
+
         function clearOtherFields(selectedValue) {
             // Get all text input fields
             const inputs = document.querySelectorAll('input.form-control.rs-values');

@@ -472,7 +472,11 @@
     <div class="container mb-5 mt-lg-0 mt-5 frontend">
         <div class="guest-favorite text-center">
             <h2>Review and Testimonial</h2>
+            @if ($vendor->reviews->isNotEmpty())
             <p>This home is in the top 10% of eligible listings based on <br>ratings, reviews and reliability</p>
+            @else
+            <p>No review has added</p>
+            @endif
         </div>
         <div class="row">
             @if ($vendor->reviews->isNotEmpty())

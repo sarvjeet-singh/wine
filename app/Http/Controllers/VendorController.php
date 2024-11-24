@@ -701,8 +701,22 @@ class VendorController extends Controller
 	{
 		// Find the vendor using the vendor ID
 		$vendor = Vendor::find($vendorid);
+		$usersCount = User::where('role', 'member')->count();
+		$mostCommonLocation = User::select('country', 'city', \DB::raw('COUNT(*) as user_count'))
+			->whereNotNull('country') // Exclude NULL countries
+			->where('country', '!=', '') // Exclude empty strings
+			->whereNotNull('city') // Exclude NULL cities
+			->where('city', '!=', '') // Exclude empty strings
+			->groupBy('country', 'city')
+			->orderByDesc('user_count')
+			->where('role', 'member')
+			->first();
+		$reviewData = Review::where('vendor_id', $vendorid)
+			->where('review_status', 'approved')
+			->selectRaw('COUNT(*) as review_count, AVG(rating) as average_rating')
+			->first();
 		$VendorMediaGallery = VendorMediaGallery::where('vendor_id', $vendorid)->get();
-		return view('VendorDashboard.vendor-dashboard', compact('vendor', 'VendorMediaGallery'));
+		return view('VendorDashboard.vendor-dashboard', compact('vendor', 'VendorMediaGallery', 'usersCount', 'mostCommonLocation', 'reviewData'));
 
 		// Check if vendor is not found
 		if (!$vendor) {
