@@ -15,6 +15,14 @@
             @endphp
         @endif
 
+        @if ($enablehr == 1 && $vendor->account_status == '2')
+            <div style="clear:both">
+            </div>
+            <!-- <hr> -->
+            @php
+                $enablehr = 1;
+            @endphp
+        @endif
         @if ($enablehr == 1 && $vendor->account_status == '3')
             <div style="clear:both">
             </div>
@@ -24,9 +32,9 @@
             @endphp
         @endif
         <div class="col-lg-6">
-            <div class="property-box {{strtolower($vendor->vendor_type) == 'winery' ? 'wine' : ''}} {{strtolower($vendor->vendor_type) == 'accommodation' ? 'accommodation' : ''}}  {{ $vendor->account_status == '2' ? 'has-after' : '' }}">
+            <div class="property-box {{strtolower($vendor->vendor_type) == 'winery' ? 'wine' : ''}} {{strtolower($vendor->vendor_type) == 'accommodation' ? 'accommodation' : ''}}  {{ ($vendor->account_status == '2' || $vendor->account_status == '1') ? 'has-after' : '' }}">
                 <div class="property-slider">
-                    @if ($vendor->mediaGallery->isNotEmpty())
+                    @if ($vendor->mediaGallery->isNotEmpty() && $vendor->account_status == 1)
                         @foreach ($vendor->mediaGallery as $media)
                             <div class="item">
                                 <div class="inner-box">

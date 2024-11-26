@@ -96,13 +96,6 @@
                     </ul>
                 </div>
             </li>
-
-            <li class="nav-item my-1">
-                <a class="nav-link" href="#">
-                    <div><i class="fas fa-cogs menu-icon"></i> Manage Transactions</div>
-                </a>
-            </li>
-
             <!-- Sales & Orders Menu -->
             <li class="nav-item my-1">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menu4" role="button"
@@ -154,16 +147,16 @@
             <!-- Parent Menu 6 -->
             <li class="nav-item my-1">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menu6" role="button"
-                    aria-expanded="{{ request()->routeIs('reviews-testimonial') ? 'true' : 'false' }}"
+                    aria-expanded="{{ request()->routeIs('reviews-testimonial', 'vendor-referrals') ? 'true' : 'false' }}"
                     aria-controls="menu6">
                     <div><i class="fas fa-cogs menu-icon"></i> Manage Engagements</div>
                     <i
-                        class="fas fa-angle-right expand-icon {{ request()->routeIs('reviews-testimonial') ? 'rotate' : '' }}"></i>
+                        class="fas fa-angle-right expand-icon {{ request()->routeIs('reviews-testimonial', 'vendor-referrals') ? 'rotate' : '' }}"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('reviews-testimonial') ? 'show' : '' }}" id="menu6">
+                <div class="collapse {{ request()->routeIs('reviews-testimonial', 'vendor-referrals') ? 'show' : '' }}" id="menu6">
                     <ul class="nav flex-column sub-menu mt-2">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link {{ request()->routeIs('vendor-referrals') ? 'active' : '' }}" href="{{ route('vendor-referrals', ['vendorid' => $id]) }}">
                                 <i class="fas fa-wrench menu-icon"></i>Referrals
                             </a>
                         </li>

@@ -1,7 +1,6 @@
 @extends('admin.layouts.app')
 
 @section('content')
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.27/dist/sweetalert2.min.css">
 
     <div class="main-content-inner">
@@ -27,7 +26,6 @@
                                 <ol class="breadcrumb mb-0">
 
                                     <li class="breadcrumb-item"><a href="#"
-
                                             class="text-decoration-none text-black">User Management</a></li>
 
                                     <li class="breadcrumb-item active" aria-current="page">Manage Review & Testimonial</li>
@@ -61,7 +59,6 @@
                                     <div class="text-center">
 
                                         <img src="{{ asset('images/UserProfile/' . ($review->user->profile_image ?? 'default-profile.png')) }}"
-
                                             class="img-fluid" alt="Profle Image" />
 
                                         <p class="fw-bold mt-2 mb-0">{{ $review->user->firstname }}
@@ -87,25 +84,31 @@
                                         <p class="mb-2"><span class="fw-bold">Date of Visit: </span>
 
                                             {{ $review->date_of_visit ?? 'N/A' }}</p>
+                                        <p class="mb-2"><span class="fw-bold">City/Town: </span>
+
+                                            {{ $review->user->city ?? 'N/A' }}</p>
+                                        <p class="mb-2"><span class="fw-bold">State/Province: </span>
+
+                                            {{ $review->user->state ?? 'N/A' }}</p>
 
                                         <div class="comment-scroll pe-2">
-                                        <p class="mb-2"><span class="fw-bold">Comment: </span>
+                                            <p class="mb-2"><span class="fw-bold">Comment: </span>
 
-                                            {{ $review->review_description ?? 'N/A' }}</p>
+                                                {{ $review->review_description ?? 'N/A' }}</p>
                                         </div>
 
                                         <!-- <p class="mb-1"><span class="fw-bold">Rating: </span>
 
-                                            {{ $review->rating ?? 'N/A' }}</p> -->
+                                                        {{ $review->rating ?? 'N/A' }}</p> -->
 
                                         <div class="rating-star mb-1 d-flex align-items-center gap-1">
                                             <p class="mb-0"><span class="fw-bold">Rating: </span></p>
                                             <ul class="list-unstyled d-flex align-items-center mb-0">
-                                                <li><i class="fa-solid fa-star"></i></li>
-                                                <li><i class="fa-solid fa-star"></i></li>
-                                                <li><i class="fa-solid fa-star"></i></li>
-                                                <li><i class="fa-solid fa-star"></i></li>
-                                                <li><i class="fa-solid fa-star"></i></li>
+                                                @if ($review->rating > 0)
+                                                    @for ($i = 1; $i <= floor($review->rating); $i++)
+                                                        <li><i class="fa-solid fa-star"></i></li>
+                                                    @endfor
+                                                @endif
                                             </ul>
                                         </div>
 
@@ -114,23 +117,15 @@
                                     <div class="mt-2">
 
                                         @if ($review->review_status == 'pending')
-
                                             <button class="btn btn-success btn-approve"
-
                                                 data-id="{{ $review->id }}">Approve</button>
 
                                             <button class="btn btn-danger btn-decline"
-
                                                 data-id="{{ $review->id }}">Decline</button>
-
                                         @elseif ($review->review_status == 'approved')
-
                                             <button class="btn btn-success" disabled>Approved</button>
-
                                         @elseif ($review->review_status == 'declined')
-
                                             <button class="btn btn-danger" disabled>Declined</button>
-
                                         @endif
 
                                     </div>
@@ -179,7 +174,7 @@
 
                                         <!-- <p class="mb-2"><span class="fw-bold">Date of Visit: </span>
 
-                                            {{ $review->date_of_visit ?? 'N/A' }}</p> -->
+                                                        {{ $review->date_of_visit ?? 'N/A' }}</p> -->
 
                                         <p class="mb-2"><span class="fw-bold">Vendor Contact Number: </span>
 
@@ -195,7 +190,7 @@
 
                     </div>
 
-                    <div class="information-box p-3">
+                    {{-- <div class="information-box p-3">
                         <div class="info-head p-3">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="text-white">Admin Section</div>
@@ -220,7 +215,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
                 </div>
 
@@ -229,15 +224,12 @@
         </div>
 
     </div>
-
 @endsection
 
 @push('js')
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.27/dist/sweetalert2.min.js"></script>
 
     <script>
-
         $(document).ready(function() {
 
             $('.btn-approve').on('click', function() {
@@ -266,7 +258,8 @@
 
                         $.ajax({
 
-                            url: '{{ route('admin.reviews.approve', ['id' => ':id']) }}'.replace(':id', reviewId),
+                            url: '{{ route('admin.reviews.approve', ['id' => ':id']) }}'
+                                .replace(':id', reviewId),
 
                             type: 'POST',
 
@@ -360,7 +353,8 @@
 
                         $.ajax({
 
-                            url: '{{ route('admin.reviews.decline', ['id' => ':id']) }}'.replace(':id', reviewId),
+                            url: '{{ route('admin.reviews.decline', ['id' => ':id']) }}'
+                                .replace(':id', reviewId),
 
                             type: 'POST',
 
@@ -427,16 +421,15 @@
             });
 
         });
-
     </script>
 
     <!-- Reject Reason Input -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const dropdown = document.getElementById("actionDropdown");
             const rejectReasonGroup = document.getElementById("rejectReasonGroup");
 
-            dropdown.addEventListener("change", function () {
+            dropdown.addEventListener("change", function() {
                 if (this.value === "reject") {
                     rejectReasonGroup.style.display = "block";
                 } else {
@@ -445,6 +438,4 @@
             });
         });
     </script>
-
 @endpush
-

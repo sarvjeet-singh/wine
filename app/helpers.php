@@ -235,6 +235,14 @@ if (!function_exists('getResidualSugars')) {
     }
 }
 
+if (!function_exists('getModules')) {
+    function getModules()
+    {
+        return \App\Models\Module::where('status', 1)
+            ->get();
+    }
+}
+
 if(! function_exists('getCategoryById')) {
     function getCategoryById($id) {
         return \App\Models\Category::find($id)->pluck('name')->first();

@@ -1226,4 +1226,9 @@ class VendorController extends Controller
 			);
 		}
 	}
+
+	public function vendorReferrals($vendorid) {
+		$referrals = User::where('guestrewards_vendor_id', $vendorid)->get();
+		return view('VendorDashboard.vendor-referrals', compact('referrals'));
+	}
 }

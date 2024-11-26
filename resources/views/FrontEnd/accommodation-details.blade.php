@@ -161,13 +161,12 @@
                     <div class="card-body">
                         <div class="d-flex flex-md-nowrap flex-wrap justify-content-between align-items-center">
                             <h2 class="text-primary theme-color fs-5">
-                                {{ !empty($vendor->sub_regions->name) ? $vendor->sub_regions->name : '' }}</h2>
+                                {{ !empty($vendor->sub_category->name) ? $vendor->sub_category->name : '' }}</h2>
                             <div class="rating-star theme-color mb-md-0 mb-3"
                                 data-rating="{{ $vendor->reviews->avg('rating') ?? 0.0 }}">
                             </div>
                         </div>
-                        <h3 class="card-title fs-5">{{ $vendor->vendor_name }}
-                            <span class="theme-color">[{{ !empty($vendor->sub_category->name) ? $vendor->sub_category->name : '' }}]</span></h3>
+                        <h3 class="card-title fs-5">{{ $vendor->vendor_name }}</h3>
                         <p class="mb-1"><i class="fas fa-map-marker-alt theme-color"></i>
                             @if ($vendor->hide_street_address == 0)
                                 <span>{{ $vendor->street_address }}</span><br>

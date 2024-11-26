@@ -35,6 +35,11 @@ use App\Http\Controllers\Admin\UserEmailController as AdminUserEmailController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 
+use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RolePermissionController;
+
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
@@ -262,6 +267,7 @@ Route::group(['middleware' => ['auth', 'check.vendorid']], function () {
     Route::put('vendor/user-details-update/{vendorid?}', [VendorController::class, 'userDetailsUpdate'])->name('user.details.update');
     Route::get('vendor-faqs/{vendorid?}', [VendorController::class, 'vendorFaqs'])->name('vendor-faqs');
     Route::get('vendor/social-media/{vendorid?}', [VendorController::class, 'vendorSocialMedia'])->name('vendor-social-media');
+    Route::get('vendor/referrals/{vendorid?}', [VendorController::class, 'vendorReferrals'])->name('vendor-referrals');
 
     // Subscription Routes
     Route::get('/subscription/list/{vendorid?}', [SubscriptionController::class, 'index'])->name('subscription.index');
@@ -405,6 +411,21 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/reviews/view/{id}', [AdminReviewController::class, 'show'])->name('admin.reviews.show');
     Route::post('admin/reviews/{id}/approve', [AdminReviewController::class, 'approveReview'])->name('admin.reviews.approve');
     Route::post('admin/reviews/{id}/decline', [AdminReviewController::class, 'declineReview'])->name('admin.reviews.decline');
+    // Roles CRUD
+    Route::resource('admin/roles', RoleController::class)->names('admin.roles');
+
+    // Permissions CRUD
+    Route::resource('admin/permissions', PermissionController::class)->names('admin.permissions');
+
+    // Modules CRUD
+    Route::resource('admin/modules', ModuleController::class)->names('admin.modules');
+
+    // Assign/Unassign Roles and Permissions
+    Route::post('admin/roles/{role}/permissions', [RolePermissionController::class, 'assignPermission']);
+    Route::delete('admin/roles/{role}/permissions/{permission}', [RolePermissionController::class, 'unassignPermission']);
+
+    Route::post('admin/users/{user}/roles', [RolePermissionController::class, 'assignRole']);
+    Route::delete('admin/users/{user}/roles/{role}', [RolePermissionController::class, 'unassignRole']);
 });
 
 Route::get('/get-subregions/{regionId}', [RegionController::class, 'getSubRegions']);
