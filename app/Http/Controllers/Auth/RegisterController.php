@@ -15,7 +15,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\View;
 use Stripe\Stripe;
-use Stripe\Customer;
+use Stripe\Customer as StripeCustomer;
+use App\Models\Customer;
 use Session;
 
 use Mews\Captcha\Captcha;
@@ -65,7 +66,7 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'firstname' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z]+$/'],
             'lastname' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z]+$/'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:customers'],
             'password' => [
                 'required',
                 'string',
@@ -105,7 +106,7 @@ class RegisterController extends Controller
         // echo "<pre>";print_r($data);
         // exit;
         $token = Str::random(60);
-        $user = User::create([
+        $user = Customer::create([
             'firstname' => $data['firstname'],
             'email' => $data['email'],
             'lastname' => $data['lastname'],
@@ -127,15 +128,6 @@ class RegisterController extends Controller
                 $user->guestrewards_vendor_id = $vendor->id;
                 $user->save();
             }
-        }
-        if (!empty($user)) {
-            Stripe::setApiKey(env('STRIPE_SECRET'));
-            $stripe_customer = Customer::create([
-                'email' => $data['email'],
-                'name' => $data['firstname'] . ' ' . $data['lastname'],
-            ]);
-            $user->stripe_id = $stripe_customer->id;
-            $user->save();
         }
 
 

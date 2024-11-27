@@ -8,6 +8,7 @@ use Illuminate\Http\Request;  // <-- Make sure this is correctly imported
 use Illuminate\Support\Facades\Auth;
 use App\Models\Vendor;
 use App\Models\User;
+use App\Models\Customer;
 use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
@@ -217,7 +218,7 @@ class LoginController extends Controller
     public function checkEmail(Request $request)
     {
         $email = $request->input('email');
-        $exists = User::where('email', $email)->exists();
+        $exists = Customer::where('email', $email)->exists();
 
         return response()->json(!$exists); // Returns true if email is unique, false if it exists
     }

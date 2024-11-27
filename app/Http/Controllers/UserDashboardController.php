@@ -11,7 +11,7 @@ use App\Models\PublishSeason;
 use App\Models\BookingDate;
 use App\Models\Experience;
 use App\Models\FaqSection;
-use App\Models\User;
+use App\Models\Customer;
 use App\Models\Vendor;
 use App\Models\Review;
 use App\Models\VendorSuggest;
@@ -31,7 +31,7 @@ class UserDashboardController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth:customer');
     }
 
     public function userDashboard()
@@ -43,6 +43,26 @@ class UserDashboardController extends Controller
             Auth::user()->update(['first_login' => false]);
         }
         return view('UserDashboard.index', compact('first_login'));
+    }
+
+    public function userSettingsSocialUpdate(Request $request){
+
+        // Retrieve the authenticated user
+        $user = Auth::user();
+
+        // Update the social media fields based on the checkboxes and inputs
+        $user->facebook =  $request->facebook;
+        $user->instagram = $request->instagram;
+        $user->youtube = $request->youtube;
+        $user->tiktok =  $request->tiktok;
+        $user->twitter = $request->twitter;
+        $user->linkedin = $request->linkedin;
+
+        // Save the updated user information
+        $user->save();
+
+        // Redirect back with a success message
+        return back()->with('social-success', 'Social media links updated successfully.');
     }
 
     public function userSettings()
@@ -68,7 +88,7 @@ class UserDashboardController extends Controller
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
             'display_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $userId,
+            'email' => 'required|email|unique:customers,email,' . $userId,
             'gender' => 'required|in:Male,Female,Other', // example validation for gender
             'age_range' => 'required', // example validation for age range
             // 'date_of_birth' => 'string|max:255'
@@ -108,7 +128,7 @@ class UserDashboardController extends Controller
             $user->save();
         }
 
-        $user = User::find($userId);
+        $user = Customer::find($userId);
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
         $user->display_name = $request->display_name;
@@ -150,11 +170,11 @@ class UserDashboardController extends Controller
         $validatedData = $request->validate($rules, $messages);
 
         $userId = Auth::id();
-        $user = User::find($userId);
+        $user = Customer::find($userId);
         $user->emergency_contact_name = $request->emergency_contact_name;
         $user->emergency_contact_relation = $request->emergency_contact_relation;
         $user->emergency_contact_phone_number = $request->emergency_contact_phone_number;
-        $user->emergency_contact_number = $request->emergency_contact_number;
+        // $user->emergency_contact_number = $request->emergency_contact_number;
         $user->medical_physical_concerns = $request->medical_physical_concerns;
         $user->alternate_contact_full_name = $request->alternate_contact_full_name;
         $user->alternate_contact_relation = $request->alternate_contact_relation;

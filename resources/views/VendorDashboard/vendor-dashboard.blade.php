@@ -19,7 +19,7 @@
                     <div class="box-image">
                         <img src="{{asset('images/icons/Inquiries-box-icon.png')}}">
                     </div>
-                    <div class="box-points">{{ $mostCommonLocation->city }}, {{ucwords($mostCommonLocation->country)}}</div>
+                    <div class="box-points">{{ $mostCommonLocation->city ?? '' }}, {{ucwords($mostCommonLocation->country ?? '')}}</div>
                     <div class="box-text">Guest Origins</div>
                 </div>
             </div>
@@ -53,7 +53,7 @@
                                         <label>Vendor</label>
                                     </div>
                                     <div class="col-sm-7 text-right">
-                                    <span>{{ ucfirst($vendor->vendor_type) }}</span>
+                                    <span>{{ ucfirst($vendor->vendor_type ?? '') }}</span>
                                     </div>
                                     <div class="col-sm-5">
                                         <label>Sub Type</label>

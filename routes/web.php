@@ -34,7 +34,7 @@ use App\Http\Controllers\Admin\WineCatalogueController as AdminWineCatalogueCont
 use App\Http\Controllers\Admin\UserEmailController as AdminUserEmailController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
-
+use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
@@ -101,6 +101,11 @@ Route::post('/registertion', [RegisterController::class, 'register'])->name('reg
 Route::get('/some-error-route', function () {
     return 'Error: Vendor not found.';
 })->name('some.error.route');
+
+// Customer routes
+Route::get('customer/login', [CustomerAuthController::class, 'showLoginForm'])->name('customer.login');
+Route::post('customer/login', [CustomerAuthController::class, 'login'])->name('customer.login.post');
+Route::post('customer/logout', [CustomerAuthController::class, 'logout'])->name('customer.logout');
 
 
 // ================= FRONT END ============== //

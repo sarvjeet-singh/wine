@@ -416,7 +416,7 @@ class VendorController extends Controller
 
             $qrCodePath = 'images/VendorQRCodes/' . $vendor->vendor_name . '-' . $vendor->id . '.png';
 
-            QrCode::format('png')->size(200)->generate($qrCodeData, public_path($qrCodePath));
+            // QrCode::format('png')->size(200)->generate($qrCodeData, public_path($qrCodePath));
 
             // Save the QR code path to the vendor
             $vendor->qr_code = $qrCodePath;
@@ -453,7 +453,7 @@ class VendorController extends Controller
                 $to = $user->email;
                 $subject = "Your new account credentials";
                 $emailContent = View::make('AdminDashboard.emails.vendorlogin', ['user' => $user, 'password' => $password])->render();
-                sendEmail($to, $subject, $emailContent);
+                // sendEmail($to, $subject, $emailContent);
             }
 
             // Commit the transaction if everything is successful
