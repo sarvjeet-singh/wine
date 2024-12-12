@@ -65,31 +65,6 @@
                                             @enderror
                                         </div>
                                     </div>
-
-                                    <div class="row mt-3">
-                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3">
-                                            <label class="form-label">Province/State<span
-                                                    class="required-filed">*</span></label>
-                                            <input type="text" class="form-control" name="state"
-                                                value="{{ old('state', Auth::user()->state) }}"
-                                                placeholder="Enter Province/State">
-                                            @error('state')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="col-sm-6 col-12">
-                                            <label for="email" class="form-label">Postal Code/Zip<span
-                                                    class="required-filed">*</span></label>
-                                            <input type="text" class="form-control" name="postal_code"  maxlength="7"
-                        oninput="formatPostalCode(this)"
-                                                value="{{ old('postal_code', Auth::user()->postal_code) }}"
-                                                placeholder="Enter Postal Code/Zip">
-                                            @error('postal_code')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-
                                     <div class="row mt-3">
                                         <div class="col-sm-6 col-12">
                                             <label class="form-label">Country</label>
@@ -105,6 +80,29 @@
                                                 @endif
                                             </select>
                                             @error('country')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3">
+                                            <label class="form-label">Province/State<span
+                                                    class="required-filed">*</span></label>
+                                            <input type="text" class="form-control" name="state"
+                                                value="{{ old('state', Auth::user()->state) }}"
+                                                placeholder="Enter Province/State">
+                                            @error('state')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-6 col-12">
+                                            <label for="email" class="form-label">Postal Code/Zip<span
+                                                    class="required-filed">*</span></label>
+                                            <input type="text" class="form-control" name="postal_code"  maxlength="7"
+                        oninput="formatPostalCode(this)"
+                                                value="{{ old('postal_code', Auth::user()->postal_code) }}"
+                                                placeholder="Enter Postal Code/Zip">
+                                            @error('postal_code')
                                                 <div class="text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>

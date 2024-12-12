@@ -31,8 +31,8 @@
                             <div class="subscription-plan-sec my-4">
                                 <div class="row g-3">
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color">Monthly</h3>
+                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_MONTHLY') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Monthly</h3>
                                             <h2 class="fw-bold text-center">$569.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center"></span>
                                             <span class="d-block fw-normal fs-6 text-center">12 Payments</span>
@@ -60,7 +60,7 @@
                                             <div class="buy-btn text-center">
 
                                                 @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_MONTHLY') == $activeSubscription['stripe_price_id'])
-                                                    <button type="button" class="btn btn-primary">Active Plan</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
                                                         data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">
@@ -78,8 +78,8 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color">Quarterly</h3>
+                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_QUARTERLY') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Quarterly</h3>
                                             <h2 class="fw-bold text-center">$1665.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
                                                 2.5%</span>
@@ -111,7 +111,7 @@
                                                     $activeSubscription &&
                                                         env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_QUARTERLY') == $activeSubscription['stripe_price_id']
                                                 )
-                                                    <button type="button" class="btn btn-primary">Active Plan</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
                                                         data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">
@@ -129,8 +129,8 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color">Semi-Annual</h3>
+                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_SEMI_ANNUAL') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Semi-Annual</h3>
                                             <h2 class="fw-bold text-center">$3126.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
                                                 8.4%</span>
@@ -162,7 +162,7 @@
                                                     $activeSubscription &&
                                                         env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_SEMI_ANNUAL') == $activeSubscription['stripe_price_id']
                                                 )
-                                                    <button type="button" class="btn btn-primary">Active Plan</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
                                                         data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">
@@ -180,8 +180,8 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color">Annual</h3>
+                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_ANNUAL') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Annual</h3>
                                             <h2 class="fw-bold text-center">$5690.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
                                                 17%</span>
@@ -212,7 +212,7 @@
                                             <div class="buy-btn text-center">
 
                                                 @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_ANNUAL') == $activeSubscription['stripe_price_id'])
-                                                    <button type="button" class="btn btn-primary">Active Plan</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
                                                         data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">
@@ -249,8 +249,8 @@
                             <div class="subscription-plan-sec my-4">
                                 <div class="row g-3">
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color">Monthly</h3>
+                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_MONTHLY') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Monthly</h3>
                                             <h2 class="fw-bold text-center">$469.00</h2>
                                             <span
                                                 class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center"></span>
@@ -276,7 +276,7 @@
                                             <div class="buy-btn text-center">
 
                                                 @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_MONTHLY') == $activeSubscription['stripe_price_id'])
-                                                    <button type="button" class="btn btn-primary">Active Plan</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
                                                         data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">
@@ -294,8 +294,8 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color">Quarterly</h3>
+                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_QUARTERLY') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Quarterly</h3>
                                             <h2 class="fw-bold text-center">$1266.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
                                                 2.5%</span>
@@ -321,7 +321,7 @@
                                             <div class="buy-btn text-center">
 
                                                 @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_QUARTERLY') == $activeSubscription['stripe_price_id'])
-                                                    <button type="button" class="btn btn-primary">Active Plan</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
                                                         data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">
@@ -339,8 +339,8 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color">Semi-Annual</h3>
+                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_SEMI_ANNUAL') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Semi-Annual</h3>
                                             <h2 class="fw-bold text-center">$2580.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
                                                 8.4%</span>
@@ -366,7 +366,7 @@
                                             <div class="buy-btn text-center">
 
                                                 @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_SEMI_ANNUAL') == $activeSubscription['stripe_price_id'])
-                                                    <button type="button" class="btn btn-primary">Active Plan</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
                                                         data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">
@@ -384,8 +384,8 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color">Annual</h3>
+                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_ANNUAL') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Annual</h3>
                                             <h2 class="fw-bold text-center">$4692.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
                                                 17%</span>
@@ -411,7 +411,7 @@
                                             <div class="buy-btn text-center">
 
                                                 @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_ANNUAL') == $activeSubscription['stripe_price_id'])
-                                                    <button type="button" class="btn btn-primary">Active Plan</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
                                                         data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">
@@ -460,9 +460,9 @@
 
                                     <div class="col-lg-3 col-md-6">
 
-                                        <div class="plan-inner bg-white p-3">
+                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_MONTHLY') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
 
-                                            <h3 class="fw-bold fs-5 text-center theme-color">Monthly</h3>
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Monthly</h3>
 
                                             <h2 class="fw-bold text-center">$769.00</h2>
                                             <span
@@ -500,7 +500,7 @@
                                             <div class="buy-btn text-center">
 
                                                 @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_MONTHLY') == $activeSubscription['stripe_price_id'])
-                                                    <button type="button" class="btn btn-primary">Active Plan</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
                                                         data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">
@@ -522,9 +522,9 @@
 
                                     <div class="col-lg-3 col-md-6">
 
-                                        <div class="plan-inner bg-white p-3">
+                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_QUARTERLY') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
 
-                                            <h3 class="fw-bold fs-5 text-center theme-color">Quarterly</h3>
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Quarterly</h3>
 
                                             <h2 class="fw-bold text-center">$2250.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
@@ -561,7 +561,7 @@
                                             <div class="buy-btn text-center">
 
                                                 @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_QUARTERLY') == $activeSubscription['stripe_price_id'])
-                                                    <button type="button" class="btn btn-primary">Active Plan</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
                                                         data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">
@@ -584,9 +584,9 @@
 
                                     <div class="col-lg-3 col-md-6">
 
-                                        <div class="plan-inner bg-white p-3">
+                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_SEMI_ANNUAL') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
 
-                                            <h3 class="fw-bold fs-5 text-center theme-color">Semi-Annual</h3>
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Semi-Annual</h3>
 
                                             <h2 class="fw-bold text-center">$4230.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
@@ -623,7 +623,7 @@
                                             <div class="buy-btn text-center">
 
                                                 @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_SEMI_ANNUAL') == $activeSubscription['stripe_price_id'])
-                                                    <button type="button" class="btn btn-primary">Active Plan</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
                                                         data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">
@@ -645,9 +645,9 @@
 
                                     <div class="col-lg-3 col-md-6">
 
-                                        <div class="plan-inner bg-white p-3">
+                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_ANNUAL') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
 
-                                            <h3 class="fw-bold fs-5 text-center theme-color">Annual</h3>
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Annual</h3>
 
                                             <h2 class="fw-bold text-center">$7692.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
@@ -684,7 +684,7 @@
                                             <div class="buy-btn text-center">
 
                                                 @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_ANNUAL') == $activeSubscription['stripe_price_id'])
-                                                    <button type="button" class="btn btn-primary">Active Plan</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
                                                         data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">

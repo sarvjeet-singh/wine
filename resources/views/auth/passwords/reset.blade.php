@@ -1,4 +1,4 @@
-@extends('FrontEnd.layouts.mainapp')
+@extends('FrontEnd.layouts.mainappvendor')
 
 
 

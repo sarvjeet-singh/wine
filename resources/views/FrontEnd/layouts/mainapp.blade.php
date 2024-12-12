@@ -21,7 +21,8 @@
     </style>
     <!-- Link to your CSS file -->
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="https://www.jqueryscript.net/demo/Responsive-Mobile-friendly-Image-Cropper-With-jQuery-rcrop/dist/rcrop.min.css">
+    <link rel="stylesheet"
+        href="https://www.jqueryscript.net/demo/Responsive-Mobile-friendly-Image-Cropper-With-jQuery-rcrop/dist/rcrop.min.css">
     <link rel="stylesheet" href="{{ asset('asset/css/dataTables.dataTables.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/fontawesome/css/all.min.css') }}">
@@ -38,7 +39,8 @@
     <link rel="stylesheet" href="{{ asset('asset/FrontEnd/css/reponsive.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ asset('asset/FrontEnd/css/frontend.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ asset('asset/FrontEnd/css/userdashboard.css') }}?v={{ time() }}">
-    <link rel="stylesheet" href="{{ asset('asset/FrontEnd/css/userdashboard-responsive.css') }}?v={{ time() }}">
+    <link rel="stylesheet"
+        href="{{ asset('asset/FrontEnd/css/userdashboard-responsive.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ asset('asset/FrontEnd/css/jquery-ui.min.css') }}">
 
     <script src="{{ asset('asset/js/jquery-3.6.0.min.js') }}"></script>
@@ -51,15 +53,27 @@
 <body>
     @php($currentUrl = request()->url())
 
-    @include('FrontEnd.includes.header')
+    @if (request()->is('vendor/login'))
+        @include('FrontEnd.includes.vendor-header')
+    @else
+        @include('FrontEnd.includes.header')
+    @endif
+
     @yield('content')
-    @include('FrontEnd.includes.footer')
+
+    @if (request()->is('vendor/login'))
+        @include('FrontEnd.includes.vendor-footer')
+    @else
+        @include('FrontEnd.includes.footer')
+    @endif
 
     <!-- Include your JavaScript file -->
     <script src="{{ asset('asset/js/bootstrap.bundle.min.js') }}"></script>
     <!-- Include the latest version of jQuery -->
 
-    <script src="https://www.jqueryscript.net/demo/Responsive-Mobile-friendly-Image-Cropper-With-jQuery-rcrop/dist/rcrop.min.js"></script>
+    <script
+        src="https://www.jqueryscript.net/demo/Responsive-Mobile-friendly-Image-Cropper-With-jQuery-rcrop/dist/rcrop.min.js">
+    </script>
     <script src="{{ asset('asset/js/dataTables.min.js') }}"></script>
     <script src="{{ asset('asset/js/select2.min.js') }}"></script>
     <script src="{{ asset('asset/js/jquery.star-rating-svg.js') }}"></script>

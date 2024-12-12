@@ -10,17 +10,25 @@ use Illuminate\Support\Facades\Storage;
 class VendorWineController extends Controller
 {
     // Define a common array for varietal type mappings
-    private $varietalNames = [
-        1 => 'Varietal',
-        2 => 'Riesling',
-        3 => 'Chardonnay',
-        4 => 'Gewürztraminer',
-        5 => 'Merlot',
-        6 => 'Gamay Noir',
-        7 => 'Pinot Noir',
-        8 => 'Cabernet Franc',
-        9 => 'Cabernet Sauvignon',
-    ];
+    private $varietalNames;
+
+    public function __construct()
+    {
+        $this->varietalNames = $this->mapGrapeVarietals();
+    }
+
+    private function mapGrapeVarietals(): array
+    {
+        $grapeVarietals = getGrapeVarietals();
+
+        // Map IDs to names for quick access
+        $mappedVarietals = [];
+        foreach ($grapeVarietals as $varietal) {
+            $mappedVarietals[$varietal->id] = $varietal->name;
+        }
+
+        return $mappedVarietals;
+    }
 
     /**
      * Convert varietal type IDs to comma-separated names.
@@ -60,8 +68,6 @@ class VendorWineController extends Controller
             // 'winery_name' => 'required|string|min:2',
             'region' => 'nullable|string',
             'sub_region' => 'nullable|string',
-            'custom_region' => 'nullable|string',
-            'custom_sub_region' => 'nullable|string',
             'varietal_blend.*' => 'nullable|string',
             'varietal_type.*' => 'nullable|string',
             // 'vintage_brand_name' => 'required|string',
@@ -96,10 +102,12 @@ class VendorWineController extends Controller
         // Combine into JSON format
         $varietalData = [];
         foreach ($varietalBlends as $index => $blend) {
-            $varietalData[] = [
-                'blend' => $blend,
-                'type' => $varietalTypes[$index] ?? null,
-            ];
+            if (!empty($blend) || !empty($varietalTypes[$index])) {
+                $varietalData[] = [
+                    'blend' => $blend,
+                    'type' => $varietalTypes[$index] ?? null,
+                ];
+            }
         }
 
         // Handle file upload
@@ -114,8 +122,6 @@ class VendorWineController extends Controller
             // 'winery_name' => $request->input('winery_name'),
             'region' => $request->input('region') ?? null,
             'sub_region' => $request->input('sub_region') ?? null,
-            'custom_region' => $request->input('custom_region') ?? null,
-            'custom_sub_region' => $request->input('custom_sub_region') ?? null,
             'varietal_blend' => json_encode($varietalData) ?? null, // Store JSON data
             // 'vintage_brand_name' => $request->input('vintage_brand_name'),
             'grape_varietals' => $grapeVarietals ?? null,
@@ -154,8 +160,6 @@ class VendorWineController extends Controller
             // 'winery_name' => 'required|string|min:2',
             'region' => 'nullable|string',
             'sub_region' => 'nullable|string',
-            'custom_region' => 'nullable|string',
-            'custom_sub_region' => 'nullable|string',
             'varietal_blend.*' => 'nullable|string',
             'varietal_type.*' => 'nullable|integer',
             // 'vintage_brand_name' => 'required|string',
@@ -183,10 +187,12 @@ class VendorWineController extends Controller
         // Combine into JSON format
         $varietalData = [];
         foreach ($varietalBlends as $index => $blend) {
-            $varietalData[] = [
-                'blend' => $blend,
-                'type' => $varietalTypes[$index] ?? null,
-            ];
+            if (!empty($blend) || !empty($varietalTypes[$index])) {
+                $varietalData[] = [
+                    'blend' => $blend,
+                    'type' => $varietalTypes[$index] ?? null,
+                ];
+            }
         }
 
         // Handle file upload
@@ -213,20 +219,20 @@ class VendorWineController extends Controller
 
         // Update other fields in your model
         $wine->image = $imagePath;
+        $rs_value = null;
 
-        $rs = $request->input('rs');
-        $rs_values = $request->input('rs_values');
-        $rs_value = $rs_values[$rs];
+        if (!empty($request->input('rs')) && !empty($request->input('rs_values'))) {
+            $rs = $request->input('rs');
+            $rs_values = $request->input('rs_values');
+            $rs_value = $rs_values[$rs];
+        }
 
         // Create new VendorWine entry
         $data = [
             // 'winery_name' => $request->input('winery_name'),
             'region' => $request->input('region'),
             'sub_region' => $request->input('sub_region'),
-            'custom_region' => $request->input('custom_region'),
-            'custom_sub_region' => $request->input('custom_sub_region'),
-            'varietal_blend' => json_encode($varietalData), // Store JSON data
-            // 'vintage_brand_name' => $request->input('vintage_brand_name'),
+            'varietal_blend' => json_encode($varietalData),
             'grape_varietals' => $grapeVarietals,
             'vintage_date' => $request->input('vintage_date'),
             'description' => $request->input('description'),

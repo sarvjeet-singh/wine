@@ -179,6 +179,29 @@ footer .footer-logo img {
 .property-box iframe {
     height: 308px;
 }
+.vendor-login-sec > .container {
+    background-color: #f9f9f9;
+    border-radius: 20px;
+}
+.vendor-login-sec .img-sec {
+    border-radius: 20px;
+}
+.vendor-login-sec .sec-desc {    
+    border-radius: 15px;
+    padding: 30px;
+    width: 100%;
+}
+.vendor-login-sec .img-sec img {
+    width: 230px;
+}
+.vendor-login-sec .inner-content {
+    padding: 30px 20px;    
+    border-radius: 0 0 16px 16px;
+}
+.vendor-login-sec .form-login-option .form-check label,
+.vendor-login-sec .form-login-option a {
+    font-size: 13px;
+}
 }
 @media screen and (max-width: 600px){
 header .navbar-collapse .navbar-nav {    

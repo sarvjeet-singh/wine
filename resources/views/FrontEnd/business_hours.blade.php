@@ -1,18 +1,15 @@
-<div class="modal-header">
-
-    <h2 class="modal-title fs-6" id="hoursModal">{{ $vendor->vendor_name }}</h2>
-
+<div class="modal-header border-0 pb-0">
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-
         <i class="fa-solid fa-xmark"></i>
-
     </button>
-
 </div>
 
 <div class="modal-body">
-
-    <h3 class="text-center mb-3 fs-6">
+    <h2 class="modal-title text-center fs-5 fw-bold text-uppercase" id="hoursModal">{{ $vendor->vendor_name }}</h2>
+    <div class="hours-icon position-relative text-center my-3">
+        <i class="fa-regular fa-clock"></i>
+    </div>
+    <h3 class="text-center fs-6">
 
         <span class="d-block theme-color fw-bold fs-5 text-uppercase">
 
@@ -63,7 +60,7 @@
 
     </h3>
 
-    <ul class="list-unstyled mb-0">
+    <ul class="list-unstyled my-4 mw-100">
 
         @foreach ($businessHours as $hour)
             <li @if ($hour->day == \Carbon\Carbon::now()->format('l')) class="active" @endif>
@@ -80,6 +77,9 @@
                         @endif
                         @if (!empty($hour->closing_time))
                             {{ \Carbon\Carbon::createFromFormat('H:i:s', $hour->closing_time)->format('h:i A') }}
+                        @endif
+                        @if ($hour->is_late == 1)
+                            (Late Closing)
                         @endif
                     @endif
 

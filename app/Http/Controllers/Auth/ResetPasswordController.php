@@ -11,7 +11,7 @@ class ResetPasswordController extends Controller
 {
     use ResetsPasswords;
 
-    protected $redirectTo = '/login';  // Redirect to login after reset
+    protected $redirectTo = '/vendor/login';  // Redirect to login after reset
 
     public function __construct()
     {
@@ -36,7 +36,7 @@ class ResetPasswordController extends Controller
 
         // Check if the reset was successful, redirect to login
         if ($response == Password::PASSWORD_RESET) {
-            return redirect()->route('login')->with('success', 'Password has been reset. Please login.');
+            return redirect()->route('vendor.login')->with('success', 'Password has been reset. Please login.');
         }
 
         // If not successful, redirect back to reset form

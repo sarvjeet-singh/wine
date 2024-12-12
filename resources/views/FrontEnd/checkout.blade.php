@@ -19,7 +19,7 @@
                         <h5 class="theme-color mb-0">
                             {{ !empty($vendor->sub_category->name) ? $vendor->sub_category->name : '' }}</h5>
                         <!-- <div class="rating-star d-flex align-items-center"
-                                            data-rating="{{ $vendor->reviews->avg('rating') ?? 0.0 }}"></div> -->
+                                                data-rating="{{ $vendor->reviews->avg('rating') ?? 0.0 }}"></div> -->
                     </div>
                     <h3 class="card-title">{{ $vendor->vendor_name }}
                         [{{ !empty($vendor->sub_regions->name) ? $vendor->sub_regions->name : '' }}]</h3>
@@ -51,7 +51,17 @@
                         @endif
                     </div> --}}
                     <div class="summary-gallery-img">
-                        <img src="{{ asset($vendor->vendor_media_logo) }}">
+                        @if (!empty($vendor->mediaLogo))
+                            <img src="{{ asset($vendor->mediaLogo->vendor_media) }}" class="img-fluid"
+                                alt="Property Image">
+                        @elseif($vendor->mediaGallery->isNotEmpty())
+                            <img src="{{ asset($vendor->mediaGallery[0]->vendor_media) }}" class="img-fluid"
+                                alt="Property Image">
+                        @elseif ($vendor->vendor_media_logo)
+                            <img src="{{ asset($vendor->vendor_media_logo) }}" class="img-fluid" alt="Property Image">
+                        @else
+                            <img src="{{ asset('images/vendorbydefault.png') }}" class="img-fluid" alt="Property Image">
+                        @endif
                     </div>
                 </div>
             </div>
@@ -296,7 +306,10 @@
                                     // Add pet fee (use inquiry value if available, else fallback to vendor value)
                                     if (!is_null($inquiry) && !is_null($inquiry->pet_fee) && $inquiry->pet_fee > 0) {
                                         $sundry_subtotal += $inquiry->pet_fee;
-                                    } elseif (!empty($vendor->accommodationMetadata->pet_boarding) && $vendor->accommodationMetadata->pet_boarding > 0) {
+                                    } elseif (
+                                        !empty($vendor->accommodationMetadata->pet_boarding) &&
+                                        $vendor->accommodationMetadata->pet_boarding > 0
+                                    ) {
                                         $sundry_subtotal += $vendor->accommodationMetadata->pet_boarding;
                                     }
                                 @endphp
@@ -378,12 +391,14 @@
                                         @endif
                                     </p>
                                 </div>
-                                @if (!empty($vendor->accommodationMetadata->applicable_taxes_amount) && $vendor->accommodationMetadata->applicable_taxes_amount > 0)
+                                @if (
+                                    !empty($vendor->accommodationMetadata->applicable_taxes_amount) &&
+                                        $vendor->accommodationMetadata->applicable_taxes_amount > 0)
                                     <div class="d-flex align-items-center justify-content-between mb-2">
                                         <p class="fw-bold mb-0">Tax:<span></span>
                                         </p>
                                         <p class="fw-bold mb-0" id="taxTotal"
-                                        data-value="{{ $inquiry && !empty($inquiry->tax_rate) && $inquiry->tax_rate > 0 ? $inquiry->tax_rate : $vendor->accommodationMetadata->applicable_taxes_amount }}">
+                                            data-value="{{ $inquiry && !empty($inquiry->tax_rate) && $inquiry->tax_rate > 0 ? $inquiry->tax_rate : $vendor->accommodationMetadata->applicable_taxes_amount }}">
                                             @if ($inquiry)
                                                 ${{ number_format(($booking_total + $inquiry->experiences_total + $sundry_subtotal) * ($vendor->accommodationMetadata->applicable_taxes_amount / 100), 2, '.', '') }}
                                             @else
@@ -404,7 +419,9 @@
                     {{-- <div class="sec-btn text-center mt-4">
                         <button class="btn book-btn w-100">Make Payment</button>
                     </div> --}}
-                    @if ((!empty($vendor->accommodationMetadata->process_type) ? $vendor->accommodationMetadata->process_type : '') == 'one-step' || !empty($booking->apk))
+                    @if (
+                        (!empty($vendor->accommodationMetadata->process_type) ? $vendor->accommodationMetadata->process_type : '') ==
+                            'one-step' || !empty($booking->apk))
                         <!-- Stripe Payment Sec Start -->
                         <div class="detail-outer-box border mt-4">
                             <div class="stripe-payment-sec">
@@ -459,10 +476,12 @@
 @endsection
 
 @section('js')
-@if ((!empty($vendor->accommodationMetadata->process_type) ? $vendor->accommodationMetadata->process_type : '') == 'one-step' || !empty($booking->apk))
+    @if (
+        (!empty($vendor->accommodationMetadata->process_type) ? $vendor->accommodationMetadata->process_type : '') ==
+            'one-step' || !empty($booking->apk))
         <script src="https://js.stripe.com/v3/"></script>
         <script>
-            const stripe = Stripe('{{ env('STRIPE_KEY') }}');
+            const stripe = Stripe('{{ $vendor->stripeDetails->stripe_publishable_key }}');
             const elements = stripe.elements();
             var cardNumber = elements.create('cardNumber', {
                 classes: {

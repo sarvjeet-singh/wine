@@ -27,10 +27,6 @@
                             <td>{{ $referral->state ?? '-' }}</td>
                         </tr>
                     @endforeach
-                @else
-                    <tr>
-                        <td colspan="5">No referrals available at the moment</td>
-                    </tr>
                 @endif
             </tbody>
         </table>

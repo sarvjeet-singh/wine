@@ -167,6 +167,8 @@
                                                     Male</option>
                                                 <option value="Female" @if (Auth::user()->gender == 'Female') selected @endif>
                                                     Female</option>
+                                                <option value="Other" @if (Auth::user()->gender == 'Other') selected @endif>
+                                                    Other</option>
                                             </select>
                                             @error('gender')
                                                 <span class="invalid-feedback" role="alert">
@@ -179,10 +181,10 @@
                                             <select class="form-control @error('age_range') is-invalid @enderror"
                                                 name="age_range">
                                                 <option value="">Select age range</option>
-                                                <option value="0-19" @if (Auth::user()->age_range == '0-19') selected @endif>
-                                                    0-19</option>
-                                                <option value="20-29" @if (Auth::user()->age_range == '20-29') selected @endif>
-                                                    20-29</option>
+                                                <option value="0-18" @if (Auth::user()->age_range == '0-18') selected @endif>
+                                                    0-18</option>
+                                                <option value="19-29" @if (Auth::user()->age_range == '19-29') selected @endif>
+                                                    19-29</option>
                                                 <option value="30-39" @if (Auth::user()->age_range == '30-39') selected @endif>
                                                     30-39</option>
                                                 <option value="40-49" @if (Auth::user()->age_range == '40-49') selected @endif>
@@ -465,14 +467,14 @@
                             </div>
                             <div class="information-box-body">
                                 <!-- @if ($errors->any())
-                                        <div class="alert alert-danger">
-                                            <ul>
-                                                @foreach ($errors->all() as $error)
+                                            <div class="alert alert-danger">
+                                                <ul>
+                                                    @foreach ($errors->all() as $error)
     <li>{{ $error }}</li>
     @endforeach
-                                            </ul>
-                                        </div>
-                                    @endif -->
+                                                </ul>
+                                            </div>
+                                        @endif -->
 
                                 @if (session('success'))
                                     <div class="alert alert-success">
@@ -766,7 +768,7 @@
                                             <label class="form-check-label" for="logout_checkbox">
                                                 <input type="checkbox" class="form-check-input"
                                                     name="logout_after_change" id="logout_checkbox">
-                                                Log me out after changing my password
+                                                Test new password
                                             </label>
                                         </div>
                                     </div>

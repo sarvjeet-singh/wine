@@ -14,7 +14,6 @@
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Email</th>
-                <th>Contact Number</th>
             </tr>
         </thead>
         <tbody>
@@ -23,7 +22,6 @@
                 <td>{{ $user->firstname }}</td>
                 <td>{{ $user->lastname }}</td>
                 <td>{{ $user->email }}</td>
-                <td>{{ $user->contact_number }}</td>
             </tr>
             @endforeach
         </tbody>

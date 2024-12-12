@@ -190,7 +190,7 @@
 
     </style>
 
-    @if ($user->date_of_birth && \Carbon\Carbon::parse($user->date_of_birth)->age >= 18)
+    @if (($user->date_of_birth && \Carbon\Carbon::parse($user->date_of_birth)->age >= 18) || Auth::guard('vendor')->check() == 1)
 
         <div class="container mt-5 frontend detail-page">
 
@@ -1339,7 +1339,6 @@
     </div>
 
     <!-- /Login Popup -->
-
 @else
 
     <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">

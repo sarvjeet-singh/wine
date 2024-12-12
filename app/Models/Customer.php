@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Notifications\CustomerVerifyEmail;
+use App\Notifications\CustomerResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class Customer extends Authenticatable
+class Customer extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -92,5 +95,18 @@ class Customer extends Authenticatable
     public function rewards()
     {
         return $this->hasMany(Reward::class, 'customer_id');
+    }
+
+    /**
+     * Send the email verification notification.
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new CustomerVerifyEmail);
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new CustomerResetPasswordNotification($token));
     }
 }

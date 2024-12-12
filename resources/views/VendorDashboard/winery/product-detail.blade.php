@@ -60,7 +60,7 @@
                                                                 class="glyphicon glyphicon-minus">-</span> </button> </span>
 
                                                     <input type="text" class="form-control input-number quantity"
-                                                        min="1" max="{{ $wine->inventory }}" value="1"> <span
+                                                        min="1" max="{{ $wine->inventory }}" oninput="this.value = this.value < this.min ? this.min : this.value" value="1"> <span
                                                         class="input-group-btn"> <button type="button"
                                                             class="quantity-right-plus btn btn-success btn-number"
                                                             data-type="plus" data-field=""> <span

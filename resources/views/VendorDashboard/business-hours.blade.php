@@ -39,6 +39,7 @@
                             $savedHour = $businessHours->where('day', ucfirst($day))->first();
                             $openingTime = isset($savedHour->opening_time) ? \Carbon\Carbon::parse($savedHour->opening_time)->format('H:i') : '';
                             $closingTime = isset($savedHour->closing_time) ? \Carbon\Carbon::parse($savedHour->closing_time)->format('H:i') : '';
+                            $isLate = isset($savedHour) && $savedHour->is_late; // Add this for "Late" status
                             ?>
                             <div class="weekdays-main mb-3 d-flex align-items-center gap-5 bussines_days_box">
                                 <div class="w-25">
@@ -60,10 +61,18 @@
                                                 id="{{ $day }}_opening_time" class="open_time"
                                                 name="hours[{{ $day }}][opening_time]">
                                         </div>
-                                        <div class="col-sm-6">
+                                        <div class="col-sm-6 d-flex align-items-center">
                                             <input type="time" value="{{ $closingTime }}"
                                                 id="{{ $day }}_closing_time" class="close_time"
-                                                name="hours[{{ $day }}][closing_time]">
+                                                name="hours[{{ $day }}][closing_time]"
+                                                {{ $isLate ? 'disabled' : '' }}>
+                                            <div class="form-check form-switch ms-2">
+                                                <input type="checkbox" class="form-check-input late-checkbox"
+                                                    id="{{ $day }}_late"
+                                                    name="hours[{{ $day }}][is_late]" value="1"
+                                                    {{ $isLate ? 'checked' : '' }}>
+                                                <label for="{{ $day }}_late" class="form-check-label">Late</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -100,27 +109,43 @@
                 const day = checkbox.id.replace('Checkbox', '');
                 const openingTimeInput = document.getElementById(`${day}_opening_time`);
                 const closingTimeInput = document.getElementById(`${day}_closing_time`);
+                const lateCheckbox = document.getElementById(`${day}_late`);
                 const statusText = document.getElementById(`${day}Status`);
 
-                // Function to toggle checkbox state and label text
+                // Function to toggle the main checkbox state and label text
                 function toggleCheckboxState() {
-                    if (openingTimeInput.value && closingTimeInput.value) {
-                        checkbox.disabled = false; // Enable the checkbox
+                    // Enable "Open/Closed" checkbox if opening time is set and (closing time is set or Late is checked)
+                    if (openingTimeInput.value && (closingTimeInput.value || lateCheckbox.checked)) {
+                        checkbox.disabled = false;
+                        checkbox.checked = true; // Automatically check when valid inputs are provided
+                        statusText.textContent = 'Open';
                     } else {
-                        checkbox.checked = false; // Uncheck if time is incomplete
+                        checkbox.checked = false; // Uncheck if conditions aren't met
                         checkbox.disabled = true; // Disable the checkbox
+                        statusText.textContent = 'Closed';
+                    }
+                }
+
+                // Function to handle enabling/disabling of the closing time input
+                function toggleClosingTimeState() {
+                    if (lateCheckbox.checked) {
+                        closingTimeInput.disabled = true;
+                        closingTimeInput.value = ''; // Clear closing time if Late is selected
+                    } else {
+                        closingTimeInput.disabled = false;
                     }
 
-                    // Update status text based on whether checkbox is checked
-                    statusText.textContent = checkbox.checked ? 'Open' : 'Closed';
+                    toggleCheckboxState(); // Recheck the main checkbox logic
                 }
 
                 // Run initially to set the correct state on page load
                 toggleCheckboxState();
+                toggleClosingTimeState();
 
-                // Add event listeners to monitor changes in time inputs and checkbox
+                // Add event listeners to monitor changes in time inputs and checkboxes
                 openingTimeInput.addEventListener('input', toggleCheckboxState);
                 closingTimeInput.addEventListener('input', toggleCheckboxState);
+                lateCheckbox.addEventListener('change', toggleClosingTimeState);
                 checkbox.addEventListener('change', function() {
                     statusText.textContent = checkbox.checked ? 'Open' : 'Closed';
                 });

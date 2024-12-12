@@ -25,7 +25,7 @@ class AdminLoginController extends Controller
         ]);
 
         // Attempt to log the user in with 'admin' role
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password, 'role' => 'admin'])) {
+        if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])) {
             // Redirect to admin dashboard if successful
             return redirect()->intended('/admin/dashboard');
         }
@@ -37,7 +37,7 @@ class AdminLoginController extends Controller
     // Logout admin
     public function logout()
     {
-        Auth::logout();
+        Auth::guard('admin')->logout();
         return redirect('/admin/login');
     }
 }

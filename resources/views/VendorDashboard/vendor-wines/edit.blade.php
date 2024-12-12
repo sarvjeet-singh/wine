@@ -278,12 +278,17 @@
         </div>
 
         <div class="col-md-6">
-            <label for="" class="form-label">Inventory</label>
             <div class="d-flex align-items-center gap-2">
-                <input type="number" class="form-control" id="casesInput" min="0" placeholder="Enter cases"
-                    style="width: 50%;">
-                <input type="number" class="form-control" id="bottlesInput" min="0"
-                    placeholder="Enter bottles" style="width: 50%;">
+                <div>
+                    <label for="casesInput" class="form-label">Case</label>
+                    <input type="number" class="form-control" id="casesInput" min="0"
+                        placeholder="Enter cases" style="width: 50%;">
+                </div>
+                <div>
+                    <label for="bottlesInput" class="form-label">Bottle</label>
+                    <input type="number" class="form-control" id="bottlesInput" min="0"
+                        placeholder="Enter bottles" style="width: 50%;">
+                </div>
             </div>
             <input type="hidden" name="inventory" value="{{ old('inventory', $wine->inventory) }}" id="inventory"
                 class="form-control">

@@ -29,7 +29,7 @@
                             @endif
                         </div>
                     @endif
-                    <form method="POST" action="{{ route('login') }}">
+                    <form method="POST" action="{{ route('customer.login.post') }}">
                         @csrf
                         <div class="row mb-3 mt-4">
                             <label for="email" class="col-form-label">{{ __('eMail Address') }}</label>

@@ -110,7 +110,7 @@
                             </div>
 
                             <div class="row mt-3">
-                                <div class="col-sm-6 col-12">
+                                <div class="col-sm-12 col-12">
                                     <label class="form-label">Unit/Suite</label>
                                     <input type="text" class="form-control @error('unitsuite') is-invalid @enderror"
                                         name="unitsuite" value="{{ old('unitsuite', $vendor->unitsuite) }}"
@@ -119,23 +119,51 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+
+                            </div>
+                            <div class="row mt-3">
                                 <div class="col-sm-6 col-12">
-                                    <label class="form-label">City/Town*</label>
-                                    <input type="text" class="form-control @error('city') is-invalid @enderror"
-                                        name="city" value="{{ old('city', $vendor->city) }}"
-                                        placeholder="Please enter City/Town">
-                                    @error('city')
+                                    <label class="form-label">Country</label>
+                                    <select class="form-control @error('country') is-invalid @enderror" name="country" id="country">
+                                        <option value="">Please select a country</option>
+                                        @foreach ($countries as $country)
+                                            <option value="{{ $country->id }}"
+                                                {{ old('country', !empty($vendor->country) ? $vendor->country : '') == $country->id ? 'selected' : '' }}>
+                                                {{ $country->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('country')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-sm-6 col-12">
+                                    <label for="province" class="form-label fw-bold">Province/State*</label>
+                                    <select class="form-control select2 @error('province') is-invalid @enderror"
+                                        name="province" id="province">
+                                        @foreach (getStates(2) as $type => $items)
+                                            <optgroup label="{{ ucfirst($type) }}">
+                                                @foreach ($items as $state)
+                                                    <option value="{{ $state->name }}"
+                                                        {{ collect(old('province', $vendor->province ?? 'Ontario'))->contains($state->name) ? 'selected' : '' }}>
+                                                        {{ $state->name }}
+                                                    </option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
+                                    </select>
+                                    @error('province')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
                             <div class="row mt-3">
                                 <div class="col-sm-6 col-12">
-                                    <label class="form-label">Province/State*</label>
-                                    <input type="text" class="form-control @error('province') is-invalid @enderror"
-                                        name="province" value="{{ old('province', $vendor->province) }}"
-                                        placeholder="Please enter Province/State">
-                                    @error('province')
+                                    <label class="form-label">City/Town*</label>
+                                    <input type="text" class="form-control @error('city') is-invalid @enderror"
+                                        name="city" value="{{ old('city', $vendor->city) }}"
+                                        placeholder="Please enter City/Town">
+                                    @error('city')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -166,21 +194,6 @@
                                             @endforeach
                                         </select>
                                         @error('sub_region')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="mt-3">
-                                        <label class="form-label">Country</label>
-                                        <select class="form-control @error('country') is-invalid @enderror" name="country">
-                                            <option value="">Please select a country</option>
-                                            @foreach ($countries as $country)
-                                                <option value="{{ $country->id }}"
-                                                    {{ old('country', !empty($vendor->country) ? $vendor->country : '') == $country->id ? 'selected' : '' }}>
-                                                    {{ $country->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('country')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -220,60 +233,37 @@
                                             <div class="box-head-heading d-flex">
                                                 <span class="box-head-label theme-color">Logo/Graphic</span>
                                             </div>
-                                            <div class="box-head-description mt-3">
-                                                Images are limited to a 50kb file size in png or jpg formats
-                                            </div>
+                                            <!--<div class="box-head-description mt-3">-->
+                                            <!--    Images are limited to a 50kb file size in png or jpg formats-->
+                                            <!--</div>-->
                                         </div>
                                         <div class="information-box-body">
                                             <div class="row mt-3">
                                                 <div class="col-sm-12">
-                                                    <div class="box-gallary-7-images-row">
+                                                    <div class="box-gallary-7-images-row vendor-default-logo">
                                                         <div
                                                             class="box-gallary-images-column select-box-gallary-images-column">
-                                                            <label for="front_License_image"
-                                                                class="custom-file-label upload-button">
+                                                            <label for="front_License_image" {{-- upload-button --}}
+                                                                class="custom-file-label">
                                                                 <!-- <img src="{{ asset('images/media-gallary/plus-icon.png') }}"
-                                                                                                            width="20"> -->
-                                                                <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                                                                                                                                            width="20"> -->
+                                                                <a href="{{ route('vendor-media-gallary') }}">
+                                                                    <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                                                                </a>
                                                             </label>
                                                         </div>
                                                         @php
-                                                            $firstMedia = $VendorMediaGallery->first(); // Get the first media item
+                                                            $firstMedia = $VendorMediaGallery
+                                                                ->where('is_default', 1)
+                                                                ->first(); // Get the first media item
                                                         @endphp
 
                                                         @if ($firstMedia)
                                                             <div class="box-gallary-images-column position-relative">
-                                                                <a href="javascript:void(0)"
-                                                                    class="dlt-icon vendor-media-delete"
-                                                                    data-id="{{ $firstMedia->id }}"
-                                                                    data-type="{{ $firstMedia->vendor_media_type }}">
-                                                                    <i class="fa-solid fa-trash"></i>
-                                                                </a>
                                                                 @if ($firstMedia->vendor_media_type == 'image')
                                                                     <img src="{{ asset($firstMedia->vendor_media) }}"
                                                                         class="box-gallary-7-images rounded-4">
-                                                                @elseif($firstMedia->vendor_media_type == 'youtube')
-                                                                    <iframe width="135px"
-                                                                        src="{{ $firstMedia->vendor_media }}"
-                                                                        frameborder="0" allowfullscreen></iframe>
                                                                 @endif
-                                                            </div>
-                                                        @endif
-                                                        @if ($vendor->vendor_media_logo)
-                                                            <div class="box-gallary-images-column position-relative">
-                                                                <a href="javascript:void(0)"
-                                                                    class="dlt-icon vendor-media-delete"
-                                                                    data-type="image"><svg class="svg-inline--fa fa-trash"
-                                                                        aria-hidden="true" focusable="false"
-                                                                        data-prefix="fas" data-icon="trash"
-                                                                        role="img" xmlns="http://www.w3.org/2000/svg"
-                                                                        viewBox="0 0 448 512" data-fa-i2svg="">
-                                                                        <path fill="currentColor"
-                                                                            d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z">
-                                                                        </path>
-                                                                    </svg><!-- <i class="fa-solid fa-trash"></i> Font Awesome fontawesome.com --></a>
-                                                                <img src="{{ asset($vendor->vendor_media_logo) }}"
-                                                                    class="box-gallary-7-images rounded-4">
                                                             </div>
                                                         @endif
                                                     </div>
@@ -310,8 +300,7 @@
                     <div class="information-box">
                         <div class="information-box-head">
                             <div class="box-head-heading d-flex">
-                                <span class="box-head-label theme-color">Booking Availability (Accommodation
-                                    Details)</span>
+                                <span class="box-head-label theme-color">Accommodation Details</span>
                             </div>
                         </div>
                         <div class="information-box-body">
@@ -385,41 +374,43 @@
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col-sm-6 col-12">
-                                        <label class="form-label">Square Footage</label>
+                                        <label class="form-label">Total Square Footage</label>
                                         <input type="text"
                                             class="form-control numeric-input @error('square_footage') is-invalid @enderror"
                                             name="square_footage"
                                             value="{{ old('square_footage', !empty($metadata->square_footage) ? $metadata->square_footage : '') }}"
-                                            placeholder="Please enter square footage">
+                                            placeholder="Total Square Footage">
                                         @error('square_footage')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="col-sm-6 col-12">
-                                        <label class="form-label">Bedrooms*</label>
+                                        <label class="form-label">Bedroom*</label>
                                         <input type="text"
                                             class="form-control numeric-input @error('bedrooms') is-invalid @enderror"
                                             name="bedrooms"
                                             value="{{ old('bedrooms', !empty($metadata->bedrooms) ? $metadata->bedrooms : '') }}"
-                                            placeholder="Please enter bedrooms">
+                                            placeholder="Bedroom">
                                         @error('bedrooms')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
                                 </div>
                                 <div class="row mt-3">
-                                    <div class="col-md-6">
-                                        <label for="sleeps" class="form-label">Sleeps*</label>
-                                        <input type="text" name="sleeps"
-                                            class="form-control @error('sleeps') is-invalid @enderror"
-                                            value="{{ old('sleeps', !empty($metadata->sleeps) ? $metadata->sleeps : '') }}"
-                                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                                        @error('sleeps')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="col-sm-6 col-12">
+                                        <label class="form-label">Washroom</label>
+                                        <input type="text"
+                                            class="form-control numeric-input @error('washrooms') is-invalid @enderror"
+                                            name="washrooms"
+                                            value="{{ old('washrooms', !empty($metadata->washrooms) ? $metadata->washrooms : '') }}"
+                                            placeholder="Washroom">
+
+                                        @error('washrooms')
+                                            <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
-                                    <div class="col-md-6">
-                                        <label for="beds" class="form-label">Beds*</label>
+                                    <div class="col-md-3">
+                                        <label for="beds" class="form-label">Bed*</label>
                                         <input type="text" name="beds"
                                             class="form-control @error('beds') is-invalid @enderror"
                                             value="{{ old('beds', !empty($metadata->beds) ? $metadata->beds : '') }}"
@@ -428,19 +419,15 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <div class="row mt-3">
-                                        <div class="col-sm-6 col-12">
-                                            <label class="form-label">Washrooms*</label>
-                                            <input type="text"
-                                                class="form-control numeric-input @error('washrooms') is-invalid @enderror"
-                                                name="washrooms"
-                                                value="{{ old('washrooms', !empty($metadata->washrooms) ? $metadata->washrooms : '') }}"
-                                                placeholder="Please enter washrooms">
-
-                                            @error('washrooms')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div>
+                                    <div class="col-md-3">
+                                        <label for="sleeps" class="form-label">Sleeps*</label>
+                                        <input type="text" name="sleeps"
+                                            class="form-control @error('sleeps') is-invalid @enderror"
+                                            value="{{ old('sleeps', !empty($metadata->sleeps) ? $metadata->sleeps : '') }}"
+                                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                        @error('sleeps')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                 </div>
                                 <div class="row mt-5">
@@ -590,7 +577,7 @@
                 </div>
             </div>
         @endif
-        
+
         @if (trim(strtolower($vendor->vendor_type)) == 'accommodation' ||
                 trim(strtolower($vendor->vendor_type)) == 'winery' ||
                 trim(strtolower($vendor->vendor_type)) == 'excursion')
@@ -893,7 +880,7 @@
                         id="upload_media">
                         @csrf
                         <input type="hidden" value="" name="vendorImage" class="base64imageupload">
-                        
+
                         <div class="mb-5 image_section">
                             <label class="form-label">Add Photo/Video</label>
                             <div class="position-relative select_image_section">
@@ -1156,28 +1143,6 @@
                 }
             });
         });
-
-        $(document).delegate('.vendor-media-delete', 'click', function() {
-            var mediaId = $(this).attr('data-id');
-            $.ajax({
-                url: "{{ route('vendor-logo-delete', ['vendorid' => $vendor->id]) }}",
-                type: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    if (response.status == "success") {
-                        window.location.reload();
-                    }
-                },
-                error: function(xhr, status, error) {
-                    // Handle any errors
-                    $('.upload-image-youtube-button').prop('disabled', false);
-                    console.error(xhr.responseText);
-                }
-            });
-        });
     </script>
     <script src="{{ asset('asset/js/select2.min.js') }}"></script>
     <script>
@@ -1187,5 +1152,62 @@
                 width: '100%'
             });
         });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#province').select2({
+                placeholder: "Select Province/State",
+                allowClear: true,
+                width: '100%',
+                dropdownCssClass: 'select2-dropdown-searchable'
+            });
+        });
+        $(document).ready(function() {
+            // Listen for country dropdown change
+            $('#country').change(function() {
+                let countryId = $(this).val();
+
+                if (countryId) {
+                    $.ajax({
+                        url: '{{ route('get.states') }}', // Endpoint for fetching states
+                        type: 'GET',
+                        data: {
+                            country_id: countryId
+                        },
+                        success: function(response) {
+                            let stateDropdown = $('#province');
+                            stateDropdown.empty(); // Clear existing options
+
+                            if (response.success) {
+                                // Populate states
+                                $.each(response.states, function(type, states) {
+                                    // Add optgroup for each type (province, state)
+                                    let group = $('<optgroup>', {
+                                        label: capitalizeFirstLetter(type)
+                                    });
+                                    $.each(states, function(index, state) {
+                                        group.append($('<option>', {
+                                            value: state.id,
+                                            text: state.name
+                                        }));
+                                    });
+                                    stateDropdown.append(group);
+                                });
+                            } else {
+                                stateDropdown.append('<option>No states available</option>');
+                            }
+                        },
+                        error: function() {
+                            alert('Failed to load states. Please try again.');
+                        }
+                    });
+                }
+            });
+        });
+
+        function capitalizeFirstLetter(string) {
+            if (!string) return ''; // Handle empty or null strings
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
     </script>
 @endsection

@@ -64,21 +64,47 @@
             </div>
             <div class="col-md-6">
                 <div>
-                    <label for="" class="form-label fw-bold">City/Town*</label>
-                    <input type="text" class="form-control @error('city') is-invalid @enderror" name="city"
-                        placeholder="City/Town" value="{{ !empty($vendor) ? $vendor->city : old('city') }}">
-                    @error('city')
+                    <label for="country" class="form-label fw-bold">Country*</label>
+                    <select name="country" id="country" class="form-select" aria-label="Select a country">
+                        <option value="">Select a country</option>
+                        @foreach (getCountries() as $country)
+                            <option value="{{ $country->id }}"
+                                {{ (!empty($vendor) && $vendor->country == $country->id) || old('country') == $country->id || (empty($vendor) && old('country') === null && $country->id == 2) ? 'selected' : '' }}>
+                                {{ $country->name }}
+                        @endforeach
+                    </select>
+                    @error('country')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div>
+                    <label for="province" class="form-label fw-bold">Province/State*</label>
+                    <select class="form-control select2 @error('province') is-invalid @enderror" name="province"
+                        id="province">
+                        @foreach (getStates(2) as $type => $items)
+                            <optgroup label="{{ ucfirst($type) }}">
+                                @foreach ($items as $state)
+                                    <option value="{{ $state->name }}"
+                                        {{ collect(old('province', $vendor->province ?? 'Ontario'))->contains($state->name) ? 'selected' : '' }}>
+                                        {{ $state->name }}
+                                    </option>
+                                @endforeach
+                            </optgroup>
+                        @endforeach
+                    </select>
+                    @error('province')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
             <div class="col-md-6">
                 <div>
-                    <label for="" class="form-label fw-bold">Province/State*</label>
-                    <input type="text" class="form-control @error('province') is-invalid @enderror" name="province"
-                        placeholder="Province/State"
-                        value="{{ !empty($vendor) ? $vendor->province : old('province') }}">
-                    @error('province')
+                    <label for="" class="form-label fw-bold">City/Town*</label>
+                    <input type="text" class="form-control @error('city') is-invalid @enderror" name="city"
+                        placeholder="City/Town" value="{{ !empty($vendor) ? $vendor->city : old('city') }}">
+                    @error('city')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
@@ -92,22 +118,6 @@
                         oninput="formatPostalCode(this)">
                     @error('postalCode')
                         <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div>
-                    <label for="country" class="form-label fw-bold">Country*</label>
-                    <select name="country" id="country" class="form-select" aria-label="Select a country">
-                        <option value="">Select a country</option>
-                        @foreach (getCountries() as $country)
-                            <option value="{{ $country->id }}"
-                                {{ (!empty($vendor) && $vendor->country == $country->id) || old('country') == $country->id || (empty($vendor) && old('country') === null && $country->id == 2) ? 'selected' : '' }}>
-                                {{ $country->name }}
-                        @endforeach
-                    </select>
-                    @error('country')
-                        <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
             </div>
@@ -195,6 +205,7 @@
     </div>
 </div>
 @push('js')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -216,7 +227,7 @@
         $(document).ready(function() {
             const defaultRegionId = $('#region').val();
             const selectedSubRegionId =
-            "{{ $vendor->sub_region ?? (old('sub_region') ?? '') }}"; // Use sub-region from DB or old value
+                "{{ $vendor->sub_region ?? (old('sub_region') ?? '') }}"; // Use sub-region from DB or old value
             const subRegionDropdown = $('#sub_region');
 
             function loadSubRegions(regionId, selectedSubRegionId = null) {
@@ -256,5 +267,126 @@
                 loadSubRegions(regionId);
             });
         });
+        $(document).ready(function() {
+            let typingTimer; // Timer for debounce
+            const debounceDelay = 500; // Delay in milliseconds
+
+            $("input[name='vendor_name'], input[name='street_address']").on("keyup", function() {
+                clearTimeout(typingTimer);
+
+                typingTimer = setTimeout(() => {
+                    validateCombination();
+                }, debounceDelay);
+            });
+
+            function validateCombination() {
+                const vendorName = $("input[name='vendor_name']").val().trim();
+                const streetAddress = $("input[name='street_address']").val().trim();
+
+                if (vendorName === "" || streetAddress === "") {
+                    // Reset the error message if fields are empty
+                    // removeError("vendor_name");
+                    removeError("street_address");
+                    return;
+                }
+
+                // AJAX request to validate the combination
+                $.ajax({
+                    url: "{{ route('check.vendor.combination') }}",
+                    type: "POST",
+                    data: {
+                        vendor_name: vendorName,
+                        street_address: streetAddress,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.exists) {
+                            // Add error to both fields
+                            // addError("vendor_name", response.message);
+                            addError("street_address", response.message);
+                        } else {
+                            // Remove error if combination does not exist
+                            // removeError("vendor_name");
+                            removeError("street_address");
+                        }
+                    },
+                    error: function() {
+                        alert("An error occurred. Please try again.");
+                    }
+                });
+            }
+
+            function addError(fieldName, message) {
+                const inputField = $(`input[name='${fieldName}']`);
+                inputField.addClass("is-invalid");
+
+                // Remove existing error feedback, if any
+                inputField.next(".invalid-feedback").remove();
+
+                // Add new feedback message
+                inputField.after(`<div class="invalid-feedback">${message}</div>`);
+            }
+
+            function removeError(fieldName) {
+                const inputField = $(`input[name='${fieldName}']`);
+                inputField.removeClass("is-invalid");
+                inputField.next(".invalid-feedback").remove();
+            }
+        });
+        $(document).ready(function() {
+            $('#province').select2({
+                placeholder: "Select Province/State",
+                allowClear: true,
+                width: '100%',
+                dropdownCssClass: 'select2-dropdown-searchable'
+            });
+        });
+        $(document).ready(function() {
+            // Listen for country dropdown change
+            $('#country').change(function() {
+                let countryId = $(this).val();
+
+                if (countryId) {
+                    $.ajax({
+                        url: '{{ route('get.states') }}', // Endpoint for fetching states
+                        type: 'GET',
+                        data: {
+                            country_id: countryId
+                        },
+                        success: function(response) {
+                            let stateDropdown = $('#province');
+                            stateDropdown.empty(); // Clear existing options
+
+                            if (response.success) {
+                                // Populate states
+                                $.each(response.states, function(type, states) {
+                                    // Add optgroup for each type (province, state)
+                                    let group = $('<optgroup>', {
+                                        label: capitalizeFirstLetter(type)
+                                    });
+                                    $.each(states, function(index, state) {
+                                        group.append($('<option>', {
+                                            value: state.id,
+                                            text: state.name
+                                        }));
+                                    });
+                                    stateDropdown.append(group);
+                                });
+                            } else {
+                                stateDropdown.append('<option>No states available</option>');
+                            }
+                        },
+                        error: function() {
+                            alert('Failed to load states. Please try again.');
+                        }
+                    });
+                }
+            });
+        });
+
+        function capitalizeFirstLetter(string) {
+            if (!string) return ''; // Handle empty or null strings
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
     </script>
 @endpush

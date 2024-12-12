@@ -11,7 +11,9 @@ use App\Models\WineryOrderWine;
 use App\Models\WineryOrderTransaction;
 use App\Models\Vendor;
 use App\Models\VendorWine;
+use App\Models\VendorStripeDetail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use DB;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
@@ -50,7 +52,7 @@ class WineryCheckoutController extends Controller
             $deliveryFee = 0.00;
         }
 
-        $vendor = Vendor::find($shopid);
+        $vendor = Vendor::with('stripeDetails')->find($shopid);
         return view('VendorDashboard.winery.checkout', compact('shopid', 'vendorid', 'vendor', 'cartTotal', 'deliveryFee'));
     }
 
@@ -189,7 +191,8 @@ class WineryCheckoutController extends Controller
                 'country' => 'CA',
             ];
 
-            Stripe::setApiKey(env('STRIPE_SECRET'));
+            $stripeDetail = VendorStripeDetail::where('vendor_id', $shopid)->first();
+            Stripe::setApiKey(Crypt::decryptString($stripeDetail->stripe_secret_key));
 
             $intent = PaymentIntent::create([
                 'amount' => $cartTotal * 100,
@@ -217,7 +220,8 @@ class WineryCheckoutController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'error' => 'Failed to place the order. Please try again.'
+                'error' => 'Failed to place the order. Please try again.',
+                'message' => $e->getMessage()
             ], 500);
         }
     }
@@ -234,7 +238,9 @@ class WineryCheckoutController extends Controller
                 // 'transaction' => $transaction
             ], 200);
         }
-        Stripe::setApiKey(env('STRIPE_SECRET'));
+        $order = WineryOrder::find($order_id);
+        $stripeDetail = VendorStripeDetail::where('vendor_id', $order->vendor_seller_id)->first();
+        Stripe::setApiKey(Crypt::decryptString($stripeDetail->stripe_secret_key));
         $paymentIntent = \Stripe\PaymentIntent::retrieve($payment_intent_id);
         $transactionData = [
             'winery_order_id' => $order_id,

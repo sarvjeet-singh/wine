@@ -29,16 +29,19 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Admin\VendorController as AdminVendorController;
 use App\Http\Controllers\Admin\WineController as AdminWineController;
-use App\Http\Controllers\Admin\CommonController as AdminCommonController;
+use App\Http\Controllers\CommonController;
 use App\Http\Controllers\Admin\WineCatalogueController as AdminWineCatalogueController;
 use App\Http\Controllers\Admin\UserEmailController as AdminUserEmailController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Auth\CustomerAuthController;
+use App\Http\Controllers\Auth\VendorAuthController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\FrontendInquiryController;
+use App\Http\Controllers\CommandController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -86,8 +89,25 @@ Route::get('/refresh-captcha', [RegisterController::class, 'refreshCaptcha'])->n
 Route::post('email/resend', [LoginController::class, 'resend'])
     ->middleware(['throttle:6,1'])
     ->name('verification.resend');
+
+Route::post('email/customer/resend', [CustomerAuthController::class, 'resend'])
+    ->middleware(['throttle:6,1'])
+    ->name('customer.verification.resend');
+Route::get('customer/email/verify/{id}/{hash}', [CustomerAuthController::class, 'verifyEmail'])->name('customer.verify.email');
+// Forgot Password
+Route::get('customer/forgot-password', [CustomerAuthController::class, 'showForgotPasswordForm'])->name('customer.password.request');
+Route::post('customer/forgot-password', [CustomerAuthController::class, 'sendResetLinkEmail'])->name('customer.password.email');
+
+// Reset Password
+Route::get('customer/password/reset/{token}', [CustomerAuthController::class, 'showResetPasswordForm'])->name('customer.password.reset');
+Route::post('customer/reset-password', [CustomerAuthController::class, 'resetPassword'])->name('customer.password.update');
+
+
+
 Route::post('/check-email', [LoginController::class, 'checkEmail'])->name('check.email');
 
+Route::get('/get-states', [CommonController::class, 'getStates'])->name('get.states');
+Route::get('/send-weekly-email', [CommandController::class, 'sendWeeklyRegisteredUsers']);
 
 Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
@@ -103,9 +123,12 @@ Route::get('/some-error-route', function () {
 })->name('some.error.route');
 
 // Customer routes
-Route::get('customer/login', [CustomerAuthController::class, 'showLoginForm'])->name('customer.login');
-Route::post('customer/login', [CustomerAuthController::class, 'login'])->name('customer.login.post');
-Route::post('customer/logout', [CustomerAuthController::class, 'logout'])->name('customer.logout');
+Route::get('user/login', [CustomerAuthController::class, 'showLoginForm'])->name('customer.login');
+Route::post('user/login', [CustomerAuthController::class, 'login'])->name('customer.login.post');
+Route::post('user/logout', [CustomerAuthController::class, 'logout'])->name('customer.logout');
+Route::get('vendor/login', [VendorAuthController::class, 'showLoginForm'])->name('vendor.login');
+Route::post('vendor/login', [VendorAuthController::class, 'login'])->name('vendor.login.post');
+Route::post('vendor/logout', [VendorAuthController::class, 'logout'])->name('vendor.logout');
 
 
 // ================= FRONT END ============== //
@@ -117,7 +140,7 @@ Route::get('check-login', function () {
     if (!auth()->check()) {
         // If not logged in, flash an error message and redirect to login
         session()->flash('error', 'You must be logged in to submit a business.');
-        return redirect()->route('login');
+        return redirect()->route('customer.login');
     }
 
     // If logged in, redirect to the original action (e.g., the form to promote a business)
@@ -125,9 +148,9 @@ Route::get('check-login', function () {
 })->name('check-login');
 // Route::get('/accommodations', [FrontEndController::class, 'getAccommodations'])->name('accommodations');
 Route::post('/get-accommodations', [FrontEndController::class, 'getAccommodationsList'])->name('get.accommodation');
-Route::post('/accommodation/inquiry', [FrontEndController::class, 'AccommodationsInquiry'])->name('accommodation.inquiry')->middleware('auth');
-Route::post('/excursion/inquiry', [FrontEndController::class, 'excursionstore'])->name('excursion.inquiry')->middleware('auth');
-Route::post('/winery/inquiry', [FrontEndController::class, 'winerystore'])->name('winery.inquiry')->middleware('auth');
+Route::post('/accommodation/inquiry', [FrontendInquiryController::class, 'storeAccommodation'])->name('accommodation.inquiry')->middleware('auth:customer');
+Route::post('/excursion/inquiry', [FrontendInquiryController::class, 'storeExcursion'])->name('excursion.inquiry')->middleware('auth:customer');
+Route::post('/winery/inquiry', [FrontendInquiryController::class, 'storeWinery'])->name('winery.inquiry')->middleware('auth:customer');
 Route::get('/accommodation/{vendorslug?}', [FrontEndController::class, 'getAccommodationDetails'])->name('accommodation-details');
 Route::get('/winery/{vendorslug?}', [FrontEndController::class, 'getWineryDetails'])->name('winery-details');
 Route::get('/excursions/{vendorslug?}', [FrontEndController::class, 'getExcursionDetails'])->name('excursion-details');
@@ -205,7 +228,7 @@ Route::post('orders/send-inquiry', [OrderController::class, 'sendInquiry'])->nam
 
 
 // ================= VENDOR ============== //
-Route::group(['middleware' => ['auth', 'check.vendorid']], function () {
+Route::group(['middleware' => ['auth:vendor', 'check.vendorid']], function () {
     Route::get('/vendor-change-password/{vendorid}', [VendorController::class, 'changePassword'])->name('vendor-change-password');
     Route::post('/vendor-password-update/{vendorid}', [VendorController::class, 'passwordUpdate'])->name('vendor-password-update');
     Route::post('/vendor-skip-password/{vendorid}', [VendorController::class, 'skipPassword'])->name('vendor-skip-password');
@@ -230,6 +253,7 @@ Route::group(['middleware' => ['auth', 'check.vendorid']], function () {
     Route::get('/vendor-media-gallary/{vendorid?}', [VendorController::class, 'getVendorMediaGallery'])->name('vendor-media-gallary');
     Route::post('/vendor-media-delete/{vendorid?}', [VendorController::class, 'deleteVendorMedia'])->name('vendor-media-delete');
     Route::post('/vendor-logo-delete/{vendorid?}', [VendorController::class, 'deleteVendorLogo'])->name('vendor-logo-delete');
+    Route::post('/vendor/media/set-default/{vendorid?}', [VendorController::class, 'setDefaultMedia'])->name('vendor-media-set-default');
 
     Route::post('/vendor/upload-media/{vendorid?}', [VendorController::class, 'uploadMedia'])->name('vendor.upload_media');
     Route::post('/vendor/upload-logo/{vendorid?}', [VendorController::class, 'uploadVendorLogo'])->name('vendor.upload_vendor_logo');
@@ -346,7 +370,8 @@ Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name
 Route::post('/admin/login', [AdminLoginController::class, 'login']);
 Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
 
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth:admin'])->group(function () {
+    Route::post('/check-vendor-combination', [AdminVendorController::class, 'checkVendorCombination'])->name('check.vendor.combination');
     Route::get('/admin/filter/search', [AdminVendorController::class, 'filterSearch'])->name('admin.vendors.search');
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/vendors/show/{id}', [AdminVendorController::class, 'show'])->name('admin.vendors.show');
@@ -376,6 +401,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/faqs/update-question/{section_id}', [AdminFaqController::class, 'updateQuestion'])->name('admin.faqs.update-question');
     Route::delete('/admin/faqs/questions/{id}', [AdminFaqController::class, 'destroyQuestion'])->name('admin.faqs.delete-question');
     Route::resource('/admin/faqs', AdminFaqController::class)->names('admin.faqs');
+
 
     // Common Routes
     // Route::prefix('admin/{entity}')->group(function () {
@@ -436,6 +462,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
 Route::get('/get-subregions/{regionId}', [RegionController::class, 'getSubRegions']);
 Route::get('/get-subcategories/{categoryId}', [CategoryController::class, 'getSubcategories'])->name('getSubcategories');
 Route::post('/webhook/stripe', [StripeWebhookController::class, 'handleWebhook']);
-
+Route::get('/vendorEmailTest', [AdminVendorController::class, 'vendorEmailTest']);
 
 // Route::get('/migration-vendor', [MigrationController::class, 'migrateVendorData']);

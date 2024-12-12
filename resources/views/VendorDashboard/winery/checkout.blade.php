@@ -15,7 +15,7 @@
 
 
 @section('content')
-
+    <link rel="stylesheet" href="{{ asset('asset/css/select2.min.css') }}">
     <style>
         .error {
 
@@ -159,17 +159,6 @@
 
                                                     <div class="col-md-4">
 
-                                                        <label for="shipping_city"
-                                                            class="form-label fw-bold">City/Town*</label>
-
-                                                        <input type="text" id="shipping_city" name="shipping_city"
-                                                            value="{{ old('shipping_city') }}" class="form-control"
-                                                            placeholder="Ontario" id="">
-
-                                                    </div>
-
-                                                    <div class="col-md-4">
-
                                                         <label for="shipping_unit"
                                                             class="form-label fw-bold">Unit/Suite#</label>
 
@@ -181,24 +170,25 @@
 
                                                     <div class="col-md-4">
 
-                                                        <label for="shipping_state"
-                                                            class="form-label fw-bold">Province/State*</label>
+                                                        <label for="shipping_city"
+                                                            class="form-label fw-bold">City/Town*</label>
 
-                                                        <input type="text" id="shipping_state" name="shipping_state"
-                                                            value="{{ old('shipping_state') }}" class="form-control"
-                                                            placeholder="L6H 1H4" id="">
+                                                        <input type="text" id="shipping_city" name="shipping_city"
+                                                            value="{{ old('shipping_city') }}" class="form-control"
+                                                            placeholder="Ontario" id="">
 
                                                     </div>
 
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-4">
 
                                                         <label for="shipping_postal_code"
                                                             class="form-label fw-bold">Postal/Zip*</label>
 
                                                         <input type="text" id="shipping_postal_code"
-                                                            name="shipping_postal_code"
+                                                            name="shipping_postal_code" maxlength="7"
                                                             value="{{ old('shipping_postal_code') }}"
-                                                            class="form-control" placeholder="Ontario" id="">
+                                                            class="form-control" placeholder="L6H 1H4"
+                                                            oninput="formatPostalCode(this)" id="">
 
                                                     </div>
 
@@ -207,9 +197,39 @@
                                                         <label for="shipping_country"
                                                             class="form-label fw-bold">Country</label>
 
-                                                        <input type="text" id="shipping_country"
-                                                            name="shipping_country" value="{{ old('shipping_country') }}"
-                                                            class="form-control" placeholder="L6H 1H4" id="">
+                                                        <select
+                                                            class="form-select @error('shipping_country') is-invalid @enderror"
+                                                            name="shipping_country" id="shipping_country">
+                                                            <option value="">Please select a country</option>
+                                                            @foreach (getCountries() as $country)
+                                                                <option value="{{ $country->name }}"
+                                                                    {{ old('shipping_country', 'Canada') == $country->name ? 'selected' : '' }}>
+                                                                    {{ $country->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+
+                                                    </div>
+
+                                                    <div class="col-md-6">
+
+                                                        <label for="shipping_state"
+                                                            class="form-label fw-bold">Province/State*</label>
+
+                                                        <select
+                                                            class="form-select select2 @error('shipping_state') is-invalid @enderror"
+                                                            name="shipping_state" id="shipping_state">
+                                                            @foreach (getStates(2) as $type => $items)
+                                                                <optgroup label="{{ ucfirst($type) }}">
+                                                                    @foreach ($items as $state)
+                                                                        <option value="{{ $state->name }}"
+                                                                            {{ collect(old('shipping_state', 'Ontario'))->contains($state->name) ? 'selected' : '' }}>
+                                                                            {{ $state->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </optgroup>
+                                                            @endforeach
+                                                        </select>
 
                                                     </div>
 
@@ -322,17 +342,6 @@
 
                                                     <div class="col-md-4">
 
-                                                        <label for="billing_city"
-                                                            class="form-label fw-bold">City/Town*</label>
-
-                                                        <input type="text" id="billing_city" name="billing_city"
-                                                            value="{{ old('billing_city') }}" class="form-control"
-                                                            placeholder="City/Town" id="">
-
-                                                    </div>
-
-                                                    <div class="col-md-4">
-
                                                         <label for="billing_unit"
                                                             class="form-label fw-bold">Unit/Suite#</label>
 
@@ -344,24 +353,25 @@
 
                                                     <div class="col-md-4">
 
-                                                        <label for="billing_state"
-                                                            class="form-label fw-bold">Province/State*</label>
+                                                        <label for="billing_city"
+                                                            class="form-label fw-bold">City/Town*</label>
 
-                                                        <input type="text" id="billing_state" name="billing_state"
-                                                            value="{{ old('billing_state') }}" class="form-control"
-                                                            placeholder="Enter state" id="">
+                                                        <input type="text" id="billing_city" name="billing_city"
+                                                            value="{{ old('billing_city') }}" class="form-control"
+                                                            placeholder="City/Town" id="">
 
                                                     </div>
 
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-4">
 
                                                         <label for="billing_postal_code"
                                                             class="form-label fw-bold">Postal/Zip*</label>
 
                                                         <input type="text" id="billing_postal_code"
-                                                            name="billing_postal_code"
+                                                            name="billing_postal_code" maxlength="7"
                                                             value="{{ old('billing_postal_code') }}" class="form-control"
-                                                            placeholder="Enter Zip code" id="">
+                                                            placeholder="Enter Zip code" oninput="formatPostalCode(this)"
+                                                            id="">
 
                                                     </div>
 
@@ -370,9 +380,38 @@
                                                         <label for="billing_country"
                                                             class="form-label fw-bold">Country</label>
 
-                                                        <input type="text" id="billing_country" name="billing_country"
-                                                            value="{{ old('billing_country') }}" class="form-control"
-                                                            placeholder="Enter Country" id="">
+                                                        <select class="form-select @error('country') is-invalid @enderror"
+                                                            name="billing_country" id="billing_country">
+                                                            <option value="">Please select a country</option>
+                                                            @foreach (getCountries() as $country)
+                                                                <option value="{{ $country->name }}"
+                                                                    {{ old('billing_country', 'Canada') == $country->name ? 'selected' : '' }}>
+                                                                    {{ $country->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+
+                                                    </div>
+
+                                                    <div class="col-md-6">
+
+                                                        <label for="billing_state"
+                                                            class="form-label fw-bold">Province/State*</label>
+
+                                                        <select
+                                                            class="form-select select2 @error('province') is-invalid @enderror"
+                                                            name="billing_state" id="billing_state">
+                                                            @foreach (getStates(2) as $type => $items)
+                                                                <optgroup label="{{ ucfirst($type) }}">
+                                                                    @foreach ($items as $state)
+                                                                        <option value="{{ $state->name }}"
+                                                                            {{ collect(old('billing_state', 'Ontario'))->contains($state->name) ? 'selected' : '' }}>
+                                                                            {{ $state->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </optgroup>
+                                                            @endforeach
+                                                        </select>
 
                                                     </div>
 
@@ -478,8 +517,8 @@
 
                                                                 <label for="cc-name">Card Holder Name</label>
 
-                                                                <input type="text" class="form-control mt-2" id="cc-name"
-                                                                    placeholder="Card Holder Name">
+                                                                <input type="text" class="form-control mt-2"
+                                                                    id="cc-name" placeholder="Card Holder Name">
 
                                                             </div>
 
@@ -569,13 +608,14 @@
 
 
 @section('js')
+    <script src="{{ asset('asset/js/select2.min.js') }}"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
 
     <script src="https://js.stripe.com/v3/"></script>
 
     <script>
-        var stripe = Stripe("{{ env('STRIPE_KEY') }}");
+        var stripe = Stripe("{{ $vendor->stripeDetails->stripe_publishable_key }}");
 
         var elements = stripe.elements();
 
@@ -1172,6 +1212,115 @@
             $("#deliveryCharges").show();
             $("#total_amount").text('${{ number_format($cartTotal + $deliveryFee, 2) }}');
         });
-    </script>
 
+        function formatPostalCode(input) {
+            // Remove all non-alphanumeric characters and convert to uppercase
+            let value = input.value.replace(/\W/g, '').toUpperCase();
+
+            // Add a space after every 3 characters
+            if (value.length > 3) {
+                value = value.slice(0, 3) + ' ' + value.slice(3);
+            }
+
+            // Update the input value
+            input.value = value;
+        }
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#billing_state, #shipping_state').select2({
+                placeholder: "Select Province/State",
+                allowClear: true,
+                width: '100%',
+                dropdownCssClass: 'select2-dropdown-searchable'
+            });
+        });
+        $(document).ready(function() {
+            // Listen for country dropdown change
+            $('#billing_country').change(function() {
+                let countryId = $(this).val();
+
+                if (countryId) {
+                    $.ajax({
+                        url: '{{ route('get.states') }}', // Endpoint for fetching states
+                        type: 'GET',
+                        data: {
+                            country_id: countryId,
+                            type: 'name'
+                        },
+                        success: function(response) {
+                            let stateDropdown = $('#billing_state');
+                            stateDropdown.empty(); // Clear existing options
+
+                            if (response.success) {
+                                // Populate states
+                                $.each(response.states, function(type, states) {
+                                    // Add optgroup for each type (province, state)
+                                    let group = $('<optgroup>', {
+                                        label: capitalizeFirstLetter(type)
+                                    });
+                                    $.each(states, function(index, state) {
+                                        group.append($('<option>', {
+                                            value: state.id,
+                                            text: state.name
+                                        }));
+                                    });
+                                    stateDropdown.append(group);
+                                });
+                            } else {
+                                stateDropdown.append('<option>No states available</option>');
+                            }
+                        },
+                        error: function() {
+                            alert('Failed to load states. Please try again.');
+                        }
+                    });
+                }
+            });
+            $('#shipping_country').change(function() {
+                let countryId = $(this).val();
+                if (countryId) {
+                    $.ajax({
+                        url: '{{ route('get.states') }}', // Endpoint for fetching states
+                        type: 'GET',
+                        data: {
+                            country_id: countryId,
+                            type: 'name'
+                        },
+                        success: function(response) {
+                            let stateDropdown = $('#shipping_state');
+                            stateDropdown.empty(); // Clear existing options
+
+                            if (response.success) {
+                                // Populate states
+                                $.each(response.states, function(type, states) {
+                                    // Add optgroup for each type (province, state)
+                                    let group = $('<optgroup>', {
+                                        label: capitalizeFirstLetter(type)
+                                    });
+                                    $.each(states, function(index, state) {
+                                        group.append($('<option>', {
+                                            value: state.id,
+                                            text: state.name
+                                        }));
+                                    });
+                                    stateDropdown.append(group);
+                                });
+                            } else {
+                                stateDropdown.append('<option>No states available</option>');
+                            }
+                        },
+                        error: function() {
+                            alert('Failed to load states. Please try again.');
+                        }
+                    });
+                }
+            });
+        });
+
+        function capitalizeFirstLetter(string) {
+            if (!string) return ''; // Handle empty or null strings
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+    </script>
 @endsection

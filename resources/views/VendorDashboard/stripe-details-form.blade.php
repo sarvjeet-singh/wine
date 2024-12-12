@@ -29,20 +29,20 @@
                             action="{{ route('stripe.details.update', ['vendorid' => $vendor->id]) }}">
                             <div class="row mt-3">
                                 <div class="col-12">
-                                    <label class="form-label" for="secret_id">Secret ID</label>
+                                    <label class="form-label" for="secret_id">Stripe Secret ID</label>
                                     <div>
                                         <input type="text" class="form-control" id="stripe_publishable_key"
                                             name="stripe_publishable_key" value="{{ old('stripe_publishable_key', $stripeDetail->stripe_publishable_key ?? '') }}" placeholder="Enter Secret ID">
                                     </div>
                                 </div>
-                                <div class="col-sm-6 col-12 mt-3">
-                                    <label class="form-label" for="secret_key">Secret Key</label>
+                                <div class="col-12 mt-3">
+                                    <label class="form-label" for="secret_key">Stripe Secret Key</label>
                                     <div>
                                         <input type="text" class="form-control" id="stripe_secret_key"
                                             name="stripe_secret_key" value="{{ old('stripe_secret_key', $stripeDetail->stripe_secret_key ?? '') }}" placeholder="Secret Key">
                                     </div>
                                 </div>
-                                <div class="col-sm-6 col-12 mt-3">
+                                <div class="col-12 mt-3">
                                     <label class="form-label" for="webhook_url">Webhook Secret</label>
                                     <div>
                                         <input type="text" class="form-control" id="webhook_secret_key"

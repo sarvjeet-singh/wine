@@ -62,25 +62,28 @@
                 <div class="information-box">
                     <div class="information-box-head">
                         <div class="box-head-heading d-flex">
-                            <span class="box-head-label theme-color">Inventory Manage</span>
+                            <span class="box-head-label theme-color w-50">Inventory Manage</span>
+                            <button class="btn btn-primary wine-btn manage_dates ms-auto px-4">Manage Dates</button>
                         </div>
                     </div>
-                    <div class="information-box-body">
+                    <div class="information-box-body pb-5">
                         <form name="frmain" id="dateform" action="" method="POST">
                             @csrf
                             <input type="hidden" name="vendor_id" value="1">
                             <input type="hidden" name="start_date" value="" id="firstdate">
                             <input type="hidden" name="end_date" value="" id="seconddate">
+                            <input type="hidden" name="booking_type" value="" id="booking_type">
+                            <input type="hidden" name="type_reason" value="" id="type_reason">
                             <input type="hidden" name="type" value="vendor">
-                            <div class="row mt-3">
-                                <div class="col-sm-4 col-12">
-                                    <label class="form-label">Apply Value</label>
-                                    <select class="form-control" name="booking_date_option">
-                                        <option value="booked">Booked Dates</option>
-                                        <option value="packaged">Package Dates</option>
-                                        <option value="blocked">Blocked Dates</option>
-                                    </select>
-                                </div>
+                            <div class="row align-items-end mt-3">
+                                <!-- <div class="col-sm-4 col-12">
+                                                <label class="form-label">Apply Value</label>
+                                                <select class="form-control" name="booking_date_option">
+                                                    <option value="booked">Booked Dates</option>
+                                                    <option value="packaged">Package Dates</option>
+                                                    <option value="blocked">Blocked Dates</option>
+                                                </select>
+                                            </div> -->
                                 <div class="col-sm-4 col-12">
                                     <label class="form-label">Select Season</label>
                                     @php
@@ -141,9 +144,12 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div class="col-sm-4 col-12">
+                                    <button type="button" id="publish_dates" class="btn wine-btn px-5">Publish
+                                        Sesson</button>
+                                </div>
                                 <div class="col-sm-4 col-12 text-right">
-                                    <br>
-                                    <button class="btn btn-primary wine-btn manage_dates">Manage Dates</button>
+
                                 </div>
                             </div>
 
@@ -177,13 +183,12 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-5">
-                                <div class="col-sm-12 text-center">
-                                    <button type="submit" class="btn wine-btn" id="dateform_submit"
-                                        disabled>Update</button>
-                                    <button type="button" id="publish_dates" class="btn wine-btn">Publish Sesson</button>
-                                </div>
-                            </div>
+                            <!-- <div class="row mt-5">
+                                            <div class="col-sm-12 text-center">
+                                                <button type="submit" class="btn wine-btn" id="dateform_submit"
+                                                    disabled>Update</button>
+                                            </div>
+                                        </div> -->
                         </form>
                     </div>
                 </div>
@@ -198,9 +203,9 @@
                     <h5 class="modal-title" id="MangeDatesLabel">All Dates</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body pt-5">
                     <!-- Add your form or content here -->
-                    <div style="position: absolute;right: 15px;z-index: 9999;">
+                    <div style="position: absolute;top:10px;right: 15px;z-index: 9999;">
                         <select class="filterDateTypes form-control">
                             <option value="All">All</option>
                             <option value="booked">Booked Dates</option>
@@ -214,6 +219,7 @@
                                 <th>S. No.</th>
                                 <th>Dates</th>
                                 <th>Value</th>
+                                <th>Reason</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -482,6 +488,86 @@
                     // Event handling for date selection in the date range picker
                     $('input[name="datefilter"]').on("clickDate.daterangepicker", function(ev, picker) {
                         if (picker.endDate !== null) {
+                            Swal.fire({
+                                title: 'Provide a Reason',
+                                html: `
+                                    <label for="reason_dropdown">Reason:</label>
+                                    <select id="reason_dropdown" class="swal2-input">
+                                        <option value="" disabled selected>Select Reason</option>
+                                        <option value="booked">Booked Dates</option>
+                                        <option value="packaged">Package Dates</option>
+                                        <option value="blocked">Blocked Dates</option>
+                                    </select><br>
+                                    <label for="reason_field">Details:</label>
+                                    <textarea id="reason_field" class="swal2-textarea" placeholder="Provide additional details..."></textarea>
+                                `,
+                                focusConfirm: false,
+                                preConfirm: () => {
+                                    const reason = $('#reason_dropdown').val();
+                                    const details = $('#reason_field').val();
+                                    if (!reason) {
+                                        Swal.showValidationMessage(
+                                            'Please select a reason');
+                                    }
+                                    return {
+                                        reason,
+                                        details
+                                    };
+                                }
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $("#booking_type").val(result.value.reason);
+                                    $("#type").val(result.value.details);
+                                    // console.log('Start Date:', startDate);
+                                    // console.log('End Date:', endDate);
+                                    // console.log('Selected Reason:', result.value.reason);
+                                    // console.log('Details:', result.value.details);
+                                    // Swal.fire('Saved!', 'Your reason has been submitted.',
+                                    //     'success');
+                                    $(".overlay-loader").show();
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: "{{ route('check.availability', ['vendorid' => $vendorid]) }}",
+                                        data: $('#dateform').serialize(),
+                                        dataType: "json",
+                                        success: function(response) {
+
+                                            if (response.status == "error") {
+                                                $(".overlay-loader").hide();
+                                                alert(response.message);
+                                                return false;
+
+                                            }
+                                            $(".overlay-loader").hide();
+
+                                            Swal.fire({
+                                                title: 'Do you want to save the dates?',
+                                                showCancelButton: true,
+                                                confirmButtonText: 'Save',
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    $.ajax({
+                                                        url: "{{ route('addbookingdate.form', ['vendorid' => $vendorid]) }}",
+                                                        data: $(
+                                                                '#dateform')
+                                                            .serialize(),
+                                                        type: 'post',
+                                                        success: function(
+                                                            success
+                                                            ) {
+                                                            Swal.fire(
+                                                                'Saved!',
+                                                                '',
+                                                                'success'
+                                                                );
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
                             $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate
                                 .format('MM/DD/YYYY'));
                             $('#firstdate').val(picker.startDate.format('YYYY-MM-DD'));
@@ -638,6 +724,11 @@
                                 };
                                 return DatesLabel[data];
                             }
+                        },
+                        {
+                            data: 'reason',
+                            name: 'reason',
+                            searchable: false
                         },
                         {
                             data: 'action',

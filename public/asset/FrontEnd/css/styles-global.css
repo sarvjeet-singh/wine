@@ -298,7 +298,7 @@
         width: 100% !important;
     }
 
-    nav.navbar ul li:hover .dropdown-menu {
+    nav.navbar ul li:hover .dropdown-menu:not(header li.dropdown .dropdown-menu) {
         display: block !important;
     }
 
@@ -329,4 +329,11 @@
         padding-bottom: 60px;
         min-height:100vh;
     }
+header.vendor-header nav.navbar {
+    border-color: #118c97;
+}
+header.vendor-header nav.navbar ul li .dropdown-menu .dropdown-item:hover,
+header.vendor-header nav.navbar ul li .dropdown-menu .dropdown-item.active {
+    background: #118c97;
+}
 /* ================= Header End ================= */

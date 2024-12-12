@@ -219,8 +219,8 @@
 
                                                                     <input type="text" id="quantity" name="quantity"
                                                                         class="form-control input-number quantity"
-                                                                        value="1" min="1"
-                                                                        max="{{ $wine->inventory }}">
+                                                                        value="1" min="1" oninput="this.value = this.value < this.min ? this.min : this.value"
+                                                                        max="{{ $wine->inventory }}" >
                                                                     <span class="input-group-btn">
                                                                         <button type="button"
                                                                             class="quantity-right-plus btn btn-success btn-number"

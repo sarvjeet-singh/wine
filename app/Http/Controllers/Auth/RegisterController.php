@@ -150,7 +150,7 @@ class RegisterController extends Controller
         $user = $this->create($request->all());
 
         // Instead of logging in, redirect to the login page
-        return redirect()->route('login')->with('success', 'Thank you for registering. You can now log in.');
+        return redirect()->route('login')->with('success', 'We’ve sent a verification link to your inbox. Click it to activate your account!');
     }
 
     public function validateCaptcha(Request $request)

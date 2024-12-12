@@ -147,7 +147,7 @@ class UserDashboardController extends Controller
             'emergency_contact_relation' => 'required|string|regex:/^[a-zA-Z\s]*$/|max:255',
             'emergency_contact_phone_number' => 'required|string|max:20',
             'emergency_contact_number' => 'required|string|max:20',
-            'medical_physical_concerns' => 'required|string|max:255',
+            'medical_physical_concerns' => 'required|string',
             'alternate_contact_full_name' => 'required|string|max:255|regex:/^[a-zA-Z\s]*$/|max:255',
             'alternate_contact_relation' => 'required|string|max:255|regex:/^[a-zA-Z\s]*$/|max:255',
             'alternate_contact_relation' => 'required|string|max:255'
@@ -174,7 +174,7 @@ class UserDashboardController extends Controller
         $user->emergency_contact_name = $request->emergency_contact_name;
         $user->emergency_contact_relation = $request->emergency_contact_relation;
         $user->emergency_contact_phone_number = $request->emergency_contact_phone_number;
-        // $user->emergency_contact_number = $request->emergency_contact_number;
+        $user->emergency_contact_number = $request->emergency_contact_number;
         $user->medical_physical_concerns = $request->medical_physical_concerns;
         $user->alternate_contact_full_name = $request->alternate_contact_full_name;
         $user->alternate_contact_relation = $request->alternate_contact_relation;

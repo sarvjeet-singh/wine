@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\User;
+use App\Models\Customer;
 use App\Mail\WeeklyRegisteredUsersMail;
 use Illuminate\Support\Facades\Mail;
 
@@ -15,8 +15,7 @@ class SendWeeklyRegisteredUsers extends Command
     public function handle()
     {
         // Fetch users with role 'Member' registered in the past week
-        $users = User::where('role', 'Member')
-            ->whereBetween('created_at', [now()->subWeek(), now()])
+        $users = Customer::whereBetween('created_at', [now()->subWeek(), now()])
             ->select('firstname', 'lastname', 'email', 'contact_number')
             ->get();
 
@@ -26,7 +25,8 @@ class SendWeeklyRegisteredUsers extends Command
         }
 
         // Send the email
-        $recipientEmail = 'sarvjeetsingh.slinfy@gmail.com'; // Replace with your recipient's email
+        // 'sarvjeetsingh.slinfy@gmail.com'
+        $recipientEmail = env('ADMIN_EMAIL'); // Replace with your recipient's email
         \Illuminate\Support\Facades\Mail::to($recipientEmail)->send(new \App\Mail\WeeklyRegisteredUsersMail($users));
 
         $this->info('Weekly registered users email sent successfully.');

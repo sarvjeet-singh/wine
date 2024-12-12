@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        'guard' => 'customer',
         'passwords' => 'users',
     ],
 
@@ -36,7 +36,7 @@ return [
     */
 
     'guards' => [
-        'web' => [
+        'vendor' => [
             'driver' => 'session',
             'provider' => 'users',
         ],
@@ -44,6 +44,10 @@ return [
             'driver' => 'session',
             'provider' => 'customers',
         ],
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ]
     ],
 
     /*
@@ -72,11 +76,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Customer::class,
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
+        ],
     ],
 
     /*
@@ -99,6 +102,12 @@ return [
     */
 
     'passwords' => [
+        'customers' => [
+            'provider' => 'customers', // This matches the customers provider defined below
+            'table' => 'password_reset_tokens', // Table for storing reset tokens
+            'expire' => 60, // Token validity in minutes
+            'throttle' => 60, // Throttle time for resend attempts
+        ],
         'users' => [
             'provider' => 'users',
             'table' => 'password_reset_tokens',

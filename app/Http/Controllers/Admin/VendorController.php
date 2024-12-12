@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\View;
+use App\Mail\VendorMail;
 use App\Models\Vendor;
 use App\Models\Country;
 use App\Models\Region;
@@ -27,7 +28,7 @@ use App\Models\VendorLicenseMetadata;
 use App\Models\VendorNonLicenseMetadata;
 use DB;
 use Log;
-
+use Mail;
 use Validator;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -44,12 +45,12 @@ class VendorController extends Controller
         if ($request->has('v') && !empty($request->v)) {
             $query->where('vendor_type', $request->v);
         }
-    
+
         // Filter by search name
         if ($request->has('q') && !empty($request->q)) {
             $query->where('vendor_name', 'like', '%' . $request->q . '%');
         }
-    
+
         // Get the filtered vendors
         $vendors = $query->orderBy('id', 'desc')->paginate(10);
 
@@ -416,7 +417,7 @@ class VendorController extends Controller
 
             $qrCodePath = 'images/VendorQRCodes/' . $vendor->vendor_name . '-' . $vendor->id . '.png';
 
-            // QrCode::format('png')->size(200)->generate($qrCodeData, public_path($qrCodePath));
+            QrCode::format('png')->size(200)->generate($qrCodeData, public_path($qrCodePath));
 
             // Save the QR code path to the vendor
             $vendor->qr_code = $qrCodePath;
@@ -452,8 +453,20 @@ class VendorController extends Controller
                 // Send email with credentials
                 $to = $user->email;
                 $subject = "Your new account credentials";
-                $emailContent = View::make('AdminDashboard.emails.vendorlogin', ['user' => $user, 'password' => $password])->render();
-                // sendEmail($to, $subject, $emailContent);
+
+                $vendorData = [
+                    'user' => $user,
+                    'password' => $password,
+                    'vendor' => $vendor
+                ];
+                if ($vendor->vendor_type == 'winery') {
+                    Mail::to($to)->send(new VendorMail($vendorData, 'emails.vendor.winery_vendor_login_details_email', $subject));
+                } else if ($vendor->vendor_type == 'licensed' || $vendor->vendor_type == 'non-licensed') {
+                    Mail::to($to)->send(new VendorMail($vendorData, 'emails.vendor.support_local_vendor_login_details_email', $subject));
+                } else {
+                    $emailContent = View::make('AdminDashboard.emails.vendorlogin', ['user' => $user, 'password' => $password])->render();
+                    sendEmail($to, $subject, $emailContent);
+                }
             }
 
             // Commit the transaction if everything is successful
@@ -626,7 +639,7 @@ class VendorController extends Controller
 
         // Search for vendors whose name matches the query
         $query = Vendor::where('vendor_name', 'LIKE', "%{$searchTerm}%");
-        if(!empty($type)) {
+        if (!empty($type)) {
             $query = $query->where('vendor_type', $type);
         }
         $vendors = $query->select('id', 'vendor_name as name')->limit(10)->get();
@@ -635,18 +648,50 @@ class VendorController extends Controller
         return response()->json($vendors);
     }
 
-    public function accountStatus($id) {
+    public function accountStatus($id)
+    {
         $vendor = Vendor::find($id);
         $accountStatuses = AccountStatus::where('status', 1)->get();
         $pricePoints = PricePoint::where('status', 1)->get();
         return view('admin.vendors.account-status', compact('vendor', 'accountStatuses', 'pricePoints'));
     }
 
-    public function updateAccountStatus(Request $request, $id) {
+    public function updateAccountStatus(Request $request, $id)
+    {
         $vendor = Vendor::find($id);
         $vendor->account_status = $request->account_status;
         $vendor->price_point = $request->price_point;
         $vendor->save();
         return redirect()->back()->with('success', 'Account status updated successfully');
+    }
+
+    public function checkVendorCombination(Request $request)
+    {
+        $validated = $request->validate([
+            'vendor_name' => 'required|string',
+            'street_address' => 'required|string',
+        ]);
+
+        $exists = Vendor::where('vendor_name', $request->vendor_name)
+            ->where('street_address', $request->street_address)
+            ->exists();
+
+        if ($exists) {
+            return response()->json(['exists' => true, 'message' => 'The vendor with this name and a similar address already exists.'], 200);
+        }
+
+        return response()->json(['exists' => false]);
+    }
+
+    public function vendorEmailTest()
+    {
+        $vendor = Vendor::with('user')->find(2);
+        $data = [
+            "username" => $vendor->user->email,
+            "password" => '12345678',
+        ];
+        $emailContent = View::make('emails.vendor.winery_vendor_login_details_email', compact('vendor', 'data'))->render();
+        echo $emailContent;
+        die;
     }
 }

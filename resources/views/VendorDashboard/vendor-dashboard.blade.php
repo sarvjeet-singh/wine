@@ -38,7 +38,7 @@
                         <img src="{{asset('images/icons/enhance-points-box.png')}}">
                     </div>
                     <div class="box-points">40</div>
-                    <div class="box-text">Enhance Points</div>
+                    <div class="box-text">Engagement Points</div>
                 </div>
             </div>
         </div>

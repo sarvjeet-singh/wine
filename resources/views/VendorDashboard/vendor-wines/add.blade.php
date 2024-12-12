@@ -199,12 +199,12 @@
             <!-- <label for="" class="form-label">Inventory</label> -->
             <div class="d-flex align-items-center gap-2">
                 <div>
-                    <label for="" class="form-label">Case</label>
+                    <label for="casesInput" class="form-label">Case</label>
                     <input type="number" class="form-control w-100" id="casesInput" min="0"
                         placeholder="Enter cases" style="width: 50%;">
                 </div>
                 <div>
-                    <label for="" class="form-label">Bottle</label>
+                    <label for="bottlesInput" class="form-label">Bottle</label>
                     <input type="number" class="form-control w-100" id="bottlesInput" min="0"
                         placeholder="Enter bottles" style="width: 50%;">
                 </div>

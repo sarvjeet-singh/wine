@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Review;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
 // use Auth;
@@ -9,8 +10,8 @@ if (! function_exists('truncateReviewDescription')) {
     function truncateReviewDescription($text, $limit = 41)
     {
         if (strlen($text) > $limit) {
-            $truncated = substr($text, 0, $limit) . '...';
-            return $truncated . ' <a href="javascript:void(0)" class="read-more theme-color" data-full-text="' . htmlspecialchars($text, ENT_QUOTES, 'UTF-8') . '">..Read More</a>';
+            $truncated = '';//substr($text, 0, $limit) . '...';
+            return $truncated . ' <a href="javascript:void(0)" class="read-more theme-color" data-full-text="' . htmlspecialchars($text, ENT_QUOTES, 'UTF-8') . '">View Comment</a>';
         }
 
         return $text;
@@ -243,26 +244,73 @@ if (!function_exists('getModules')) {
     }
 }
 
-if(! function_exists('getCategoryById')) {
-    function getCategoryById($id) {
+if (!function_exists('getPricePoints')) {
+    function getPricePoints()
+    {
+        return \App\Models\PricePoint::where('status', 1)
+            ->get();
+    }
+}
+
+if (! function_exists('getCategoryById')) {
+    function getCategoryById($id)
+    {
         return \App\Models\Category::find($id)->pluck('name')->first();
     }
 }
 
-if(! function_exists('getSubCategoryById')) {
-    function getSubCategoryById($id) {
+if (! function_exists('getSubCategoryById')) {
+    function getSubCategoryById($id)
+    {
         return \App\Models\SubCategory::find($id)->pluck('name')->first();
     }
 }
 
-if(! function_exists('getEstablishmentById')) {
-    function getEstablishmentById($id) {
+if (! function_exists('getEstablishmentById')) {
+    function getEstablishmentById($id)
+    {
         return \App\Models\Establishment::find($id)->pluck('name')->first();
     }
 }
 
-if(! function_exists('getAccountStatusById')) {
-    function getAccountStatusById($id) {
+if (! function_exists('getAccountStatusById')) {
+    function getAccountStatusById($id)
+    {
         return \App\Models\AccountStatus::find($id)->pluck('name')->first();
+    }
+}
+
+if (! function_exists('getStates')) {
+    function getStates($country_id)
+    {
+        return \App\Models\State::where('status', 1)->where('country_id', $country_id)
+            ->orderBy('name')
+            ->get()
+            ->groupBy('type')
+            ->sortKeysUsing(function ($key) {
+                // Custom sorting logic: prioritize 'province' over 'state'
+                return $key === 'province' ? 0 : ($key === 'state' ? 1 : 2);
+            });
+    }
+}
+
+if (!function_exists('authCheck')) {
+    function authCheck()
+    {
+        // Check if a specific type of user is logged in
+        if (Auth::guard('customer')->check()) {
+            return ['is_logged_in' => true, 'user_type' => 'customer', 'user' => Auth::guard('customer')->user()];
+        }
+
+        if (Auth::guard('vendor')->check()) {
+            return ['is_logged_in' => true, 'user_type' => 'vendor', 'user' => Auth::guard('vendor')->user()];
+        }
+
+        if (Auth::guard('admin')->check()) {
+            return ['is_logged_in' => true, 'user_type' => 'admin', 'user' => Auth::guard('admin')->user()];
+        }
+
+        // If no user is logged in
+        return ['is_logged_in' => false, 'user_type' => null, 'user' => null];
     }
 }

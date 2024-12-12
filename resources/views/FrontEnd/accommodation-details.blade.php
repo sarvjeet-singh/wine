@@ -100,25 +100,25 @@
                 <div class="card mb-4 border-0">
                     <!-- <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
 
-                                    <div id="propertyCarouse3" class="" data-ride="carousel">
+                                        <div id="propertyCarouse3" class="" data-ride="carousel">
 
-                                        <div class="owl-carousel owl-theme">
-                                            @if ($vendor->mediaGallery->isNotEmpty())
+                                            <div class="owl-carousel owl-theme">
+                                                @if ($vendor->mediaGallery->isNotEmpty())
     @foreach ($vendor->mediaGallery as $media)
     <div class="item">
-                                                        @if ($media->vendor_media_type === 'youtube')
+                                                            @if ($media->vendor_media_type === 'youtube')
     <iframe width="100%" height="300px" src="{{ $media->vendor_media }}"
-                                                                frameborder="0" allowfullscreen></iframe>
+                                                                    frameborder="0" allowfullscreen></iframe>
 @elseif ($media->vendor_media_type === 'image')
     <img src="{{ asset($media->vendor_media) }}" alt="Image"
-                                                                class="img-fluid">
+                                                                    class="img-fluid">
     @endif
-                                                    </div>
+                                                        </div>
     @endforeach
     @endif
+                                            </div>
                                         </div>
-                                    </div>
-                                </div> -->
+                                    </div> -->
 
                     <div class="single-main-slider">
                         <div class="container">
@@ -202,7 +202,8 @@
                                     /
                                     {{ !empty($vendor->accommodationMetadata->sleeps) ? $vendor->accommodationMetadata->sleeps : '' }}
                                 </li>
-                                <li>{{ !empty($vendor->price_point) ? $vendor->price_point : '-' }}</li>
+                                <li>{{ !empty($vendor->pricePoint->name) ? explode(' ', $vendor->pricePoint->name)[0] : '-' }}
+                                </li>
                             </ul>
                         </div>
 
@@ -305,15 +306,17 @@
                                     </label>
                                 </div>
                                 <div class="text-end">
-                                    @if (Auth::check())
-                                        <button type="button" class="btn book-btn" id="confirm_booking_btn">Process
-                                            Payment</button>
-                                    @else
-                                        <div class="d-flex align-items-center justify-content-end gap-3">
-                                            <!-- <p class="mb-0 fw-bold">You must be logged-in to initiate a booking</p> -->
-                                            <button type="button" class="btn book-btn" id="login_form_btn"
-                                                data-bs-toggle="modal" data-bs-target="#loginPopup">Login</button>
-                                        </div>
+                                    @if (!Auth::guard('vendor')->check())
+                                        @if (Auth::check())
+                                            <button type="button" class="btn book-btn" id="confirm_booking_btn">Process
+                                                Payment</button>
+                                        @else
+                                            <div class="d-flex align-items-center justify-content-end gap-3">
+                                                <!-- <p class="mb-0 fw-bold">You must be logged-in to initiate a booking</p> -->
+                                                <button type="button" class="btn book-btn" id="login_form_btn"
+                                                    data-bs-toggle="modal" data-bs-target="#loginPopup">Login</button>
+                                            </div>
+                                        @endif
                                     @endif
                                 </div>
                             </form>
@@ -336,12 +339,14 @@
                         <div class="d-flex justify-content-between">
                             <span class="fa-lg">Minimum Booking:</span>
                             <strong
-                                class="fa-lg text-muted">{{ !empty($vendor->accommodationMetadata->booking_minimum) ? $vendor->accommodationMetadata->booking_minimum.' nights' : 0 }} </strong>
+                                class="fa-lg text-muted">{{ !empty($vendor->accommodationMetadata->booking_minimum) ? $vendor->accommodationMetadata->booking_minimum . ' nights' : 0 }}
+                            </strong>
                         </div>
                         <div class="d-flex justify-content-between">
                             <span class="fa-lg">Maximum Booking:</span>
                             <strong
-                                class="fa-lg text-muted">{{ !empty($vendor->accommodationMetadata->booking_maximum) ? $vendor->accommodationMetadata->booking_maximum .' nights' : 0 }} </strong>
+                                class="fa-lg text-muted">{{ !empty($vendor->accommodationMetadata->booking_maximum) ? $vendor->accommodationMetadata->booking_maximum . ' nights' : 0 }}
+                            </strong>
                         </div>
                         <div class="d-flex justify-content-between">
                             <span class="fa-lg">Check-In After:</span>
@@ -583,23 +588,23 @@
                                     <tbody class="roomList">
 
                                         <!-- <tr>
+                                                                                                                                                                <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
+                                                                                                                                                                <td>Standard</td>
+                                                                                                                                                                <td class="room-avail">Available</td>
+                                                                                                                                                                <td>
+                                                                                                                                                                    <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+                                                                                                                                                                    <button class="btn">Select Room</button>
+                                                                                                                                                                </td>
+                                                                                                                                                            </tr>
+                                                                                                                                                            <tr>
                                                                                                                                                             <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
-                                                                                                                                                            <td>Standard</td>
-                                                                                                                                                            <td class="room-avail">Available</td>
-                                                                                                                                                            <td>
-                                                                                                                                                                <span class="room-price d-block fw-bold mb-2">$499/per night</span>
-                                                                                                                                                                <button class="btn">Select Room</button>
-                                                                                                                                                            </td>
-                                                                                                                                                        </tr>
-                                                                                                                                                        <tr>
-                                                                                                                                                        <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
-                                                                                                                                                            <td>Standard</td>
-                                                                                                                                                            <td class="room-not-avail">Not Available</td>
-                                                                                                                                                            <td>
-                                                                                                                                                                <span class="room-price d-block fw-bold mb-2">$499/per night</span>
-                                                                                                                                                                <button class="btn">Select Room</button>
-                                                                                                                                                            </td>
-                                                                                                                                                        </tr> -->
+                                                                                                                                                                <td>Standard</td>
+                                                                                                                                                                <td class="room-not-avail">Not Available</td>
+                                                                                                                                                                <td>
+                                                                                                                                                                    <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+                                                                                                                                                                    <button class="btn">Select Room</button>
+                                                                                                                                                                </td>
+                                                                                                                                                            </tr> -->
                                     </tbody>
                                 </table>
                             </div>

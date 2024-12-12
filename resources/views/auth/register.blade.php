@@ -15,6 +15,13 @@
             font-size: 14px;
             font-weight: 400;
         }
+
+        body.modal-open {
+            padding-right: 0 !important;
+        }
+        .password-error {
+            border: 1px solid red !important;
+        }
     </style>
     <div class="container-fluid over-flow-register">
         <div class="row justify-content-center">
@@ -95,14 +102,15 @@
                                         name="password" required autocomplete="new-password"
                                         placeholder="Enter your password">
                                     <i class="fa-solid fa-eye togglePassword password-custom-icon"></i>
-                                    <span id="password-strength"
-                                        style="position:relative; top:100%; left:0; font-size:0.8em; color:red;"></span>
+                                    {{-- <span id="password-strength"
+                                        style="position:relative; top:100%; left:0; font-size:0.8em; color:red;"></span> --}}
                                 </div>
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
+                                {{-- @error('password') --}}
+                                <span class="" role="alert">
+                                    <strong>Password must contain uppercase, lowercase, number, and special
+                                        character</strong>
+                                </span>
+                                {{-- @enderror --}}
                             </div>
                             <div class="col-md-6" style="position:relative">
                                 <label for="password-confirm" class="col-form-label">{{ __('Confirm Password') }}</label>
@@ -142,12 +150,15 @@
                         <ul>
 
                             <li>Receive <b>$25</b> in bonus <b>Bottle Bucks</b> rewards just for registering.</li>
-                            <li>Earn additional cash back reward dollars for submitting verifiable testimonials & reviews.</li>
+                            <li>Earn additional cash back reward dollars for submitting verifiable testimonials & reviews.
+                            </li>
                             <li>Save third-party booking fees and win periodic getaways to wine country.</li>
                             <li>Get access to exclusive guest lists, special events and functions.</li>
-                            <li>Book a minimum of six (6) nights’ accommodations and get two (2) complimentary excursion activities. Only with participating vendors. Subject to availability.</li>
+                            <li>Book a minimum of six (6) nights’ accommodations and get two (2) complimentary excursion
+                                activities. Only with participating vendors. Subject to availability.</li>
                         </ul>
-                        <div class="text-center mt-2"><b>Some benefits may not be valid in conjunction with other offers.</div>
+                        <div class="text-center mt-2"><b>Some benefits may not be valid in conjunction with other offers.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -199,8 +210,9 @@
                     <br>
                     <div class="row enablecaptha mt-4">
                         <div class="col-sm-3">
-                            <label class="pe-2 pb-2" style="font-weight: 600;">Skill Testing: </label><i id="refresh-captcha"
-                                class="fas fa-sync-alt" style="cursor: pointer; font-size: 20px;"></i><br>
+                            <label class="pe-2 pb-2" style="font-weight: 600;">Skill Testing: </label><i
+                                id="refresh-captcha" class="fas fa-sync-alt"
+                                style="cursor: pointer; font-size: 20px;"></i><br>
                             <img id="captcha-image" src="{{ captcha_src('default') }}" alt="CAPTCHA">
                         </div>
                         <div class="col-sm-6">
@@ -285,7 +297,12 @@
                     }
                 },
                 errorPlacement: function(error, element) {
-                    error.insertAfter(element); // Default error message positioning
+                    if (element.attr("name") === "password") {
+                        // highlight the password field
+                        $("#password").addClass("password-error");
+                    } else {
+                        error.insertAfter(element); // Default error message positioning
+                    }
                 },
                 // Remove error on keyup
                 onkeyup: function(element) {
@@ -326,7 +343,7 @@
                         if ($('#terms-error').length === 0) {
                             // Append the error message next to the label, not the checkbox
                             $('#agreeterms').closest('label').append(
-                                '<div id="terms-error" class="error-message" style="color:red; font-weight:400; margin-left: 10px;">Please agree to the terms</div>'
+                                '<div id="terms-error" class="error-message" style="color:red; font-weight:400; margin-left: 10px;">Please accept terms of participant</div>'
                             );
                         }
                         $("#terms-error").show();
@@ -360,7 +377,7 @@
                                     $('#captcha-error').hide();
                                     if (isValid) {
                                         $('#guestregisterform')[0]
-                                    .submit(); // Submit form after successful CAPTCHA validation
+                                            .submit(); // Submit form after successful CAPTCHA validation
                                     }
                                 } else {
                                     // Show error message if CAPTCHA is invalid
@@ -378,7 +395,8 @@
                             error: function() {
                                 // Handle AJAX errors
                                 alert(
-                                    'There was an error while validating the CAPTCHA. Please try again.');
+                                    'There was an error while validating the CAPTCHA. Please try again.'
+                                    );
                                 isValid = false;
                                 toggleButtonSpinner(false);
                             }
@@ -413,7 +431,7 @@
                 const password = $(this).val();
                 const strengthText = $('#password-strength');
                 if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
-                    strengthText.css('color', 'green').text('Strong password');
+                    //strengthText.css('color', 'green').text('Strong password');
                 }
             });
             $(document).on('click', '#refresh-captcha', function() {

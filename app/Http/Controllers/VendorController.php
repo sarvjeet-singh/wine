@@ -32,6 +32,7 @@ use App\Models\Cuisine;
 use App\Models\Country;
 use App\Models\FaqSection;
 use App\Models\User;
+use App\Models\Customer;
 use App\Models\SubRegion;
 use App\Models\VendorStripeDetail;
 use App\Models\VendorAccommodationMetadata;
@@ -178,7 +179,8 @@ class VendorController extends Controller
 		$booking_dates = new BookingDate;
 		$booking_dates->user_id = $user->id;
 		$booking_dates->vendor_id = $request->vendorid;
-		$booking_dates->booking_type = $request->booking_date_option;
+		$booking_dates->booking_type = $request->booking_type;
+		$booking_dates->reason = $request->type_reason ? $request->type_reason : '';
 		$booking_dates->start_date = $request->start_date;
 		$booking_dates->end_date = $request->end_date;
 		$booking_dates->save();
@@ -399,13 +401,13 @@ class VendorController extends Controller
 					}
 				},
 			],
-			'vendor_email' => 'required|email|max:255',
+			'vendor_email' => 'nullable|email|max:255',
 			'country' => 'required|string|max:255',
 			'province' => 'required|string|max:255',
 			'city' => 'required|string|max:255',
 			'unitsuite' => 'nullable|string|max:255',
 			'postalCode' => 'required|string|max:10',
-			'vendor_phone' => 'required|string|max:20',
+			'vendor_phone' => 'nullable|string|max:20',
 			'sub_region' => 'nullable|string|max:255',
 			'description' => 'nullable|string|max:1000',
 			'hide_street_address' => 'integer|max:1',
@@ -509,7 +511,23 @@ class VendorController extends Controller
 	}
 	public function getBookingUtility($vendorid)
 	{
-		$vendor = Vendor::with('accommodationMetadata')->find($vendorid);
+		$vendor = Vendor::find($vendorid);
+		if(!$vendor){
+			return redirect()->back()->with('error', 'Vendor not found.');
+		}
+		if (strtolower($vendor->vendor_type) === 'winery') {
+			$vendor->load('wineryMetadata');
+			$vendor->metadata = $vendor->wineryMetadata;
+			unset($vendor->excursionMetadata);
+		} elseif (strtolower($vendor->vendor_type) === 'excursion') {
+			$vendor->load('excursionMetadata');
+			$vendor->metadata = $vendor->excursionMetadata;
+			unset($vendor->excursionMetadata);
+		} elseif (strtolower($vendor->vendor_type) === 'accommodation') {
+			$vendor->load('accommodationMetadata');
+			$vendor->metadata = $vendor->accommodationMetadata;
+			unset($vendor->accommodationMetadata);
+		}
 		return view('VendorDashboard.vendor-booking-utility', compact('vendor'));
 	}
 
@@ -531,50 +549,72 @@ class VendorController extends Controller
 	}
 	public function updateVendorBookingUtility(Request $request)
 	{
-		$request->validate([
-			'process_type' => 'required|string|in:one-step,two-step,redirect-url',
-			'redirect_url' => 'nullable|required_if:process_type,redirect-url|url',
-			'security_deposit_amount' => 'nullable|required_if:apply_security_deposit,1|string|max:255',
-			'applicable_taxes_amount' => 'nullable|required_if:apply_applicable_taxes,1|string|max:255',
-			'cleaning_fee_amount' => 'nullable|required_if:apply_cleaning_fee,1|string|max:255',
-			'pet_boarding' => 'nullable|required_if:apply_pet_boarding,1|string|max:255',
-			'checkin_start_time' => 'required',
-			'host' => 'required',
-			// 'checkin_end_time' => 'required|before:checkin_start_time',
-			'checkout_time' => 'required',
-		]);
-
-
 		$vendor = Vendor::find($request->vendorid);
 		if (!$vendor) {
 			return redirect()->back()->with('error', 'Vendor not found.');
 		}
+		$required_fields = [
+			'process_type' => 'required|string|in:one-step,two-step,redirect-url',
+			'redirect_url_type' => 'nullable|required_if:process_type,redirect-url|string|in:http://,https://',
+			'redirect_url' => 'nullable|required_if:process_type,redirect-url',
+			'applicable_taxes_amount' => 'nullable|required_if:apply_applicable_taxes,1|string|max:255',
+			// 'checkin_end_time' => 'required|before:checkin_start_time',
+		];
+		if (strtolower($vendor->vendor_type) == 'accommodation') {
+			$required_fields = array_merge($required_fields, [
+				'checkin_start_time' => 'required',
+				'checkout_time' => 'required',
+				'security_deposit_amount' => 'nullable|required_if:apply_security_deposit,1|string|max:255',
+				'cleaning_fee_amount' => 'nullable|required_if:apply_cleaning_fee,1|string|max:255',
+				'pet_boarding' => 'nullable|required_if:apply_pet_boarding,1|string|max:255',
+				'host' => 'nullable|string|max:255',
+			]);
+		}
+		$request->validate($required_fields);
 
-		$vendor->host = $request->host;
+		$vendor->host = $request->host ?? null;
 		$vendor->save();
 
-		$metdata = VendorAccommodationMetadata::where('vendor_id', $request->vendorid)->first();
-		if (!$metdata) {
-			$metdata = new VendorAccommodationMetadata();
-			$metdata->vendor_id = $request->vendorid;
+		if (strtolower($vendor->vendor_type) == 'accommodation') {
+			$metdata = VendorAccommodationMetadata::where('vendor_id', $request->vendorid)->first();
+			if (!$metdata) {
+				$metdata = new VendorAccommodationMetadata();
+				$metdata->vendor_id = $request->vendorid;
+			}
+			$metdata->cleaning_fee_amount  =  $request->cleaning_fee_amount;
+			$metdata->checkout_time = $request->checkout_time ?
+				Carbon::createFromFormat('h:i A', $request->checkout_time)->format('H:i:s') : null;
+
+			$metdata->checkin_start_time = $request->checkin_start_time ?
+				Carbon::createFromFormat('h:i A', $request->checkin_start_time)->format('H:i:s') : null;
+
+			$metdata->checkin_end_time = $request->checkin_end_time ?
+				Carbon::createFromFormat('h:i A', $request->checkin_end_time)->format('H:i:s') : null;
+			$metdata->pet_boarding = $request->pet_boarding;
+			$metdata->booking_minimum  =  $request->booking_minimum;
+			$metdata->booking_maximum  =  $request->booking_maximum;
+			$metdata->security_deposit_amount  =  $request->security_deposit_amount;
+		}
+
+		if(strtolower($vendor->vendor_type) == 'excursion') {
+			$metdata = VendorExcursionMetadata::where('vendor_id', $request->vendorid)->first();
+			if (!$metdata) {
+				$metdata = new VendorExcursionMetadata();
+				$metdata->vendor_id = $request->vendorid;
+			}
+		}
+		if(strtolower($vendor->vendor_type) == 'winery'){
+			$metdata = VendorWineryMetadata::where('vendor_id', $request->vendorid)->first();
+			if (!$metdata) {
+				$metdata = new VendorWineryMetadata();
+				$metdata->vendor_id = $request->vendorid;
+			}
 		}
 
 		$metdata->process_type  =  $request->process_type;
-		$metdata->redirect_url  =  $request->redirect_url;
-		$metdata->booking_minimum  =  $request->booking_minimum;
-		$metdata->booking_maximum  =  $request->booking_maximum;
-		$metdata->security_deposit_amount  =  $request->security_deposit_amount;
+		$metdata->redirect_url  =  $request->redirect_url_type . $request->redirect_url;
 		$metdata->applicable_taxes_amount  =  $request->applicable_taxes_amount;
-		$metdata->cleaning_fee_amount  =  $request->cleaning_fee_amount;
-		$metdata->checkout_time = $request->checkout_time ?
-			Carbon::createFromFormat('h:i A', $request->checkout_time)->format('H:i:s') : null;
 
-		$metdata->checkin_start_time = $request->checkin_start_time ?
-			Carbon::createFromFormat('h:i A', $request->checkin_start_time)->format('H:i:s') : null;
-
-		$metdata->checkin_end_time = $request->checkin_end_time ?
-			Carbon::createFromFormat('h:i A', $request->checkin_end_time)->format('H:i:s') : null;
-		$metdata->pet_boarding = $request->pet_boarding;
 		// print_r($metdata); die;
 		$metdata->save();
 
@@ -615,11 +655,18 @@ class VendorController extends Controller
 			$filePath = $vendorDir . '/' . $filename;
 			file_put_contents($filePath, $data);
 
-			// Save the media information to the database (optional)
+			// Save the media information to the database
 			$VendorMediaGallery = new VendorMediaGallery;
 			$VendorMediaGallery->vendor_media = 'images/VendorImages/' . $vendor->vendor_name . '/' . $filename;
 			$VendorMediaGallery->vendor_media_type = 'image';
 			$VendorMediaGallery->vendor_id = $vendor->id;
+
+			// Check if there are no existing media for this vendor
+			$existingMediaCount = VendorMediaGallery::where('vendor_id', $vendor->id)->where('is_default', 1)->count();
+			if ($existingMediaCount === 0) {
+				$VendorMediaGallery->is_default = 1; // Make this the default image
+			}
+
 			$VendorMediaGallery->save();
 		}
 		if ($request->youtube_link) {
@@ -683,7 +730,15 @@ class VendorController extends Controller
 	{
 		$media = VendorMediaGallery::findOrFail($request->mediaId);
 
-		// Delete the file from the filesystem
+		// Check if the image is the default
+		if ($media->is_default) {
+			return response()->json([
+				'status' => 'error',
+				'message' => 'Default media cannot be deleted. Please set another media as default before deleting this one.'
+			], 400);
+		}
+
+		// Delete the file from the filesystem if it's an image
 		if ($media->vendor_media_type == "image") {
 			$filePath = public_path($media->vendor_media);
 			if (File::exists($filePath)) {
@@ -695,6 +750,31 @@ class VendorController extends Controller
 		$media->delete();
 
 		return response()->json(['status' => 'success']);
+	}
+
+	public function setDefaultMedia(Request $request, $vendorId)
+	{
+		// Validate the media ID
+		$request->validate([
+			'mediaId' => 'required|exists:vendor_media_galleries,id',
+		]);
+
+		// Find the media by ID
+		$media = VendorMediaGallery::findOrFail($request->mediaId);
+
+		// Ensure the media belongs to the vendor
+		if ($media->vendor_id != $vendorId) {
+			return response()->json(['status' => 'error', 'message' => 'Unauthorized action.'], 403);
+		}
+
+		// Reset all media is_default to 0 for this vendor
+		VendorMediaGallery::where('vendor_id', $vendorId)->update(['is_default' => 0]);
+
+		// Set the current media as default
+		$media->is_default = 1;
+		$media->save();
+
+		return response()->json(['status' => 'success', 'message' => 'Media set as logo successfully.']);
 	}
 
 	public function getVendorDetails($vendorid)
@@ -729,7 +809,7 @@ class VendorController extends Controller
 	public function getManageDates(Request $request)
 	{
 		if ($request->ajax()) {
-			$BookingDate = BookingDate::select(DB::raw('id, CONCAT(start_date, " - ", end_date) as date,booking_type,id'))
+			$BookingDate = BookingDate::select(DB::raw('id, CONCAT(start_date, " - ", end_date) as date,booking_type,id, reason'))
 				->where('vendor_id', $request->vendorid);
 			if ($request->filterDateTypes != "All") {
 				$BookingDate = $BookingDate->where('booking_type', $request->filterDateTypes);
@@ -760,7 +840,7 @@ class VendorController extends Controller
 	{
 		// Custom validation logic
 		$validator = Validator::make($request->all(), [
-			'answer' => ['required', 'array', function ($attribute, $value, $fail) {
+			'answer' => ['nullable', 'array', function ($attribute, $value, $fail) {
 				foreach ($value as $questionId => $answer) {
 					$questionnaire = Questionnaire::find($questionId);
 
@@ -771,19 +851,19 @@ class VendorController extends Controller
 					// Handle validation based on question type
 					if ($questionnaire->question_type === 'checkbox') {
 						// Ensure checkbox answers are an array and at least one checkbox is selected
-						if (!is_array($answer) || count(array_filter($answer, 'strlen')) === 0) {
-							$fail('At least one answer must be provided for question ' . $questionId . '.');
-						}
+						// if (!is_array($answer) || count(array_filter($answer, 'strlen')) === 0) {
+						// 	$fail('At least one answer must be provided for question ' . $questionId . '.');
+						// }
 					} elseif ($questionnaire->question_type === 'radio') {
 						// Ensure radio answers are a non-empty string
-						if (strlen(trim($answer)) === 0) {
-							$fail('An answer must be provided for question ' . $questionId . '.');
-						}
+						// if (strlen(trim($answer)) === 0) {
+						// 	$fail('An answer must be provided for question ' . $questionId . '.');
+						// }
 					} else {
 						// For text input or other types
-						if (strlen(trim($answer)) === 0) {
-							$fail('An answer must be provided for question ' . $questionId . '.');
-						}
+						// if (strlen(trim($answer)) === 0) {
+						// 	$fail('An answer must be provided for question ' . $questionId . '.');
+						// }
 					}
 				}
 			}],
@@ -1152,22 +1232,53 @@ class VendorController extends Controller
 
 	public function changePassword(Request $request, $vendorid)
 	{
-		$user_id = Auth::user()->id;
+		$user_id = Auth::guard('vendor')->user()->id;
 		$user = User::find($user_id);
 		$vendor = Vendor::find($vendorid);
-		return view('VendorDashboard.change-password', compact('vendor', 'user'));
+		$hideSidebar = false;
+		if ($user->password_updated == 0) {
+			$hideSidebar = true;
+		}
+		return view('VendorDashboard.change-password', compact('vendor', 'user', 'hideSidebar'));
 	}
 
 	public function passwordUpdate(Request $request, $vendorid)
 	{
-		$validator = Validator::make($request->all(), [
-			'new_password' => 'required|min:8',
+		$user = User::find(Auth::user()->id);
+		$req = [
+			'new_password' => 'required|min:8|regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@$!%*#?&])[A-Za-z0-9@$!%*#?&]{8,}$/',
 			'confirm_password' => 'required|min:8|same:new_password',
-		]);
+		];
+		if ($request->has('old_password') || $user->password_updated > 0) {
+			$req['old_password'] = 'required';
+			$req['new_password'] = [
+				'required',
+				'min:8',
+				'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@$!%*#?&])[A-Za-z0-9@$!%*#?&]{8,}$/',
+				function ($attribute, $value, $fail) use ($request) {
+					if ($value === $request->old_password) {
+						$fail('The new password must not match the old password.');
+					}
+				},
+			];
+		}
+		$validator = Validator::make($request->all(), $req);
 
 		// Check validation
 		if ($validator->fails()) {
 			return redirect()->back()->withErrors($validator)->withInput();
+		}
+
+		// check old password
+		if ($request->has('old_password')) {
+			if (!Hash::check($request->old_password, $user->password)) {
+				return response()->json(
+					[
+						'errors' => 'Old password is incorrect.'
+					],
+					500
+				);
+			}
 		}
 		try {
 			// Find the vendor by ID
@@ -1191,7 +1302,7 @@ class VendorController extends Controller
 		} catch (\Exception $e) {
 			return response()->json(
 				[
-					'message' => 'An error occurred while updating the password update.'
+					'errors' => 'An error occurred while updating the password update.'
 				],
 				500
 			);
@@ -1227,8 +1338,9 @@ class VendorController extends Controller
 		}
 	}
 
-	public function vendorReferrals($vendorid) {
-		$referrals = User::where('guestrewards_vendor_id', $vendorid)->get();
+	public function vendorReferrals($vendorid)
+	{
+		$referrals = Customer::where('guestrewards_vendor_id', $vendorid)->get();
 		return view('VendorDashboard.vendor-referrals', compact('referrals'));
 	}
 }

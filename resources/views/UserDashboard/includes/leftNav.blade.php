@@ -60,7 +60,7 @@
                 <a href="{{ route('user-inquiries') }}" class="nav-link px-sm-2 px-3 align-middle">
                     <img src="{{ asset('images/icons/tranctions_icon_grey.png') }}"
                         data-image="{{ asset('images/icons/tranctions_icon') }}">
-                    <span class="ms-1 d-none d-sm-inline">My Inquiries</span>
+                    <span class="ms-1 d-none d-sm-inline">Booking Inquiries</span>
                 </a>
             </li>
             <li class="nav-item {{ request()->is('user/transactions*') ? 'active' : '' }}">

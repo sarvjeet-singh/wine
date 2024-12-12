@@ -207,7 +207,7 @@
                         <th scope="col">Inventory</th>
 
                         <th scope="col">Price</th>
-                        <th scope="col">Delisted</th>
+                        <th scope="col">Listed</th>
 
                         <th scope="col">Action</th>
 
@@ -234,7 +234,7 @@
                             <td>{{ $wine->inventory }}</td>
 
                             <td>${{ $wine->price }}</td>
-                            <td>{{ $wine->delisted == 1 ? 'Yes' : 'No' }}</td>
+                            <td>{{ $wine->delisted == 0 ? 'Yes' : 'No' }}</td>
 
                             <td>
 

@@ -26,6 +26,7 @@ class VendorSettingController extends Controller
                 'hours.*.opening_time' => 'nullable|date_format:H:i',
                 'hours.*.closing_time' => 'nullable|date_format:H:i',
                 'hours.*.is_open' => 'nullable|boolean',
+                'hours.*.is_late' => 'nullable|boolean',
             ]);
             foreach ($validated['hours'] as $day => $hour) {
                 // Check if a record already exists for the vendor and the day
@@ -39,6 +40,7 @@ class VendorSettingController extends Controller
                         'opening_time' => $hour['opening_time'] ?? null,
                         'closing_time' => $hour['closing_time'] ?? null,
                         'is_open' => isset($hour['is_open']) ? 1 : 0,
+                        'is_late' => isset($hour['is_late']) ? 1 : 0,
                     ]);
                 } else {
                     $data = [
@@ -47,6 +49,7 @@ class VendorSettingController extends Controller
                         'opening_time' => $hour['opening_time'] ?? null,
                         'closing_time' => $hour['closing_time'] ?? null,
                         'is_open' => isset($hour['is_open']) ? 1 : 0,
+                        'is_late' => isset($hour['is_late']) ? 1 : 0,
                     ];
                     BusinessHour::create($data);
                 }

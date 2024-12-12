@@ -831,6 +831,21 @@ html .ui-button.ui-state-disabled:active {
 .subscription-plan-sec .plan-inner {
     border-radius: 15px;
     height: 100%;
+    border: 2px solid transparent;
+}
+.subscription-plan-sec .plan-inner.active-plan {
+    border-color: #198754;
+}
+.subscription-plan-sec .plan-inner.active-plan h3 svg {
+    width: 20px;
+    height: 20px;
+    color: #198754;
+}
+.subscription-plan-sec .plan-inner h3 svg {
+    display: none;
+}
+.subscription-plan-sec .plan-inner.active-plan h3 svg {
+    display: var(--fa-display,inline-block);
 }
 .subscription-plan-sec .save-value {
     min-height: 24px;
@@ -861,6 +876,21 @@ html .ui-button.ui-state-disabled:active {
 }
 .subscription-plan-sec ul li li {
     font-size: 14px;
+}
+.subscription-plan-sec .buy-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.subscription-plan-sec .buy-btn .btn.btn-primary {
+    background-color: #118c97;
+    border-color: #118c97;
+}
+.subscription-plan-sec .buy-btn .btn.btn-primary.active {
+    background-color: #198754;
+    border-color: #198754;
 }
 /* ================== Subscription Plan CSS End ================== */
 
@@ -1209,18 +1239,7 @@ html .ui-button.ui-state-disabled:active {
     rotate: 90deg;
 }
 .cellaring-value-sec .form-check-label p {
-    position: absolute;
-    top: 8px;
-    left: 32%;
-    opacity: 0;
-    visibility: hidden;
-    transition: .3s ease-in-out;
     font-size: 14px;
-}
-.cellaring-value-sec .form-check-label:hover p,
-.cellaring-value-sec input:hover + .form-check-label p {
-    opacity: 1;
-    visibility: visible;
 }
 .dt-search [type="search"] {
   outline: none;
@@ -1429,7 +1448,6 @@ a.dlt-icon {
 .batch-sec img {
     width: 180px;
 }
-
 .fa-picnic {
     width: 24px;
     height: 24px;
@@ -1439,4 +1457,3 @@ a.dlt-icon {
     display: inline-block;
     color: #000;
 }
-

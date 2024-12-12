@@ -17,6 +17,7 @@ use App\Models\Vendor;
 use App\Models\VendorSocialMedia;
 use App\Models\VendorPricing;
 use App\Models\Review;
+use App\Models\Customer;
 use App\Models\User;
 use App\Models\VendorInquiry;
 use App\Models\VendorMediaGallery;
@@ -221,14 +222,21 @@ class FrontEndController extends Controller
 
     public function getWineryDetails($vendorslug)
     {
-        if (!Auth::check()) {
-            return redirect()->route('wineries-listing');
+        if (!Auth::guard('vendor')->check()) {
+            $user_id =  Auth::guard('customer')->user()->id;
+            $user = Customer::find($user_id);
+            if (!Auth::guard('customer')->check()) {
+                return redirect()->route('wineries-listing');
+            }
+        } else {
+            $user_id =  Auth::guard('vendor')->user()->id;
+            $user = Vendor::find($user_id);
         }
         // Check if the vendor slug exists
         $vendor = Vendor::with('sub_regions', 'sub_category', 'countryName', 'accommodationMetadata')->where('vendor_slug', $vendorslug)->first();
         $today = Carbon::now()->format('l'); // e.g., 'Monday'
-        $user_id = Auth::user()->id;
-        $user = User::find($user_id);
+
+
         // Query the business hours for today
         $businessHours = BusinessHour::where('vendor_id', $vendor->id)
             ->where('day', $today)
@@ -254,17 +262,20 @@ class FrontEndController extends Controller
         }
         $cuisineIds = !empty($vendor->wineryMetadata->cuisines) ? $vendor->wineryMetadata->cuisines : '[]'; // Split the comma-separated list into an array of IDs
         $cuisineNames = '';
-        if(!empty($cuisineIds)){
+        if (!empty($cuisineIds)) {
             $cuisineIds = json_decode($cuisineIds);
             $cuisines = Cuisine::whereIn('id', $cuisineIds)->get(); // Retrieve the cuisines by these IDs
             $cuisineNames = $cuisines->pluck('name')->implode(', ');
         }
-        
+
 
         // Implode the names into a comma-separated string
         $socialLinks = $vendor->socialMedia()->first();
         $amenities = $vendor->amenities()->get();
-        $wines = VendorWine::where('vendor_id', $vendor->id)->get();
+        $wines = VendorWine::where('vendor_id', $vendor->id)
+            ->where('delisted', 0)
+            ->where('price', '>', 0.00)
+            ->get();
         // If the vendor does not exist, redirect to the homepage
         if (!$vendor) {
             return redirect('/');
@@ -880,8 +891,7 @@ class FrontEndController extends Controller
         }
 
         // Get vendor details using vendor_id
-        $vendor = Vendor::with('sub_regions', 'sub_category', 'countryName', 'accommodationMetadata')->find($booking->vendor_id);
-
+        $vendor = Vendor::with('mediaLogo','sub_regions', 'sub_category', 'countryName', 'accommodationMetadata', 'stripeDetails')->find($booking->vendor_id);
         if (!$vendor) {
             return redirect()->route('home')->with('error', 'Vendor not found');
         }
@@ -1268,7 +1278,12 @@ class FrontEndController extends Controller
         // Get the search query
         $searchTerm = $request->input('query');
         $type = $request->input('type');
-
+        if ($type == 'accommodations') {
+            $type = 'accommodation';
+        }
+        if ($type == 'wineries') {
+            $type = 'winery';
+        }
         // Search for vendors whose name matches the query
         $vendors = Vendor::where('vendor_name', 'LIKE', "%{$searchTerm}%")
             ->where('vendor_type', $type)
@@ -1351,7 +1366,8 @@ class FrontEndController extends Controller
                 'sub_category',
                 'sub_regions',
                 $type . 'Metadata',
-                'mediaGallery'
+                'mediaGallery',
+                'mediaLogo',
             ];
         } else if ($vendor_type == 'excursion') {
             $type = 'excursion';
@@ -1364,7 +1380,8 @@ class FrontEndController extends Controller
                 $type . 'Metadata.farmingPractices',
                 $type . 'Metadata.maxGroup',
                 $type . 'Metadata.cuisine',
-                'mediaGallery'
+                'mediaGallery',
+                'mediaLogo',
             ];
         } else if ($vendor_type == 'winery') {
             $type = 'winery';
@@ -1377,7 +1394,8 @@ class FrontEndController extends Controller
                 $type . 'Metadata.farmingPractices',
                 $type . 'Metadata.maxGroup',
                 $type . 'Metadata.cuisine',
-                'mediaGallery'
+                'mediaGallery',
+                'mediaLogo',
             ];
         } else if ($vendor_type == 'licensed') {
             $type = 'license';
@@ -1389,7 +1407,8 @@ class FrontEndController extends Controller
                 $type . 'Metadata.farmingPractices',
                 $type . 'Metadata.maxGroup',
                 $type . 'Metadata.cuisine',
-                'mediaGallery'
+                'mediaGallery',
+                'mediaLogo',
             ];
         } else if ($vendor_type == 'non-licensed') {
             $type = 'nonLicense';
@@ -1401,7 +1420,8 @@ class FrontEndController extends Controller
                 $type . 'Metadata.farmingPractices',
                 $type . 'Metadata.maxGroup',
                 $type . 'Metadata.cuisine',
-                'mediaGallery'
+                'mediaGallery',
+                'mediaLogo',
             ];
         }
         if ($request->ajax()) {
@@ -1638,9 +1658,9 @@ class FrontEndController extends Controller
                 ->orderBy('vendor_name', 'asc')
                 ->paginate(10)
                 ->appends($request->all());
-
+            $cities = Vendor::where('vendor_type', $vendor_type)->orderBy('city', 'asc')->distinct()->pluck('city');
             return response()->json([
-                'html' => view('FrontEnd.get_vendor_type_list', compact('vendors'))->render(), // Rendered HTML of the listings
+                'html' => view('FrontEnd.get_vendor_type_list', compact('vendors', 'cities'))->render(), // Rendered HTML of the listings
                 'pagination' => (string) $vendors->links('vendor.pagination.bootstrap-5'), // Pagination links
                 'total' => $vendors->total(),
             ]);

@@ -21,7 +21,7 @@
                         <div class="alert alert-danger">
                             {{ session('error') }}
                             @if (session('show_resend_link'))
-                                <form action="{{ route('verification.resend') }}" method="POST" class="d-inline">
+                                <form action="{{ route('customer.verification.resend') }}" method="POST" class="d-inline">
                                     @csrf
                                     <input type="hidden" name="email" value="{{ session('unverified_email') }}">
                                     <button type="submit" class="btn btn-link text-decoration-none theme-btn">Resend Verification Email</button>
@@ -77,8 +77,8 @@
                                 </div>
                             </div>
                             <div class="col-md-6 col-7 text-end">
-                                @if (Route::has('password.request'))
-                                    <a href="{{ route('password.request') }}">
+                                @if (Route::has('customer.password.request'))
+                                    <a href="{{ route('customer.password.request') }}">
                                         {{ __('Forgot Your Password?') }}
                                     </a>
                                 @endif

@@ -71,6 +71,11 @@ class Vendor extends Model
     {
         return $this->hasMany(VendorMediaGallery::class);
     }
+
+    public function mediaLogo()
+    {
+        return $this->hasOne(VendorMediaGallery::class)->where('is_default', 1);
+    }
     public function bookingDates()
     {
         return $this->hasMany(BookingDate::class);
@@ -142,5 +147,9 @@ class Vendor extends Model
 
     public function accountStatus() {
         return $this->belongsTo(AccountStatus::class, 'account_status');
+    }
+
+    public function stripeDetails() {
+        return $this->hasOne(VendorStripeDetail::class, 'vendor_id', 'id');
     }
 }

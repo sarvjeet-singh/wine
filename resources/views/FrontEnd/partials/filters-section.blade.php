@@ -216,29 +216,18 @@
                                         </div>
                                         <div class="filter-box mb-3">
                                             <h6>Price Point</h6>
-                                            <div class="form-check">
-                                                <input class="form-check-input filter" type="checkbox" value="least"
-                                                    name="price_point" id="Least">
-                                                <label class="form-check-label" for="Least"> $ Least </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input name="price_point" class="form-check-input filter"
-                                                    type="checkbox" value="low" id="LowModerately">
-                                                <label class="form-check-label" for="LowModerately"> $$ Low Moderately
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input name="price_point" class="form-check-input filter"
-                                                    type="checkbox" value="high" id="ModeratelyHigh">
-                                                <label class="form-check-label" for="ModeratelyHigh"> $$$ Moderately
-                                                    High </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input name="price_point" class="form-check-input filter"
-                                                    type="checkbox" value="expensive" id="MostExpensive">
-                                                <label class="form-check-label" for="MostExpensive"> $$$$ Most
-                                                    Expensive </label>
-                                            </div>
+
+                                            @if (count(getPricePoints()) > 0)
+                                                @foreach (getPricePoints() as $pricePoint)
+                                                    <div class="form-check">
+                                                        <input class="form-check-input filter" type="checkbox"
+                                                            value="{{ $pricePoint->id }}" name="price_point"
+                                                            id="price_point{{ $pricePoint->id }}">
+                                                        <label class="form-check-label" for="Least">
+                                                            {{ $pricePoint->name }} </label>
+                                                    </div>
+                                                @endforeach
+                                            @endif
                                         </div>
         </div>
     </div>
@@ -268,7 +257,7 @@
             var searchValue = $('#search').val();
             if (searchValue) {
                 params.set('search',
-                searchValue); // No need for `encodeURIComponent` here as URLSearchParams does it.
+                    searchValue); // No need for `encodeURIComponent` here as URLSearchParams does it.
             }
             // Iterate over all checked checkboxes and add their values to the URL
             $('.filter:checked').each(function() {

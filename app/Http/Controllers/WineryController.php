@@ -24,7 +24,8 @@ class WineryController extends Controller
             ->where(function ($query) {
                 $query->where('account_status', '1')
                     ->orWhere('account_status', '2');
-            });
+            })
+            ->where('id', '!=', $vendorid);
 
         // Apply filters if input values are provided
         if ($search) {
@@ -75,6 +76,8 @@ class WineryController extends Controller
         // Fetch the results with ordering
         $wines = $query->orderByRaw('CASE WHEN grape_varietals IS NULL THEN 1 ELSE 0 END, grape_varietals ASC')
             ->where('delisted', 0)
+            ->where('vendor_id', '!=', $vendorid)
+            ->where('price', '>', 0.00)
             ->orderBy('id', 'desc')
             ->paginate(10);
         $vendor = Vendor::where('id', $shopid)->first();
@@ -85,6 +88,8 @@ class WineryController extends Controller
     {
         $wine = VendorWine::where('id', $wineid)
             ->where('inventory', '>', 0)
+            ->where('vendor_id', '!=', $vendorid)
+            ->where('price', '>', 0.00)
             ->first();
         if (!$wine) {
             return redirect()->back();

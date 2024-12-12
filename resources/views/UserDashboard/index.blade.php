@@ -120,7 +120,7 @@
                                 </div>
                             </div>
                             <div class="information-box-body">
-                                <div class="box-body-label">Profile Image</div>
+                                <div class="box-body-label">{{Auth::user()->profile_image ? 'Profile Image' : 'Upload Profile Image'}}</div>
                                 <div class="row g-3 mt-sm-3 mt-2">
                                     <div class="col-md-4 profile-parent">
                                         <img src="{{ Auth::user()->profile_image ? asset('images/UserProfile/' . Auth::user()->profile_image) : asset('images/UserProfile/default-profile.png') }}"
@@ -177,19 +177,19 @@
                                             <div class="col-sm-5 mb-sm-0 mb-2">
                                                 <div class="box-body-label">My Socials:</div>
                                                 @if (Auth::user()->facebook != '')
-                                                    <img src="{{ asset('images/FrontEnd/image 10.png') }}"
+                                                    <img src="{{ asset('images/FrontEnd/facebook.png') }}"
                                                         class="box-social-icon">
                                                 @endif
                                                 @if (Auth::user()->instagram != '')
-                                                    <img src="{{ asset('images/FrontEnd/image 13.png') }}"
+                                                    <img src="{{ asset('images/FrontEnd/instagram.png') }}"
                                                         class="box-social-icon">
                                                 @endif
                                                 @if (Auth::user()->youtube != '')
-                                                    <img src="{{ asset('images/FrontEnd/image 12.png') }}"
+                                                    <img src="{{ asset('images/FrontEnd/youtube.png') }}"
                                                         class="box-social-icon">
                                                 @endif
                                                 @if (Auth::user()->tiktok != '')
-                                                    <img src="{{ asset('images/FrontEnd/image 11.png') }}"
+                                                    <img src="{{ asset('images/FrontEnd/tiktok.png') }}"
                                                         class="box-social-icon">
                                                 @endif
                                                 @if (Auth::user()->twitter != '')
@@ -197,7 +197,7 @@
                                                         class="box-social-icon">
                                                 @endif
                                                 @if (Auth::user()->linkedin != '')
-                                                    <img src="{{ asset('images/FrontEnd/image 14.png') }}"
+                                                    <img src="{{ asset('images/FrontEnd/linkedin.png') }}"
                                                         class="box-social-icon">
                                                 @endif
                                             </div>
