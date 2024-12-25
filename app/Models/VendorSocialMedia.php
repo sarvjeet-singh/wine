@@ -15,7 +15,7 @@ class VendorSocialMedia extends Model
         'instagram',
         'twitter',
         'youtube',
-        'linkedin',
+        'pinterest',
         'tiktok'
     ];
 }

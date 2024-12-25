@@ -39,9 +39,9 @@
                         aria-controls="menu3">
                         <div><i class="fas fa-cogs menu-icon"></i> Accommodation Inventory</div>
                         <i
-                            class="fas fa-angle-right expand-icon {{ request()->routeIs( 'inventory-management', 'vendor-pricing', 'vendor-inquiries', 'vendor-transactions') ? 'rotate' : '' }}"></i>
+                            class="fas fa-angle-right expand-icon {{ request()->routeIs('inventory-management', 'vendor-pricing', 'vendor-inquiries', 'vendor-transactions') ? 'rotate' : '' }}"></i>
                     </a>
-                    <div class="collapse {{ request()->routeIs( 'inventory-management', 'vendor-pricing', 'vendor-inquiries', 'vendor-transactions') ? 'show' : '' }}"
+                    <div class="collapse {{ request()->routeIs('inventory-management', 'vendor-pricing', 'vendor-inquiries', 'vendor-transactions') ? 'show' : '' }}"
                         id="menu3">
                         <ul class="nav flex-column sub-menu mt-2">
                             <li class="nav-item"><a
@@ -182,35 +182,37 @@
             <li class="nav-item my-1">
                 <a class="nav-link {{ request()->routeIs('vendor-faqs') ? 'active' : '' }}"
                     href="{{ route('vendor-faqs', ['vendorid' => $id]) }}">
-                    <i class="fas fa-wrench menu-icon"></i>User FAQs
+                    <i class="fas fa-wrench menu-icon"></i>FAQs
                 </a>
             </li>
             <!-- Parent Menu 8 -->
             <li class="nav-item my-1">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menu8" role="button"
-                    aria-expanded="{{ request()->routeIs('vendor-booking-utility','vendor-settings', 'business-hours.index') ? 'true' : 'false' }}"
+                    aria-expanded="{{ request()->routeIs('vendor-booking-utility', 'vendor-settings', 'business-hours.index', 'stripe.details.show', 'vendor-social-media', 'vendor-change-password','vendor-access-credentials', 'vendor-questionnaire') ? 'true' : 'false' }}"
                     aria-controls="menu8">
                     <div><i class="fas fa-cogs menu-icon"></i> Operational Settings</div>
                     <i
-                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-booking-utility','vendor-settings', 'business-hours.index') ? 'rotate' : '' }}"></i>
+                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-booking-utility', 'vendor-settings', 'business-hours.index', 'stripe.details.show', 'vendor-social-media', 'vendor-change-password','vendor-access-credentials', 'vendor-questionnaire') ? 'rotate' : '' }}"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('vendor-booking-utility','vendor-settings', 'business-hours.index', 'stripe.details.show', 'vendor-social-media', 'vendor-change-password') ? 'show' : '' }}"
+                <div class="collapse {{ request()->routeIs('vendor-booking-utility', 'vendor-settings', 'business-hours.index', 'stripe.details.show', 'vendor-social-media', 'vendor-change-password','vendor-access-credentials', 'vendor-questionnaire') ? 'show' : '' }}"
                     id="menu8">
                     <ul class="nav flex-column sub-menu mt-2">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('vendor-settings') ? 'active' : '' }}"
                                 href="{{ route('vendor-settings', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i> Vendor Details
+                                <i class="fas fa-wrench menu-icon"></i> {{ ucfirst($vendor->vendor_type) }} Details
                             </a>
                         </li>
-                        <li class="nav-item"><a
-                            class="nav-link {{ request()->routeIs('vendor-booking-utility') ? 'active' : '' }}"
-                            href="{{ route('vendor-booking-utility', ['vendorid' => $id]) }}">
-                            <i class="fas fa-wrench menu-icon"></i>Transaction Parametres</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('vendor-booking-utility') ? 'active' : '' }}"
+                                href="{{ route('vendor-booking-utility', ['vendorid' => $id]) }}">
+                                <i class="fas fa-cog menu-icon"></i> Transaction Parameters
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('stripe.details.show') ? 'active' : '' }}"
                                 href="{{ route('stripe.details.show', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i>Payment Gateway
+                                <i class="fas fa-wrench menu-icon"></i> Payment Gateway
                             </a>
                         </li>
                         @if (strtolower($vendor->vendor_type) != 'accommodation')
@@ -222,19 +224,24 @@
                             </li>
                         @endif
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-wrench menu-icon"></i>Vendor Contacts
+                            <a class="nav-link {{ request()->routeIs('vendor-access-credentials') ? 'active' : '' }}" href="{{ route('vendor-access-credentials', ['vendorid' => $id]) }}">
+                                <i class="fas fa-wrench menu-icon"></i> Vendor Contacts
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{route('vendor-change-password', ['vendorid' => $id])}}">
-                                <i class="fas fa-wrench menu-icon"></i>Change Password
+                            <a class="nav-link {{ request()->routeIs('vendor-questionnaire') ? 'active' : '' }}" href="{{ route('vendor-questionnaire', ['vendorid' => $id]) }}">
+                                <i class="fas fa-wrench menu-icon"></i> {{ ucfirst($vendor->vendor_type) }} Questionnaire
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('vendor-social-media') ? 'active' : '' }}""
+                            <a class="nav-link {{ request()->routeIs('vendor-change-password') ? 'active' : '' }}" href="{{ route('vendor-change-password', ['vendorid' => $id]) }}">
+                                <i class="fas fa-wrench menu-icon"></i> Change Password
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('vendor-social-media') ? 'active' : '' }}"
                                 href="{{ route('vendor-social-media', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i>Social Media
+                                <i class="fas fa-wrench menu-icon"></i> Social Media
                             </a>
                         </li>
                     </ul>

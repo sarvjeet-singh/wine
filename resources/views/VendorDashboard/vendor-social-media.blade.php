@@ -68,10 +68,10 @@
                             </div>
                             <div class="row mt-3">
                                 <div class="col-sm-6 col-12">
-                                    <label class="form-label">LinkedIn</label>
-                                    <input type="text" class="form-control @error('linkedin') is-invalid @enderror"
-                                        name="linkedin" value="{{ old('linkedin', $vendor->socialMedia->linkedin ?? '') }}"
-                                        placeholder="Please enter LinkedIn link">
+                                    <label class="form-label">Pinterest</label>
+                                    <input type="text" class="form-control @error('pinterest') is-invalid @enderror"
+                                        name="pinterest" value="{{ old('pinterest', $vendor->socialMedia->pinterest ?? '') }}"
+                                        placeholder="Please enter Pinterest link">
                                     @error('linkedin')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror

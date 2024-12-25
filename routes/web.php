@@ -46,7 +46,7 @@ use App\Http\Controllers\CommandController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
-// use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Artisan;
 // Artisan::call('storage:link');
 
 // use App\Http\Middleware\CheckVendorAuthorization;
@@ -136,15 +136,27 @@ Route::get('/', [FrontEndController::class, 'home'])->name('home');
 Route::get('/login/{token}', [LoginController::class, 'loginWithToken'])->name('login-with-token');
 Route::post('/customlogin', [LoginController::class, 'process_login'])->name('custom_login');
 Route::post('/login-ajax', [LoginController::class, 'loginAjax'])->name('login.ajax');
-Route::get('check-login', function () {
-    if (!auth()->check()) {
+Route::get('check-login/{type}', function ($type) {
+    if (!auth()->check() && $type == 'review') {
+        // If not logged in, flash an error message and redirect to login
+        session()->flash('error', 'You must be logged in to submit a review.');
+        return redirect()->route('customer.login');
+    }
+    if (!auth()->check() && $type == 'become-vendor') {
         // If not logged in, flash an error message and redirect to login
         session()->flash('error', 'You must be logged in to submit a business.');
         return redirect()->route('customer.login');
     }
-
-    // If logged in, redirect to the original action (e.g., the form to promote a business)
-    return redirect()->route('become-vendor');
+    if (!auth()->check() && $type == 'vendor-inquiry') {
+        // If not logged in, flash an error message and redirect to login
+        session()->flash('error', 'You must be logged in to submit an inquiry.');
+        return redirect()->route('customer.login');
+    }
+    if (!auth()->check() && $type == 'book-now') {
+        // If not logged in, flash an error message and redirect to login
+        session()->flash('error', 'You must be logged in to book.');
+        return redirect()->route('customer.login');
+    }
 })->name('check-login');
 // Route::get('/accommodations', [FrontEndController::class, 'getAccommodations'])->name('accommodations');
 Route::post('/get-accommodations', [FrontEndController::class, 'getAccommodationsList'])->name('get.accommodation');
@@ -190,8 +202,8 @@ Route::get('/guest-rewards', function () {
 })->name('guest-rewards');
 
 //  QR Code
-Route::get('vendor-QCode-show/{slug}', [FrontEndController::class, 'showQCode'])->name('vendorQCode.show');
-Route::get('vendor-QCode-generate/{slug}', [FrontEndController::class, 'generateQCode'])->name('vendorQCode.generate');
+Route::get('qr/{short_code}', [FrontEndController::class, 'showQCode'])->name('vendorQCode.show');
+Route::get('vendor-QCode-generate/{short_code}', [FrontEndController::class, 'generateQCode'])->name('vendorQCode.generate');
 
 // ================= USER DASHBOARD ============== //
 Auth::routes();
@@ -209,6 +221,7 @@ Route::post('/user-settings-refferral-update', [UserDashboardController::class, 
 Route::post('/user-settings-social-update', [UserDashboardController::class, 'userSettingsSocialUpdate'])->name('user-settings-social-update');
 Route::post('/user-settings-update-password', [UserDashboardController::class, 'userSettingsUpdatePassword'])->name('user-settings-update-password');
 Route::get('/vendor_list', [UserDashboardController::class, 'vendor_list'])->name('vendor_list');
+Route::get('/support_vendor_list', [UserDashboardController::class, 'support_vendor_list'])->name('support_vendor_list');
 Route::get('/vendor-suggest', [UserDashboardController::class, 'vendorsuggest'])->name('vendorsuggest');
 Route::post('/vendor-suggest', [UserDashboardController::class, 'StoreVendorSuggest'])->name('vendor_suggest');
 Route::get('/become-vendor', [UserDashboardController::class, 'becomevendor'])->name('become-vendor');
@@ -249,10 +262,12 @@ Route::group(['middleware' => ['auth:vendor', 'check.vendorid']], function () {
     Route::post('/vendor-settings-booking/{vendorid?}', [VendorController::class, 'VendorSettingsBooking'])->name('vendor-settings-booking');
     Route::post('/vendor-social-media-update/{vendorid}', [VendorController::class, 'updateVendorSocialMedia'])->name('vendor-social-media-update');
     Route::post('/vendor-questionnaire-update/{vendorid}', [VendorController::class, 'updateQuestionnaireMedia'])->name('vendor-questionnaire-update');
+    Route::get('/vendor-questionnaire/{vendorid}', [VendorController::class, 'questionnaire'])->name('vendor-questionnaire');
+    Route::get('/vendor-access-credentials/{vendorid}', [VendorController::class, 'accessCredentials'])->name('vendor-access-credentials');
 
     Route::get('/vendor-media-gallary/{vendorid?}', [VendorController::class, 'getVendorMediaGallery'])->name('vendor-media-gallary');
-    Route::post('/vendor-media-delete/{vendorid?}', [VendorController::class, 'deleteVendorMedia'])->name('vendor-media-delete');
     Route::post('/vendor-logo-delete/{vendorid?}', [VendorController::class, 'deleteVendorLogo'])->name('vendor-logo-delete');
+    Route::post('/vendor-media-delete/{vendorid?}', [VendorController::class, 'deleteVendorMedia'])->name('vendor-media-delete');
     Route::post('/vendor/media/set-default/{vendorid?}', [VendorController::class, 'setDefaultMedia'])->name('vendor-media-set-default');
 
     Route::post('/vendor/upload-media/{vendorid?}', [VendorController::class, 'uploadMedia'])->name('vendor.upload_media');
@@ -401,7 +416,23 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::post('/admin/faqs/update-question/{section_id}', [AdminFaqController::class, 'updateQuestion'])->name('admin.faqs.update-question');
     Route::delete('/admin/faqs/questions/{id}', [AdminFaqController::class, 'destroyQuestion'])->name('admin.faqs.delete-question');
     Route::resource('/admin/faqs', AdminFaqController::class)->names('admin.faqs');
+    
+    // vendor routes
+    Route::get('admin/vendors/vendor-details/{id}', [AdminVendorController::class, 'vendorDetails'])->name('admin.vendor.details');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-view', [AdminVendorController::class, 'getViewTab'])->name('admin.vendor.details.ajax-view');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-experience', [AdminVendorController::class, 'getExperienceTab'])->name('admin.vendor.details.ajax-experience');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-stripe', [AdminVendorController::class, 'getStripeDetailsTab'])->name('admin.vendor.details.ajax-stripe');
+    Route::post('admin/vendors/vendor-details/{id}/ajax-stripe-update', [AdminVendorController::class, 'updateStripeDetails'])->name('admin.vendor.details.ajax-stripe-update');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-media-gallery', [AdminVendorController::class, 'getMediaGalleryTab'])->name('admin.vendor.details.ajax-media-gallery');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-social-media', [AdminVendorController::class, 'getSocialMediaTab'])->name('admin.vendor.details.ajax-social-media');
+    Route::post('admin/vendor-media-delete/{vendorid?}', [AdminVendorController::class, 'deleteMedia'])->name('admin.vendor.details.ajax-media-delete');
+    Route::post('admin/vendor/media/set-default/{vendorid?}', [AdminVendorController::class, 'setDefaultMedia'])->name('admin.vendor.details.ajax-media-set-default');
 
+    Route::post('admin/vendor/upload-media/{vendorid?}', [AdminVendorController::class, 'uploadMedia'])->name('admin.vendor.details.ajax.upload_media');
+    Route::post('admin/vendors/vendor-details/{id}/ajax-social-media-update', [AdminVendorController::class, 'updateSocialMedia'])->name('admin.vendor.details.ajax-social-media-update');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-questionnaire', [AdminVendorController::class, 'getQuestionnaireTab'])->name('admin.vendor.details.ajax-questionnaire');
+    Route::post('admin/vendors/vendor-details/{id}/ajax-questionnaire-update', [AdminVendorController::class, 'updateQuestionnaire'])->name('admin.vendor.details.ajax-questionnaire-update');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-access-credentials', [AdminVendorController::class, 'getAccessCredentialsTab'])->name('admin.vendor.details.ajax-access-credentials');
 
     // Common Routes
     // Route::prefix('admin/{entity}')->group(function () {
@@ -459,9 +490,20 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::delete('admin/users/{user}/roles/{role}', [RolePermissionController::class, 'unassignRole']);
 });
 
-Route::get('/get-subregions/{regionId}', [RegionController::class, 'getSubRegions']);
+Route::get('/get-subregions/{regionId}', [RegionController::class, 'getSubRegions'])->name('get.subregions');
 Route::get('/get-subcategories/{categoryId}', [CategoryController::class, 'getSubcategories'])->name('getSubcategories');
 Route::post('/webhook/stripe', [StripeWebhookController::class, 'handleWebhook']);
 Route::get('/vendorEmailTest', [AdminVendorController::class, 'vendorEmailTest']);
 
+// Route::get('/generate-short-codes', function () {
+//     Artisan::call('vendor:add-short-code');
+
+//     return 'Short codes generated successfully!';
+// });
+// Route::get('/generate-qr-codes', function () {
+//     Artisan::call('vendors:generate-qr-codes');
+
+//     return 'QR codes generated successfully!';
+// });
+Route::get('/{vendor_short_code}', [FrontendController::class, 'detailsShortCode'])->name('vendor.detailsShortCode');
 // Route::get('/migration-vendor', [MigrationController::class, 'migrateVendorData']);

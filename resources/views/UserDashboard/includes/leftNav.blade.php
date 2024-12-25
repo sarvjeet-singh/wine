@@ -46,7 +46,7 @@
                 <a href="{{ route('vendorsuggest') }}" class="nav-link px-sm-2 px-3 align-middle">
                     <img src="{{ asset('images/icons/referral_icon_grey.png') }}"
                         data-image="{{ asset('images/icons/referral_icon') }}">
-                    <span class="ms-1 d-none d-sm-inline">Suggest Vendor</span>
+                    <span class="ms-1 d-none d-sm-inline">Promote a Business</span>
                 </a>
             </li>
             <li class="nav-item {{ request()->is('manage-review*') ? 'active' : '' }}">

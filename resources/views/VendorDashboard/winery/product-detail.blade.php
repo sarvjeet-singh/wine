@@ -89,7 +89,7 @@
                                                 <div class="cart-btn">
                                                     {{-- @if ($wine->inventory > 12) --}}
                                                     <a href="javascript:void(0)" data-id="{{ $wine->id }}"
-                                                        data-quantity="1" class="btn wine-btn add-to-cart">Add
+                                                        data-quantity="{{$wine->inventory > 12 ? 12 : 1}}" class="btn wine-btn add-to-cart">Add
                                                         to Cart</a>
                                                     {{-- @else
                                                     <a href="javascript:void(0)" class="btn wine-btn disabled">Add to
@@ -440,7 +440,7 @@
                                                         <div class="cart-btn text-end"> <a href="javascript:void(0)"
                                                                 data-id="{{ $wine->id }}"
                                                                 class="btn wine-btn add-to-cart-slider"
-                                                                data-quantity="1">Add to Cart</a>
+                                                                data-quantity="{{$wine->inventory > 12 ? 12 : 1}}">Add to Cart</a>
                                                         </div>
                                                     </div>
                                                 @else

@@ -12,7 +12,7 @@
         <div class="information-box">
             <div class="information-box-head">
                 <div class="box-head-heading d-flex flex-wrap flex-column">
-                    <span class="box-head-label theme-color">Become a vendor</span>
+                    <span class="box-head-label theme-color">Promote a Business</span>
                     {{-- <p class="f-15">Suggest a vendor that does not currently exist in our database and you would like to submit a review for</p> --}}
                 </div>
             </div>

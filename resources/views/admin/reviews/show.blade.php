@@ -58,14 +58,14 @@
 
                                     <div class="text-center">
 
-                                        <img src="{{ asset('images/UserProfile/' . ($review->user->profile_image ?? 'default-profile.png')) }}"
+                                        <img src="{{ asset('images/UserProfile/' . ($review->customer->profile_image ?? 'default-profile.png')) }}"
                                             class="img-fluid" alt="Profle Image" />
 
-                                        <p class="fw-bold mt-2 mb-0">{{ $review->user->firstname }}
+                                        <p class="fw-bold mt-2 mb-0">{{ $review->customer->firstname ?? '' }}
 
-                                            {{ $review->user->lastname }}</p>
+                                            {{ $review->customer->lastname ?? '' }}</p>
 
-                                        <p class="mb-0">{{ $review->user->email }}</p>
+                                        <p class="mb-0">{{ $review->customer->email ?? '' }}</p>
 
                                     </div>
 
@@ -86,25 +86,20 @@
                                             {{ $review->date_of_visit ?? 'N/A' }}</p>
                                         <p class="mb-2"><span class="fw-bold">City/Town: </span>
 
-                                            {{ $review->user->city ?? 'N/A' }}</p>
+                                            {{ $review->customer->city ?? 'N/A' }}</p>
                                         <p class="mb-2"><span class="fw-bold">State/Province: </span>
 
-                                            {{ $review->user->state ?? 'N/A' }}</p>
+                                            {{ $review->customer->state ?? 'N/A' }}</p>
 
                                         <div class="comment-scroll pe-2">
                                             <p class="mb-2"><span class="fw-bold">Comment: </span>
 
                                                 {{ $review->review_description ?? 'N/A' }}</p>
                                         </div>
-
-                                        <!-- <p class="mb-1"><span class="fw-bold">Rating: </span>
-
-                                                        {{ $review->rating ?? 'N/A' }}</p> -->
-
                                         <div class="rating-star mb-1 d-flex align-items-center gap-1">
                                             <p class="mb-0"><span class="fw-bold">Rating: </span></p>
                                             <ul class="list-unstyled d-flex align-items-center mb-0">
-                                                @if ($review->rating > 0)
+                                                @if (isset($review->rating) && $review->rating > 0)
                                                     @for ($i = 1; $i <= floor($review->rating); $i++)
                                                         <li><i class="fa-solid fa-star"></i></li>
                                                     @endfor
@@ -116,15 +111,15 @@
 
                                     <div class="mt-2">
 
-                                        @if ($review->review_status == 'pending')
+                                        @if (isset($review->review_status) && $review->review_status == 'pending')
                                             <button class="btn btn-success btn-approve"
                                                 data-id="{{ $review->id }}">Approve</button>
 
                                             <button class="btn btn-danger btn-decline"
                                                 data-id="{{ $review->id }}">Decline</button>
-                                        @elseif ($review->review_status == 'approved')
+                                        @elseif (isset($review->review_status) && $review->review_status == 'approved')
                                             <button class="btn btn-success" disabled>Approved</button>
-                                        @elseif ($review->review_status == 'declined')
+                                        @elseif (isset($review->review_status) && $review->review_status == 'declined')
                                             <button class="btn btn-danger" disabled>Declined</button>
                                         @endif
 

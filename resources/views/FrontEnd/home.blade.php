@@ -176,11 +176,11 @@
                                             <div
                                                 class="d-flex align-items-center justify-content-lg-start justify-content-center mt-3">
                                                 <div class="user-img">
-                                                    <img src="{{ $review->user->profile_image ? asset('images/UserProfile/' . $review->user->profile_image) : asset('images/UserProfile/default-profile.png') }}"
+                                                    <img src="{{ (isset($review->customer->profile_image) && $review->customer->profile_image) ? asset('images/UserProfile/' . $review->customer->profile_image) : asset('images/UserProfile/default-profile.png') }}"
                                                         alt="User Pic">
                                                 </div>
                                                 <div class="user-name">
-                                                    <p>{{ $review->user->firstname }} {{ $review->user->lastname }}</p>
+                                                    <p>{{ $review->customer->firstname ?? "" }} {{ $review->customer->lastname ?? "" }}</p>
                                                     <div class="rating-star theme-color d-flex"
                                                         data-rating="{{ $review->avg('rating') ?? 0.0 }}">
                                                     </div>

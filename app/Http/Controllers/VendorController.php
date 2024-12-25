@@ -312,16 +312,6 @@ class VendorController extends Controller
 		$tastingOptions = TastingOption::get();
 		$establishments = Establishment::get();
 		$cuisines = Cuisine::get();
-
-		$questionnaires = Questionnaire::with(['vendorQuestionnaires' => function ($query) use ($vendorid) {
-			$query->where('vendor_id', $vendorid);
-		}])
-			->where(
-				'vendor_type',
-				'=',
-				trim(strtolower($vendor->vendor_type))
-			)
-			->get();
 		switch (strtolower($vendor_type)) {
 			case 'excursion':
 				$vendor->load('excursionMetadata');
@@ -346,7 +336,7 @@ class VendorController extends Controller
 				// Add other cases as necessary
 		}
 		$VendorMediaGallery = VendorMediaGallery::where('vendor_id', $vendorid)->get();
-		return view('VendorDashboard.vendor-settings', compact('vendor', 'questionnaires', 'subCategories', 'inventoryTypes', 'farmingPractices', 'maxGroups', 'tastingOptions', 'cuisines', 'establishments', 'countries', 'metadata', 'subRegions', 'VendorMediaGallery'));
+		return view('VendorDashboard.vendor-settings', compact('vendor', 'subCategories', 'inventoryTypes', 'farmingPractices', 'maxGroups', 'tastingOptions', 'cuisines', 'establishments', 'countries', 'metadata', 'subRegions', 'VendorMediaGallery'));
 	}
 	public function getVendorAmenities($vendorId)
 	{
@@ -458,7 +448,7 @@ class VendorController extends Controller
 			'instagram' => 'nullable|string|max:255',
 			'twitter' => 'nullable|string|max:255',
 			'youtube' => 'nullable|string|max:255',
-			'linkedin' => 'nullable|string|max:255',
+			'pinterest' => 'nullable|string|max:255',
 			'tiktok' => 'nullable|string|max:255',
 		]);
 
@@ -466,7 +456,7 @@ class VendorController extends Controller
 		if ($vendor) {
 			$vendor->socialMedia()->updateOrCreate(
 				['vendor_id' => $request->vendorid],
-				$request->only(['facebook', 'instagram', 'twitter', 'youtube', 'linkedin', 'tiktok'])
+				$request->only(['facebook', 'instagram', 'twitter', 'youtube', 'pinterest', 'tiktok'])
 			);
 			return redirect()->back()->with('social-media-success', 'Social media links updated successfully.');
 		}
@@ -622,7 +612,7 @@ class VendorController extends Controller
 	}
 	public function getReviewsTestimonial($vendorid)
 	{
-		$reviews = Review::with('user')->where('vendor_id', $vendorid)->get();
+		$reviews = Review::with('customer')->where('vendor_id', $vendorid)->get();
 		return view('VendorDashboard.reviews-testimonial', compact('reviews'));
 	}
 
@@ -1181,11 +1171,11 @@ class VendorController extends Controller
 			// Update the authenticated user instance in the session
 			Auth::setUser($user);
 
-			return redirect()->route('vendor-settings', $vendorid)
+		return redirect()->route('vendor-access-credentials', $vendorid)
 				->with('success', 'User updated successfully.');
 		}
 
-		return redirect()->route('vendor-settings', $vendorid)
+		return redirect()->route('vendor-access-credentials', $vendorid)
 			->with('error', 'User update failed.');
 	}
 
@@ -1342,5 +1332,24 @@ class VendorController extends Controller
 	{
 		$referrals = Customer::where('guestrewards_vendor_id', $vendorid)->get();
 		return view('VendorDashboard.vendor-referrals', compact('referrals'));
+	}
+
+	public function questionnaire($vendorid) {
+		$vendor = Vendor::find($vendorid);
+		$questionnaires = Questionnaire::with(['vendorQuestionnaires' => function ($query) use ($vendorid) {
+			$query->where('vendor_id', $vendorid);
+		}])
+			->where(
+				'vendor_type',
+				'=',
+				trim(strtolower($vendor->vendor_type))
+			)
+			->get();
+		return view('VendorDashboard.questionnaire', compact('questionnaires', 'vendor'));
+	}
+
+	public function accessCredentials($vendorid) {
+		$vendor = Vendor::find($vendorid);
+		return view('VendorDashboard.access-credentials', compact('vendor'));
 	}
 }

@@ -337,6 +337,10 @@
                             <strong class="fa-lg text-muted">${{ $vendor->pricing->current_rate ?? 0 }}/Night</strong>
                         </div>
                         <div class="d-flex justify-content-between">
+                            <span class="fa-lg">Square Footage:</span>
+                            <strong class="fa-lg text-muted">{{ $vendor->accommodationMetadata->square_footage ?? 0 }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
                             <span class="fa-lg">Minimum Booking:</span>
                             <strong
                                 class="fa-lg text-muted">{{ !empty($vendor->accommodationMetadata->booking_minimum) ? $vendor->accommodationMetadata->booking_minimum . ' nights' : 0 }}
@@ -486,19 +490,19 @@
                         <div class="card guest-testi">
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-3 gap-3">
-                                    <img src="{{ $review->user->profile_image ? asset('images/UserProfile/' . $review->user->profile_image) : asset('images/UserProfile/default-profile.png') }}"
+                                    <img src="{{ !empty($review->customer->profile_image) ? asset('images/UserProfile/' . $review->customer->profile_image) : asset('images/UserProfile/default-profile.png') }}"
                                         alt="User Image" style="height:60px; width:60px;" class="rounded-circle mr-3">
                                     <div>
-                                        <h5 class="card-title mb-2">{{ $review->user->firstname }}
-                                            {{ $review->user->lastname }}</h5>
-                                        <h6 class="card-subtitle text-muted ">{{ $review->user->city }},
-                                            {{ $review->user->state }}</h6>
+                                        <h5 class="card-title mb-2">{{ $review->customer->firstname ?? '' }}
+                                            {{ $review->customer->lastname ?? '' }}</h5>
+                                        <h6 class="card-subtitle text-muted ">{{ $review->customer->city ?? '' }},
+                                            {{ $review->customer->state ?? '' }}</h6>
                                         <div class="rating-star theme-color" data-rating="{{ $review->rating ?? 0.0 }}">
                                             <small class="text-muted">{{ $review->created_at->diffForHumans() }}</small>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="card-text">{{ $review->review_description }}</p>
+                                <p class="card-text">{{ $review->review_description ?? '' }}</p>
 
                             </div>
                         </div>

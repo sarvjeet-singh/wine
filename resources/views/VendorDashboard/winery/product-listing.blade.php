@@ -234,7 +234,7 @@
                                                                     <a href="javascript:void(0)"
                                                                         data-id="{{ $wine->id }}"
                                                                         class="btn wine-btn add-to-cart"
-                                                                        data-quantity="1">Add
+                                                                        data-quantity="{{$wine->inventory > 12 ? 12 : 1}}">Add
                                                                         to Cart</a>
                                                                     {{-- @else
                                                                     <a href="javascript:void(0)" title="Low Inventory"

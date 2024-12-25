@@ -10,7 +10,7 @@ if (! function_exists('truncateReviewDescription')) {
     function truncateReviewDescription($text, $limit = 41)
     {
         if (strlen($text) > $limit) {
-            $truncated = '';//substr($text, 0, $limit) . '...';
+            $truncated = ''; //substr($text, 0, $limit) . '...';
             return $truncated . ' <a href="javascript:void(0)" class="read-more theme-color" data-full-text="' . htmlspecialchars($text, ENT_QUOTES, 'UTF-8') . '">View Comment</a>';
         }
 
@@ -20,7 +20,7 @@ if (! function_exists('truncateReviewDescription')) {
 if (! function_exists('reviewsCount')) {
     function reviewsCount()
     {
-        return Review::where('user_id', Auth::id())->count();
+        return Review::where('customer_id', Auth::id())->count();
     }
 }
 
@@ -312,5 +312,37 @@ if (!function_exists('authCheck')) {
 
         // If no user is logged in
         return ['is_logged_in' => false, 'user_type' => null, 'user' => null];
+    }
+
+    /**
+     * Generate a YouTube-style unique ID using SHA256.
+     *
+     * @param string $input Optional input string for uniqueness (e.g., video metadata, timestamp).
+     * @param int $length Length of the unique ID to generate (default is 11).
+     * @return string Generated unique ID.
+     */
+    function generateYouTubeStyleId($input = '', $length = 11)
+    {
+        // Base character set: a-z, A-Z, 0-9, -, _
+        $characterSet = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        // $characterSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+        // If no input provided, use the current time in microseconds
+        if (empty($input)) {
+            $input = microtime(true) . uniqid();
+        }
+
+        // Hash the input using SHA256
+        $hash = hash('sha256', $input);
+
+        // Convert the hash to Base64-like encoding
+        $uniqueId = '';
+        for ($i = 0; $i < $length; $i++) {
+            // Use 2 hex characters (1 byte) for each character in the unique ID
+            $index = hexdec(substr($hash, $i * 2, 2)) % strlen($characterSet);
+            $uniqueId .= $characterSet[$index];
+        }
+
+        return $uniqueId;
     }
 }

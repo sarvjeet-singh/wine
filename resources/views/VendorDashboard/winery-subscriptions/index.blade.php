@@ -6,7 +6,7 @@
 
 
 
-@section('title', 'Wine Country Weekends - Winery Shop')
+@section('title', 'Wine Country Weekends - ' . ucfirst($vendor->vendor_type) . ' Shop')
 
 
 
@@ -31,16 +31,18 @@
                             <div class="subscription-plan-sec my-4">
                                 <div class="row g-3">
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_MONTHLY') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Monthly</h3>
+                                        <div
+                                            class="plan-inner {{ $activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_MONTHLY') == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i
+                                                    class="fa-solid fa-circle-check"></i> Monthly</h3>
                                             <h2 class="fw-bold text-center">$569.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center"></span>
                                             <span class="d-block fw-normal fs-6 text-center">12 Payments</span>
                                             <span class="d-block fw-normal fs-7 mb-3 text-center fst-italic">Equivalent to
                                                 $6828/yr</span>
-                                            <p class="fw-bold mb-2">What Accommodation Vendor Gets:</p>
+                                            <p class="fw-bold mb-2">Benefits:</p>
                                             <ul class="list-unstyled p-0 mb-4">
-                                                <li class="position-relative mb-2">Account Upgrade to “Partner/Full”<ul>
+                                                <li class="position-relative mb-2">Account Upgrade to <b>“Partner/Full”</b><ul>
                                                         <li class="p-0">Media Gallery</li>
                                                         <li class="p-0">Dedicated Vendor Page</li>
                                                         <li class="p-0">Own Payment Gateway</li>
@@ -78,15 +80,17 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_QUARTERLY') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Quarterly</h3>
+                                        <div
+                                            class="plan-inner {{ $activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_QUARTERLY') == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i
+                                                    class="fa-solid fa-circle-check"></i> Quarterly</h3>
                                             <h2 class="fw-bold text-center">$1665.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
                                                 2.5%</span>
                                             <span class="d-block fw-normal fs-6 text-center">4 Payments</span>
                                             <span class="d-block fw-normal fs-7 mb-3 text-center fst-italic">Equivalent to
                                                 $555/month</span>
-                                            <p class="fw-bold mb-2">What Accommodation Vendor Gets:</p>
+                                            <p class="fw-bold mb-2">Benefits:</p>
                                             <ul class="list-unstyled p-0 mb-4">
                                                 <li class="position-relative mb-2">Account Upgrade to “Partner/Full”<ul>
                                                         <li class="p-0">Media Gallery</li>
@@ -129,15 +133,17 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_SEMI_ANNUAL') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Semi-Annual</h3>
+                                        <div
+                                            class="plan-inner {{ $activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_SEMI_ANNUAL') == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i
+                                                    class="fa-solid fa-circle-check"></i> Semi-Annual</h3>
                                             <h2 class="fw-bold text-center">$3126.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
                                                 8.4%</span>
                                             <span class="d-block fw-normal fs-6 text-center">2 Payments</span>
                                             <span class="d-block fw-normal fs-7 mb-3 text-center fst-italic">Equivalent to
                                                 $521/month</span>
-                                            <p class="fw-bold mb-2">What Accommodation Vendor Gets:</p>
+                                            <p class="fw-bold mb-2">Benefits:</p>
                                             <ul class="list-unstyled p-0 mb-4">
                                                 <li class="position-relative mb-2">Account Upgrade to “Partner/Full”<ul>
                                                         <li class="p-0">Media Gallery</li>
@@ -180,8 +186,10 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_ANNUAL') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Annual</h3>
+                                        <div
+                                            class="plan-inner {{ $activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_ANNUAL') == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i
+                                                    class="fa-solid fa-circle-check"></i> Annual</h3>
                                             <h2 class="fw-bold text-center">$5690.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
                                                 17%</span>
@@ -249,15 +257,17 @@
                             <div class="subscription-plan-sec my-4">
                                 <div class="row g-3">
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_MONTHLY') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Monthly</h3>
+                                        <div
+                                            class="plan-inner {{ $activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_MONTHLY') == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i
+                                                    class="fa-solid fa-circle-check"></i> Monthly</h3>
                                             <h2 class="fw-bold text-center">$469.00</h2>
                                             <span
                                                 class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center"></span>
                                             <span class="d-block fw-normal fs-6 text-center">12 Payments</span>
                                             <span class="d-block fw-normal fs-7 mb-3 text-center fst-italic">Equivalent to
                                                 $5628/yr</span>
-                                            <p class="fw-bold mb-2">What Excursion Vendor Gets:</p>
+                                            <p class="fw-bold mb-2">Benefits:</p>
                                             <ul class="list-unstyled p-0 mb-4">
                                                 <li class="position-relative mb-2">Account Upgrade to “Partner/Full”<ul>
                                                         <li class="p-0">Media Gallery</li>
@@ -294,15 +304,17 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_QUARTERLY') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Quarterly</h3>
+                                        <div
+                                            class="plan-inner {{ $activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_QUARTERLY') == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i
+                                                    class="fa-solid fa-circle-check"></i> Quarterly</h3>
                                             <h2 class="fw-bold text-center">$1266.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
                                                 2.5%</span>
                                             <span class="d-block fw-normal fs-6 text-center">4 Payments</span>
                                             <span class="d-block fw-normal fs-7 mb-3 text-center fst-italic">Equivalent to
                                                 $457/month</span>
-                                            <p class="fw-bold mb-2">What Excursion Vendor Gets:</p>
+                                            <p class="fw-bold mb-2">Benefits:</p>
                                             <ul class="list-unstyled p-0 mb-4">
                                                 <li class="position-relative mb-2">Account Upgrade to “Partner/Full”<ul>
                                                         <li class="p-0">Media Gallery</li>
@@ -339,15 +351,17 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_SEMI_ANNUAL') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Semi-Annual</h3>
+                                        <div
+                                            class="plan-inner {{ $activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_SEMI_ANNUAL') == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i
+                                                    class="fa-solid fa-circle-check"></i> Semi-Annual</h3>
                                             <h2 class="fw-bold text-center">$2580.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
                                                 8.4%</span>
                                             <span class="d-block fw-normal fs-6 text-center">2 Payments</span>
                                             <span class="d-block fw-normal fs-7 mb-3 text-center fst-italic">Equivalent to
                                                 $430/month</span>
-                                            <p class="fw-bold mb-2">What Excursion Vendor Gets:</p>
+                                            <p class="fw-bold mb-2">Benefits:</p>
                                             <ul class="list-unstyled p-0 mb-4">
                                                 <li class="position-relative mb-2">Account Upgrade to “Partner/Full”<ul>
                                                         <li class="p-0">Media Gallery</li>
@@ -384,15 +398,17 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
-                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_ANNUAL') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
-                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Annual</h3>
+                                        <div
+                                            class="plan-inner {{ $activeSubscription && env('PLAN_STRIPE_PRICE_ID_EXCURSION_ANNUAL') == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i
+                                                    class="fa-solid fa-circle-check"></i> Annual</h3>
                                             <h2 class="fw-bold text-center">$4692.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
                                                 17%</span>
                                             <span class="d-block fw-normal fs-6 text-center">1 Payment</span>
                                             <span class="d-block fw-normal fs-7 mb-3 text-center fst-italic">Equivalent to
                                                 $391/month</span>
-                                            <p class="fw-bold mb-2">What Excursion Vendor Gets:</p>
+                                            <p class="fw-bold mb-2">Benefits:</p>
                                             <ul class="list-unstyled p-0 mb-4">
                                                 <li class="position-relative mb-2">Account Upgrade to “Partner/Full”<ul>
                                                         <li class="p-0">Media Gallery</li>
@@ -460,9 +476,11 @@
 
                                     <div class="col-lg-3 col-md-6">
 
-                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_MONTHLY') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
+                                        <div
+                                            class="plan-inner {{ $activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_MONTHLY') == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
 
-                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Monthly</h3>
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i
+                                                    class="fa-solid fa-circle-check"></i> Monthly</h3>
 
                                             <h2 class="fw-bold text-center">$769.00</h2>
                                             <span
@@ -474,27 +492,31 @@
 
                                                 $9228/yr</span>
 
-                                            <p class="fw-bold mb-2">What Winery Vendor Gets:</p>
+                                            <p class="fw-bold mb-2">Benefits:</p>
 
                                             <ul class="list-unstyled p-0 mb-4">
                                                 <li class="position-relative mb-2">Profile upgraded to “Partner/Full”
                                                     <ul>
                                                         <li class="p-0">Media Gallery</li>
                                                         <li class="p-0">Dedicated Vendor Page</li>
-                                                        <li class="p-0">Own Payment Gateway</li>
+                                                        <li class="p-0">Curated Experiences</li>
+                                                        <li class="p-0">E-Commerce w/ Own Payment Gateway</li>
+                                                        <li class="p-0">Next Available Ranking Position</li>
                                                     </ul>
                                                 </li>
-                                                <li class="position-relative mb-2">Next available position</li>
-                                                <li class="position-relative mb-2">Product placement w/ reseller vendors
+                                                <li class="position-relative mb-2">Wines Listed in B2B Wine Catalogue
                                                 </li>
-                                                <li class="position-relative mb-2">Wines sales transacted via B2B catalogue
+                                                <li class="position-relative mb-2">Product Placement w/ Resellers
                                                 </li>
-                                                <li class="position-relative mb-2">Product featured on Wine Menu Inserts
+                                                <li class="position-relative mb-2">Promotional Infographics (i.e. Outdoor
+                                                    Signage, Wine Menu Inserts, etc.)
                                                 </li>
-                                                <li class="position-relative mb-2">Guest Rewards Program (i.e. register and
-                                                    engage members)</li>
-                                                <li class="position-relative mb-2">Support Local Initiative (i.e. outreach
-                                                    and promote)</li>
+                                                <li class="position-relative mb-2">Guest Rewards Program (i.e. QR Code,
+                                                    Register & Engage Users) </li>
+                                                <li class="position-relative mb-2">Support Local Initiative (i.e. QR Code,
+                                                    Outreach & Promote Vendors)</li>
+                                                <li class="position-relative mb-2">Getaway Packages (i.e. Experience
+                                                    Promoted as Excursion Option)</li>
                                             </ul>
 
                                             <div class="buy-btn text-center">
@@ -522,9 +544,11 @@
 
                                     <div class="col-lg-3 col-md-6">
 
-                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_QUARTERLY') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
+                                        <div
+                                            class="plan-inner {{ $activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_QUARTERLY') == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
 
-                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Quarterly</h3>
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i
+                                                    class="fa-solid fa-circle-check"></i> Quarterly</h3>
 
                                             <h2 class="fw-bold text-center">$2250.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
@@ -535,27 +559,31 @@
 
                                                 $750/month</span>
 
-                                            <p class="fw-bold mb-2">What Winery Vendor Gets:</p>
+                                            <p class="fw-bold mb-2">Benefits:</p>
 
                                             <ul class="list-unstyled p-0 mb-4">
                                                 <li class="position-relative mb-2">Profile upgraded to “Partner/Full”
                                                     <ul>
                                                         <li class="p-0">Media Gallery</li>
                                                         <li class="p-0">Dedicated Vendor Page</li>
-                                                        <li class="p-0">Own Payment Gateway</li>
+                                                        <li class="p-0">Curated Experiences</li>
+                                                        <li class="p-0">E-Commerce w/ Own Payment Gateway</li>
+                                                        <li class="p-0">Next Available Ranking Position</li>
                                                     </ul>
                                                 </li>
-                                                <li class="position-relative mb-2">Next available position</li>
-                                                <li class="position-relative mb-2">Product placement w/ reseller vendors
+                                                <li class="position-relative mb-2">Wines Listed in B2B Wine Catalogue
                                                 </li>
-                                                <li class="position-relative mb-2">Wines sales transacted via B2B catalogue
+                                                <li class="position-relative mb-2">Product Placement w/ Resellers
                                                 </li>
-                                                <li class="position-relative mb-2">Product featured on Wine Menu Inserts
+                                                <li class="position-relative mb-2">Promotional Infographics (i.e. Outdoor
+                                                    Signage, Wine Menu Inserts, etc.)
                                                 </li>
-                                                <li class="position-relative mb-2">Guest Rewards Program (i.e. register and
-                                                    engage members)</li>
-                                                <li class="position-relative mb-2">Support Local Initiative (i.e. outreach
-                                                    and promote)</li>
+                                                <li class="position-relative mb-2">Guest Rewards Program (i.e. QR Code,
+                                                    Register & Engage Users) </li>
+                                                <li class="position-relative mb-2">Support Local Initiative (i.e. QR Code,
+                                                    Outreach & Promote Vendors)</li>
+                                                <li class="position-relative mb-2">Getaway Packages (i.e. Experience
+                                                    Promoted as Excursion Option)</li>
                                             </ul>
 
                                             <div class="buy-btn text-center">
@@ -584,9 +612,11 @@
 
                                     <div class="col-lg-3 col-md-6">
 
-                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_SEMI_ANNUAL') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
+                                        <div
+                                            class="plan-inner {{ $activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_SEMI_ANNUAL') == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
 
-                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Semi-Annual</h3>
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i
+                                                    class="fa-solid fa-circle-check"></i> Semi-Annual</h3>
 
                                             <h2 class="fw-bold text-center">$4230.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
@@ -597,27 +627,31 @@
 
                                                 $705/month</span>
 
-                                            <p class="fw-bold mb-2">What Winery Vendor Gets:</p>
+                                            <p class="fw-bold mb-2">Benefits:</p>
 
                                             <ul class="list-unstyled p-0 mb-4">
                                                 <li class="position-relative mb-2">Profile upgraded to “Partner/Full”
                                                     <ul>
                                                         <li class="p-0">Media Gallery</li>
                                                         <li class="p-0">Dedicated Vendor Page</li>
-                                                        <li class="p-0">Own Payment Gateway</li>
+                                                        <li class="p-0">Curated Experiences</li>
+                                                        <li class="p-0">E-Commerce w/ Own Payment Gateway</li>
+                                                        <li class="p-0">Next Available Ranking Position</li>
                                                     </ul>
                                                 </li>
-                                                <li class="position-relative mb-2">Next available position</li>
-                                                <li class="position-relative mb-2">Product placement w/ reseller vendors
+                                                <li class="position-relative mb-2">Wines Listed in B2B Wine Catalogue
                                                 </li>
-                                                <li class="position-relative mb-2">Wines sales transacted via B2B catalogue
+                                                <li class="position-relative mb-2">Product Placement w/ Resellers
                                                 </li>
-                                                <li class="position-relative mb-2">Product featured on Wine Menu Inserts
+                                                <li class="position-relative mb-2">Promotional Infographics (i.e. Outdoor
+                                                    Signage, Wine Menu Inserts, etc.)
                                                 </li>
-                                                <li class="position-relative mb-2">Guest Rewards Program (i.e. register and
-                                                    engage members)</li>
-                                                <li class="position-relative mb-2">Support Local Initiative (i.e. outreach
-                                                    and promote)</li>
+                                                <li class="position-relative mb-2">Guest Rewards Program (i.e. QR Code,
+                                                    Register & Engage Users) </li>
+                                                <li class="position-relative mb-2">Support Local Initiative (i.e. QR Code,
+                                                    Outreach & Promote Vendors)</li>
+                                                <li class="position-relative mb-2">Getaway Packages (i.e. Experience
+                                                    Promoted as Excursion Option)</li>
                                             </ul>
 
                                             <div class="buy-btn text-center">
@@ -645,9 +679,11 @@
 
                                     <div class="col-lg-3 col-md-6">
 
-                                        <div class="plan-inner {{($activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_ANNUAL') == $activeSubscription['stripe_price_id']) ? 'active-plan' : ''}} bg-white p-3">
+                                        <div
+                                            class="plan-inner {{ $activeSubscription && env('PLAN_STRIPE_PRICE_ID_WINERY_ANNUAL') == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
 
-                                            <h3 class="fw-bold fs-5 text-center theme-color"><i class="fa-solid fa-circle-check"></i> Annual</h3>
+                                            <h3 class="fw-bold fs-5 text-center theme-color"><i
+                                                    class="fa-solid fa-circle-check"></i> Annual</h3>
 
                                             <h2 class="fw-bold text-center">$7692.00</h2>
                                             <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">Save
@@ -658,27 +694,31 @@
 
                                                 $641/month</span>
 
-                                            <p class="fw-bold mb-2">What Winery Vendor Gets:</p>
+                                            <p class="fw-bold mb-2">Benefits:</p>
 
                                             <ul class="list-unstyled p-0 mb-4">
                                                 <li class="position-relative mb-2">Profile upgraded to “Partner/Full”
                                                     <ul>
                                                         <li class="p-0">Media Gallery</li>
                                                         <li class="p-0">Dedicated Vendor Page</li>
-                                                        <li class="p-0">Own Payment Gateway</li>
+                                                        <li class="p-0">Curated Experiences</li>
+                                                        <li class="p-0">E-Commerce w/ Own Payment Gateway</li>
+                                                        <li class="p-0">Next Available Ranking Position</li>
                                                     </ul>
                                                 </li>
-                                                <li class="position-relative mb-2">Next available position</li>
-                                                <li class="position-relative mb-2">Product placement w/ reseller vendors
+                                                <li class="position-relative mb-2">Wines Listed in B2B Wine Catalogue
                                                 </li>
-                                                <li class="position-relative mb-2">Wines sales transacted via B2B catalogue
+                                                <li class="position-relative mb-2">Product Placement w/ Resellers
                                                 </li>
-                                                <li class="position-relative mb-2">Product featured on Wine Menu Inserts
+                                                <li class="position-relative mb-2">Promotional Infographics (i.e. Outdoor
+                                                    Signage, Wine Menu Inserts, etc.)
                                                 </li>
-                                                <li class="position-relative mb-2">Guest Rewards Program (i.e. register and
-                                                    engage members)</li>
-                                                <li class="position-relative mb-2">Support Local Initiative (i.e. outreach
-                                                    and promote)</li>
+                                                <li class="position-relative mb-2">Guest Rewards Program (i.e. QR Code,
+                                                    Register & Engage Users) </li>
+                                                <li class="position-relative mb-2">Support Local Initiative (i.e. QR Code,
+                                                    Outreach & Promote Vendors)</li>
+                                                <li class="position-relative mb-2">Getaway Packages (i.e. Experience
+                                                    Promoted as Excursion Option)</li>
                                             </ul>
 
                                             <div class="buy-btn text-center">

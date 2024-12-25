@@ -53,6 +53,9 @@ class WineryCheckoutController extends Controller
         }
 
         $vendor = Vendor::with('stripeDetails')->find($shopid);
+        if(!isset($vendor->stripeDetails->stripe_publishable_key) && !isset($vendor->stripeDetails->stripe_secret_key)) {
+            return redirect()->route('cart.index', ['shopid' => $shopid, 'vendorid' => $vendorid])->with('error', 'Payment server error.');
+        }
         return view('VendorDashboard.winery.checkout', compact('shopid', 'vendorid', 'vendor', 'cartTotal', 'deliveryFee'));
     }
 

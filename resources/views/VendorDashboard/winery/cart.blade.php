@@ -25,6 +25,11 @@
                     </div>
 
                     <div class="information-box-body">
+                        @if (session('error'))
+                            <div class="alert alert-danger">
+                                {{ session('error') }}
+                            </div>
+                        @endif
 
                         <div class="cart-sec px-xl-5 py-xl-4 py-2">
 
@@ -71,7 +76,6 @@
                                                     @if (!empty($cart))
 
                                                         @foreach ($cart->items as $item)
-
                                                             <tr>
 
                                                                 <td>
@@ -81,21 +85,13 @@
                                                                         <div class="pro-img">
 
                                                                             @if ($item->product->image)
-
                                                                                 <img width="100px"
-
                                                                                     src="{{ asset('storage/' . $item->product->image) }}"
-
                                                                                     class="img-fluid" alt="Wine Image">
-
                                                                             @else
-
                                                                                 <img width="100px"
-
                                                                                     src="{{ asset('images/vendorbydefault.png') }}"
-
                                                                                     class="img-fluid" alt="Wine Image">
-
                                                                             @endif
 
                                                                         </div>
@@ -111,13 +107,9 @@
                                                                             <div class="remove-prod">
 
                                                                                 <a href="javascript:void(0);"
-
                                                                                     data-product-id="{{ $item->product->id }}"
-
                                                                                     data-vendor-id="{{ $vendorid }}"
-
                                                                                     data-shop-id="{{ $item->product->vendor_id }}"
-
                                                                                     class="text-decoration-none theme-color remove-from-cart">
 
                                                                                     Remove
@@ -143,25 +135,18 @@
                                                                 <td>
 
                                                                     <select class="form-select update-quantity"
-
                                                                         data-product-id="{{ $item->product->id }}"
-
                                                                         data-vendor-id="{{ $vendorid }}"
-
                                                                         data-shop-id="{{ $item->product->vendor_id }}"
-
                                                                         aria-label="Select quantity">
 
                                                                         @for ($i = 1; $i <= $item->product->inventory; $i++)
-
                                                                             <option value="{{ $i }}"
-
                                                                                 {{ $item->quantity == $i ? 'selected' : '' }}>
 
                                                                                 {{ $i }}
 
                                                                             </option>
-
                                                                         @endfor
 
                                                                     </select>
@@ -173,7 +158,6 @@
                                                                     @php
 
                                                                         $itemTotal =
-
                                                                             $item->product->price * $item->quantity;
 
                                                                         $cartTotal += $itemTotal;
@@ -189,7 +173,6 @@
                                                                 </td>
 
                                                             </tr>
-
                                                         @endforeach
 
                                                     @endif
@@ -204,7 +187,8 @@
 
                                         <div class="subtotal-cost border-top border-bottom py-3 my-3 text-end">
 
-                                            <p class="mb-0">Subtotal: <strong>${{ number_format($cartTotal, 2) }}</strong>
+                                            <p class="mb-0">Subtotal:
+                                                <strong>${{ number_format($cartTotal, 2) }}</strong>
 
                                             </p>
 
@@ -237,7 +221,6 @@
                                                     <!-- <button type="button" class="btn wine-btn w-100" data-bs-toggle="modal" data-bs-target="#checkoutModal">Checkout</button> -->
 
                                                     <a href="{{ route('winery.checkout', ['shopid' => $cart->shop_id, 'vendorid' => $vendorid]) }}"
-
                                                         class="btn wine-btn w-100">Checkout</a>
 
                                                 </div>
@@ -249,9 +232,7 @@
                                     </div>
 
                                 </div>
-
                             @else
-
                                 <div class="text-center">
 
                                     <h3 class="theme-color">Your cart is empty.</h3>
@@ -283,7 +264,6 @@
 @section('js')
 
     <script>
-
         $('.remove-from-cart').click(function() {
 
             var productId = $(this).data('product-id');
@@ -489,8 +469,6 @@
             });
 
         });
-
     </script>
 
 @endsection
-

@@ -45,7 +45,8 @@ class UserDashboardController extends Controller
         return view('UserDashboard.index', compact('first_login'));
     }
 
-    public function userSettingsSocialUpdate(Request $request){
+    public function userSettingsSocialUpdate(Request $request)
+    {
 
         // Retrieve the authenticated user
         $user = Auth::user();
@@ -276,7 +277,7 @@ class UserDashboardController extends Controller
         // Proceed with storing the review
         // Assuming you have a Review model
         $review = new Review();
-        $review->user_id = Auth::id();
+        $review->customer_id = Auth::id();
         $review->vendor_id = $request->vendor_id;
         $review->rating = $request->rating;
         $review->date_of_visit = $request->date_of_visit;
@@ -292,7 +293,7 @@ class UserDashboardController extends Controller
 
     public function userReviewsManage()
     {
-        $reviews = Review::with('vendor')->where('user_id', Auth::id())->get();
+        $reviews = Review::with('vendor')->where('customer_id', Auth::id())->get();
         return view('UserDashboard.manage-review', compact('reviews'));
     }
 
@@ -369,16 +370,19 @@ class UserDashboardController extends Controller
             'guestrewards' => 'required',
             'guestrewards_social_media' => 'required_if:guestrewards,Social Media Content',
             'guestrewards_vendor_id' => 'required_if:guestrewards,Niagara Region Vendor',
+            'guest_referral_other' => 'required_if:guestrewards,Other',
         ], [
             'guestrewards.required' => 'Please select a referral option.',
             'guestrewards_social_media.required_if' => 'Please select a social media platform.',
             'guestrewards_vendor_id.required_if' => 'Please select a vendor.',
+            'guest_referral_other.required_if' => 'Please enter a referral name.',
         ]);
 
         // Update the user's settings
         $user = Auth::user();
         $user->guestrewards = $request->guestrewards;
         $user->guestreward_user = $request->guestreward_user;
+        $user->guest_referral_other = $request->guestrewards == 'Other' ? $request->guest_referral_other : null;
         $user->guestrewards_social_media = $request->guestrewards == 'Social Media Content' ? $request->guestrewards_social_media : null;
         $user->guestrewards_vendor_id = $request->guestrewards == 'Niagara Region Vendor' ? $request->guestrewards_vendor_id : null;
         $user->save();
@@ -390,6 +394,7 @@ class UserDashboardController extends Controller
     {
         $query = $request->input('q');
         $options = Vendor::where('vendor_name', 'LIKE', '%' . $query . '%')
+            ->whereNotIn('vendor_type', ['licensed', 'non-licensed'])
             ->get() // Get both columns
             ->map(function ($vendor) {
                 return [
@@ -397,6 +402,22 @@ class UserDashboardController extends Controller
                     "text" => $vendor->vendor_name
                 ]; // remove for now. ' - '.$vendor->buisnessstreet_address . ", " . $vendor->buisness_vendor_city
             });
+        return response()->json($options);
+    }
+    public function support_vendor_list(Request $request)
+    {
+        $query = $request->input('q');
+
+        $options = Vendor::where('vendor_name', 'LIKE', '%' . $query . '%')
+            ->whereNotIn('vendor_type', ['winery', 'accommodation', 'excursion']) // Exclude specific vendor types
+            ->get()
+            ->map(function ($vendor) {
+                return [
+                    "id" => $vendor->id,
+                    "text" => $vendor->vendor_name
+                ];
+            });
+
         return response()->json($options);
     }
     public function StoreVendorSuggest(Request $request)
@@ -424,13 +445,13 @@ class UserDashboardController extends Controller
         ]);
         // Add user ID to the validated data
         $validated['user_id'] = Auth::id();
-        if(isset($validated['vendor_category']) && $validated['vendor_category'] != null){
+        if (isset($validated['vendor_category']) && $validated['vendor_category'] != null) {
             $validated['vendor_category'] = getCategoryById($validated['vendor_category']);
         }
-        if(isset($validated['vendor_sub_category']) && $validated['vendor_sub_category'] != null){
+        if (isset($validated['vendor_sub_category']) && $validated['vendor_sub_category'] != null) {
             $validated['vendor_sub_category'] = getSubCategoryById($validated['vendor_sub_category']);
         }
-        if(isset($validated['establishment_facility']) && $validated['establishment_facility'] != null){
+        if (isset($validated['establishment_facility']) && $validated['establishment_facility'] != null) {
             $validated['establishment_facility'] = getEstablishmentById($validated['establishment_facility']);
         }
 

@@ -21,11 +21,11 @@ class FrontendInquiryController extends Controller
                 'vendor_id' => 'required|integer',
                 'check_in_date' => 'required|date',
                 'check_out_date' => 'required|date',
-                'visit_nature' => 'required|array',
-                'number_of_guests' => 'required|integer',
-                'accommodation_type' => 'required|array',
-                'city' => 'required|string',
-                'rooms_or_beds' => 'required|integer',
+                'visit_nature' => 'nullable|array',
+                'number_of_guests' => 'nullable|integer',
+                'accommodation_type' => 'nullable|array',
+                'city' => 'nullable|string',
+                'rooms_or_beds' => 'nullable|integer',
                 'additional_comments' => 'nullable|string',
             ]);
             $vendor = Vendor::with('sub_category')->findOrFail($validated['vendor_id']);
@@ -39,10 +39,15 @@ class FrontendInquiryController extends Controller
                 'user' => Auth::guard('customer')->user()
             ];
 
-            $data['inquiry']['visit_nature'] = implode(', ',$data['inquiry']['visit_nature']);
-            $data['inquiry']['accommodation_type'] = implode(', ',$data['inquiry']['accommodation_type']);
-            
-            Mail::to(env('ADMIN_EMAIL'))->send(new InquiryMail($data, 'emails.accommodation_inquiry')); 
+            if (isset($data['inquiry']['visit_nature']) && !empty($data['inquiry']['visit_nature'])) {
+                $data['inquiry']['visit_nature'] = implode(', ', $data['inquiry']['visit_nature']);
+            }
+
+            if (isset($data['inquiry']['accommodation_type']) && !empty($data['inquiry']['accommodation_type'])) {
+                $data['inquiry']['accommodation_type'] = implode(', ', $data['inquiry']['accommodation_type']);
+            }
+
+            Mail::to(env('ADMIN_EMAIL'))->send(new InquiryMail($data, 'emails.accommodation_inquiry'));
             die;
 
             return response()->json(['success' => true, 'message' => 'Accommodation inquiry saved successfully.']);
@@ -58,10 +63,10 @@ class FrontendInquiryController extends Controller
                 'vendor_id' => 'required|integer',
                 'check_in_date' => 'required|date',
                 'check_out_date' => 'required|date',
-                'visit_nature' => 'required|array',
-                'number_of_guests' => 'required|integer',
-                'city' => 'required|string',
-                'preferred_excursions' => 'required|array',
+                'visit_nature' => 'nullable|array',
+                'number_of_guests' => 'nullable|integer',
+                'city' => 'nullable|string',
+                'preferred_excursions' => 'nullable|array',
                 'additional_comments' => 'nullable|string',
             ]);
             $vendor = Vendor::with('sub_category')->findOrFail($validated['vendor_id']);
@@ -75,8 +80,15 @@ class FrontendInquiryController extends Controller
                 'user' => Auth::guard('customer')->user()
             ];
 
-            $data['inquiry']['visit_nature'] = implode(', ',$data['inquiry']['visit_nature']);
-            $data['inquiry']['preferred_excursions'] = implode(', ',$data['inquiry']['preferred_excursions']);
+            if (isset($data['inquiry']['visit_nature']) && !empty($data['inquiry']['visit_nature'])) {
+                $data['inquiry']['visit_nature'] = implode(', ', $data['inquiry']['visit_nature']);
+            }
+
+            if (isset($data['inquiry']['preferred_excursions']) && !empty($data['inquiry']['preferred_excursions'])) {
+                $data['inquiry']['preferred_excursions'] = implode(', ', $data['inquiry']['preferred_excursions']);
+            }
+            // $data['inquiry']['visit_nature'] = implode(', ', $data['inquiry']['visit_nature']);
+            // $data['inquiry']['preferred_excursions'] = implode(', ', $data['inquiry']['preferred_excursions']);
 
             Mail::to(env('ADMIN_EMAIL'))->send(new InquiryMail($data, 'emails.excursion_inquiry'));
 
@@ -93,11 +105,11 @@ class FrontendInquiryController extends Controller
                 'vendor_id' => 'required|integer',
                 'check_in_date' => 'required|date',
                 'check_out_date' => 'required|date',
-                'visit_nature' => 'required|array',
-                'number_of_guests' => 'required|integer',
-                'experience_preference' => 'required|string',
-                'sub_region' => 'required|string',
-                'winery_types' => 'required|array',
+                'visit_nature' => 'nullable|array',
+                'number_of_guests' => 'nullable|integer',
+                'experience_preference' => 'nullable|string',
+                'sub_region' => 'nullable|string',
+                'winery_types' => 'nullable|array',
                 'additional_comments' => 'nullable|string',
             ]);
             $vendor = Vendor::with('sub_category')->findOrFail($validated['vendor_id']);
@@ -110,9 +122,14 @@ class FrontendInquiryController extends Controller
                 'inquiry' => $validated,
                 'user' => Auth::guard('customer')->user()
             ];
-
-            $data['inquiry']['visit_nature'] = implode(', ',$data['inquiry']['visit_nature']);
-            $data['inquiry']['winery_types'] = implode(', ',$data['inquiry']['winery_types']);
+            if (isset($data['inquiry']['winery_types']) && !empty($data['inquiry']['winery_types'])) {
+                $data['inquiry']['winery_types'] = implode(', ', $data['inquiry']['winery_types']);
+            }
+            if (isset($data['inquiry']['visit_nature']) && !empty($data['inquiry']['visit_nature'])) {
+                $data['inquiry']['visit_nature'] = implode(', ', $data['inquiry']['visit_nature']);
+            }
+            // $data['inquiry']['visit_nature'] = implode(', ',$data['inquiry']['visit_nature']);
+            // $data['inquiry']['winery_types'] = implode(', ',$data['inquiry']['winery_types']);
 
             Mail::to(env('ADMIN_EMAIL'))->send(new InquiryMail($data, 'emails.winery_inquiry'));
 

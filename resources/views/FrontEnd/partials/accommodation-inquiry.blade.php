@@ -100,7 +100,7 @@
 
                                 <label class="mb-1">How many guests are in your travel party?</label>
 
-                                <input type="number" class="form-control" name="number_of_guests" required>
+                                <input type="number" class="form-control" name="number_of_guests">
 
                             </div>
 
@@ -154,7 +154,7 @@
 
                                 <label class="mb-1">In what city/town would you prefer to be accommodated?</label>
 
-                                <select class="form-control" name="city" required>
+                                <select class="form-control" name="city">
 
                                     <option value="">--Select--</option>
 
@@ -180,7 +180,7 @@
 
                                 <label class="mb-1">Please indicate the number of rooms/beds required.</label>
 
-                                <input type="number" class="form-control" name="rooms_or_beds" required>
+                                <input type="number" class="form-control" name="rooms_or_beds">
 
                             </div>
 
@@ -262,39 +262,39 @@
 
                 },
 
-                "visit_nature[]": {
+                // "visit_nature[]": {
 
-                    required: true,
+                //     required: true,
 
-                },
+                // },
 
-                number_of_guests: {
+                // number_of_guests: {
 
-                    required: true,
+                //     required: true,
 
-                    digits: true,
+                //     digits: true,
 
-                },
+                // },
 
-                "accommodation_type[]": {
+                // "accommodation_type[]": {
 
-                    required: true,
+                //     required: true,
 
-                },
+                // },
 
-                city: {
+                // city: {
 
-                    required: true,
+                //     required: true,
 
-                },
+                // },
 
-                rooms_or_beds: {
+                // rooms_or_beds: {
 
-                    required: true,
+                //     required: true,
 
-                    digits: true,
+                //     digits: true,
 
-                },
+                // },
 
                 additional_comments: {
 

@@ -20,9 +20,11 @@ class CustomerVerifyEmail extends BaseVerifyEmail
 
         return (new MailMessage)
             ->subject('Verify Your Email Address')
-            ->line('Please click the button below to verify your email address.')
-            ->action('Verify Email Address', $verificationUrl)
-            ->line('If you did not create an account, no further action is required.');
+            ->view('emails.customer-verify-email', [
+                'verificationUrl' => $verificationUrl,
+                'notifiable' => $notifiable,
+                'username' => $notifiable->firstname
+            ]);
     }
 
     /**
@@ -35,9 +37,11 @@ class CustomerVerifyEmail extends BaseVerifyEmail
     {
         return URL::temporarySignedRoute(
             'customer.verify.email', // Name of the verification route
-            now()->addMinutes(60), // Link expiration time
-            ['id' => $notifiable->getKey(), 'hash' => sha1($notifiable->getEmailForVerification())]
+            now()->addMinutes(config('auth.verification.expire', 60)), // Link expiration time from config
+            [
+                'id' => $notifiable->getKey(),
+                'hash' => sha1($notifiable->getEmailForVerification()), // Email hash
+            ]
         );
     }
 }
-

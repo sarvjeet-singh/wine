@@ -30,7 +30,7 @@
             </div>
             <div class="col-sm-6 login-register-right-section">
                 <div class="login-register-mobile-version">
-                    @if (request()->query('slug') && !empty($vendor->vendor_name))
+                    @if (request()->query('sc') && !empty($vendor->vendor_name))
                         <div class="ty-notify">
                             <p class="mb-2"><i class="fa-solid fa-circle-check"></i> You are registering courtesy of
                                 <span class="fw-bold theme-color">{{ $vendor->vendor_name ?? '' }}.</span>
@@ -43,8 +43,8 @@
                     @endforeach
                     <form method="POST" action="{{ route('registertion') }}" id="guestregisterform">
                         @csrf
-                        @if (request()->query('slug'))
-                            <input type="hidden" name="refer_by" value="{{ request()->query('slug') }}">
+                        @if (request()->query('sc'))
+                            <input type="hidden" name="refer_by" value="{{ request()->query('sc') }}">
                         @endif
                         <div class="row mb-3 mt-4">
                             <div class="col-md-6" style="position:relative">

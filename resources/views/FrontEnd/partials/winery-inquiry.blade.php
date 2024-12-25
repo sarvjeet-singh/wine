@@ -296,37 +296,37 @@
 
                 },
 
-                "visit_nature[]": {
+                // "visit_nature[]": {
 
-                    required: true,
+                //     required: true,
 
-                },
+                // },
 
                 number_of_guests: {
 
-                    required: true,
+                    // required: true,
 
                     digits: true,
 
                 },
 
-                experience_preference: {
+                // experience_preference: {
 
-                    required: true,
+                //     required: true,
 
-                },
+                // },
 
-                sub_region: {
+                // sub_region: {
 
-                    required: true,
+                //     required: true,
 
-                },
+                // },
 
-                "winery_types[]": {
+                // "winery_types[]": {
 
-                    required: true,
+                //     required: true,
 
-                },
+                // },
 
                 additional_comments: {
 

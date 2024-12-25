@@ -40,9 +40,9 @@
                                             </td>
                                             <td>
                                                 <img width="50px" class="userprofile-image-icon"
-                                                    src="{{ asset('images/UserProfile/' . ($review->user->profile_image ?? 'default-profile.png')) }}">
+                                                    src="{{ asset('images/UserProfile/' . ($review->customer->profile_image ?? 'default-profile.png')) }}">
                                             </td>
-                                            <td>{{ $review->user->firstname ?? '' }} {{ $review->user->lastname ?? '' }}
+                                            <td>{{ $review->customer->firstname ?? '' }} {{ $review->customer->lastname ?? '' }}
                                             </td>
                                             <td>{{ ucfirst($review->vendor->vendor_type) }}</td>
                                             <td>{{ $review->vendor->vendor_name }}</td>

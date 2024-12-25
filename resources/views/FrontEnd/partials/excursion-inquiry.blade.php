@@ -140,7 +140,7 @@
 
                                     accommodated?</label>
 
-                                <select class="form-control" name="city" required>
+                                <select class="form-control" name="city">
 
                                     <option value="">--Select--</option>
 
@@ -268,31 +268,31 @@
 
                 },
 
-                "visit_nature[]": {
+                // "visit_nature[]": {
 
-                    required: true,
+                //     required: true,
 
-                },
+                // },
 
-                number_of_guests: {
+                // number_of_guests: {
 
-                    required: true,
+                //     required: true,
 
-                    digits: true,
+                //     digits: true,
 
-                },
+                // },
 
-                city: {
+                // city: {
 
-                    required: true,
+                //     required: true,
 
-                },
+                // },
 
-                "preferred_excursions[]": {
+                // "preferred_excursions[]": {
 
-                    required: true,
+                //     required: true,
 
-                },
+                // },
 
                 additional_comments: {
 

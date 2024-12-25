@@ -45,6 +45,7 @@ class Vendor extends Model
         'vendor_stripe_id',
         'password_updated',
         'host',
+        'short_code',
     ];
     protected static function boot()
     {
@@ -52,6 +53,14 @@ class Vendor extends Model
 
         static::saving(function ($model) {
             $model->vendor_slug = Str::slug($model->vendor_name);
+        });
+
+        static::creating(function ($vendor) {
+            do {
+                $shortCode = generateYouTubeStyleId(null,8);
+            } while (\App\Models\Vendor::where('short_code', $shortCode)->exists()); // Check if the code exists in the database
+
+            $vendor->short_code = $shortCode; // Assign the unique code
         });
     }
 
@@ -129,27 +138,38 @@ class Vendor extends Model
         return $this->hasOne(VendorNonLicenseMetadata::class, 'vendor_id');
     }
 
-    public function countryName() {
+    public function countryName()
+    {
         return $this->belongsTo(Country::class, 'country');
     }
 
-    public function sub_category() {
+    public function sub_category()
+    {
         return $this->belongsTo(SubCategory::class, 'vendor_sub_category');
     }
 
-    public function sub_regions() {
+    public function sub_regions()
+    {
         return $this->belongsTo(SubRegion::class, 'sub_region');
     }
 
-    public function pricePoint() {
+    public function pricePoint()
+    {
         return $this->belongsTo(PricePoint::class, 'price_point');
     }
 
-    public function accountStatus() {
+    public function accountStatus()
+    {
         return $this->belongsTo(AccountStatus::class, 'account_status');
     }
 
-    public function stripeDetails() {
+    public function stripeDetails()
+    {
         return $this->hasOne(VendorStripeDetail::class, 'vendor_id', 'id');
+    }
+
+    public function state()
+    {
+        return $this->belongsTo(State::class, 'province');
     }
 }

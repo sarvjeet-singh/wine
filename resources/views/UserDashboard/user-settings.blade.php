@@ -245,59 +245,65 @@
                                     @endif
                                     <div class="row mt-3 g-3">
                                         <div class="col-md-4 col-12">
-                                            <input type="checkbox" class="custom-checkbox" id="Facebook"
+                                            <input type="checkbox" class="custom-checkbox social-media-checkbox" id="Facebook"
                                                 name="facebook_checkbox" {{ Auth::user()->facebook ? 'checked' : '' }}>
                                             <label for="Facebook">Facebook</label>
                                             <input type="text" class="form-control mt-2" id="facebook"
-                                                name="facebook" value="{{ Auth::user()->facebook }}"
+                                                name="facebook" {{ !Auth::user()->facebook ? 'disabled' : '' }}
+                                                value="{{ Auth::user()->facebook }}"
                                                 placeholder="Enter your Facebook username">
                                             <div class="error" id="facebook-error"></div>
 
                                         </div>
                                         <div class="col-md-4 col-12">
-                                            <input type="checkbox" class="custom-checkbox" id="Instagram"
+                                            <input type="checkbox" class="custom-checkbox social-media-checkbox" id="Instagram"
                                                 name="instagram_checkbox" {{ Auth::user()->instagram ? 'checked' : '' }}>
                                             <label for="Instagram">Instagram</label>
                                             <input type="text" class="form-control mt-2" id="instagram"
-                                                name="instagram" value="{{ Auth::user()->instagram }}"
+                                                name="instagram" {{ !Auth::user()->instagram ? 'disabled' : '' }}
+                                                value="{{ Auth::user()->instagram }}"
                                                 placeholder="Enter your Instagram username">
                                             <div class="error" id="instagram-error"></div>
                                         </div>
                                         <div class="col-md-4 col-12">
-                                            <input type="checkbox" class="custom-checkbox" id="Youtube"
+                                            <input type="checkbox" class="custom-checkbox social-media-checkbox" id="Youtube"
                                                 name="youtube_checkbox" {{ Auth::user()->youtube ? 'checked' : '' }}>
                                             <label for="Youtube">Youtube</label>
                                             <input type="text" class="form-control mt-2" id="youtube"
-                                                name="youtube" value="{{ Auth::user()->youtube }}"
+                                                name="youtube" {{ !Auth::user()->youtube ? 'disabled' : '' }}
+                                                value="{{ Auth::user()->youtube }}"
                                                 placeholder="Enter your Youtube channel">
                                             <div class="error" id="youtube-error"></div>
                                         </div>
                                     </div>
                                     <div class="row mt-md-3 mt-1 g-3">
                                         <div class="col-md-4 col-12">
-                                            <input type="checkbox" class="custom-checkbox" id="Tiktok"
+                                            <input type="checkbox" class="custom-checkbox social-media-checkbox" id="Tiktok"
                                                 name="tiktok_checkbox" {{ Auth::user()->tiktok ? 'checked' : '' }}>
                                             <label for="Tiktok">Tik Tok</label>
                                             <input type="text" class="form-control mt-2" id="tiktok"
-                                                name="tiktok" value="{{ Auth::user()->tiktok }}"
+                                                name="tiktok" {{ !Auth::user()->tiktok ? 'disabled' : '' }}
+                                                value="{{ Auth::user()->tiktok }}"
                                                 placeholder="Enter your Tiktok username">
                                             <div class="error" id="tiktok-error"></div>
                                         </div>
                                         <div class="col-md-4 col-12">
-                                            <input type="checkbox" class="custom-checkbox" id="Twitter"
+                                            <input type="checkbox" class="custom-checkbox social-media-checkbox" id="Twitter"
                                                 name="twitter_checkbox" {{ Auth::user()->twitter ? 'checked' : '' }}>
                                             <label for="Twitter">Twitter</label>
                                             <input type="text" class="form-control mt-2" id="twitter"
-                                                name="twitter" value="{{ Auth::user()->twitter }}"
+                                                name="twitter" {{ !Auth::user()->twitter ? 'disabled' : '' }}
+                                                value="{{ Auth::user()->twitter }}"
                                                 placeholder="Enter your Twitter Username">
                                             <div class="error" id="twitter-error"></div>
                                         </div>
                                         <div class="col-md-4 col-12">
-                                            <input type="checkbox" class="custom-checkbox" id="Linkedin"
+                                            <input type="checkbox" class="custom-checkbox social-media-checkbox" id="Linkedin"
                                                 name="linkedin_checkbox" {{ Auth::user()->linkedin ? 'checked' : '' }}>
                                             <label for="Linkedin">Linkedin</label>
                                             <input type="text" class="form-control mt-2" id="linkedin"
-                                                name="linkedin" value="{{ Auth::user()->linkedin }}"
+                                                name="linkedin" {{ !Auth::user()->linkedin ? 'disabled' : '' }}
+                                                value="{{ Auth::user()->linkedin }}"
                                                 placeholder="Enter your Linkedin username">
                                             <div class="error" id="linkedin-error"></div>
                                         </div>
@@ -461,20 +467,20 @@
                                 <div class="box-head-heading d-flex">
                                     <span class="box-head-label theme-color">Referral</span>
                                 </div>
-                                <div class="box-head-description mt-3">
+                                <div class="box-head-description">
                                     What caused you to join our community and Guest Rewards program?
                                 </div>
                             </div>
                             <div class="information-box-body">
                                 <!-- @if ($errors->any())
-                                            <div class="alert alert-danger">
-                                                <ul>
-                                                    @foreach ($errors->all() as $error)
+                                                <div class="alert alert-danger">
+                                                    <ul>
+                                                        @foreach ($errors->all() as $error)
     <li>{{ $error }}</li>
     @endforeach
-                                                </ul>
-                                            </div>
-                                        @endif -->
+                                                    </ul>
+                                                </div>
+                                            @endif -->
 
                                 @if (session('success'))
                                     <div class="alert alert-success">
@@ -484,7 +490,7 @@
 
                                 <form action="{{ route('user.settings.refferral.update') }}" method="post">
                                     @csrf
-                                    <div class="row mt-3 g-md-0 g-1">
+                                    <div class="row mt-3 g-md-3 g-1">
                                         <div class="col-md-4 col-12">
                                             <div class="form-check form-check-inline">
                                                 <label class="form-check-label">
@@ -495,6 +501,31 @@
                                                         @if (!empty(Auth::user()->guestrewards)) disabled @endif> Search Engine
                                                     Results
                                                 </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-12">
+                                            <div class="form-check form-check-inline">
+                                                <label class="form-check-label">
+                                                    <input type="radio"
+                                                        class="guestrewards form-check-input radio-button"
+                                                        name="guestrewards" value="Word of Mouth"
+                                                        @if (Auth::user()->guestrewards == 'Word of Mouth') checked @endif
+                                                        @if (!empty(Auth::user()->guestrewards)) disabled @endif> Word of Mouth
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-12">
+                                            <div class="form-check form-check-inline">
+                                                <label class="form-check-label">
+                                                    <input type="radio"
+                                                        class="guestrewards form-check-input radio-button"
+                                                        name="guestrewards" value="Other"
+                                                        @if (Auth::user()->guestrewards == 'Other') checked @endif
+                                                        @if (!empty(Auth::user()->guestrewards)) disabled @endif> Other
+                                                </label>
+                                                <input type="text" @if (!empty(Auth::user()->guest_referral_other)) disabled @else style="display:none" @endif class="guest_referral_other"
+                                                value="{{ Auth::user()->guest_referral_other }}"
+                                                name="guest_referral_other">
                                             </div>
                                         </div>
                                         <div class="col-md-4 col-12">
@@ -564,8 +595,8 @@
                                             </div>
                                             <div class="gurest_social_media mt-2"
                                                 @if (Auth::user()->guestrewards == 'Social Media Content') style="display:block" @endif>
-                                                <div class="row">
-                                                    <div class="col-md-2">
+                                                <div class="row g-2">
+                                                    <div class="col-md-4">
                                                         <div class="form-check form-check-inline">
                                                             <label class="form-check-label">
                                                                 <input type="radio"
@@ -578,7 +609,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-2">
+                                                    <div class="col-md-4">
                                                         <div class="form-check form-check-inline SocialMediaParent">
                                                             <label class="form-check-label">
                                                                 <input type="radio"
@@ -591,7 +622,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-2">
+                                                    <div class="col-md-4">
                                                         <div class="form-check form-check-inline SocialMediaParent">
                                                             <label class="form-check-label">
                                                                 <input type="radio"
@@ -604,7 +635,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-2">
+                                                    <div class="col-md-4">
                                                         <div class="form-check form-check-inline SocialMediaParent">
                                                             <label class="form-check-label">
                                                                 <input type="radio"
@@ -617,7 +648,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-2">
+                                                    <div class="col-md-4">
                                                         <div class="form-check form-check-inline SocialMediaParent">
                                                             <label class="form-check-label">
                                                                 <input type="radio"
@@ -630,7 +661,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-2">
+                                                    <div class="col-md-4">
                                                         <div class="form-check form-check-inline SocialMediaParent">
                                                             <label class="form-label">
                                                                 <input type="radio"
@@ -647,7 +678,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="guestreward_user"
+                                    {{-- <div class="guestreward_user"
                                         @if (Auth::user()->guestreward_user != '') style="display: block !important;" @else style="display: none !important;" @endif>
                                         <div class="row mt-3">
                                             <div class="col-sm-4 col-12">
@@ -671,7 +702,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="row mt-5">
                                         <div class="col-sm-12 text-center">
                                             <button type="submit" class="btn wine-btn">Update</button>
@@ -797,7 +828,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Profie Image</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Profile Image</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><i
                             class="fa-solid fa-xmark"></i></button>
                 </div>
@@ -865,7 +896,7 @@
         });
 
         $('.guestrewards').change(function() {
-            $(".gurest_vendorlist, .gurest_social_media, .guestreward_user, .gurest_local_vendorlist").hide();
+            $(".gurest_vendorlist, .gurest_social_media, .guestreward_user, .gurest_local_vendorlist, .guest_referral_other").hide();
             if ($(this).val() == "Niagara Region Vendor") {
                 $(".gurest_vendorlist").show();
             } else if ($(this).val() == "Support Local Vendor") {
@@ -873,6 +904,8 @@
             } else if ($(this).val() == "Search Engine Results") {} else if ($(this).val() ==
                 "Social Media Content") {
                 $(".gurest_social_media").show();
+            } else if($(this).val() == "Other") {
+                $(".guest_referral_other").show();
             }
         });
         $('#buisness_vendor_name').select2({
@@ -905,7 +938,7 @@
             width: '100%',
             ajax: {
                 type: "get",
-                url: "{{ route('vendor_list') }}", // Update with your Laravel route URL
+                url: "{{ route('support_vendor_list') }}", // Update with your Laravel route URL
                 dataType: 'json',
                 processResults: function(data) {
                     var options = [];
@@ -927,6 +960,18 @@
             },
             minimumInputLength: 1
         });
+
+        $(".social-media-checkbox").change(function() {
+            var id = $(this).attr("id");
+            if ($(this).is(":checked")) {
+                console.log(id);
+                $("#" + id.toLowerCase()).prop("disabled", false);
+            } else {
+                console.log(id);
+                $("#" + id.toLowerCase()).val('').prop("disabled", true);
+            }
+        });
+
 
         document.querySelectorAll('.phone-number').forEach(function(input) {
             input.addEventListener('input', function(e) {

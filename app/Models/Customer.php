@@ -48,6 +48,7 @@ class Customer extends Authenticatable implements MustVerifyEmail
         'remember_token',
         'guestrewards',
         'guestreward_user',
+        'guest_referral_other',
         'guestrewards_vendor_id',
         'guestrewards_social_media',
         'street_address',
@@ -64,6 +65,7 @@ class Customer extends Authenticatable implements MustVerifyEmail
         'date_of_birth',
         'first_login',
         'password_updated',
+        'ip_address',
     ];
 
     /**

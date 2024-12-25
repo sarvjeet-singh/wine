@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\View;
 use App\Mail\VendorMail;
@@ -26,6 +27,9 @@ use App\Models\VendorExcursionMetadata;
 use App\Models\VendorWineryMetadata;
 use App\Models\VendorLicenseMetadata;
 use App\Models\VendorNonLicenseMetadata;
+use App\Models\Questionnaire;
+use App\Models\VendorQuestionnaire;
+use App\Models\VendorMediaGallery;
 use DB;
 use Log;
 use Mail;
@@ -33,6 +37,9 @@ use Validator;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\User;
+use App\Models\VendorSocialMedia;
+use App\Models\VendorStripeDetail;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
 
 class VendorController extends Controller
@@ -411,11 +418,11 @@ class VendorController extends Controller
 
             // Generate QR Code
             $qrCodeData = route('vendorQCode.show', [
-                'slug' => $vendor->id . '-' . $vendor->vendor_slug,
-                'redirect' => "/register" // Replace 'register' with your desired redirect route
+                'short_code' => $vendor->short_code,
+                'redirect' => "register" // Replace 'register' with your desired redirect route
             ]);
 
-            $qrCodePath = 'images/VendorQRCodes/' . $vendor->vendor_name . '-' . $vendor->id . '.png';
+            $qrCodePath = 'images/VendorQRCodes/' . $vendor->vendor_name . '-' . $vendor->short_code . '.png';
 
             QrCode::format('png')->size(200)->generate($qrCodeData, public_path($qrCodePath));
 
@@ -459,14 +466,15 @@ class VendorController extends Controller
                     'password' => $password,
                     'vendor' => $vendor
                 ];
-                if ($vendor->vendor_type == 'winery') {
-                    Mail::to($to)->send(new VendorMail($vendorData, 'emails.vendor.winery_vendor_login_details_email', $subject));
-                } else if ($vendor->vendor_type == 'licensed' || $vendor->vendor_type == 'non-licensed') {
-                    Mail::to($to)->send(new VendorMail($vendorData, 'emails.vendor.support_local_vendor_login_details_email', $subject));
-                } else {
-                    $emailContent = View::make('AdminDashboard.emails.vendorlogin', ['user' => $user, 'password' => $password])->render();
-                    sendEmail($to, $subject, $emailContent);
-                }
+                Mail::to($to)->send(new VendorMail($vendorData, 'emails.vendor.vendor_login_details_email', $subject));
+                // if ($vendor->vendor_type == 'winery') {
+                //     Mail::to($to)->send(new VendorMail($vendorData, 'emails.vendor.winery_vendor_login_details_email', $subject));
+                // } else if ($vendor->vendor_type == 'licensed' || $vendor->vendor_type == 'non-licensed') {
+                //     Mail::to($to)->send(new VendorMail($vendorData, 'emails.vendor.support_local_vendor_login_details_email', $subject));
+                // } else {
+                //     $emailContent = View::make('AdminDashboard.emails.vendorlogin', ['user' => $user, 'password' => $password])->render();
+                //     sendEmail($to, $subject, $emailContent);
+                // }
             }
 
             // Commit the transaction if everything is successful
@@ -659,6 +667,9 @@ class VendorController extends Controller
     public function updateAccountStatus(Request $request, $id)
     {
         $vendor = Vendor::find($id);
+        if ($vendor->account_status != $request->account_status) {
+            $vendor->account_status_updated_at = \Carbon\Carbon::now();
+        }
         $vendor->account_status = $request->account_status;
         $vendor->price_point = $request->price_point;
         $vendor->save();
@@ -685,13 +696,293 @@ class VendorController extends Controller
 
     public function vendorEmailTest()
     {
+        // $vendor = Vendor::with('user')->find(2);
+        // $qrCodeData = route('vendorQCode.show', [
+        //     'short_code' => $vendor->short_code,
+        //     'redirect' => "register" // Replace 'register' with your desired redirect route
+        // ]);
+        // echo $qrCodeData; die;
         $vendor = Vendor::with('user')->find(2);
         $data = [
             "username" => $vendor->user->email,
             "password" => '12345678',
         ];
-        $emailContent = View::make('emails.vendor.winery_vendor_login_details_email', compact('vendor', 'data'))->render();
+        $emailContent = View::make('emails.vendor.vendor_login_details_email', compact('vendor', 'data'))->render();
         echo $emailContent;
         die;
     }
+
+    public function vendorDetails($id)
+    {
+        $vendor = Vendor::with('user')->find($id);
+        return view('admin.vendors.vendor-detail', compact('vendor'));
+    }
+
+    public function getViewTab($id)
+    {
+        $vendor = Vendor::with('user')->find($id);
+        return view('admin.vendors.ajax.view', compact('vendor'));
+    }
+
+    public function getExperienceTab($id)
+    {
+        return view('admin.vendors.ajax.curative-experience');
+    }
+
+    public function getStripeDetailsTab($id)
+    {
+        $vendor = Vendor::find($id);
+        $stripeDetail = VendorStripeDetail::where('vendor_id', $id)->first();
+
+        // Decrypt sensitive fields before passing to the view
+        if ($stripeDetail) {
+            $stripeDetail->stripe_secret_key = Crypt::decryptString($stripeDetail->stripe_secret_key);
+            if (!empty($stripeDetail->webhook_secret_key)) {
+                $stripeDetail->webhook_secret_key = Crypt::decryptString($stripeDetail->webhook_secret_key);
+            }
+        }
+        return view('admin.vendors.ajax.stripe-details', compact('vendor', 'stripeDetail'));
+    }
+
+    public function updateStripeDetails(Request $request, $id)
+    {
+        $request->validate([
+            'stripe_publishable_key' => 'required|string',
+            'stripe_secret_key' => 'required|string',
+            'webhook_secret_key' => 'nullable|string',
+        ]);
+        $stripeDetail = VendorStripeDetail::where('vendor_id', $id)->first();
+
+        if (!$stripeDetail) {
+            $stripeDetail = new VendorStripeDetail();
+            $stripeDetail->vendor_id = $id;
+        }
+        $stripeDetail->stripe_publishable_key = $request->stripe_publishable_key;
+        $stripeDetail->stripe_secret_key = Crypt::encryptString($request->stripe_secret_key);
+        $stripeDetail->webhook_secret_key = Crypt::encryptString($request->webhook_secret_key);
+        $save = $stripeDetail->save();
+
+        if (!$save) {
+            return response()->json(['success' => false]);
+        }
+        // ajax
+        return response()->json(['success' => true]);
+    }
+
+    public function getQuestionnaireTab($id)
+    {
+        $vendor = Vendor::find($id);
+        $questionnaires = Questionnaire::with(['vendorQuestionnaires' => function ($query) use ($id) {
+            $query->where('vendor_id', $id);
+        }])
+            ->where(
+                'vendor_type',
+                '=',
+                trim(strtolower($vendor->vendor_type))
+            )
+            ->get();
+        return view('admin.vendors.ajax.questionnaire', compact('questionnaires', 'vendor'));
+    }
+
+    public function updateQuestionnaire(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'answer' => ['nullable', 'array', function ($attribute, $value, $fail) {
+                foreach ($value as $questionId => $answer) {
+                    $questionnaire = Questionnaire::find($questionId);
+                    if (!$questionnaire) {
+                        continue;
+                    }
+                    if ($questionnaire->question_type === 'checkbox') {
+                        // Validation logic for checkboxes (optional)
+                    } elseif ($questionnaire->question_type === 'radio') {
+                        // Validation logic for radio (optional)
+                    }
+                }
+            }],
+            'answer.*' => ['nullable'],
+            'answer.*.*' => ['string', 'nullable'],
+        ], [
+            'answer.required' => 'At least one answer must be provided.',
+            'answer.array' => 'Answers must be an array.',
+            'answer.*.*' => 'Invalid answer format.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $validated = $validator->validated();
+
+        foreach ($validated['answer'] as $questionnaireId => $answer) {
+            $questionnaire = Questionnaire::find($questionnaireId);
+            if ($questionnaire) {
+                $value = $questionnaire->question_type === 'checkbox' ? json_encode($answer ?? []) : $answer;
+                VendorQuestionnaire::updateOrCreate(
+                    ['vendor_id' => $request->id, 'questionnaire_id' => $questionnaireId],
+                    ['answer' => $value]
+                );
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Questionnaire updated successfully.',
+        ]);
+    }
+
+    public function getSocialMediaTab($id)
+    {
+        $vendor = Vendor::find($id);
+        return view('admin.vendors.ajax.social-media', compact('vendor'));
+    }
+
+    public function updateSocialMedia(Request $request, $id)
+    {
+        $request->validate([
+            'facebook' => 'nullable|string',
+            'instagram' => 'nullable|string',
+            'twitter' => 'nullable|string',
+            'youtube' => 'nullable|string',
+            'pinterest' => 'nullable|string',
+            'tiktok' => 'nullable|string',
+        ]);
+        $socialMedia = VendorSocialMedia::where('vendor_id', $id)->first();
+        if (!$socialMedia) {
+            $socialMedia = new VendorSocialMedia();
+            $socialMedia->vendor_id = $id;
+        }
+        $socialMedia->facebook = $request->facebook ?? NULL;
+        $socialMedia->instagram = $request->instagram ?? NULL;
+        $socialMedia->twitter = $request->twitter ?? NULL;
+        $socialMedia->youtube = $request->youtube ?? NULL;
+        $socialMedia->pinterest = $request->pinterest ?? NULL;
+        $socialMedia->tiktok = $request->tiktok ?? NULL;
+        $save = $socialMedia->save();
+        if (!$save) {
+            return response()->json(['success' => false]);
+        }
+        // ajax
+        return response()->json(['success' => true]);
+    }
+
+    public function getAccessCredentialsTab($id)
+    {
+        return view('admin.vendors.ajax.access-credentials');
+    }
+
+    public function getMediaGalleryTab($id)
+    {
+        $vendor = Vendor::find($id);
+        $VendorMediaGallery = VendorMediaGallery::where('vendor_id', $id)->get();
+        return view('admin.vendors.ajax.media-gallery', compact('vendor', 'VendorMediaGallery'));
+    }
+
+    public function uploadMedia(Request $request)
+	{
+		$vendor = Vendor::find($request->vendorid);
+		$vendor_media_type = '';
+		if ($request->vendorImage) {
+			$vendor_media_type = 'image';
+			list($type, $data) = explode(';', $request->vendorImage);
+			list(, $data) = explode(',', $data);
+			$data = base64_decode($data);
+
+			// Generate a random filename
+			$filename = Str::random(10) . '.png';
+
+			// Create the vendor-specific directory if it doesn't exist
+			$vendorDir = public_path('images/VendorImages/' . $vendor->vendor_name);
+			if (!File::exists($vendorDir)) {
+				File::makeDirectory($vendorDir, 0777, true, true);
+			}
+
+			// Save the image to the directory
+			$filePath = $vendorDir . '/' . $filename;
+			file_put_contents($filePath, $data);
+
+			// Save the media information to the database
+			$VendorMediaGallery = new VendorMediaGallery;
+			$VendorMediaGallery->vendor_media = 'images/VendorImages/' . $vendor->vendor_name . '/' . $filename;
+			$VendorMediaGallery->vendor_media_type = 'image';
+			$VendorMediaGallery->vendor_id = $vendor->id;
+
+			// Check if there are no existing media for this vendor
+			$existingMediaCount = VendorMediaGallery::where('vendor_id', $vendor->id)->where('is_default', 1)->count();
+			if ($existingMediaCount === 0) {
+				$VendorMediaGallery->is_default = 1; // Make this the default image
+			}
+
+			$VendorMediaGallery->save();
+		}
+		if ($request->youtube_link) {
+			$urlParts = parse_url($request->youtube_link);
+			if (isset($urlParts['query'])) {
+				parse_str($urlParts['query'], $query);
+				$videolink = isset($query['v']) ? "https://www.youtube.com/embed/" . $query['v'] : $request->youtube_link;
+			} else {
+				$videolink = $request->youtube_link;
+			}
+
+			$vendor_media_type = 'youtube';
+			$VendorMediaGallery = new VendorMediaGallery;
+			$VendorMediaGallery->vendor_media = $videolink;
+			$VendorMediaGallery->vendor_media_type = 'youtube';
+			$VendorMediaGallery->vendor_id = $vendor->id;
+			$VendorMediaGallery->save();
+			$filePath = $videolink;
+		}
+		return response()->json(['status' => 'success', 'path' => $filePath, 'type' => $vendor_media_type, 'mediaid' => $VendorMediaGallery->id]);
+	}
+
+    public function deleteMedia(Request $request)
+	{
+		$media = VendorMediaGallery::findOrFail($request->mediaId);
+
+		// Check if the image is the default
+		if ($media->is_default) {
+			return response()->json([
+				'status' => 'error',
+				'message' => 'Default media cannot be deleted. Please set another media as default before deleting this one.'
+			], 400);
+		}
+
+		// Delete the file from the filesystem if it's an image
+		if ($media->vendor_media_type == "image") {
+			$filePath = public_path($media->vendor_media);
+			if (File::exists($filePath)) {
+				File::delete($filePath);
+			}
+		}
+
+		// Delete the record from the database
+		$media->delete();
+
+		return response()->json(['status' => 'success']);
+	}
+
+	public function setDefaultMedia(Request $request, $vendorId)
+	{
+		// Validate the media ID
+		$request->validate([
+			'mediaId' => 'required|exists:vendor_media_galleries,id',
+		]);
+
+		// Find the media by ID
+		$media = VendorMediaGallery::findOrFail($request->mediaId);
+
+		// Ensure the media belongs to the vendor
+		if ($media->vendor_id != $vendorId) {
+			return response()->json(['status' => 'error', 'message' => 'Unauthorized action.'], 403);
+		}
+
+		// Reset all media is_default to 0 for this vendor
+		VendorMediaGallery::where('vendor_id', $vendorId)->update(['is_default' => 0]);
+
+		// Set the current media as default
+		$media->is_default = 1;
+		$media->save();
+
+		return response()->json(['status' => 'success', 'message' => 'Media set as logo successfully.']);
+	}
 }

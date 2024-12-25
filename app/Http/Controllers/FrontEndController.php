@@ -204,10 +204,10 @@ class FrontEndController extends Controller
         }
     }
 
-    public function getAccommodationDetails($vendorslug)
+    private function getAccommodationDetails($short_code)
     {
         // Check if the vendor slug exists
-        $vendor = Vendor::with('sub_regions', 'sub_category', 'countryName', 'accommodationMetadata')->where('vendor_slug', $vendorslug)->first();
+        $vendor = Vendor::with('sub_regions', 'sub_category', 'countryName', 'accommodationMetadata')->where('short_code', $short_code)->first();
         $socialLinks = $vendor->socialMedia()->first();
         $amenities = $vendor->amenities()->get();
         // If the vendor does not exist, redirect to the homepage
@@ -220,20 +220,19 @@ class FrontEndController extends Controller
         return view('FrontEnd.accommodation-details', compact('vendor', 'socialLinks', 'amenities'));
     }
 
-    public function getWineryDetails($vendorslug)
+    private function getWineryDetails($short_code)
     {
-        if (!Auth::guard('vendor')->check()) {
-            $user_id =  Auth::guard('customer')->user()->id;
-            $user = Customer::find($user_id);
-            if (!Auth::guard('customer')->check()) {
-                return redirect()->route('wineries-listing');
-            }
-        } else {
+        if (Auth::guard('vendor')->check()) {
             $user_id =  Auth::guard('vendor')->user()->id;
             $user = Vendor::find($user_id);
+        } else if (Auth::guard('customer')->check()) {
+            $user_id =  Auth::guard('customer')->user()->id;
+            $user = Customer::find($user_id);
+        } else {
+            $user = null;
         }
         // Check if the vendor slug exists
-        $vendor = Vendor::with('sub_regions', 'sub_category', 'countryName', 'accommodationMetadata')->where('vendor_slug', $vendorslug)->first();
+        $vendor = Vendor::with('sub_regions', 'sub_category', 'countryName', 'accommodationMetadata')->where('short_code', $short_code)->first();
         $today = Carbon::now()->format('l'); // e.g., 'Monday'
 
 
@@ -286,10 +285,10 @@ class FrontEndController extends Controller
         return view('FrontEnd.wineryDetails', compact('vendor', 'socialLinks', 'amenities', 'wines', 'hours', 'cuisineNames', 'user'));
     }
 
-    public function getExcursionDetails($vendorslug)
+    public function getExcursionDetails($short_code)
     {
         // Check if the vendor slug exists
-        $vendor = Vendor::with('sub_regions', 'sub_category', 'countryName', 'accommodationMetadata')->where('vendor_slug', $vendorslug)->first();
+        $vendor = Vendor::with('sub_regions', 'sub_category', 'countryName', 'accommodationMetadata')->where('short_code', $short_code)->first();
         $socialLinks = $vendor->socialMedia()->first();
         $amenities = $vendor->amenities()->get();
         // If the vendor does not exist, redirect to the homepage
@@ -891,7 +890,7 @@ class FrontEndController extends Controller
         }
 
         // Get vendor details using vendor_id
-        $vendor = Vendor::with('mediaLogo','sub_regions', 'sub_category', 'countryName', 'accommodationMetadata', 'stripeDetails')->find($booking->vendor_id);
+        $vendor = Vendor::with('mediaLogo', 'sub_regions', 'sub_category', 'countryName', 'accommodationMetadata', 'stripeDetails')->find($booking->vendor_id);
         if (!$vendor) {
             return redirect()->route('home')->with('error', 'Vendor not found');
         }
@@ -1021,23 +1020,23 @@ class FrontEndController extends Controller
         // Redirect or return a response
         return redirect()->back()->with('success', 'Form submitted successfully!');
     }
-    public function showQCode(Request $request, $slug)
+    public function showQCode(Request $request, $short_code)
     {
         $redirect = $request->query('redirect', null);
         if ($redirect) {
-            return redirect($redirect . "?slug=" . $slug);
+            return redirect($redirect . "?sc=" . $short_code);
         }
-        $vendor = Vendor::where('vendor_slug', $slug)->firstOrFail();
+        $vendor = Vendor::where('short_code', $short_code)->firstOrFail();
 
         return view('FrontEnd.showQCode', compact('vendor'));
     }
-    public function generateQCode($slug)
+    public function generateQCode($short_code)
     {
-        $vendor = Vendor::where('vendor_slug', $slug)->firstOrFail();
+        $vendor = Vendor::where('short_code', $short_code)->firstOrFail();
         // Generate QR Code
         if ($vendor->qr_code == "") {
             $qrCodeData = route('vendorQCode.show', [
-                'slug' => $vendor->vendor_slug,
+                'short_code' => $vendor->short_code,
                 'redirect' => "/register" // Replace 'register' with your desired redirect route
             ]);
 
@@ -1655,6 +1654,7 @@ class FrontEndController extends Controller
             $vendors = $partnerData->union($participantData)
                 ->union($preliminaryData)
                 ->orderBy('account_status', 'asc')
+                ->orderBy('account_status_updated_at', 'asc')
                 ->orderBy('vendor_name', 'asc')
                 ->paginate(10)
                 ->appends($request->all());
@@ -1665,6 +1665,18 @@ class FrontEndController extends Controller
                 'total' => $vendors->total(),
             ]);
             // return view('FrontEnd.get_non_licensed_list', compact('vendors'));
+        }
+    }
+
+    public function detailsShortCode($short_code, Request $request)
+    {
+        $vendor = Vendor::where('short_code', $short_code)->first();
+        if (strtolower($vendor->vendor_type) == 'accommodation') {
+            return $this->getAccommodationDetails($short_code);
+        } else if (strtolower($vendor->vendor_type) == 'winery') {
+            return $this->getWineryDetails($short_code);
+        } else if (strtolower($vendor->vendor_type) == 'excursion') {
+            return $this->getExcursionDetails($short_code);
         }
     }
 }

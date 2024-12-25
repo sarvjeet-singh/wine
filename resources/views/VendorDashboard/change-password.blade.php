@@ -14,125 +14,119 @@
 
 @section('content')
 
-    <div class="col right-side">
+    @if (!isset($hideSidebar) || !$hideSidebar)
+        <div class="col right-side">
+        @else
+            <div class="d-flex justify-content-center">
+                <div class="col-6">
+    @endif
 
-        <div class="row mt-5 d-flex justify-content-center">
+    <div class="row mt-5 d-flex justify-content-center">
 
-            <div class="col-12">
+        <div class="col-12">
 
-                <div class="information-box p-0">
+            <div class="information-box p-0">
 
-                    <div class="information-box-head">
+                <div class="information-box-head">
 
-                        <div class="box-head-heading d-flex">
+                    <div class="box-head-heading d-flex">
 
-                            <span
+                        <span
+                            class="box-head-label theme-color">{{ $hideSidebar ? 'Update Your Password or Skip This Step' : 'Change Password' }}</span>
 
-                                class="box-head-label theme-color">{{ $hideSidebar ? 'Update Your Password or Skip This Step' : 'Change Password' }}</span>
+                    </div>
+
+                </div>
+
+                <div class="information-box-body">
+
+                    @if ($errors->any())
+
+                        <div class="alert alert-danger">
+
+                            <ul>
+
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+
+                            </ul>
 
                         </div>
 
-                    </div>
+                    @endif
 
-                    <div class="information-box-body">
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
 
-                        @if ($errors->any())
+                            {{ session('success') }}
 
-                            <div class="alert alert-danger">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 
-                                <ul>
+                        </div>
+                    @endif
 
-                                    @foreach ($errors->all() as $error)
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
 
-                                        <li>{{ $error }}</li>
+                            {{ session('error') }}
 
-                                    @endforeach
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 
-                                </ul>
+                        </div>
+                    @endif
 
-                            </div>
+                    <form action="{{ route('vendor-password-update', ['vendorid' => $vendor->id]) }}" method="post"
+                        id="account-form">
 
-                        @endif
+                        @csrf
 
-                        @if (session('success'))
-
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-
-                                {{ session('success') }}
-
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-
-                                    aria-label="Close"></button>
-
-                            </div>
-
-                        @endif
-
-                        @if (session('error'))
-
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-
-                                {{ session('error') }}
-
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-
-                                    aria-label="Close"></button>
-
-                            </div>
-
-                        @endif
-
-                        <form action="{{ route('vendor-password-update', ['vendorid' => $vendor->id]) }}" method="post"
-
-                            id="account-form">
-
-                            @csrf
-
-                            <div class="row g-3 mb-2">
-
+                        <div class="row g-3 mb-2">
+                            @if (!$hideSidebar)
                                 <div class="col-12">
                                     <div class="position-relative">
                                         <label for="old_password" class="form-label fw-bold">Old Password</label>
-                                        <input type="password" class="form-control pe-5" name="old_password" id="old_password"
-                                            placeholder="Old Password" required>
+                                        <input type="password" class="form-control pe-5" name="old_password"
+                                            id="old_password" placeholder="Old Password" required>
                                         <i class="fa-solid fa-eye togglePassword3 password-custom-icon"
-                                    onclick="togglePasswordVisibility('old_password')" style="position: absolute; right: 10px; top: 44px; cursor: pointer; color: #118c97;"></i>
+                                            onclick="togglePasswordVisibility('old_password')"
+                                            style="position: absolute; right: 10px; top: 44px; cursor: pointer; color: #118c97;"></i>
                                     </div>
                                 </div>
-
-                                <div class="col-12">
-                                    <div class="position-relative">
-                                        <label for="new_password" class="form-label fw-bold">New Password</label>
-                                        <input type="password" class="form-control pe-5" name="new_password" id="new_password"
-                                            placeholder="New Password" required>
-                                        <i class="fa-solid fa-eye togglePassword3 password-custom-icon"
-                                    onclick="togglePasswordVisibility('new_password')" style="position: absolute; right: 10px; top: 44px; cursor: pointer; color: #118c97;"></i>
-                                    </div>
+                            @endif
+                            <div class="col-12">
+                                <div class="position-relative">
+                                    <label for="new_password" class="form-label fw-bold">New Password</label>
+                                    <input type="password" class="form-control pe-5" name="new_password" id="new_password"
+                                        placeholder="New Password" required>
+                                    <i class="fa-solid fa-eye togglePassword3 password-custom-icon"
+                                        onclick="togglePasswordVisibility('new_password')"
+                                        style="position: absolute; right: 10px; top: 44px; cursor: pointer; color: #118c97;"></i>
                                 </div>
+                            </div>
 
-                                <div class="col-12">
-                                    <div class="position-relative">
-                                         <label for="confirm_password" class="form-label fw-bold">Confirm Password</label>
-                                        <input type="password" class="form-control pe-5" name="confirm_password"
-                                            id="confirm_password" placeholder="Confirm Password" required>
-                                        <i class="fa-solid fa-eye togglePassword3 password-custom-icon"
-                                    onclick="togglePasswordVisibility('confirm_password')" style="position: absolute; right: 10px; top: 44px; cursor: pointer; color: #118c97;"></i>
-                                    </div>
+                            <div class="col-12">
+                                <div class="position-relative">
+                                    <label for="confirm_password" class="form-label fw-bold">Confirm Password</label>
+                                    <input type="password" class="form-control pe-5" name="confirm_password"
+                                        id="confirm_password" placeholder="Confirm Password" required>
+                                    <i class="fa-solid fa-eye togglePassword3 password-custom-icon"
+                                        onclick="togglePasswordVisibility('confirm_password')"
+                                        style="position: absolute; right: 10px; top: 44px; cursor: pointer; color: #118c97;"></i>
                                 </div>
+                            </div>
 
-                                <div class="col-sm-12 text-center">
+                            <div class="col-sm-12 text-center">
 
-                                    {{ $hideSidebar ? '<button type="button" class="btn wine-btn px-5" id="skip-btn">Skip</button>' : '' }}
+                                {!! $hideSidebar ? '<button type="button" class="btn wine-btn px-5" id="skip-btn">Skip</button>' : '' !!}
 
-                                    <button type="submit" class="btn wine-btn px-5" id="update-btn">Update</button>
-
-                                </div>
+                                <button type="submit" class="btn wine-btn px-5" id="update-btn">Update</button>
 
                             </div>
 
-                        </form>
+                        </div>
 
-                    </div>
+                    </form>
 
                 </div>
 
@@ -141,6 +135,12 @@
         </div>
 
     </div>
+    @if (!isset($hideSidebar) || !$hideSidebar)
+        </div>
+    @else
+        </div>
+        </div>
+    @endif
 
 @endsection
 
@@ -149,7 +149,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 
     <script>
-
         $(document).ready(function() {
 
             $.validator.addMethod(
@@ -487,11 +486,10 @@
             });
 
         });
-
     </script>
 
-<!-- Password Eye Icon -->
-<script>
+    <!-- Password Eye Icon -->
+    <script>
         function togglePasswordVisibility(inputId) {
             const input = document.getElementById(inputId);
             if (input.type === "password") {
@@ -500,7 +498,6 @@
                 input.type = "password";
             }
         }
-</script>
+    </script>
 
 @endsection
-

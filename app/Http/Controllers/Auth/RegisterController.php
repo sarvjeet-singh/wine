@@ -85,12 +85,9 @@ class RegisterController extends Controller
     public function showRegistrationForm(Request $request)
     {
         $vendor = null;
-        $slug = $request->query('slug');
-        if($slug){
-            $slug = explode('-', $slug);
-            if(is_numeric($slug[0])){
-                $vendor = Vendor::where('id', $slug[0])->first();
-            }
+        $sc = $request->query('sc');
+        if ($sc) {
+            $vendor = Vendor::where('short_code', $sc)->first();
         }
         return view('auth.register', compact('vendor'));
     }
@@ -112,24 +109,21 @@ class RegisterController extends Controller
             'lastname' => $data['lastname'],
             'password' => Hash::make($data['password']),
             'role' => 'Member',
-            'login_token' => $token
+            'login_token' => $token,
+            'ip_address' => request()->ip()
         ]);
 
         // Refer by vendor
         if (isset($data['refer_by']) && !empty($data['refer_by'])) {
-            $slug = $data['refer_by'];
-            if($slug) {
-                $slug = explode('-', $slug);
-            }
-            $vendor = Vendor::where('id', $slug[0])->first();
+            $short_code = $data['refer_by'];
+            $vendor = Vendor::where('short_code', $short_code)->first();
 
             if ($vendor->id) {
-                $user->guestrewards = "Niagara Region Vendor";
+                $user->guestrewards = $vendor->vendor_name;
                 $user->guestrewards_vendor_id = $vendor->id;
                 $user->save();
             }
         }
-
 
         // $loginLink = route('login-with-token', ['token' => $token]);
 

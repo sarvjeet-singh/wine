@@ -27,7 +27,7 @@
 
                 <div class="sec-btn mt-4">
                     @guest
-                        <a href="{{ route('check-login') }}" class="btn theme-btn">
+                        <a href="{{ route('check-login', 'become-vendor') }}" class="btn theme-btn">
                             Promote a Business
                         </a>
                     @else

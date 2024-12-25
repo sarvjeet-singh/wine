@@ -80,7 +80,7 @@
                             @csrf
                             <div class="row mt-3">
                                 <div class="col-sm-6 col-12">
-                                    <label class="form-label">Business/Vendor Name</label>
+                                    <label class="form-label">Business/Vendor Name*</label>
                                     <input type="text" class="form-control @error('vendor_name') is-invalid @enderror"
                                         name="vendor_name" value="{{ old('vendor_name', $vendor->vendor_name) }}"
                                         placeholder="Please enter Property name">
@@ -88,6 +88,21 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                <div class="col-sm-6 col-12">
+                                    <div>
+                                        <label class="form-label">Business/Vendor Phone</label>
+                                        <input type="text"
+                                            class="form-control phone-number @error('vendor_phone') is-invalid @enderror"
+                                            name="vendor_phone" value="{{ old('vendor_phone', $vendor->vendor_phone) }}"
+                                            placeholder="Please enter Business Phone">
+                                        @error('vendor_phone')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
                                 <div class="col-sm-6 col-12">
                                     <label class="form-label">Street Address*</label>
                                     <input type="text" class="form-control @error('street_address') is-invalid @enderror"
@@ -100,18 +115,15 @@
                                         <input class="form-check-input @error('hide_street_address') is-invalid @enderror"
                                             type="checkbox" id="hideStreetAddress" name="hide_street_address" value="1"
                                             {{ old('hide_street_address', $vendor->hide_street_address) ? 'checked' : '' }}>
-                                        <label class="check-label" for="form-check-label">Check this box to hide street
-                                            address</label>
+                                        <label class="check-label" for="form-check-label">Hide street address in
+                                            profile</label>
                                         @error('hide_street_address')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="row mt-3">
-                                <div class="col-sm-12 col-12">
-                                    <label class="form-label">Unit/Suite</label>
+                                <div class="col-sm-6 col-12">
+                                    <label class="form-label">Unit/Suite#</label>
                                     <input type="text" class="form-control @error('unitsuite') is-invalid @enderror"
                                         name="unitsuite" value="{{ old('unitsuite', $vendor->unitsuite) }}"
                                         placeholder="Please enter Unit/Suite">
@@ -123,8 +135,9 @@
                             </div>
                             <div class="row mt-3">
                                 <div class="col-sm-6 col-12">
-                                    <label class="form-label">Country</label>
-                                    <select class="form-control @error('country') is-invalid @enderror" name="country" id="country">
+                                    <label class="form-label">Country*</label>
+                                    <select class="form-control @error('country') is-invalid @enderror" name="country"
+                                        id="country">
                                         <option value="">Please select a country</option>
                                         @foreach ($countries as $country)
                                             <option value="{{ $country->id }}"
@@ -180,12 +193,27 @@
                             </div>
                             <div class="row mt-3">
                                 <div class="col-sm-6 col-12">
-                                    <div class="">
+                                    <div>
+                                        <label class="form-label">Region</label>
+                                        <select name="region" id="region" class="form-control">
+                                            <option value="">Please select a Region</option>
+                                            @foreach (getRegions() as $region)
+                                                <option value="{{ $region->id }}"
+                                                    {{ old('region', $vendor->region ?? '') == $region->id ? 'selected' : '' }}>
+                                                    {{ $region->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('region')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mt-3">
                                         <label class="form-label">Sub-Region</label>
-                                        <select name="sub_region"
+                                        <select name="sub_region" id="sub_region"
                                             class="form-control @error('sub_region') is-invalid @enderror">
                                             <option value="">Please select a sub-region</option>
-
                                             @foreach ($subRegions as $subRegion)
                                                 <option value="{{ $subRegion->id }}"
                                                     {{ old('sub_region', $vendor->sub_region ?? '') == $subRegion->id ? 'selected' : '' }}>
@@ -198,31 +226,21 @@
                                         @enderror
                                     </div>
                                     <div class="mt-3">
-                                        <label class="form-label">Business Phone</label>
-                                        <input type="text"
-                                            class="form-control phone-number @error('vendor_phone') is-invalid @enderror"
-                                            name="vendor_phone" value="{{ old('vendor_phone', $vendor->vendor_phone) }}"
-                                            placeholder="Please enter Business Phone">
-                                        @error('vendor_phone')
+                                        <label class="form-label">Website URL</label>
+                                        <input type="text" class="form-control @error('website') is-invalid @enderror"
+                                            name="website" value="{{ old('website', $vendor->website) }}"
+                                            placeholder="Please enter Website Url">
+                                        @error('website')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                     <div class="mt-3">
-                                        <label class="form-label">Business Email</label>
+                                        <label class="form-label">eMail</label>
                                         <input type="text"
                                             class="form-control @error('vendor_email') is-invalid @enderror"
                                             name="vendor_email" value="{{ old('vendor_email', $vendor->vendor_email) }}"
                                             placeholder="Please enter Business Email">
                                         @error('vendor_email')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="mt-3">
-                                        <label class="form-label">Website</label>
-                                        <input type="text" class="form-control @error('website') is-invalid @enderror"
-                                            name="website" value="{{ old('website', $vendor->website) }}"
-                                            placeholder="Please enter Website Url">
-                                        @error('website')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -246,7 +264,7 @@
                                                             <label for="front_License_image" {{-- upload-button --}}
                                                                 class="custom-file-label">
                                                                 <!-- <img src="{{ asset('images/media-gallary/plus-icon.png') }}"
-                                                                                                                                            width="20"> -->
+                                                                                                                                                                                            width="20"> -->
                                                                 <a href="{{ route('vendor-media-gallary') }}">
                                                                     <i class="fa-solid fa-arrow-up-from-bracket"></i>
                                                                 </a>
@@ -385,12 +403,12 @@
                                         @enderror
                                     </div>
                                     <div class="col-sm-6 col-12">
-                                        <label class="form-label">Bedroom*</label>
+                                        <label class="form-label">Bedrooms*</label>
                                         <input type="text"
                                             class="form-control numeric-input @error('bedrooms') is-invalid @enderror"
                                             name="bedrooms"
                                             value="{{ old('bedrooms', !empty($metadata->bedrooms) ? $metadata->bedrooms : '') }}"
-                                            placeholder="Bedroom">
+                                            placeholder="Bedrooms">
                                         @error('bedrooms')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -398,19 +416,19 @@
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col-sm-6 col-12">
-                                        <label class="form-label">Washroom</label>
+                                        <label class="form-label">Washrooms*</label>
                                         <input type="text"
                                             class="form-control numeric-input @error('washrooms') is-invalid @enderror"
                                             name="washrooms"
                                             value="{{ old('washrooms', !empty($metadata->washrooms) ? $metadata->washrooms : '') }}"
-                                            placeholder="Washroom">
+                                            placeholder="Washrooms">
 
                                         @error('washrooms')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="col-md-3">
-                                        <label for="beds" class="form-label">Bed*</label>
+                                        <label for="beds" class="form-label">Beds*</label>
                                         <input type="text" name="beds"
                                             class="form-control @error('beds') is-invalid @enderror"
                                             value="{{ old('beds', !empty($metadata->beds) ? $metadata->beds : '') }}"
@@ -464,45 +482,68 @@
                                 @csrf
                                 @method('PUT')
                                 <!-- Add method="PUT" if you are updating -->
-                                <div class="row g-3 mt-3">
-                                    <div class="col-md-6">
+                                <div class="row g-3 mt-1">
+                                    <div class="col-12">
                                         <div>
                                             <label for="vendor_sub_category"
                                                 class="form-label fw-bold">{{ ucfirst($vendor->vendor_type) }}
                                                 Sub-Type*</label>
+                                        </div>
+                                        <div class="row">
                                             @if (count($subCategories) > 0)
-                                                <select class="form-select" name="vendor_sub_category"
-                                                    id="vendor_sub_category">
-                                                    <option value="">Please Select</option>
-                                                    @foreach ($subCategories as $subCategory)
-                                                        <option value="{{ $subCategory->id }}"
-                                                            {{ old('vendor_sub_category', $vendor->vendor_sub_category) == $subCategory->id ? 'selected' : '' }}>
-                                                            {{ $subCategory->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                                @foreach ($subCategories as $subCategory)
+                                                    <div class="col-lg-6 col-12">
+                                                        <div class="form-check mb-3" style="min-height: 70px;">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="vendor_sub_category"
+                                                                id="vendor_sub_category_{{ $subCategory->id }}"
+                                                                value="{{ $subCategory->id }}"
+                                                                {{ old('vendor_sub_category', $vendor->vendor_sub_category) == $subCategory->id ? 'checked' : '' }}>
+                                                            <label class="form-check-label"
+                                                                for="vendor_sub_category_{{ $subCategory->id }}">
+                                                                {{ $subCategory->name }}
+                                                            </label>
+                                                            <div class="fs-7">
+                                                                <!-- You can customize this description or add more subcategory details -->
+                                                                {{ $subCategory->description ?? '' }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
                                             @endif
                                         </div>
                                     </div>
-
-                                    @if (strtolower($vendor->vendor_type) == 'excursion')
-                                        <div class="col-md-6">
+                                    @if (strtolower($vendor->vendor_type) != 'licensed')
+                                        <div class="col-12">
                                             <div>
-                                                <label for="establishment"
-                                                    class="form-label fw-bold">Establishment/Facility</label>
-                                                <select class="form-select" name="establishment" id="establishment">
-                                                    <option value="">Select</option>
-                                                    @foreach ($establishments as $establishment)
-                                                        <option value="{{ $establishment['id'] }}"
-                                                            {{ old('establishment', isset($metadata->establishment) ? $metadata->establishment : '') == $establishment['id'] ? 'selected' : '' }}>
-                                                            {{ $establishment['name'] }}
-                                                        </option>
+                                                <label for="farming_practices" class="form-label fw-bold">Farming
+                                                    Practices</label>
+                                            </div>
+                                            <div class="row">
+                                                @if (count($farmingPractices) > 0)
+                                                    @foreach ($farmingPractices as $farmingPractice)
+                                                        <div class="col-lg-6 col-12">
+                                                            <div class="form-check mb-3" style="min-height: 70px;">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="farming_practices"
+                                                                    id="farming_practice_{{ $farmingPractice['id'] }}"
+                                                                    value="{{ $farmingPractice['id'] }}"
+                                                                    {{ old('farming_practices', isset($metadata->farming_practices) ? $metadata->farming_practices : '') == $farmingPractice['id'] ? 'checked' : '' }}>
+                                                                <label class="form-check-label"
+                                                                    for="farming_practice_{{ $farmingPractice['id'] }}">
+                                                                    {{ $farmingPractice['name'] }}
+                                                                </label>
+                                                                <div class="fs-7">
+                                                                    <!-- Add a description if available -->
+                                                                    {{ $farmingPractice['description'] ?? 'No additional details available.' }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     @endforeach
-                                                </select>
+                                                @endif
                                             </div>
                                         </div>
                                     @endif
-
                                     @if (strtolower($vendor->vendor_type) == 'winery')
                                         <div class="col-md-6">
                                             <div>
@@ -520,18 +561,17 @@
                                             </div>
                                         </div>
                                     @endif
-                                    @if (strtolower($vendor->vendor_type) != 'licensed')
+                                    @if (strtolower($vendor->vendor_type) == 'excursion')
                                         <div class="col-md-6">
                                             <div>
-                                                <label for="farming_practices" class="form-label fw-bold">Farming
-                                                    Practices</label>
-                                                <select class="form-select" name="farming_practices"
-                                                    id="farming_practices">
-                                                    <option value="">Select a farming practice</option>
-                                                    @foreach ($farmingPractices as $farmingPractice)
-                                                        <option value="{{ $farmingPractice['id'] }}"
-                                                            {{ old('farming_practices', isset($metadata->farming_practices) ? $metadata->farming_practices : '') == $farmingPractice['id'] ? 'selected' : '' }}>
-                                                            {{ $farmingPractice['name'] }}
+                                                <label for="establishment"
+                                                    class="form-label fw-bold">Establishment/Facility</label>
+                                                <select class="form-select" name="establishment" id="establishment">
+                                                    <option value="">Select</option>
+                                                    @foreach ($establishments as $establishment)
+                                                        <option value="{{ $establishment['id'] }}"
+                                                            {{ old('establishment', isset($metadata->establishment) ? $metadata->establishment : '') == $establishment['id'] ? 'selected' : '' }}>
+                                                            {{ $establishment['name'] }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -576,295 +616,7 @@
                     </div>
                 </div>
             </div>
-        @endif
-
-        @if (trim(strtolower($vendor->vendor_type)) == 'accommodation' ||
-                trim(strtolower($vendor->vendor_type)) == 'winery' ||
-                trim(strtolower($vendor->vendor_type)) == 'excursion')
-            @if (count($questionnaires))
-                <div class="row mt-5">
-                    <div class="col-sm-12">
-                        <div class="information-box">
-                            <div class="information-box-head">
-                                <div class="box-head-heading d-flex">
-                                    <span class="box-head-label theme-color">Questionnaire</span>
-                                </div>
-                            </div>
-                            <div class="information-box-body">
-                                @if (session('questionnaire-success'))
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                        {{ session('questionnaire-success') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                            aria-label="Close"></button>
-                                    </div>
-                                @endif
-                                <form action="{{ route('vendor-questionnaire-update', ['vendorid' => $vendor->id]) }}"
-                                    method="post">
-                                    @csrf
-                                    @foreach ($questionnaires as $key => $questionnaire)
-                                        <div class="row mt-3">
-                                            <div class="col-12">
-
-                                                <label class="form-label">{{ $key + 1 }}.
-                                                    {{ $questionnaire->question }}</label>
-
-                                                @php
-                                                    $vendorQuestionnaire = $questionnaire->vendorQuestionnaires->firstWhere(
-                                                        'vendor_id',
-                                                        $vendor->id,
-                                                    );
-                                                    $answers = $vendorQuestionnaire
-                                                        ? json_decode($vendorQuestionnaire->answer, true)
-                                                        : [];
-                                                    $options = json_decode($questionnaire->options, true);
-                                                @endphp
-
-                                                @if ($questionnaire->question_type === 'radio')
-                                                    <!-- Single choice (Radio buttons) -->
-                                                    <div class="row g-3 mt-3">
-                                                        @foreach ($options as $key => $option)
-                                                            <div class="col-lg-4 col-md-6">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="answer[{{ $questionnaire->id }}]"
-                                                                        id="question_{{ $questionnaire->id }}_{{ $key }}"
-                                                                        value="{{ $key }}"
-                                                                        {{ old('answer.' . $questionnaire->id, $vendorQuestionnaire->answer ?? '') == $key ? 'checked' : '' }}>
-                                                                    <label class="form-check-label"
-                                                                        for="question_{{ $questionnaire->id }}_{{ $key }}">
-                                                                        {!! $option !!}
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                @elseif($questionnaire->question_type === 'checkbox')
-                                                    <!-- Multiple choice (Checkboxes) -->
-                                                    @foreach ($options as $key => $option)
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                name="answer[{{ $questionnaire->id }}][]"
-                                                                id="question_{{ $questionnaire->id }}_{{ $key }}"
-                                                                value="{{ $option }}"
-                                                                {{ in_array($option, $answers) ? 'checked' : '' }}>
-                                                            <label class="form-check-label"
-                                                                for="question_{{ $questionnaire->id }}_{{ $key }}">
-                                                                {!! $option !!}
-                                                            </label>
-                                                        </div>
-                                                    @endforeach
-                                                @else
-                                                    <!-- Default: Text input -->
-                                                    <input type="text"
-                                                        class="form-control @error('answer.' . $questionnaire->id) is-invalid @enderror"
-                                                        name="answer[{{ $questionnaire->id }}]" placeholder="Answer"
-                                                        value="{{ old('answer.' . $questionnaire->id, $vendorQuestionnaire->answer ?? '') }}">
-                                                @endif
-
-                                                @error('answer.' . $questionnaire->id)
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    @endforeach
-
-                                    @error('answer')
-                                        <div class="row mt-3">
-                                            <div class="col-12">
-                                                <div class="alert alert-danger">{{ $message }}</div>
-                                            </div>
-                                        </div>
-                                    @enderror
-
-                                    <div class="row mt-5">
-                                        <div class="col-sm-12 text-center">
-                                            <button type="submit" class="btn wine-btn">Save</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
-        @endif
-
-        <div class="row mt-5">
-            <div class="col-sm-12">
-                <div class="information-box">
-                    <div class="information-box-head">
-                        <div class="box-head-heading d-flex">
-                            <span class="box-head-label theme-color">Access Credentials</span>
-                        </div>
-                    </div>
-                    <div class="information-box-body">
-                        @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-                        @if (session('error'))
-                            <div class="alert alert-danger">
-                                {{ session('error') }}
-                            </div>
-                        @endif
-                        <form method="POST" action="{{ route('user.details.update', ['vendorid' => $vendor->id]) }}">
-                            @csrf
-                            @method('PUT')
-                            <div class="row mt-3">
-                                <div class="col-sm-6 col-12">
-                                    <label class="form-label">Given Name(s)</label>
-                                    <div>
-                                        <input type="text"
-                                            class="form-control @error('firstname') is-invalid @enderror"
-                                            name="firstname" value="{{ old('firstname', Auth::user()->firstname) }}"
-                                            placeholder="Enter first name">
-                                        @error('firstname')
-                                            <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-12">
-                                    <label class="form-label">Surname / Last Name</label>
-                                    <div>
-                                        <input type="text"
-                                            class="form-control @error('lastname') is-invalid @enderror" name="lastname"
-                                            value="{{ old('lastname', Auth::user()->lastname) }}"
-                                            placeholder="Enter last name">
-                                        @error('lastname')
-                                            <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mt-3">
-                                <div class="col-sm-6 col-12">
-                                    <label class="form-label">eMail / Username</label>
-                                    <div>
-                                        <input type="text" class="form-control" name="email"
-                                            value="{{ Auth::user()->email }}" placeholder="Enter email address"
-                                            disabled>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-12">
-                                    <label class="form-label">Contact Phone</label>
-                                    <div>
-                                        <input type="text"
-                                            class="form-control @error('contact_number') is-invalid @enderror"
-                                            name="contact_number"
-                                            value="{{ old('contact_number', Auth::user()->contact_number) }}"
-                                            placeholder="Enter Phone number">
-                                        @error('contact_number')
-                                            <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Add Account Btn Section -->
-                            {{-- <div class="row mt-3">
-                                <div class="col-12 text-end">
-                                    <a href="#" id="toggle-form" class="btn wine-btn">Add Account</a>
-                                </div>
-                            </div> --}}
-                            {{-- <div id="form-container">
-                                <form id="account-form" style="display: none;">
-                                    <div class="row mt-3">
-                                        <div class="col-sm-6 col-12">
-                                            <label class="form-label">Given Name(s)</label>
-                                            <input type="text" class="form-control" name="firstname"
-                                                value="{{ Auth::user()->firstname }}" placeholder="Enter first name">
-                                        </div>
-                                        <div class="col-sm-6 col-12">
-                                            <label class="form-label">Surname / Last Name</label>
-                                            <input type="text" class="form-control" name="lastname"
-                                                value="{{ Auth::user()->lastname }}" placeholder="Enter last name">
-                                        </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-sm-6 col-12">
-                                            <label class="form-label">Title</label>
-                                            <select name="title"
-                                                class="form-control @error('title') is-invalid @enderror">
-                                                <option value="Chief Executive Officer (CEO)"
-                                                    @if (old('title') == 'Chief Executive Officer (CEO)') selected @endif>Chief Executive
-                                                    Officer (CEO)</option>
-                                                <option value="President"
-                                                    @if (old('title') == 'President') selected @endif>President</option>
-                                                <option value="Chief Financial Officer"
-                                                    @if (old('title') == 'Chief Financial Officer') selected @endif>Chief Financial
-                                                    Officer</option>
-                                                <option value="Chief Information Officer"
-                                                    @if (old('title') == 'Chief Information Officer') selected @endif>Chief Information
-                                                    Officer</option>
-                                                <option value="Vice-President"
-                                                    @if (old('title') == 'Vice-President') selected @endif>Vice-President
-                                                </option>
-                                                <option value="Director"
-                                                    @if (old('title') == 'Director') selected @endif>Director</option>
-                                                <option value="Manager"
-                                                    @if (old('title') == 'Manager') selected @endif>Manager</option>
-                                                <option value="Chief Marketing Officer"
-                                                    @if (old('title') == 'Chief Marketing Officer') selected @endif>Chief Marketing
-                                                    Officer</option>
-                                                <option value="Chairman of the Board"
-                                                    @if (old('title') == 'Chairman of the Board') selected @endif>Chairman of the
-                                                    Board</option>
-                                                <option value="Admin Staff"
-                                                    @if (old('title') == 'Admin Staff') selected @endif>Admin Staff</option>
-                                            </select>
-                                            @error('title')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                        <div class="col-sm-6 col-12">
-                                            <label class="form-label">Position</label>
-                                            <input type="text" class="form-control" name="position"
-                                                placeholder="Enter Position">
-                                        </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-sm-6 col-12">
-                                            <label class="form-label">eMail / Username</label>
-                                            <input type="text" class="form-control" name="email"
-                                                value="{{ Auth::user()->email }}" placeholder="Enter email address">
-                                        </div>
-                                        <div class="col-sm-6 col-12">
-                                            <label class="form-label">Contact Phone</label>
-                                            <input type="text" class="form-control phone-number" name="contact_number"
-                                                value="{{ Auth::user()->contact_number }}"
-                                                placeholder="Enter Phone number">
-                                        </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-sm-6 col-12">
-                                            <label class="form-label">Password</label>
-                                            <input type="password" class="form-control" placeholder="Password">
-                                        </div>
-                                        <div class="col-sm-6 col-12">
-                                            <label class="form-label">Confirm Password</label>
-                                            <input type="password" class="form-control" placeholder="Confirm Password">
-                                        </div>
-                                    </div>
-                                    <!-- <div class="row mt-5">
-                                                <div class="col-sm-12 text-center">
-                                                    <button type="submit" class="btn wine-btn">Update</button>
-                                                </div>
-                                            </div>  -->
-                                </form>
-                            </div> --}}
-                            <!-- /Add Account Btn Section -->
-                            <div class="row mt-5">
-                                <div class="col-sm-12 text-center">
-                                    <button type="submit" class="btn wine-btn">Update</button>
-                                    {{-- <button type="button" id="delete-form" class="btn btn-danger">Delete</button> --}}
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @endif        
     </div>
     <div class="modal mediaGalleryModal fade" id="editMediaModal" tabindex="-1" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -1209,5 +961,39 @@
             if (!string) return ''; // Handle empty or null strings
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
+        $(document).ready(function() {
+            $('#region').on('change', function() {
+                var regionId = $(this).val(); // Get selected region ID
+                var subRegionSelect = $('#sub_region'); // Sub-region dropdown
+                subRegionSelect.empty(); // Clear the current options
+                subRegionSelect.append('<option value="">Loading...</option>'); // Show loading text
+
+                if (regionId) {
+                    $.ajax({
+                        url: '{{ route('get.subregions', ['regionId' => ':regionId']) }}' .replace(':regionId', regionId), // Adjust the URL to your route
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(data) {
+                            subRegionSelect.empty(); // Clear and load new options
+                            subRegionSelect.append(
+                                '<option value="">Please select a sub-region</option>');
+
+                            $.each(data, function(key, subRegion) {
+                                subRegionSelect.append('<option value="' + subRegion
+                                    .id + '">' + subRegion.name + '</option>');
+                            });
+                        },
+                        error: function() {
+                            subRegionSelect.empty();
+                            subRegionSelect.append(
+                                '<option value="">Failed to load sub-regions</option>');
+                        }
+                    });
+                } else {
+                    subRegionSelect.empty();
+                    subRegionSelect.append('<option value="">Please select a sub-region</option>');
+                }
+            });
+        });
     </script>
 @endsection

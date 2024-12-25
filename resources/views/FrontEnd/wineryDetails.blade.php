@@ -5,7 +5,6 @@
 @section('content')
 
     <style>
-
         .quantity-control {
 
             display: flex;
@@ -187,10 +186,11 @@
             grid-template-columns: 1fr 1fr;
 
         }
-
     </style>
 
-    @if (($user->date_of_birth && \Carbon\Carbon::parse($user->date_of_birth)->age >= 18) || Auth::guard('vendor')->check() == 1)
+    @if ((Auth::guard('customer')->check() == 1 &&
+        ($user->date_of_birth && \Carbon\Carbon::parse($user->date_of_birth)->age >= 18)) ||
+            Auth::guard('vendor')->check() == 1 || !Auth::check())
 
         <div class="container mt-5 frontend detail-page">
 
@@ -211,17 +211,13 @@
                                         <div class="property-gallery-main">
 
                                             @if ($vendor->mediaGallery->isNotEmpty())
-
                                                 @foreach ($vendor->mediaGallery as $media)
-
                                                     <div class="item">
 
                                                         <img src="{{ asset($media->vendor_media) }}">
 
                                                     </div>
-
                                                 @endforeach
-
                                             @endif
 
                                         </div>
@@ -235,17 +231,13 @@
                                         <div class="property-gallery-thumb">
 
                                             @if ($vendor->mediaGallery->isNotEmpty())
-
                                                 @foreach ($vendor->mediaGallery as $media)
-
                                                     <div class="item">
 
                                                         <img src="{{ asset($media->vendor_media) }}">
 
                                                     </div>
-
                                                 @endforeach
-
                                             @endif
 
                                         </div>
@@ -285,7 +277,6 @@
                                     {{ !empty($vendor->sub_regions->name) ? $vendor->sub_regions->name : '' }}</h2>
 
                                 <div class="rating-star theme-color mb-md-0 mb-3"
-
                                     data-rating="{{ $vendor->reviews->avg('rating') ?? 0.0 }}">
 
                                 </div>
@@ -295,7 +286,6 @@
                             <h3 class="card-title fs-5">{{ $vendor->vendor_name }}
 
                                 <span
-
                                     class="theme-color">[{{ !empty($vendor->sub_category->name) ? $vendor->sub_category->name : '' }}]</span>
 
                             </h3>
@@ -303,9 +293,7 @@
                             <p class="mb-1"><i class="fas fa-map-marker-alt theme-color"></i>
 
                                 @if ($vendor->hide_street_address == 0)
-
                                     <span>{{ $vendor->street_address }}</span><br>
-
                                 @endif
 
                                 <span class="mx-3">{{ $vendor->city }}, {{ $vendor->province }},
@@ -313,9 +301,7 @@
                                     {{ $vendor->postalCode }}<br> <span style="margin-left: 2rem !important;">
 
                                         @if ($vendor->country == 'CA')
-
                                             Canada
-
                                         @endif
 
                                     </span></span>
@@ -337,7 +323,6 @@
                             <div class="property-feature">
 
                                 <ul
-
                                     class="room-info-inner d-flex justify-content-between list-unstyled p-0 pt-3 gap-1 mb-2">
 
                                     <li class="fw-bold"><span class="theme-color"></span> Farming Practices</li>
@@ -351,11 +336,9 @@
                                 </ul>
 
                                 <ul
-
                                     class="room-info-inner d-flex justify-content-between list-unstyled p-0 border-top pt-2 gap-1">
 
                                     <li><span
-
                                             class="theme-color"></span>{{ $vendor->wineryMetadata->farmingPractices->name ?? '' }}
 
                                     </li>
@@ -373,7 +356,6 @@
 
 
                             @if ($vendor->experiences->isNotEmpty())
-
                                 <div class="border-top border-bottom py-5 mt-4">
 
                                     <h3 class="theme-color">Curated Experiences</h3>
@@ -387,19 +369,13 @@
                                         <ul class="nav nav-pills flex-sm-row flex-column" id="pills-tab" role="tablist">
 
                                             @foreach ($vendor->experiences as $key => $experience)
-
                                                 <li class="nav-item" role="presentation">
 
                                                     <button
-
                                                         class="nav-link w-100 text-capitalize @if ($key == 0) active @endif"
-
                                                         id="tab-{{ $key }}" data-bs-toggle="pill"
-
                                                         data-bs-target="#content-{{ $key }}" type="button"
-
                                                         role="tab" aria-controls="content-{{ $key }}"
-
                                                         aria-selected="{{ $key == 0 ? 'true' : 'false' }}">
 
                                                         Experience {{ $key + 1 }}
@@ -407,7 +383,6 @@
                                                     </button>
 
                                                 </li>
-
                                             @endforeach
 
                                         </ul>
@@ -421,11 +396,8 @@
                                         <div class="tab-content p-3" id="pills-tabContent">
 
                                             @foreach ($vendor->experiences as $key => $experience)
-
                                                 <div class="tab-pane fade @if ($key == 0) show active @endif"
-
                                                     id="content-{{ $key }}" role="tabpanel"
-
                                                     aria-labelledby="tab-{{ $key }}">
 
                                                     <div class="d-flex align-items-center justify-content-between mb-3">
@@ -443,7 +415,6 @@
                                                     <p>{{ $experience->description }}</p>
 
                                                 </div>
-
                                             @endforeach
 
                                         </div>
@@ -451,15 +422,11 @@
                                     </div>
 
                                 </div>
-
                             @endif
 
                             @if (
-
                                 !empty($vendor->accommodationMetadata->process_type) &&
-
                                     $vendor->accommodationMetadata->process_type != 'redirect-url')
-
                                 <form method="post" id="process_payment" action="{{ route('checkout.process') }}">
 
                                     @csrf
@@ -483,7 +450,6 @@
                                                 <label for="" class="form-label">Number In Travel Party</label>
 
                                                 <input type="text" name="number_travel_party" class="form-control"
-
                                                     placeholder="Number In Travel Party" id="Travelvalue">
 
                                             </div>
@@ -511,11 +477,8 @@
                                     </div>
 
                                     @if (Auth::check())
-
                                     @else
-
                                         <p class="mt-3 mb-0">You must be logged-in to initiate a booking</p>
-
                                     @endif
 
 
@@ -523,7 +486,6 @@
                                     <div class="col-lg-12 pt-2 scroll-offset" id="datepicker-container">
 
                                         <input type="text" class="form-control" name="datefilter" value=""
-
                                             style="opacity: 0; font-size: 0;" readonly />
 
                                     </div>
@@ -533,11 +495,9 @@
                                     <div class="form-check m-3">
 
                                         <input class="form-check-input" type="checkbox" value=""
-
                                             id="guest-registry">
 
                                         <label class="form-check-label" for="guest-registry"
-
                                             style="font-size: 15px; font-weight: 400; cursor: pointer;">
 
                                             My Guest Registry section is completed
@@ -549,29 +509,23 @@
                                     <div class="text-end">
 
                                         @if (Auth::check())
-
                                             <button type="button" class="btn book-btn" id="confirm_booking_btn">Process
 
                                                 Payment</button>
-
                                         @else
-
                                             <div class="d-flex align-items-center justify-content-end gap-3">
 
                                                 <!-- <p class="mb-0 fw-bold">You must be logged-in to initiate a booking</p> -->
 
                                                 <button type="button" class="btn book-btn" id="login_form_btn"
-
                                                     data-bs-toggle="modal" data-bs-target="#loginPopup">Login</button>
 
                                             </div>
-
                                         @endif
 
                                     </div>
 
                                 </form>
-
                             @endif
 
                         </div>
@@ -601,7 +555,6 @@
                                 <span class="fa-lg">Cuisine Type:</span>
 
                                 <strong
-
                                     class="fa-lg text-muted">{{ $cuisineNames ? ucwords($cuisineNames) : '' }}</strong>
 
                             </div>
@@ -611,7 +564,6 @@
                                 <span class="fa-lg">Tastings</span>
 
                                 <strong
-
                                     class="fa-lg text-muted">{{ !empty($vendor->wineryMetadata->tastingOptions->name) ? ucwords($vendor->wineryMetadata->tastingOptions->name) : '' }}</strong>
 
                             </div>
@@ -629,7 +581,6 @@
                                 <span class="fa-lg">Max Group Size:</span>
 
                                 <strong
-
                                     class="fa-lg text-muted">{{ !empty($vendor->wineryMetadata->maxGroup->name) ? strtolower($vendor->wineryMetadata->maxGroup->name) : '' }}</strong>
 
                             </div>
@@ -637,13 +588,11 @@
                         </div>
 
                         @if ($vendor->policy != '')
-
                             <h5 class="mt-5">Refund Policy</h5>
 
                             <p class="text-capitalize mb-0">{{ $vendor->policy }}</p>
 
                             @if ($vendor->policy == 'partial')
-
                                 <p>A full refund minus transaction fees will be issued upon request up to 7 days prior to
 
                                     the
@@ -657,23 +606,17 @@
                                     at
 
                                     the vendor’s discretion.</p>
-
                             @elseif($vendor->policy == 'open')
-
                                 <p>A full refund minus transaction fees will be issued upon request up to 24 hours prior to
 
                                     the
 
                                     check-in date indicated.</p>
-
                             @else
-
                                 <p>All bookings are final. No portion of your transaction will be refunded. A credit or rain
 
                                     cheque may be issued by the subject vendor at the vendor’s discretion.</p>
-
                             @endif
-
                         @endif
 
                     </div>
@@ -695,11 +638,8 @@
                                     <div class="col-6">
 
                                         @if (count($amenities) > 0)
-
                                             @foreach ($amenities as $key => $amenity)
-
                                                 @if ($key < 8)
-
                                                     <!-- Display only the first 7 amenities -->
 
                                                     <p class="my-4 d-flex align-items-center gap-3">
@@ -709,21 +649,16 @@
                                                         {{ $amenity->amenity_name }}
 
                                                     </p>
-
                                                 @endif
 
                                                 @if ($key == 3)
-
                                                     <!-- Split into two columns after 4 items -->
 
                                     </div>
 
                                     <div class="col-6">
-
                     @endif
-
     @endforeach
-
     @endif
 
     </div>
@@ -733,7 +668,6 @@
 
 
     @if (count($amenities) > 8)
-
         <!-- Display "See All" button if there are more than 8 amenities -->
 
         <div class="text-center pt-3">
@@ -743,7 +677,6 @@
                 All</button>
 
         </div>
-
     @endif
 
     </div>
@@ -753,19 +686,12 @@
     @endif
 
     @if (
-
         !empty($socialLinks->facebook) ||
-
             !empty($socialLinks->twitter) ||
-
             !empty($socialLinks->instagram) ||
-
             !empty($socialLinks->linkedin) ||
-
             !empty($socialLinks->youtube) ||
-
             !empty($socialLinks->tiktok))
-
         <div class="p-3 mt-xxl-5 mt-4 shadow rounded-4 bg-white border-0">
 
             <div class="card-header bg-white border-0 pb-0">
@@ -777,79 +703,66 @@
             <div class="card-body">
 
                 @if (!empty($socialLinks->facebook))
-
                     <a href="{{ $socialLinks->facebook }}" class="btn p-0 btn-social-icon">
 
                         <img src="{{ asset('images/FrontEnd/facebook.png') }}" height="30" alt="Facebook">
 
                     </a>
-
                 @endif
 
 
 
                 @if (!empty($socialLinks->twitter))
-
                     <a href="{{ $socialLinks->twitter }}" class="btn p-0 btn-social-icon">
 
                         <img src="{{ asset('images/FrontEnd/twitter.png') }}" height="30" alt="Twitter">
 
                     </a>
-
                 @endif
 
 
 
                 @if (!empty($socialLinks->instagram))
-
                     <a href="{{ $socialLinks->instagram }}" class="btn p-0 btn-social-icon">
 
                         <img src="{{ asset('images/FrontEnd/instagram.png') }}" height="30" alt="Instagram">
 
                     </a>
-
                 @endif
 
 
 
                 @if (!empty($socialLinks->linkedin))
-
                     <a href="{{ $socialLinks->linkedin }}" class="btn p-0 btn-social-icon">
 
                         <img src="{{ asset('images/FrontEnd/linkedin.png') }}" height="30" alt="LinkedIn">
 
                     </a>
-
                 @endif
 
 
 
                 @if (!empty($socialLinks->youtube))
-
                     <a href="{{ $socialLinks->youtube }}" class="btn p-0 btn-social-icon">
 
                         <img src="{{ asset('images/FrontEnd/youtube.png') }}" height="30" alt="YouTube">
 
                     </a>
-
                 @endif
 
 
 
                 @if (!empty($socialLinks->tiktok))
-
                     <a href="{{ $socialLinks->tiktok }}" class="btn p-0 btn-social-icon">
 
                         <img src="{{ asset('images/FrontEnd/tiktok.png') }}" height="30" alt="TikTok">
 
                     </a>
-
                 @endif
 
             </div>
 
         </div>
-
     @endif
 
     </div>
@@ -861,7 +774,6 @@
 
 
     @if (count($wines) > 0)
-
         <div class="wine-slider-outer mt-sm-0 mt-5 mb-5">
 
             <div class="container">
@@ -875,7 +787,6 @@
                 <div class="wine-slider-wrapper">
 
                     @foreach ($wines as $wine)
-
                         <div class="wine-item p-3">
 
                             <div class="wine-thumbnail text-center">
@@ -883,17 +794,11 @@
                                 <a href="javascript:void(0);" tabindex="0">
 
                                     @if ($wine->image)
-
                                         <img src="{{ asset('storage/' . $wine->image) }}" class="img-fluid"
-
                                             alt="{{ $wine->series ?? '' }}">
-
                                     @else
-
                                         <img src="{{ asset('images/vendorbydefault.png') }}" class="img-fluid"
-
                                             alt="{{ $wine->series ?? '' }}">
-
                                     @endif
 
                                 </a>
@@ -903,7 +808,6 @@
                             <div class="wine-info text-center mt-3">
 
                                 <h5 class="fw-bold mb-1"><a
-
                                         href="javascript:void(0);">{{ $wine->series ?? '' }}({{ $wine->vintage_date ?? '' }})</a>
 
                                 </h5>
@@ -913,7 +817,6 @@
                             </div>
 
                         </div>
-
                     @endforeach
 
                 </div>
@@ -921,7 +824,6 @@
             </div>
 
         </div>
-
     @endif
 
     <div class="container mb-5 mt-lg-0 mt-5 frontend">
@@ -939,9 +841,7 @@
         <div class="row">
 
             @if ($vendor->reviews->isNotEmpty())
-
                 @foreach ($vendor->reviews as $review)
-
                     <div class="col-md-4 pb-4">
 
                         <div class="card guest-testi">
@@ -950,19 +850,17 @@
 
                                 <div class="d-flex align-items-center mb-3 gap-3">
 
-                                    <img src="{{ $review->user->profile_image ? asset('images/UserProfile/' . $review->user->profile_image) : asset('images/UserProfile/default-profile.png') }}"
-
+                                    <img src="{{ !empty($review->customer->profile_image) ? asset('images/UserProfile/' . $review->customer->profile_image) : asset('images/UserProfile/default-profile.png') }}"
                                         alt="User Image" style="height:60px; width:60px;" class="rounded-circle mr-3">
 
                                     <div>
 
-                                        <h5 class="card-title mb-2">{{ $review->user->firstname }}
+                                        <h5 class="card-title mb-2">{{ $review->customer->firstname ?? '' }}
 
-                                            {{ $review->user->lastname }}</h5>
+                                            {{ $review->customer->lastname ?? '' }}</h5>
 
-                                        <h6 class="card-subtitle text-muted ">{{ $review->user->city }},
-
-                                            {{ $review->user->state }}</h6>
+                                        <h6 class="card-subtitle text-muted ">
+                                            {{ $review->customer->city ?? '' }},{{ $review->customer->state ?? '' }}</h6>
 
                                         <div class="rating-star theme-color" data-rating="{{ $review->rating ?? 0.0 }}">
 
@@ -983,13 +881,9 @@
                         </div>
 
                     </div>
-
                 @endforeach
-
             @else
-
-                    <p>No review has added</p>
-
+                <p>No review has added</p>
             @endif
 
         </div>
@@ -1015,7 +909,6 @@
                     </div>
 
                     <button type="button" class="btn-close border rounded-circle" data-bs-dismiss="modal"
-
                         aria-label="Close">x</button>
 
                 </div>
@@ -1033,13 +926,10 @@
                                 <h6 class="fw-bold">Basic</h6>
 
                                 @if (count($amenities) > 0)
-
                                     <ul class="list-unstyled">
 
                                         @foreach ($amenities as $key => $amenity)
-
                                             @if ($amenity->amenity_type == 'Basic')
-
                                                 <li class="d-flex align-items-center gap-3 py-2 border-bottom">
 
                                                     <i class="{{ $amenity->amenity_icons }} theme-color"></i>
@@ -1047,13 +937,10 @@
                                                     {{ $amenity->amenity_name }}
 
                                                 </li>
-
                                             @endif
-
                                         @endforeach
 
                                     </ul>
-
                                 @endif
 
                             </div>
@@ -1063,13 +950,10 @@
                                 <h6 class="fw-bold">Premium</h6>
 
                                 @if (count($amenities) > 0)
-
                                     <ul class="list-unstyled">
 
                                         @foreach ($amenities as $key => $amenity)
-
                                             @if ($amenity->amenity_type == 'Premium')
-
                                                 <li class="d-flex align-items-center gap-3 py-2 border-bottom">
 
                                                     <i class="{{ $amenity->amenity_icons }} theme-color"></i>
@@ -1077,19 +961,14 @@
                                                     {{ $amenity->amenity_name }}
 
                                                 </li>
-
                                             @endif
-
                                         @endforeach
 
                                     </ul>
-
                                 @endif
 
                             </div>
-
                         @else
-
                             <p>No amenities available</p>
 
                         @endif
@@ -1115,7 +994,6 @@
                     <h5 class="modal-title" id="exampleModalLabel">Availability</h5>
 
                     <button type="button" class="btn-close  border rounded-circle" data-bs-dismiss="modal"
-
                         aria-label="Close">x</button>
 
                 </div>
@@ -1154,39 +1032,39 @@
 
                                         <!-- <tr>
 
-                                                                                                                                                                                                        <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
+                                                                                                                                                                                                                    <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
 
-                                                                                                                                                                                                        <td>Standard</td>
+                                                                                                                                                                                                                    <td>Standard</td>
 
-                                                                                                                                                                                                        <td class="room-avail">Available</td>
+                                                                                                                                                                                                                    <td class="room-avail">Available</td>
 
-                                                                                                                                                                                                        <td>
+                                                                                                                                                                                                                    <td>
 
-                                                                                                                                                                                                            <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+                                                                                                                                                                                                                        <span class="room-price d-block fw-bold mb-2">$499/per night</span>
 
-                                                                                                                                                                                                            <button class="btn">Select Room</button>
+                                                                                                                                                                                                                        <button class="btn">Select Room</button>
 
-                                                                                                                                                                                                        </td>
+                                                                                                                                                                                                                    </td>
 
-                                                                                                                                                                                                    </tr>
+                                                                                                                                                                                                                </tr>
 
-                                                                                                                                                                                                    <tr>
+                                                                                                                                                                                                                <tr>
 
-                                                                                                                                                                                                    <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
+                                                                                                                                                                                                                <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
 
-                                                                                                                                                                                                        <td>Standard</td>
+                                                                                                                                                                                                                    <td>Standard</td>
 
-                                                                                                                                                                                                        <td class="room-not-avail">Not Available</td>
+                                                                                                                                                                                                                    <td class="room-not-avail">Not Available</td>
 
-                                                                                                                                                                                                        <td>
+                                                                                                                                                                                                                    <td>
 
-                                                                                                                                                                                                            <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+                                                                                                                                                                                                                        <span class="room-price d-block fw-bold mb-2">$499/per night</span>
 
-                                                                                                                                                                                                            <button class="btn">Select Room</button>
+                                                                                                                                                                                                                        <button class="btn">Select Room</button>
 
-                                                                                                                                                                                                        </td>
+                                                                                                                                                                                                                    </td>
 
-                                                                                                                                                                                                    </tr> -->
+                                                                                                                                                                                                                </tr> -->
 
                                     </tbody>
 
@@ -1237,9 +1115,7 @@
                         <div class="form-field mb-2 position-relative">
 
                             <input type="email" id="email" class="form-control"
-
                                 @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required
-
                                 autocomplete="email" autofocus placeholder="Enter your Email address">
 
                             <i class="fa-solid fa-envelope"></i>
@@ -1249,13 +1125,11 @@
                         <div>
 
                             @error('email')
-
                                 <span class="invalid-feedback" role="alert">
 
                                     <strong>{{ $message }}</strong>
 
                                 </span>
-
                             @enderror
 
                         </div>
@@ -1263,11 +1137,8 @@
                         <div class="form-field mb-2 position-relative">
 
                             <input id="password" type="password"
-
                                 class="form-control left-with-icon gpassword @error('password') is-invalid @enderror"
-
                                 name="password" required autocomplete="current-password"
-
                                 placeholder="Enter your current password">
 
                             <i class="fa-solid fa-unlock"></i>
@@ -1277,13 +1148,11 @@
                         <div>
 
                             @error('password')
-
                                 <span class="invalid-feedback" role="alert">
 
                                     <strong>{{ $message }}</strong>
 
                                 </span>
-
                             @enderror
 
                         </div>
@@ -1303,13 +1172,11 @@
                             </div>
 
                             @if (Route::has('password.request'))
-
                                 <a class="f-15 text-decoration-none" href="{{ route('password.request') }}">
 
                                     {{ __('Forgot Password?') }}
 
                                 </a>
-
                             @endif
 
                         </div>
@@ -1321,7 +1188,6 @@
                             <p class="my-3">OR</p>
 
                             <p class="f-15">Join Our <a href="{{ route('register') }}"
-
                                     class="text-decoration-none theme-color">Guest
 
                                     Rewards</a> Program</p>
@@ -1340,7 +1206,6 @@
 
     <!-- /Login Popup -->
 @else
-
     <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
 
         <div class="text-center">
@@ -1370,9 +1235,7 @@
 
 
 @section('js')
-
     <script>
-
         $('.wine-slider-wrapper').slick({
 
             dots: false,
@@ -1430,11 +1293,9 @@
             ]
 
         });
-
     </script>
 
     <script>
-
         $(document).ready(function() {
 
 
@@ -2154,11 +2015,9 @@
             }
 
         });
-
     </script>
 
     <script>
-
         $(document).ready(function() {
 
             $('#loginForm').on('submit', function(e) {
@@ -2220,13 +2079,11 @@
             });
 
         });
-
     </script>
 
 
 
     <script>
-
         const $left = $(".left");
 
         const $gl = $(".property-gallery-main");
@@ -2388,7 +2245,6 @@
             $('[data-toggle="tooltip"]').tooltip();
 
         });
-
     </script>
 
 
@@ -2396,7 +2252,6 @@
     <!-- Calender Target on Click of Check Avail Btn -->
 
     <script>
-
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
             anchor.addEventListener("click", function(e) {
@@ -2420,8 +2275,5 @@
             });
 
         });
-
     </script>
-
 @endsection
-

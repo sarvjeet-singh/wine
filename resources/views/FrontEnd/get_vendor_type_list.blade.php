@@ -36,7 +36,7 @@
         @endif
         <div class="col-lg-6">
             <div
-                class="property-box {{ strtolower($vendor->vendor_type) == 'winery' ? 'wine' : '' }} {{ strtolower($vendor->vendor_type) == 'accommodation' || strtolower($vendor->vendor_type) == 'excursion' ? 'accommodation' : '' }}  {{ $vendor->account_status == '2' || $vendor->account_status == '1' ? 'has-after' : '' }}">
+                class="property-box {{ strtolower($vendor->vendor_type) == 'winery' ? 'wine' : 'accommodation' }} {{ $vendor->account_status == '2' || $vendor->account_status == '1' ? 'has-after' : '' }}">
                 <div class="property-slider">
                     @if ($vendor->mediaGallery->isNotEmpty() && $vendor->account_status == 1)
                         @foreach ($vendor->mediaGallery as $media)
@@ -85,12 +85,15 @@
                     @if ($vendor->account_status == '1')
                         @php
                             $urll = '';
-                            if (strtolower($vendor->vendor_type) == 'accommodation') {
-                                $urll = route('accommodation-details', ['vendorslug' => $vendor->vendor_slug]);
-                            } elseif (strtolower($vendor->vendor_type) == 'winery') {
-                                $urll = route('winery-details', ['vendorslug' => $vendor->vendor_slug]);
-                            } elseif (strtolower($vendor->vendor_type) == 'excursion') {
-                                $urll = route('excursion-details', ['vendorslug' => $vendor->vendor_slug]);
+                            // if (strtolower($vendor->vendor_type) == 'accommodation') {
+                            //     $urll = route('accommodation-details', ['vendorslug' => $vendor->vendor_slug]);
+                            // } elseif (strtolower($vendor->vendor_type) == 'winery') {
+                            //     $urll = route('winery-details', ['vendorslug' => $vendor->vendor_slug]);
+                            // } elseif (strtolower($vendor->vendor_type) == 'excursion') {
+                            //     $urll = route('excursion-details', ['vendorslug' => $vendor->vendor_slug]);
+                            // }
+                            if ($vendor->account_status == '1') {
+                                $urll = route('vendor.detailsShortCode', $vendor->short_code);
                             }
                         @endphp
                         <a href="{{ $urll }}" class="fw-bold">{{ $vendor->vendor_name }}
@@ -219,20 +222,27 @@
                 @else --}}
                     @if (!Auth::guard('vendor')->check())
                         @if ($vendor->account_status == '1')
-                            <a href="{{ $urll }}" class="text-decoration-none text-white btn book-btn book-now-btn">Book
-                                Now</a>
+                            {{-- <a href="{{ !Auth::guard('customer')->check() ? route('check-login', 'book-now') : $urll }}"
+                                class="text-decoration-none text-white btn book-btn book-now-btn">Book Now</a> --}}
+                            <a href="{{ $urll }}"
+                                class="text-decoration-none text-white btn book-btn book-now-btn">Book Now</a>
                         @else
-                            <button class="btn book-btn vendorinqurey text-white" data-id="{{ $vendor->id }}">
-                                Inquiry
-                            </button>
+                            @if (strtolower($vendor->vendor_type) == 'accommodation' ||
+                                    strtolower($vendor->vendor_type) == 'winery' ||
+                                    strtolower($vendor->vendor_type) == 'excursion')
+                                @if (Auth::guard('customer')->check())
+                                    <button class="btn book-btn vendorinqurey text-white"
+                                        data-id="{{ $vendor->id }}">
+                                        Inquiry
+                                    </button>
+                                @else
+                                    <a class="text-decoration-none text-white btn book-btn"
+                                        href="{{ route('check-login', 'vendor-inquiry') }}">Inquiry</a>
+                                @endif
+                            @endif
                         @endif
-                        @if (!Auth::guard('customer')->check())
-                            <a href="{{ route('check-login') }}"
-                                class="text-decoration-none text-white btn book-btn">Review</a>
-                        @else
-                            <a href="{{ route('user-review-submit') }}"
-                                class="text-decoration-none text-white btn book-btn">Review</a>
-                        @endif
+                        <a href="{{ !Auth::guard('customer')->check() ? route('check-login', 'review') : route('user-review-submit') }}"
+                            class="text-decoration-none text-white btn book-btn">Review</a>
                     @else
                         @if ($vendor->account_status == '1')
                             <a href="{{ $urll }}" class="text-decoration-none text-white btn book-btn">View
