@@ -74,8 +74,6 @@
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
         // Initialize form validation
@@ -107,23 +105,11 @@
                         $('#saveSocialMediaForm').prop('disabled', true).text('Updating...');
                     },
                     success: function(response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: 'Details updated successfully!',
-                            confirmButtonText: 'OK',
-                        }).then(() => {
-                            // Optional: Perform any additional action after the alert
-                        });
+                        showToast("Success", "Details updated successfully!.", "success");
                         $('#saveSocialMediaForm').prop('disabled', false).text('Update');
                     },
                     error: function(xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'An error occurred. Please try again.',
-                            confirmButtonText: 'Retry',
-                        });
+                        showToast("Error", "An error occurred. Please try again.", "error");
                         $('#saveSocialMediaForm').prop('disabled', false).text('Update');
                     }
                 });

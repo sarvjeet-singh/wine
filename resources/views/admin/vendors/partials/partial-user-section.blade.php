@@ -10,11 +10,11 @@
         <div class="row g-4">
             <div class="col-md-6">
                 <div>
-                    <label for="" class="form-label fw-bold">eMail Address</label>
-                    <input type="email" class="form-control @error('email') is-invalid @enderror" name="email"
-                        id="email" placeholder="eMail Address"
-                        value="{{ old('email', $vendor->user->email ?? '') }}"
-                        {{ !empty($vendor->user_id) ? '' : '' }}>
+                    <label for="" class="form-label fw-bold">eMail Address <small>(Email sent on
+                            {{ !empty($vendor->email_sent_at) ? \Carbon\Carbon::parse($vendor->email_sent_at)->format('M d, Y H:i A') : 'N/A' }})</small></label>
+                    <input type="email" autocomplete="off" class="form-control @error('email') is-invalid @enderror"
+                        name="email" id="email" placeholder="eMail Address"
+                        value="{{ old('email', $vendor->user->email ?? '') }}" {{ !empty($vendor->user_id) ? '' : '' }}>
                     @error('email')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -54,6 +54,13 @@
                     @error('vendor_last_name')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div>
+                    <label for="" class="form-label fw-bold">Custom Password</small></label>
+                    <input type="password" autocomplete="off" class="form-control" name="custom_password"
+                        id="custom_password" placeholder="Enter password">
                 </div>
             </div>
         </div>

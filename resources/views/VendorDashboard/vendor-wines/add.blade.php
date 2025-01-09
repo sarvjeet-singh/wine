@@ -147,14 +147,14 @@
 
         <div class="col-md-6">
 
-            <label for="" class="form-label">Alcohol By Volume</label>
+            <label for="abv" class="form-label">Alcohol By Volume</label>
 
             <!-- <input type="number" class="form-control" step="0.01" min="0" max="100" name="abv_rs"
 
                 id="abv_rs"> -->
 
             <div class="input-group">
-                <input type="text" class="form-control percent" name="abv" id="abv">
+                <input type="number" class="form-control" name="abv" id="abv">
                 <span class="input-group-text">%</span>
             </div>
 

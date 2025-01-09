@@ -172,19 +172,19 @@
 
                                                                     switch ($residualSugar) {
                                                                         case '0-1':
-                                                                            echo '0 - 1 g/l (Bone Dry)';
+                                                                            echo $wine->rs_value .' g/l (Bone Dry)';
                                                                             break;
                                                                         case '1-9':
-                                                                            echo '1 - 9 g/l (Dry)';
+                                                                            echo $wine->rs_value .' g/l (Dry)';
                                                                             break;
                                                                         case '10-49':
-                                                                            echo '10 - 49 g/l (Off Dry)';
+                                                                            echo $wine->rs_value .' g/l (Off Dry)';
                                                                             break;
                                                                         case '50-120':
-                                                                            echo '50 - 120 g/l (Semi-Sweet)';
+                                                                            echo $wine->rs_value .' g/l (Semi-Sweet)';
                                                                             break;
                                                                         case '120+':
-                                                                            echo '120+ g/l (Sweet)';
+                                                                            echo $wine->rs_value .' g/l (Sweet)';
                                                                             break;
                                                                         default:
                                                                             echo '';
@@ -193,21 +193,7 @@
                                                     </tr>
                                                     <tr>
                                                         <th><span class="theme-color fw-bold">Blend:</span></th>
-                                                        @php
-                                                            // Map select option values to varietal types
-                                                            $varietalTypes = [
-                                                                1 => 'Varietal',
-                                                                2 => 'Riesling',
-                                                                3 => 'Chardonnay',
-                                                                4 => 'Gewürztraminer',
-                                                                5 => 'Merlot',
-                                                                6 => 'Gamay Noir',
-                                                                7 => 'Pinot Noir',
-                                                                8 => 'Cabernet Franc',
-                                                                9 => 'Cabernet Sauvignon',
-                                                            ];
-                                                        @endphp
-
+                                                        
                                                         <td>
                                                             @if ($wine->varietal_blend)
                                                                 @php
@@ -220,7 +206,7 @@
                                                                         <div>
                                                                             {{-- Display blend percentage and mapped varietal type --}}
                                                                             <span>{{ $varietal->blend ?? 'N/A' }}%</span> -
-                                                                            <span>{{ $varietalTypes[$varietal->type] ?? 'Unknown Type' }}</span>
+                                                                            <span>{{ getGrapeVarietalsById($varietal->type) ?? 'Unknown Type' }}</span>
                                                                         </div>
                                                                     @endforeach
                                                                 @else

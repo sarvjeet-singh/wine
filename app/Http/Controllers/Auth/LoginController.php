@@ -45,15 +45,14 @@ class LoginController extends Controller
 
     // public function login(Request $request)
     // {
-    //     // Check if there's an error message to be flashed
-    //     if ($request->has('error_message')) {
-    //         session()->flash('error', $request->input('error_message'));
-    //     }
-
-    //     // Your login logic here (authenticating the user)
-
-    //     return view('auth.login');
+    //     echo 'here'; die;
+    //     redirect()->route('customer.login');
     // }
+
+    public function login(Request $request)
+    {
+        return redirect()->route('customer.login');
+    }
 
     protected function authenticated(Request $request, $user)
     {

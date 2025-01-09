@@ -10,7 +10,7 @@
 
             </div>
             <div class="col-sm-6 login-register-right-section">
-                <div class="login-register-mobile-version">
+            <div class="login-register-mobile-version">
                     <h2>{{ __('Login') }}</h2>
                     @if (session('success'))
                         <div class="alert alert-success">

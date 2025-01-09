@@ -453,7 +453,20 @@
             data: formData,
             success: function(response) {
                 if (response.status == "success") {
-                    window.location.reload();
+                    // window.location.reload();
+                    showToast("Success", response.message ||
+                        "The media has been uploaded successfully.", "success");
+                    $button.prop('disabled', false);
+                    $btnText.show(); // Show the button text in case of error
+                    $loader.hide(); // Hide the loader if error occurs
+                    $(".mediaGalleryModal").modal('hide');
+                    const url = $(
+                            `.nav-link[aria-controls="tab-pane-media-gallery"]`)
+                        .data(
+                            'url');
+                    if (url) {
+                        loadTabContent(url, `#myTabContent`);
+                    }
 
                     var galleryHtml =
                         `<div class="box-gallary-images-column">
@@ -514,32 +527,35 @@
                     },
                     success: function(response) {
                         if (response.status === "success") {
-                            Swal.fire(
-                                'Deleted!',
-                                'The media has been deleted successfully.',
-                                'success'
-                            ).then(() => {
-                                window.location
-                                    .reload(); // Reload after showing success
-                            });
+                            // Swal.fire(
+                            //     'Deleted!',
+                            //     'The media has been deleted successfully.',
+                            //     'success'
+                            // ).then(() => {
+                            //     window.location
+                            //         .reload(); // Reload after showing success
+                            // });
+                            showToast("Success", response.message ||
+                                "The media has been deleted successfully.", "success");
+                            const url = $(
+                                    `.nav-link[aria-controls="tab-pane-media-gallery"]`)
+                                .data(
+                                    'url');
+                            if (url) {
+                                loadTabContent(url, `#myTabContent`);
+                            }
                         } else {
-                            Swal.fire(
-                                'Error!',
-                                response.message || 'An unexpected error occurred.',
-                                'error'
-                            );
+                            showToast("Error", response.message ||
+                                "An error occurred while deleting the media.", "error");
                         }
                     },
                     error: function(xhr, status, error) {
                         // Handle any errors
-                        Swal.fire(
-                            'Error!',
-                            xhr.responseJSON.message ||
+                        showToast("Error", xhr.responseJSON.message ||
                             'An error occurred while deleting the media. Please try again.',
-                            'error'
-                        );
+                            "error");
                         $('.upload-image-youtube-button').prop('disabled', false);
-                        console.error(xhr.responseText);
+                        // console.error(xhr.responseText);
                     }
                 });
             }
@@ -572,30 +588,29 @@
                     },
                     success: function(response) {
                         if (response.status === "success") {
-                            Swal.fire(
-                                'Success!',
+                            showToast("Success", response.message ||
                                 'The media has been set as the default image.',
-                                'success'
-                            ).then(() => {
-                                window.location
-                                    .reload(); // Reload after setting default
-                            });
+                                "success");
+                            const url = $(
+                                    `.nav-link[aria-controls="tab-pane-media-gallery"]`)
+                                .data(
+                                    'url');
+                            if (url) {
+                                loadTabContent(url, `#myTabContent`);
+                            }
                         } else {
-                            Swal.fire(
-                                'Error!',
-                                response.message || 'An unexpected error occurred.',
-                                'error'
-                            );
+                            showToast("Error", response.message ||
+                                'An error occurred while setting the default media.',
+                                "error");
                         }
+
                     },
                     error: function(xhr, status, error) {
                         // Handle any errors
-                        Swal.fire(
-                            'Error!',
+                        showToast("Error", xhr.responseJSON.message ||
                             'An error occurred while setting the default media. Please try again.',
-                            'error'
-                        );
-                        console.error(xhr.responseText);
+                            "error");
+                        // console.error(xhr.responseText);
                     }
                 });
             }

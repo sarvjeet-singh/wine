@@ -14,6 +14,12 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('email:weekly-registered-users')->weeklyOn(1, '8:00'); // Every Monday at 8 AM
+        $schedule->command('subscriptions:check-expired')->dailyAt('00:00');
+        $schedule->command('customers:delete-unverified')->dailyAt('00:00');
+        $schedule->command('email:test')->dailyAt('00:00');
+        // $schedule->call(function () {
+        //     \Log::info('Cron is running correctly.');
+        // })->everyMinute();
     }
 
     /**

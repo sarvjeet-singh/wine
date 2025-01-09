@@ -526,7 +526,7 @@
 
                                         <p class="fw-bold mb-0">Current Status</p>
 
-                                        <select class="update-status form-select" data-id="{{ $order->id }}"
+                                        <select @if ($order->status == 'completed') disabled @endif class="update-status form-select" data-id="{{ $order->id }}"
 
                                             style="width: auto;">
 

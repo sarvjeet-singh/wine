@@ -1,6 +1,31 @@
 @extends('admin.layouts.app')
 @section('content')
+    <link rel="stylesheet" href="{{ asset('asset/css/select2.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css" />
+    <link rel="stylesheet" href="{{ asset('asset/admin/css/jquery-ui.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('asset/admin/css/jquery-ui-timepicker-addon.min.css') }}">
     <style>
+        .box-gallary-7-images-row {
+            grid-column-gap: 6px;
+            grid-row-gap: 4px;
+            grid-template-rows: auto auto;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            grid-auto-columns: 1fr;
+            display: grid;
+            text-align: center;
+        }
+
+        .box-gallary-images-column {
+            margin: 0px 4px 20px 0px;
+            width: 100%;
+        }
+
+        .box-gallary-7-images {
+            cursor: pointer;
+            height: 135px;
+            width: 135px;
+        }
+
         #myTab {
             overflow-x: scroll;
             /* Enable horizontal scroll */
@@ -131,10 +156,11 @@
                         <div>
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb mb-0">
-                                    <li class="breadcrumb-item"><a href="#"
-                                            class="text-decoration-none text-black">User
+                                    <li class="breadcrumb-item"><a href="{{ route('admin.vendors') }}"
+                                            class="text-decoration-none text-black">Vendor
                                             Management</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Listing</li>
+                                    <li class="breadcrumb-item active" aria-current="page">
+                                        {{ $vendor->vendor_name ?? 'Vendor' }}</li>
                                 </ol>
                             </nav>
                         </div>
@@ -152,10 +178,20 @@
                                         data-url="{{ route('admin.vendor.details.ajax-view', $vendor->id) }}">View</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="tab-system-admin" data-bs-toggle="tab"
+                                        data-bs-target="#tab-pane-system-admin" type="button" role="tab"
+                                        aria-controls="tab-pane-system-admin"
+                                        data-url="{{ route('admin.vendor.details.ajax-system-admin', $vendor->id) }}"
+                                        aria-selected="false">System Admin</button>
+                                </li>
+                                @if(strtolower($vendor->vendor_type) == 'winery')
+                                <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="tab-wine-listing" data-bs-toggle="tab"
                                         data-bs-target="#tab-pane-wine-listing" type="button" role="tab"
+                                        data-url="{{ route('admin.vendor.details.ajax-wines', $vendor->id) }}"
                                         aria-controls="tab-pane-wine-listing" aria-selected="false">Wine Listing</button>
                                 </li>
+                                @endif
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="tab-vendor-detail" data-bs-toggle="tab"
                                         data-bs-target="#tab-pane-vendor-detail" type="button" role="tab"
@@ -170,6 +206,7 @@
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="tab-booking-utility" data-bs-toggle="tab"
                                         data-bs-target="#tab-pane-booking-utility" type="button" role="tab"
+                                        data-url="{{ route('admin.vendor.details.ajax-booking-utility', $vendor->id) }}"
                                         aria-controls="tab-pane-booking-utility" aria-selected="false">Booking
                                         Utility</button>
                                 </li>
@@ -187,19 +224,22 @@
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="tab-booking-inquiries" data-bs-toggle="tab"
                                         data-bs-target="#tab-pane-booking-inquiries" type="button" role="tab"
+                                        data-url="{{ route('admin.vendor.details.ajax-inquiries', $vendor->id) }}"
                                         aria-controls="tab-pane-booking-inquiries" aria-selected="false">Booking
                                         Inquiries</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="tab-booking-transaction" data-bs-toggle="tab"
                                         data-bs-target="#tab-pane-booking-transaction" type="button" role="tab"
+                                        data-url="{{ route('admin.vendor.details.ajax-transactions', $vendor->id) }}"
                                         aria-controls="tab-pane-booking-transaction" aria-selected="false">Booking
                                         Transaction</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="tab-amenties" data-bs-toggle="tab"
                                         data-bs-target="#tab-pane-amenties" type="button" role="tab"
-                                        aria-controls="tab-pane-amenties" aria-selected="false">Amenties</button>
+                                        data-url="{{ route('admin.vendor.details.ajax-amenities', $vendor->id) }}"
+                                        aria-controls="tab-pane-amenties" aria-selected="false">Amenities</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="tab-curated-exp" data-bs-toggle="tab"
@@ -209,13 +249,9 @@
                                         aria-selected="false">Curated Experience</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="tab-system-admin" data-bs-toggle="tab"
-                                        data-bs-target="#tab-pane-system-admin" type="button" role="tab"
-                                        aria-controls="tab-pane-system-admin" aria-selected="false">System Admin</button>
-                                </li>
-                                <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="tab-setting" data-bs-toggle="tab"
                                         data-bs-target="#tab-pane-setting" type="button" role="tab"
+                                        data-url="{{ route('admin.vendor.details.ajax-settings', $vendor->id) }}"
                                         aria-controls="tab-pane-setting" aria-selected="false">Settings</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
@@ -261,6 +297,9 @@
     </div>
 @endsection
 @push('js')
+    <script src="{{ asset('asset/admin/js/jquery-ui.min.js') }}"></script>
+    <script src="{{ asset('asset/admin/js/jquery-ui-timepicker-addon.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
     <script>
         function loadTabContent(url, targetPane) {
             // Show Facebook-style skeleton loader
@@ -295,12 +334,6 @@
 
                 if (url) {
                     loadTabContent(url, targetPane);
-
-                    // Update browser history
-                    // const state = {
-                    //     paneId: paneId
-                    // };
-                    // history.pushState(state, null, url);
                 }
             });
 
@@ -347,18 +380,15 @@
             // Function to check the overflow and hide arrows accordingly
             function checkArrowVisibility() {
                 var scrollLeft = $('#myTab').scrollLeft();
-                console.log($('#myTab').scrollLeft());
                 var scrollWidth = $('#myTab')[0].scrollWidth;
-                console.log(scrollWidth);
                 var containerWidth = $('#myTab').outerWidth();
-                console.log(containerWidth);
                 // If scrolled to the left, hide the left arrow
                 if (scrollLeft === 0) {
                     $('.scroll-left').hide();
                 } else {
                     $('.scroll-left').show();
                 }
-                
+
                 // If scrolled to the right, hide the right arrow
                 if (scrollLeft + containerWidth + 2 >= scrollWidth) {
                     $('.scroll-right').hide();

@@ -230,7 +230,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('vendor-questionnaire') ? 'active' : '' }}" href="{{ route('vendor-questionnaire', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i> {{ ucfirst($vendor->vendor_type) }} Questionnaire
+                                <i class="fas fa-wrench menu-icon"></i> Questionnaire
                             </a>
                         </li>
                         <li class="nav-item">

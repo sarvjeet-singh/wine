@@ -127,6 +127,20 @@ if (! function_exists('getGrapeVarietals')) {
     }
 }
 
+if (! function_exists('getGrapeVarietalsById')) {
+    function getGrapeVarietalsById($id = null)
+    {
+        if ($id == null) {
+            return null;
+        }
+        return \App\Models\GrapeVarietal::where('status', 1)
+            ->where('id', $id)
+            ->orderBy('name', 'asc')
+            ->pluck('name')
+            ->first();
+    }
+}
+
 if (! function_exists('getRegions')) {
     function getRegions()
     {
@@ -218,14 +232,14 @@ if (!function_exists('getResidualSugars')) {
      * @param string|null $key The key to retrieve a specific value. If null, returns the full array.
      * @return array|string|null The full array, a single value, or null if the key doesn't exist.
      */
-    function getResidualSugars(?string $key = null)
+    function getResidualSugars(?string $key = null, $value = null)
     {
         $options = [
-            '0-1' => '0 - 1 g/l (Bone Dry)',
-            '1-9' => '1 - 9 g/l (Dry)',
-            '10-49' => '10 - 49 g/l (Off Dry)',
-            '50-120' => '50 - 120 g/l (Semi-Sweet)',
-            '120+' => '120+ g/l (Sweet)',
+            '0-1' => $value . ' g/l (Bone Dry)',
+            '1-9' => $value . ' g/l (Dry)',
+            '10-49' => $value . ' g/l (Off Dry)',
+            '50-120' => $value . ' g/l (Semi-Sweet)',
+            '120+' => $value . ' g/l (Sweet)',
         ];
 
         if ($key === null) {
@@ -248,6 +262,14 @@ if (!function_exists('getPricePoints')) {
     function getPricePoints()
     {
         return \App\Models\PricePoint::where('status', 1)
+            ->get();
+    }
+}
+
+if (!function_exists('getAccountStatus')) {
+    function getAccountStatus()
+    {
+        return \App\Models\AccountStatus::where('status', 1)
             ->get();
     }
 }
@@ -291,6 +313,34 @@ if (! function_exists('getStates')) {
                 // Custom sorting logic: prioritize 'province' over 'state'
                 return $key === 'province' ? 0 : ($key === 'state' ? 1 : 2);
             });
+    }
+}
+
+if (!function_exists('calculateStockingFeeAndPrice')) {
+    function calculateStockingFeeAndPrice(float $cost)
+    {
+        // Calculate stocking fee
+        $stockingFee = 0;
+
+        if ($cost <= 20) {
+            $stockingFee = 3;
+        } elseif ($cost <= 40) {
+            $stockingFee = 4;
+        } elseif ($cost <= 60) {
+            $stockingFee = 6;
+        } elseif ($cost <= 80) {
+            $stockingFee = 8;
+        } else {
+            $stockingFee = 10;
+        }
+
+        // Calculate final price
+        $finalPrice = $cost + $stockingFee;
+
+        return [
+            'stocking_fee' => $stockingFee,
+            'final_price' => $finalPrice,
+        ];
     }
 }
 
@@ -344,5 +394,46 @@ if (!function_exists('authCheck')) {
         }
 
         return $uniqueId;
+    }
+}
+
+if (!function_exists('isCanadaIP')) {
+    /**
+     * Check if the given IP address belongs to Canada.
+     *
+     * @param string $ip The IP address to check.
+     * @return bool True if the IP is from Canada, false otherwise.
+     */
+    function isCanadaIP(string $ip): bool
+    {
+        if (!env('CHECK_IP_ALLOW_OUTSIDE_COUNTRY', false)) {
+            return true;
+        }
+        // Validate IP address
+        if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+            return false; // Invalid IP address
+        }
+
+        // API URL
+        $url = "https://ipinfo.io/{$ip}/json";
+
+        try {
+            // Set timeout for the request
+            $context = stream_context_create([
+                'http' => ['timeout' => 5]
+            ]);
+
+            // Fetch data from API
+            $response = file_get_contents($url, false, $context);
+
+            // Decode JSON response
+            $data = json_decode($response, true);
+
+            // Return true if the country code is CA (Canada)
+            return isset($data['country']) && $data['country'] === 'CA';
+        } catch (Exception $e) {
+            // Log or handle errors as needed
+            return false;
+        }
     }
 }

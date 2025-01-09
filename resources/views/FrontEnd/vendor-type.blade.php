@@ -97,6 +97,7 @@
                     @endphp
                     <li><a href="{{ route($routepath) }}" class="text-decoration-none">{{ ucfirst($type) }} Directory</a></li>
                 </ul>
+                <div id="records-found" class="text-center">[ {{$vendorCount}} Records ]</div>
             </div>
         </div>
     </section>

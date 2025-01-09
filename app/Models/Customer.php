@@ -66,6 +66,7 @@ class Customer extends Authenticatable implements MustVerifyEmail
         'first_login',
         'password_updated',
         'ip_address',
+        'email_verified_at',
     ];
 
     /**

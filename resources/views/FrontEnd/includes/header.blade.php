@@ -69,6 +69,10 @@
                                     </form>
                                 </div>
                             </li>
+                        @elseif (authCheck()['is_logged_in'] && authCheck()['user_type'] === 'admin')
+                            <li class="nav-item">
+                                <a class="nav-link login-btn" href="{{ route('admin.dashboard') }}">Admin Dashboard</a>
+                            </li>
                         @endif
                     @endif
                 </ul>

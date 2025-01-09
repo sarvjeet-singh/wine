@@ -93,9 +93,18 @@
                             </div>
                         </div>
 
-                        <div class="row mt-3 mb-3">
+                        <div class="row mt-3 mb-2">
                             <div class="col-md-12 text-center">
-                                OR
+                                or login with
+                            </div>
+                        </div>
+                        <div class="row mt-2 mb-3">
+                            <div class="col-md-12 text-center">
+                                <div class="social-login-sec d-flex align-items-center justify-content-center gap-2">
+                                    <a href="{{ url('auth/google') }}"><i class="fa-brands fa-google"></i></a>
+                                    {{-- <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                                    <a href="#"><i class="fa-brands fa-instagram"></i></a> --}}
+                                </div>
                             </div>
                         </div>
                         <div class="row mt-3 mb-3">

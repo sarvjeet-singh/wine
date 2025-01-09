@@ -53,8 +53,8 @@
                                 </li>
                             @endforeach
                             <li>
-                            <a class="dropdown-item fs-7" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                            <a class="dropdown-item fs-7" href="{{ route('vendor.logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                                <form id="logout-form" action="{{ route('vendor.logout') }}" method="POST"
                                     style="display: none;">
                                     @csrf
                                 </form>

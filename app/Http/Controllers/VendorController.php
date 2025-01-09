@@ -8,6 +8,7 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Validator;
 
 use App\Models\PublishSeason;
+use App\Helpers\SeasonHelper;
 use App\Models\BookingDate;
 use App\Models\Experience;
 use App\Models\Vendor;
@@ -194,22 +195,38 @@ class VendorController extends Controller
 		}
 
 		$vendorID = $request->vendorid;
-		$PublishSeason = PublishSeason::where('vendor_id', $vendorID)->where('season_type', $request->season_type)->first();
-		if (isset($PublishSeason->id)) {
-			$PublishSeason = PublishSeason::find($PublishSeason->id);
-		} else {
+		$seasonType = $request->season_type;
+
+		// Check if pricing exists for the specified season
+		$seasonPricingExists = VendorPricing::where('vendor_id', $vendorID)
+			->whereNotNull($seasonType)
+			->exists();
+
+		if (!$seasonPricingExists) {
+			return response()->json([
+				'success' => false,
+				'message' => 'Pricing does not exist for the selected season.',
+			], 400);
+		}
+
+		// Find or create PublishSeason record
+		$PublishSeason = PublishSeason::where('vendor_id', $vendorID)
+			->where('season_type', $seasonType)
+			->first();
+
+		if (!$PublishSeason) {
 			$PublishSeason = new PublishSeason();
 		}
 
 		$PublishSeason->vendor_id = $vendorID;
-		$PublishSeason->season_type = $request->season_type;
+		$PublishSeason->season_type = $seasonType;
 		$PublishSeason->publish = 1;
 		$PublishSeason->save();
-		$data = [
-			'success' => true
-		];
 
-		return response()->json($data);
+		return response()->json([
+			'success' => true,
+			'message' => 'Season published successfully.',
+		]);
 	}
 
 	public function getCuratedExperience($vendorid)
@@ -466,7 +483,9 @@ class VendorController extends Controller
 	public function getVendorPricing($vendorid)
 	{
 		$vendor = Vendor::find($vendorid);
-		return view('VendorDashboard.vendor-pricing', compact('vendor'));
+		$currentDate = now();
+		$season = SeasonHelper::getSeasonAndPrice($currentDate, $vendorid);
+		return view('VendorDashboard.vendor-pricing', compact('vendor', 'season'));
 	}
 
 	public function updateVendorPricing(Request $request)
@@ -502,7 +521,7 @@ class VendorController extends Controller
 	public function getBookingUtility($vendorid)
 	{
 		$vendor = Vendor::find($vendorid);
-		if(!$vendor){
+		if (!$vendor) {
 			return redirect()->back()->with('error', 'Vendor not found.');
 		}
 		if (strtolower($vendor->vendor_type) === 'winery') {
@@ -586,14 +605,14 @@ class VendorController extends Controller
 			$metdata->security_deposit_amount  =  $request->security_deposit_amount;
 		}
 
-		if(strtolower($vendor->vendor_type) == 'excursion') {
+		if (strtolower($vendor->vendor_type) == 'excursion') {
 			$metdata = VendorExcursionMetadata::where('vendor_id', $request->vendorid)->first();
 			if (!$metdata) {
 				$metdata = new VendorExcursionMetadata();
 				$metdata->vendor_id = $request->vendorid;
 			}
 		}
-		if(strtolower($vendor->vendor_type) == 'winery'){
+		if (strtolower($vendor->vendor_type) == 'winery') {
 			$metdata = VendorWineryMetadata::where('vendor_id', $request->vendorid)->first();
 			if (!$metdata) {
 				$metdata = new VendorWineryMetadata();
@@ -1171,7 +1190,7 @@ class VendorController extends Controller
 			// Update the authenticated user instance in the session
 			Auth::setUser($user);
 
-		return redirect()->route('vendor-access-credentials', $vendorid)
+			return redirect()->route('vendor-access-credentials', $vendorid)
 				->with('success', 'User updated successfully.');
 		}
 
@@ -1334,7 +1353,8 @@ class VendorController extends Controller
 		return view('VendorDashboard.vendor-referrals', compact('referrals'));
 	}
 
-	public function questionnaire($vendorid) {
+	public function questionnaire($vendorid)
+	{
 		$vendor = Vendor::find($vendorid);
 		$questionnaires = Questionnaire::with(['vendorQuestionnaires' => function ($query) use ($vendorid) {
 			$query->where('vendor_id', $vendorid);
@@ -1348,7 +1368,8 @@ class VendorController extends Controller
 		return view('VendorDashboard.questionnaire', compact('questionnaires', 'vendor'));
 	}
 
-	public function accessCredentials($vendorid) {
+	public function accessCredentials($vendorid)
+	{
 		$vendor = Vendor::find($vendorid);
 		return view('VendorDashboard.access-credentials', compact('vendor'));
 	}

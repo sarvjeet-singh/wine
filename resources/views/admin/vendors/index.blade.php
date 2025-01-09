@@ -48,7 +48,8 @@
                                     <tr>
                                         <th>Vendor Name</th>
                                         <th>Account Type</th>
-                                        <th>Email</th>
+                                        <th>Business Email</th>
+                                        <th>Account Status</th>
                                         <th>Date Created</th>
                                         <th>Action</th>
                                     </tr>
@@ -57,19 +58,17 @@
                                     @if (count($vendors) > 0)
                                         @foreach ($vendors as $vendor)
                                             <tr>
-                                                <td>{{ $vendor->vendor_name }}</td>
-                                                <td>{{ $vendor->vendor_type }}</td>
-                                                <td>{{ $vendor->vendor_email }}</td>
+                                                <td>{{ $vendor->vendor_name ?? '-' }}</td>
+                                                <td>{{ ucfirst($vendor->vendor_type) ?? '-' }}</td>
+                                                <td>{{ $vendor->vendor_email ?? '-' }}</td>
+                                                <td>{{ $vendor->accountStatus->name ?? '-' }}</td>
                                                 <td>{{ $vendor->created_at->format('m/d/Y') }}</td>
                                                 <td>
                                                     <a href="{{ route('admin.vendors.edit', $vendor->id) }}">
                                                         <img
                                                             src="{{ asset('asset/admin/images/icons/gray-edit-icon.png') }}" />
                                                     </a>
-                                                    <a href="{{ route('admin.vendor.account.status', $vendor->id) }}">
-                                                        <i class="fa-solid fa-check-circle"></i>
-                                                    </a>
-                                                    <a href="{{ route('admin.vendors.show', $vendor->id) }}">
+                                                    <a href="{{ route('admin.vendor.details', $vendor->id) }}">
                                                         <i class="fa-solid fa-eye"></i>
                                                     </a>
                                                 </td>
@@ -123,7 +122,8 @@
                 minLength: 2, // Trigger after 2 characters
                 select: function(event, ui) {
                     // Optional: Do something with the selected vendor (ui.item)
-                    console.log(ui.item.id + ": " + ui.item.value);
+                    // console.log(ui.item.id + ": " + ui.item.value);
+                    filterVendors();
                 }
             });
         });

@@ -356,7 +356,17 @@ nav.navbar .cart-sec span span {
 .information-box-body {
     padding: 15px 30px;
 }
-
+.information-box .selection span.select2-selection {
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    min-height: 37px;
+}
+.information-box .selection span.select2-selection .select2-selection__rendered {
+    padding: 6px 12px;
+}
+.information-box .selection button.select2-selection__clear,
+.information-box .selection .select2-selection__arrow {
+    height: 100% !important;
+}
 .box-body-label {
     font-family: Inter_Tight_bold;
     font-size: 18px;
@@ -398,6 +408,15 @@ nav.navbar .cart-sec span span {
     display: grid;
     text-align: center;
 }
+.box-gallary-7-images-row.vendor-default-logo {
+    grid-template-columns: 1fr 2fr;
+    align-items: center;
+}
+.box-gallary-7-images-row.vendor-default-logo .box-gallary-7-images {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 .box-gallary-images-column {
     margin: 0px 4px 20px 0px;
     width: 100%;
@@ -424,6 +443,11 @@ nav.navbar .cart-sec span span {
     align-items: center;
     justify-content: center;
     border-radius: 30px;
+}
+.box-gallary-7-images-row.vendor-default-logo .custom-file-label {
+    width: 100%;
+    background-color: unset;
+    border: none;
 }
 .custom-file-label img {
     height: 20px;
@@ -948,7 +972,8 @@ html .ui-button.ui-state-disabled:active {
 }
 .wine-club-listing-sec .input-group button.btn-number,
 .wine-detail-sec .input-group button.btn-number,
-.wine-recommend-slider .input-group button.btn-number {
+.wine-recommend-slider .input-group button.btn-number,
+.cart-sec .input-group button.btn-number {
     padding: 4px 10px;
     width: 30px;
     background-color: #408a95;
@@ -956,24 +981,28 @@ html .ui-button.ui-state-disabled:active {
 }
 .wine-club-listing-sec .input-group button.quantity-left-minus,
 .wine-detail-sec .input-group button.quantity-left-minus,
-.wine-recommend-slider .input-group button.quantity-left-minus {
+.wine-recommend-slider .input-group button.quantity-left-minus,
+.cart-sec .input-group button.quantity-left-minus {
     border-radius: 4px 0 0 4px;
 }
 .wine-club-listing-sec .input-group button.quantity-right-plus,
 .wine-detail-sec .input-group button.quantity-right-plus,
-.wine-recommend-slider .input-group button.quantity-right-plus {
+.wine-recommend-slider .input-group button.quantity-right-plus,
+.cart-sec .input-group button.quantity-right-plus {
     border-radius: 0 4px 4px 0;
 }
 .wine-club-listing-sec .input-group input,
 .wine-detail-sec .input-group input,
-.wine-recommend-slider .input-group input {
+.wine-recommend-slider .input-group input,
+.cart-sec .input-group input {
     font-size: 15px;
     text-align: center;
     padding: 4px;
 }
 .wine-club-listing-sec .input-group input:focus,
 .wine-detail-sec .input-group input:focus,
-.wine-recommend-slider .input-group input:focus {
+.wine-recommend-slider .input-group input:focus,
+.cart-sec .input-group input {
     border-color: #408a95 !important;
 }
 .wine-club-listing-sec .wine-title {
@@ -1315,7 +1344,40 @@ html .ui-button.ui-state-disabled:active {
 .swal2-styled.swal2-confirm {
     background-color: var(--theme-main-color);
 }
-
+.swal2-popup {
+    border-radius: 15px;
+}
+.swal2-popup h2 {
+    font-size: 24px;
+    color: #408a95;
+}
+.swal2-popup label {
+    color: #000;
+    display: block;
+    text-align: left;
+    margin-bottom: 10px;
+}
+.swal2-popup select,
+.swal2-popup textarea {
+    width: 100%;
+    margin: 0 0 20px;
+    height: auto;
+    padding: 6px 10px;
+    font-size: 16px;
+    box-shadow: unset;
+}
+.swal2-popup textarea {
+    margin-bottom: 0;
+}
+.swal2-popup button {
+    min-width: 100px;
+}
+.swal2-file:focus,
+.swal2-input:focus,
+.swal2-textarea:focus {
+    border-color: #408a95;
+    box-shadow: unset;
+}
 .form-check .form-check-input {
     border-color: var(--theme-main-color);
     padding: 10px;

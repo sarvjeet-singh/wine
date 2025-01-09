@@ -63,7 +63,7 @@
                                     <a class="dropdown-item" href="/vendor-dashboard/{vendorid}">Dashboard</a>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                    <form id="logout-form" action="{{ route('vendor.logout') }}" method="POST"
                                         style="display: none;">
                                         @csrf
                                     </form>

@@ -131,31 +131,32 @@
                             href="tel:{{ $vendor->vendor_phone }}">{{ $vendor->vendor_phone }}</a></p>
                 </div>
                 <p class="desc mb-3">{{ $vendor->description }}</p>
-                <ul class="room-info-inner heading d-flex justify-content-between list-unstyled p-0 pt-3 gap-1">
+                <div class="property-feature mb-sm-0 mb-3">
+                <ul class="room-info-inner heading d-flex justify-content-between list-unstyled p-0 pt-sm-3 gap-1">
                     @if (strtolower($vendor->vendor_type) == 'accommodation')
-                        <li> Bedrooms</li>
-                        <li>Washrooms</li>
-                        <li>Beds / Sleeps</li>
+                        <li class="fw-bold"> Bedrooms</li>
+                        <li class="fw-bold">Washrooms</li>
+                        <li class="fw-bold">Beds / Sleeps</li>
                     @endif
                     @if (strtolower($vendor->vendor_type) == 'winery')
-                        <li>Farming Practices</li>
+                        <li class="fw-bold">Farming Practices</li>
                     @endif
                     @if (strtolower($vendor->vendor_type) == 'excursion' || strtolower($vendor->vendor_type) == 'winery')
-                        <li>Max Group</li>
+                        <li class="fw-bold">Max Group</li>
                     @endif
                     @if (strtolower($vendor->vendor_type) == 'excursion')
-                        <li>Establishment/Facility</li>
+                        <li class="fw-bold">Establishment/Facility</li>
                     @endif
                     @if (strtolower($vendor->vendor_type) == 'winery')
-                        <li>Tasting</li>
+                        <li class="fw-bold">Tasting</li>
                     @endif
                     @if (strtolower($vendor->vendor_type) == 'winery' ||
                             strtolower($vendor->vendor_type) == 'accommodation' ||
                             strtolower($vendor->vendor_type) == 'excursion')
-                        <li>Price Point</li>
+                        <li class="fw-bold">Price Point</li>
                     @endif
                 </ul>
-                <ul class="room-info-inner d-flex justify-content-between list-unstyled p-0 border-top pt-3 gap-1">
+                <ul class="room-info-inner d-flex justify-content-between list-unstyled p-0 border-top pt-sm-3 gap-1">
 
                     {{-- Accommodation Details --}}
                     @if (strtolower($vendor->vendor_type) == 'accommodation')
@@ -209,6 +210,7 @@
                         </li>
                     @endif
                 </ul>
+                </div>
                 <div class="d-flex gap-2">
                     @if ($vendor->business_hours_count > 0)
                         <button type="button" class="btn book-btn open-modal-btn" data-url="get-hours"

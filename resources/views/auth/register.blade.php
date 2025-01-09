@@ -19,6 +19,7 @@
         body.modal-open {
             padding-right: 0 !important;
         }
+
         .password-error {
             border: 1px solid red !important;
         }
@@ -38,9 +39,13 @@
                         </div>
                     @endif
                     <h2>{{ __('Join Our Guest Rewards Program') }}</h2>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+                    @if ($errors->any())
+                        <div class="alert alert-danger" role="alert">
+                            @foreach ($errors->all() as $error)
+                                <p>{{ $error }}</p>
+                            @endforeach
+                        </div>
+                    @endif
                     <form method="POST" action="{{ route('registertion') }}" id="guestregisterform">
                         @csrf
                         @if (request()->query('sc'))
@@ -52,7 +57,7 @@
                                 <input id="firstname" type="text"
                                     class="form-control required @error('firstname') is-invalid @enderror" name="firstname"
                                     value="{{ old('firstname') }}" autocomplete="firstname" autofocus
-                                    placeholder="Enter your Given Name(s)">
+                                    placeholder="">
 
                                 @error('firstname')
                                     <span class="invalid-feedback" role="alert">
@@ -65,7 +70,7 @@
                                 <input id="lastname" type="text"
                                     class="form-control required @error('lastname') is-invalid @enderror" name="lastname"
                                     value="{{ old('lastname') }}" autocomplete="lastname" autofocus
-                                    placeholder="Enter your Last/Surname">
+                                    placeholder="">
 
                                 @error('lastname')
                                     <span class="invalid-feedback" role="alert">
@@ -82,7 +87,7 @@
                                 <input id="email" type="email"
                                     class="form-control left-with-icon required @error('email') is-invalid @enderror"
                                     name="email" value="{{ old('email') }}" autocomplete="email" autofocus
-                                    placeholder="Enter your eMail Address">
+                                    placeholder="">
 
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
@@ -100,13 +105,13 @@
                                     <input id="password" type="password"
                                         class="form-control left-with-icon gpassword @error('password') is-invalid @enderror"
                                         name="password" required autocomplete="new-password"
-                                        placeholder="Enter your password">
+                                        placeholder="">
                                     <i class="fa-solid fa-eye togglePassword password-custom-icon"></i>
                                     {{-- <span id="password-strength"
                                         style="position:relative; top:100%; left:0; font-size:0.8em; color:red;"></span> --}}
                                 </div>
                                 {{-- @error('password') --}}
-                                <span class="" role="alert">
+                                <span class="theme-color mt-1" role="alert" style="display: inline-block;line-height: normal;font-size: 14px;">
                                     <strong>Password must contain uppercase, lowercase, number, and special
                                         character</strong>
                                 </span>
@@ -118,13 +123,14 @@
                                     <i class="fa-solid fa-lock register-custom-icon"></i>
                                     <input id="password-confirm" type="password"
                                         class="form-control left-with-icon required" name="password_confirmation"
-                                        autocomplete="new-password" placeholder="Enter your confirm password">
+                                        autocomplete="new-password" placeholder="">
                                     <i class="fa-solid fa-eye togglePassword password-custom-icon"></i>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mb-0">
+                            <input type="hidden" name="g-recaptcha-response" id="recaptcha-token">
                             <div class="col-md-12 text-center">
                                 <button type="submit" class="wine-btn register-continue">
                                     {{ __('Continue') }}
@@ -137,15 +143,24 @@
                                 OR
                             </div>
                         </div>
-                        <div class="row mb-5">
+                        <div class="row mt-2 mb-3">
+                            <div class="col-md-12 text-center">
+                                <div class="social-login-sec d-flex align-items-center justify-content-center gap-2">
+                                    <a href="{{ url('auth/google') }}"><i class="fa-brands fa-google"></i></a>
+                                    {{-- <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                                    <a href="#"><i class="fa-brands fa-instagram"></i></a> --}}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="row mb-5">
                             <div class="col-md-12 text-center">
                                 Already Have an account? <a href="{{ route('login') }}" class="fw-bold">Sign In</a>
                             </div>
-                        </div>
+                        </div> -->
                     </form>
                     <hr>
                     <div class="current-benifits mb-5">
-                        <h3 class="text-center">Current Benefits</h3>
+                        <h3 class="text-center">Benefits Include:</h3>
 
                         <ul>
 
@@ -396,7 +411,7 @@
                                 // Handle AJAX errors
                                 alert(
                                     'There was an error while validating the CAPTCHA. Please try again.'
-                                    );
+                                );
                                 isValid = false;
                                 toggleButtonSpinner(false);
                             }
@@ -465,5 +480,16 @@
                 $button.prop('disabled', false);
             }
         }
+    </script>
+    <script src="https://www.google.com/recaptcha/api.js?render={{ env('GOOGLE_RECAPTCHA_KEY') }}"></script>
+    <script>
+        grecaptcha.ready(function() {
+            grecaptcha.execute("{{ env('GOOGLE_RECAPTCHA_KEY') }}", {
+                    action: 'contact_form'
+                })
+                .then(function(token) {
+                    document.getElementById('recaptcha-token').value = token;
+                });
+        });
     </script>
 @endsection

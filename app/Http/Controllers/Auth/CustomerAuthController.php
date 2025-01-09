@@ -15,35 +15,41 @@ class CustomerAuthController extends Controller
 {
     public function showLoginForm()
     {
+        if (Auth::guard('customer')->check()) {
+            return redirect('/user-dashboard');
+        }
         return view('auth.customer-login');
     }
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        try {
+            $credentials = $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
 
-        if (Auth::guard('customer')->attempt($credentials)) {
-            $user = Auth::guard('customer')->user();
+            if (Auth::guard('customer')->attempt($credentials)) {
+                $user = Auth::guard('customer')->user();
 
-            // Check if the user's email is verified
-            if (!$user || !$user->hasVerifiedEmail()) {
-                // Logout the user to avoid partial session issues
-                Auth::guard('customer')->logout();
-                return redirect()->route('customer.login')
-                    ->with('error', 'You need to verify your email address before logging in.')
-                    ->with('show_resend_link', true)
-                    ->with('unverified_email', $user->email);
+                // Check if the user's email is verified
+                if (!$user || !$user->hasVerifiedEmail()) {
+                    // Logout the user to avoid partial session issues
+                    Auth::guard('customer')->logout();
+                    return redirect()->route('customer.login')
+                        ->with('error', 'You need to verify your email address before logging in.')
+                        ->with('show_resend_link', true)
+                        ->with('unverified_email', $user->email);
+                }
+                $request->session()->regenerate();
+                return redirect()->route('user-dashboard');
             }
-            $request->session()->regenerate();
-            return redirect()->route('user-dashboard');
-        }
+        } catch (\Exception $e) {
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
+            return back()->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ]);
+        }
     }
 
     public function resend(Request $request)

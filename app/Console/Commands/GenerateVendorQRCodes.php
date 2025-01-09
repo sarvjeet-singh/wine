@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Vendor; // Replace with your Vendor model namespace
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Intervention\Image\Facades\Image;
 
 class GenerateVendorQRCodes extends Command
 {
@@ -40,18 +41,43 @@ class GenerateVendorQRCodes extends Command
             try {
                 $qrCodeData = route('vendorQCode.show', [
                     'short_code' => $vendor->short_code,
-                    'redirect' => 'register' // Adjust redirect route as needed
+                    'redirect' => 'register', // Adjust redirect route as needed
                 ]);
-
+    
                 $qrCodePath = 'images/VendorQRCodes/' . $vendor->vendor_name . '-' . $vendor->short_code . '.png';
-
+    
                 // Ensure the directory exists
                 if (!file_exists(public_path('images/VendorQRCodes'))) {
                     mkdir(public_path('images/VendorQRCodes'), 0777, true);
                 }
-
-                QrCode::format('png')->size(200)->generate($qrCodeData, public_path($qrCodePath));
-
+    
+                // Generate QR code as a temporary image
+                $qrCode = QrCode::format('png')
+                    ->size(350) // Set the size of the QR code
+                    ->margin(1) // Add some margin around the QR code
+                    ->generate($qrCodeData);
+    
+                $qrCodeTempPath = 'images/VendorQRCodes/' . $vendor->vendor_name . '-' . $vendor->short_code . '_temp.png';
+                $qrCodeTempPath = public_path($qrCodeTempPath);
+                file_put_contents($qrCodeTempPath, $qrCode);
+    
+                // Load the QR code image
+                $qrCodeImage = Image::make($qrCodeTempPath);
+    
+                // Prepare the circular background with the logo
+                $logoPath = public_path('images/logo-leaf.png');
+                if (file_exists($logoPath)) {
+                    $logo = Image::make($logoPath)->resize(65, 65); // Resize the logo
+                    // Add the circular canvas with the logo to the center of the QR code
+                    $qrCodeImage->insert($logo, 'center');
+                }
+    
+                // Save the final QR code with the logo
+                $qrCodeImage->save(public_path($qrCodePath));
+    
+                // Clean up the temporary file
+                unlink($qrCodeTempPath);
+    
                 // Save the QR code path to the vendor
                 $vendor->qr_code = $qrCodePath;
                 $vendor->save();

@@ -29,10 +29,14 @@
     height: 400px;
     object-fit: cover;
 }
+.property-box iframe {
+    height: 400px;
+}
 }
 
 @media screen and (min-width: 1650px){
-.property-box .item img {
+.property-box .item img,
+.property-box iframe {
     height: 500px;
 }
 }
@@ -42,7 +46,8 @@
     max-width: 1600px;
     margin: 0 auto;
 }
-.property-box .item img {
+.property-box .item img,
+.property-box iframe {
     height: 400px;
 }
 }
@@ -268,6 +273,21 @@ header .navbar-collapse .navbar-nav {
     flex-wrap: wrap;
     row-gap: 6px !important;
 }
+.detail-page .property-feature,
+.room-info-outer,
+.property-box .property-feature {
+    display: flex;
+    gap: 15px;
+}
+.detail-page .property-feature ul,
+.room-info-outer ul,
+.property-box .property-feature ul {
+    width: 50%;
+    flex-direction: column;
+    align-items: flex-start;
+    border: none !important;
+    margin-bottom: 0;
+}
 .checkin-dates .date-fields {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
@@ -279,7 +299,7 @@ header .navbar-collapse .navbar-nav {
     height: 40px;    
 }
 .enquiry-modal .check-list ul {
-    grid-template-columns: repeat(1,1fr);    
+    grid-template-columns: repeat(1,1fr);
 }
 .two-col-sec {
     margin: 30px 0 50px;
@@ -349,6 +369,10 @@ footer .footer-logo img {
 }
 
 @media screen and (max-width: 576px){
+nav.navbar ul li.nav-item.dropdown,
+nav.navbar ul li.nav-item {
+    padding: 4px 10px;
+}
 .side-filter {
     display: none;
     transform: translateX(100%);
@@ -361,6 +385,30 @@ footer .footer-logo img {
     margin: 10px;
     padding: 0;
     z-index: 1;
+}
+.hours-modal .modal-content {    
+    background-position: center;    
+}
+.hours-modal .modal-content:before {    
+    background-color: #000000ba;    
+}
+.hours-modal li:not(.cuisine-value-sec li) {    
+    grid-template-columns: 1fr 2fr;
+    gap: 10px;
+    font-size: 15px;
+}
+.hours-modal span.weekday {
+    margin-left: 0;    
+}
+.curated-exp-sec .nav li.nav-item:first-child button {
+    border-radius: 10px 10px 0 0;
+}
+.curated-exp-sec .nav li.nav-item:last-child button {
+    border-radius: 0;
+    border-left: none;
+}
+.ttk-sec .fa-lg {
+    font-size: 16px !important;
 }
 }
 

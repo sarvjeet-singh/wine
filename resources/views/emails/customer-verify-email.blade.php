@@ -24,9 +24,7 @@
             style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
             Verify Email
         </a>
-        <p>Cheers!<br>WCW Marketing Team</p>
-
-
+        <p>Cheers!</p>
         <h4 style="color: #c0a144;">The WCW Marketing Team</h4>
 
         <div>

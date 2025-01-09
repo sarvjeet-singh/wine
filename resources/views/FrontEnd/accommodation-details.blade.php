@@ -334,7 +334,7 @@
                         </div>
                         <div class="d-flex justify-content-between">
                             <span class="fa-lg">Booking Rate:</span>
-                            <strong class="fa-lg text-muted">${{ $vendor->pricing->current_rate ?? 0 }}/Night</strong>
+                            <strong class="fa-lg text-muted">${{ $season['price'] ?? $vendor->pricing->current_rate ?? 0 }}/Night</strong>
                         </div>
                         <div class="d-flex justify-content-between">
                             <span class="fa-lg">Square Footage:</span>
@@ -731,7 +731,7 @@
             var currentYear = new Date().getFullYear();
             var NextYear = currentYear + 1;
             seasonEndDate = new Date(monthNames[seasonDate.getMonth()] + seasonDate.getDate() + ", " + NextYear);
-
+            
             if ($(window).width() < 768) {
                 daterangepickerMobile('input[name="datefilter"]', seasonDate, seasonEndDate, allcojoinDates,
                     unavailableDates, bookedAndBlockeddates, checkOutOnly, allcojoinDatess);

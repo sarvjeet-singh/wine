@@ -18,8 +18,11 @@ use Stripe\Stripe;
 use Stripe\Customer as StripeCustomer;
 use App\Models\Customer;
 use Session;
-
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 use Mews\Captcha\Captcha;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Crypt;
 
 class RegisterController extends Controller
 {
@@ -86,6 +89,7 @@ class RegisterController extends Controller
     {
         $vendor = null;
         $sc = $request->query('sc');
+        $cookie = setcookie('refer_by', $sc, time() + (86400 * 30), "/");
         if ($sc) {
             $vendor = Vendor::where('short_code', $sc)->first();
         }
@@ -122,6 +126,8 @@ class RegisterController extends Controller
                 $user->guestrewards = $vendor->vendor_name;
                 $user->guestrewards_vendor_id = $vendor->id;
                 $user->save();
+                // delete cookie
+                setcookie('refer_by', '', time() - 3600, "/");
             }
         }
 
@@ -140,7 +146,25 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $this->validator($request->all())->validate();
-        // exit;
+
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => env('GOOGLE_RECAPTCHA_SECRET'), // Replace with your Secret Key
+            'response' => $request->input('g-recaptcha-response'),
+            'remoteip' => $request->ip(),
+        ]);
+
+        $responseBody = json_decode($response->getBody(), true);
+
+        // Check if reCAPTCHA is valid and has a good score
+        if (!$responseBody['success'] || $responseBody['score'] < 0.5) {
+            return back()->withErrors(['captcha' => 'reCAPTCHA verification failed. Please try again.']);
+        }
+        $ip = $request->ip();
+        $isCanada = isCanadaIP($ip);
+        if (!$isCanada) {
+            return back()->withErrors(['location' => 'Our services are currently only available to residents of Canada.  We apologize for any inconvenience.']);
+        }
+
         $user = $this->create($request->all());
 
         // Instead of logging in, redirect to the login page
@@ -177,5 +201,53 @@ class RegisterController extends Controller
             'captcha' => $captchaData['img'],
             // 'captchaKey' => $captchaData['key'],
         ]);
+    }
+
+    public function registerSocial(Request $request)
+    {
+        try {
+            $request->validate([
+                'password' => [
+                    'nullable',
+                    'string',
+                    'min:8',
+                    'confirmed',
+                    'regex:/[A-Z]/',       // must contain at least one uppercase letter
+                    'regex:/[a-z]/',       // must contain at least one lowercase letter
+                    'regex:/[0-9]/',       // must contain at least one number
+                    'regex:/[@$!%*#?&]/',  // must contain a special character
+                ],
+                'terms' => 'required',
+            ]);
+            $data = $request->all();
+            $user = Session::get('user');
+            $name = explode(' ', $user->name);
+            $user = [
+                'firstname' => $name[0] ?? "",
+                'email' => $user['email'],
+                'lastname' => $name[1] ?? "",
+                'role' => 'Member',
+                'email_verified_at' => now(),
+                'ip_address' => request()->ip()
+            ];
+            if (isset($data['password']) && !empty($data['password'])) {
+                $user['password'] = Hash::make($data['password']);
+            }
+            if (isset($_COOKIE['refer_by']) && !empty($_COOKIE['refer_by'])) {
+                $vendor = Vendor::where('short_code', $_COOKIE['refer_by'])->first();
+                if ($vendor->id) {
+                    $user['guestrewards'] = $vendor->vendor_name;
+                    $user['guestrewards_vendor_id'] = $vendor->id;
+                    // delete cookie
+                    setcookie('refer_by', '', time() - 3600, "/");
+                }
+            }
+            $user = Customer::create($user);
+            Session::forget('user');
+            Auth::login($user);
+            return redirect()->route('user-dashboard');
+        } catch (\Exception $e) {
+            return redirect()->route('login')->withErrors('error', $e->getMessage());
+        }
     }
 }

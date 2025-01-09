@@ -149,7 +149,7 @@
                                                         class="rs-value d-flex align-items-center justify-content-between gap-1">
                                                         <h6 class="fs-7 mb-0 fw-bold">Residual Sugars</h6>
                                                         <p class="fs-7 mb-0">
-                                                            {{ $wine->rs ? getResidualSugars($wine->rs) : '-' }}</p>
+                                                            {{ $wine->rs ? getResidualSugars($wine->rs, $wine->rs_value) : '-' }}</p>
                                                     </div>
                                                     <div
                                                         class="varietal-values d-flex align-items-center justify-content-between gap-1">

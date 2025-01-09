@@ -31,7 +31,7 @@
                             </div>
                         @endif
 
-                        <div class="cart-sec px-xl-5 py-xl-4 py-2">
+                        <div class="cart-sec px-xl-2 py-xl-4 py-2">
 
                             {{-- ({{ ($cart && $cart->items->count()) ? $cart->items->count() : 0 }}) --}}
 
@@ -57,7 +57,7 @@
 
                                                         <th>Price</th>
 
-                                                        <th>Quantity</th>
+                                                        <th width="25%">Quantity</th>
 
                                                         <th>Item Total</th>
 
@@ -132,25 +132,37 @@
 
                                                                 </td>
 
-                                                                <td>
-
-                                                                    <select class="form-select update-quantity"
-                                                                        data-product-id="{{ $item->product->id }}"
-                                                                        data-vendor-id="{{ $vendorid }}"
-                                                                        data-shop-id="{{ $item->product->vendor_id }}"
-                                                                        aria-label="Select quantity">
-
-                                                                        @for ($i = 1; $i <= $item->product->inventory; $i++)
-                                                                            <option value="{{ $i }}"
-                                                                                {{ $item->quantity == $i ? 'selected' : '' }}>
-
-                                                                                {{ $i }}
-
-                                                                            </option>
-                                                                        @endfor
-
-                                                                    </select>
-
+                                                                <td>                                    
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-btn">
+                                                                            <button type="button"
+                                                                                class="quantity-left-minus btn btn-danger btn-number"
+                                                                                data-type="minus" data-field="">
+                                                                                <span
+                                                                                    class="glyphicon glyphicon-minus">-</span>
+                                                                            </button>
+                                                                        </span>
+                                                                        <input type="text" id="quantity_{{ $item->product->id }}"
+                                                                            class="form-control input-number quantity"
+                                                                            value="{{ $item->quantity }}" min="1" max="{{$item->product->inventory}}">
+                                                                        <span class="input-group-btn">
+                                                                            <button type="button"
+                                                                                class="quantity-right-plus btn btn-success btn-number"
+                                                                                data-type="plus" data-field="">
+                                                                                <span
+                                                                                    class="glyphicon glyphicon-plus">+</span>
+                                                                            </button>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <button 
+                                                                            data-product-id="{{ $item->product->id }}"
+                                                                            data-vendor-id="{{ $vendorid }}"
+                                                                            data-shop-id="{{ $item->product->vendor_id }}"
+                                                                            class="btn btn-primary update-quantity"><i class="fa-solid fa-arrows-rotate"></i></button>
+                                                                    </div>
+                                                                    </div>
                                                                 </td>
 
                                                                 <td>
@@ -364,7 +376,7 @@
 
         });
 
-        $('.update-quantity').on("change", function() {
+        $(document).on("click", '.update-quantity',function() {
 
             var productId = $(this).data('product-id');
 
@@ -372,7 +384,7 @@
 
             var shopId = $(this).data('shop-id');
 
-            var quantity = $(this).val();
+            var quantity = $("#quantity_" + productId).val();
 
 
 
@@ -468,6 +480,36 @@
 
             });
 
+        });
+    </script>
+
+
+    <!-- Quantity Selector -->
+    <script>
+        $(document).ready(function() {
+            $('.quantity-right-plus').click(function(e) {
+                e.preventDefault();
+
+                // Find the closest input field to the clicked button
+                var quantityInput = $(this).closest('.input-group').find('.quantity');
+                var quantity = parseInt(quantityInput.val());
+
+                // Increment the value
+                quantityInput.val(quantity + 1);
+            });
+
+            $('.quantity-left-minus').click(function(e) {
+                e.preventDefault();
+
+                // Find the closest input field to the clicked button
+                var quantityInput = $(this).closest('.input-group').find('.quantity');
+                var quantity = parseInt(quantityInput.val());
+
+                // Decrement the value if greater than 0
+                if (quantity > 1) {
+                    quantityInput.val(quantity - 1);
+                }
+            });
         });
     </script>
 

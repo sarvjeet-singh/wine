@@ -101,45 +101,4 @@ class SubscriptionController extends Controller
 
         return response()->json($response);
     }
-
-    public function cmanage()
-    {
-        $user = Auth::user();
-        $subscription = Subscription::where('user_id', $user->id)->where('status', 'active')->first();
-        $vendorId = 1; // Assuming a vendor ID
-
-        return view('subscriptions.manage', compact('subscription', 'vendorId'));
-    }
-
-    public function schangeSubscription(Request $request)
-    {
-        $user = Auth::user();
-        $vendorId = $request->input('vendor_id');
-        $newPlanId = $request->input('new_plan_id');
-
-        $newSubscription = $this->stripeService->changeSubscription($user, $vendorId, $newPlanId);
-
-        $subscriptionInfoHtml = view('subscriptions._info', ['subscription' => $newSubscription])->render();
-
-        return response()->json(['subscriptionInfoHtml' => $subscriptionInfoHtml], 200);
-    }
-
-    public function scancelSubscription()
-    {
-        $user = Auth::user();
-        $subscription = Subscription::where('user_id', $user->id)->where('status', 'active')->first();
-
-        if (!$subscription) {
-            return response()->json(['message' => 'No active subscription found.'], 404);
-        }
-
-        $this->stripeService->cancelSubscription($subscription);
-
-        $subscription->status = 'canceled';
-        $subscription->save();
-
-        $subscriptionInfoHtml = view('subscriptions._info', ['subscription' => $subscription])->render();
-
-        return response()->json(['subscriptionInfoHtml' => $subscriptionInfoHtml], 200);
-    }
 }

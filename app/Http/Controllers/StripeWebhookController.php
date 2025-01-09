@@ -7,6 +7,7 @@ use Stripe\Stripe;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
 use App\Models\WinerySubscription;
+use App\Models\Vendor;
 use Log;
 
 class StripeWebhookController extends Controller
@@ -50,6 +51,16 @@ class StripeWebhookController extends Controller
                     'start_date' => $startDate,
                     'end_date' => $endDate,
                 ]);
+            // Retrieve the vendor_id from the updated WinerySubscription
+            $vendorId = WinerySubscription::where('stripe_subscription_id', $subscriptionId)
+                ->value('vendor_id');
+
+            // Update the Vendors table with the vendor_id
+            if ($vendorId) {
+                Vendor::where('id', $vendorId)->update([
+                    'account_status' => 1, // Replace with your desired status
+                ]);
+            }
         } elseif ($event->type === 'customer.subscription.updated') {
             $subscriptionId = $event->data->object->id;
             $status = $event->data->object->status;
@@ -65,16 +76,34 @@ class StripeWebhookController extends Controller
                     'start_date' => $currentPeriodStart,
                     'end_date' => $currentPeriodEnd,
                 ]);
+            $vendorId = WinerySubscription::where('stripe_subscription_id', $subscriptionId)
+                ->value('vendor_id');
+
+            // Update the Vendors table with the vendor_id
+            if ($vendorId) {
+                Vendor::where('id', $vendorId)->update([
+                    'account_status' => 1, // Replace with your desired status
+                ]);
+            }
         } elseif ($event->type === 'customer.subscription.deleted') {
             $subscriptionId = $event->data->object->id;
             $status = 'canceled'; // Set status to canceled
-    
+
             // Update the subscription status in your database
             WinerySubscription::where('stripe_subscription_id', $subscriptionId)
                 ->update([
                     'status' => $status,
                     'end_date' => now(), // Optionally set end date to now or keep it as is
                 ]);
+            $vendorId = WinerySubscription::where('stripe_subscription_id', $subscriptionId)
+                ->value('vendor_id');
+
+            // Update the Vendors table with the vendor_id
+            if ($vendorId) {
+                Vendor::where('id', $vendorId)->update([
+                    'account_status' => 3, // Replace with your desired status
+                ]);
+            }
         }
 
         return response()->json(['status' => 'success'], 200);

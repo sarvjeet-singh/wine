@@ -44,47 +44,47 @@
                             </span>{{ $vendor->state->name ?? '' }}</p>
                     </div>
                     <div class="my-4">
-                        <h4><span class="fw-bold">Price Rating:</span> $</h4>
+                        <h4><span class="fw-bold">Price Rating:</span> $0.00</h4>
                     </div>
                     <div class="social-links">
                         <h6 class="mb-3">Social media </h6>
                         <ul class="list-unstyled d-flex align-items-center gap-3">
-                            @if ($vendor->socialMedia->facebook)
+                            @if (!empty($vendor->socialMedia->facebook))
                                 <li>
                                     <a target="_blank" href="{{ $vendor->socialMedia->facebook ?? '#' }}">
                                         <i class="fa-brands fa-facebook-f"></i>
                                     </a>
                                 </li>
                             @endif
-                            @if ($vendor->socialMedia->instagram)
+                            @if (!empty($vendor->socialMedia->instagram))
                                 <li>
                                     <a target="_blank" href="{{ $vendor->socialMedia->instagram ?? '#' }}">
                                         <i class="fa-brands fa-instagram"></i>
                                     </a>
                                 </li>
                             @endif
-                            @if ($vendor->socialMedia->twitter)
+                            @if (!empty($vendor->socialMedia->twitter))
                                 <li>
                                     <a target="_blank" href="{{ $vendor->socialMedia->twitter ?? '#' }}">
                                         <i class="fa-brands fa-x-twitter"></i>
                                     </a>
                                 </li>
                             @endif
-                            @if ($vendor->socialMedia->youtube)
+                            @if (!empty($vendor->socialMedia->youtube))
                                 <li>
                                     <a target="_blank" href="{{ $vendor->socialMedia->youtube ?? '#' }}">
                                         <i class="fa-brands fa-youtube"></i>
                                     </a>
                                 </li>
                             @endif
-                            @if ($vendor->socialMedia->pinterest)
+                            @if (!empty($vendor->socialMedia->pinterest))
                                 <li>
                                     <a target="_blank" href="{{ $vendor->socialMedia->pinterest ?? '#' }}">
                                         <i class="fa-brands fa-pinterest"></i>
                                     </a>
                                 </li>
                             @endif
-                            @if ($vendor->socialMedia->tiktok)
+                            @if (!empty($vendor->socialMedia->tiktok))
                                 <li>
                                     <a target="_blank" href="{{ $vendor->socialMedia->tiktok ?? '#' }}">
                                         <i class="fa-brands fa-tiktok"></i>
@@ -96,11 +96,25 @@
                 </div>
                 <div class="col-md-3">
                     <div class="view-tab-images d-flex align-items-center gap-3">
-                        <img src="{{ $vendor->qr_code ? url($vendor->qr_code) : '' }}" class="img-fluid" />
-                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                        <img id="qr-code-img" src="{{ $vendor->qr_code ? url($vendor->qr_code) : '' }}"
+                            class="img-fluid" />
+                        <i id="download-qr" class="fa-solid fa-cloud-arrow-down"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+    $(function() {
+        $('#download-qr').on('click', function() {
+            const qrImage = $('#qr-code-img');
+            const link = $('<a></a>')
+                .attr('href', qrImage.attr('src'))
+                .attr('download', 'qr_code.png');
+            $('body').append(link);
+            link[0].click();
+            link.remove();
+        });
+    })
+</script>

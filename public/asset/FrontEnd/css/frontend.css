@@ -44,7 +44,35 @@
     padding-left: 40px;
 
 }
-
+.social-login-sec svg {
+    width: 24px;
+    height: 24px;
+}
+.social-login-sec a {
+    color: #fff;
+}
+.social-login-sec svg {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    padding: 10px;
+    transition: .2s ease-in-out;
+}
+.social-login-sec a:hover svg {
+    scale: 1.05;
+}
+.social-login-sec svg.fa-google {
+    background-color: #366dda;
+}
+.social-login-sec svg.fa-facebook {
+    background-color: #405494;
+}
+.social-login-sec svg.fa-instagram {
+    background-color: #e3345a;
+}
+.social-login-sec img {
+    width: 34px;
+}
 /* ================= LOGIN/REGISTER END ================= */
 
 /* ================= REGISTER START ================= */

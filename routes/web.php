@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\VendorWineController;
 use App\Http\Controllers\WineryController;
 use App\Http\Controllers\WineryCartController;
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\WineryCheckoutController;
 use App\Http\Controllers\WineReviewController;
 use App\Http\Controllers\WineryOrderController;
@@ -36,6 +37,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\Auth\VendorAuthController;
+use App\Http\Controllers\Admin\ConfigurationSettingController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
@@ -61,8 +63,17 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
-Auth::routes(['verify' => true]);
-
+Auth::routes(['verify' => true, 'login' => false]);
+Route::get('login', [LoginController::class, 'login'])->name('login');
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+Route::post('register-social', [RegisterController::class, 'registerSocial'])->name('register.social');
+Route::get('/privacy', function () {
+    return view('FrontEnd.privacy');
+});
+Route::get('/terms', function () {
+    return view('FrontEnd.terms');
+});
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
@@ -77,11 +88,11 @@ Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
         $user->markEmailAsVerified();
 
         // Redirect to home or any other page after successful verification
-        return redirect('/login')->with('success', 'Email verified successfully.');
+        return redirect('/customer/login')->with('success', 'Email verified successfully.');
     }
 
     // If verification fails, return an error or redirect back
-    return redirect('/login')->withErrors(['error' => 'Invalid verification link.']);
+    return redirect('/customer/login')->withErrors(['error' => 'Invalid verification link.']);
 })->middleware('signed')->name('verification.verify');
 
 Route::post('/validate-captcha', [RegisterController::class, 'validateCaptcha'])->name('validate-captcha');
@@ -205,8 +216,6 @@ Route::get('/guest-rewards', function () {
 Route::get('qr/{short_code}', [FrontEndController::class, 'showQCode'])->name('vendorQCode.show');
 Route::get('vendor-QCode-generate/{short_code}', [FrontEndController::class, 'generateQCode'])->name('vendorQCode.generate');
 
-// ================= USER DASHBOARD ============== //
-Auth::routes();
 Route::get('/user-dashboard', [UserDashboardController::class, 'userDashboard'])->name('user-dashboard');
 Route::get('/user-review-submit', [UserDashboardController::class, 'userReviews'])->name('user-review-submit');
 Route::post('/user-reviews-submit', [UserDashboardController::class, 'userReviewsSubmit'])->name('user-reviews-submit');
@@ -392,8 +401,7 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::get('/admin/vendors/show/{id}', [AdminVendorController::class, 'show'])->name('admin.vendors.show');
     Route::get('/admin/wine-catalogues', [AdminWineCatalogueController::class, 'index'])->name('admin.dashboard');
 
-    Route::get('admin/vendors/account-status/{id}', [AdminVendorController::class, 'accountStatus'])->name('admin.vendor.account.status');
-    Route::put('admin/vendors/update-account-status/{id}', [AdminVendorController::class, 'updateAccountStatus'])->name('admin.vendor.update.account.status');
+    // Route::get('admin/vendors/account-status/{id}', [AdminVendorController::class, 'accountStatus'])->name('admin.vendor.account.status');
     Route::get('/admin/vendors', [AdminVendorController::class, 'index'])->name('admin.vendors');
     Route::get('/admin/vendors/create/{type?}', [AdminVendorController::class, 'create'])->name('admin.vendors.create');
     Route::post('/admin/vendors/store', [AdminVendorController::class, 'store'])->name('admin.vendors.store');
@@ -416,11 +424,12 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::post('/admin/faqs/update-question/{section_id}', [AdminFaqController::class, 'updateQuestion'])->name('admin.faqs.update-question');
     Route::delete('/admin/faqs/questions/{id}', [AdminFaqController::class, 'destroyQuestion'])->name('admin.faqs.delete-question');
     Route::resource('/admin/faqs', AdminFaqController::class)->names('admin.faqs');
-    
+
     // vendor routes
     Route::get('admin/vendors/vendor-details/{id}', [AdminVendorController::class, 'vendorDetails'])->name('admin.vendor.details');
     Route::get('admin/vendors/vendor-details/{id}/ajax-view', [AdminVendorController::class, 'getViewTab'])->name('admin.vendor.details.ajax-view');
     Route::get('admin/vendors/vendor-details/{id}/ajax-experience', [AdminVendorController::class, 'getExperienceTab'])->name('admin.vendor.details.ajax-experience');
+    Route::post('admin/vendors/vendor-details/{id}/ajax-experience-update', [AdminVendorController::class, 'updateExperience'])->name('admin.vendor.details.ajax-experience-update');
     Route::get('admin/vendors/vendor-details/{id}/ajax-stripe', [AdminVendorController::class, 'getStripeDetailsTab'])->name('admin.vendor.details.ajax-stripe');
     Route::post('admin/vendors/vendor-details/{id}/ajax-stripe-update', [AdminVendorController::class, 'updateStripeDetails'])->name('admin.vendor.details.ajax-stripe-update');
     Route::get('admin/vendors/vendor-details/{id}/ajax-media-gallery', [AdminVendorController::class, 'getMediaGalleryTab'])->name('admin.vendor.details.ajax-media-gallery');
@@ -433,6 +442,21 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::get('admin/vendors/vendor-details/{id}/ajax-questionnaire', [AdminVendorController::class, 'getQuestionnaireTab'])->name('admin.vendor.details.ajax-questionnaire');
     Route::post('admin/vendors/vendor-details/{id}/ajax-questionnaire-update', [AdminVendorController::class, 'updateQuestionnaire'])->name('admin.vendor.details.ajax-questionnaire-update');
     Route::get('admin/vendors/vendor-details/{id}/ajax-access-credentials', [AdminVendorController::class, 'getAccessCredentialsTab'])->name('admin.vendor.details.ajax-access-credentials');
+    Route::put('admin/vendors/vendor-details/{id}/ajax-access-credentials-update', [AdminVendorController::class, 'updateAccessCredentials'])->name('admin.vendor.details.ajax-access-credentials-update');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-amenities', [AdminVendorController::class, 'getAmenitiesTab'])->name('admin.vendor.details.ajax-amenities');
+    Route::post('admin/vendors/vendor-details/{id}/ajax-amenities-update', [AdminVendorController::class, 'updateAmenities'])->name('admin.vendor.details.ajax-amenities-update');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-booking-utility', [AdminVendorController::class, 'getBookingUtilityTab'])->name('admin.vendor.details.ajax-booking-utility');
+    Route::post('admin/vendors/vendor-details/{id}/ajax-booking-utility-update', [AdminVendorController::class, 'updateBookingUtility'])->name('admin.vendor.details.ajax-booking-utility-update');
+    Route::post('admin/vendors/vendor-details/{id}/ajax-settings-policy-update', [AdminVendorController::class, 'updateVendorPolicy'])->name('admin.vendor.details.ajax-settings-policy-update');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-settings', [AdminVendorController::class, 'getSettingsTab'])->name('admin.vendor.details.ajax-settings');
+    Route::post('admin/vendors/vendor-details/{id}/ajax-settings-update', [AdminVendorController::class, 'settingsUpdate'])->name('admin.vendor.details.ajax-settings-update');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-system-admin', [AdminVendorController::class, 'getSystemAdminTab'])->name('admin.vendor.details.ajax-system-admin');
+    Route::put('admin/vendors/update-account-status/{id}', [AdminVendorController::class, 'updateAccountStatus'])->name('admin.vendor.details.ajax-account-status-update');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-wines', [AdminVendorController::class, 'getWineTab'])->name('admin.vendor.details.ajax-wines');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-view-wine/{wine_id}', [AdminVendorController::class, 'viewWineDetails'])->name('admin.vendor.details.ajax-view-wine');
+    Route::post('admin/vendors/vendor-details/{id}/ajax-update-wine/{wine_id}', [AdminVendorController::class, 'updateWineFee'])->name('admin.vendor.details.ajax-update-wine');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-inquiries', [AdminVendorController::class, 'getInquiriesTab'])->name('admin.vendor.details.ajax-inquiries');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-transactions', [AdminVendorController::class, 'getTransactionTab'])->name('admin.vendor.details.ajax-transactions');
 
     // Common Routes
     // Route::prefix('admin/{entity}')->group(function () {
@@ -488,6 +512,9 @@ Route::middleware(['auth:admin'])->group(function () {
 
     Route::post('admin/users/{user}/roles', [RolePermissionController::class, 'assignRole']);
     Route::delete('admin/users/{user}/roles/{role}', [RolePermissionController::class, 'unassignRole']);
+    Route::get('/admin/configuration-settings', [ConfigurationSettingController::class, 'index'])->name('admin.configuration-settings');
+    Route::post('/admin/configuration-settings', [ConfigurationSettingController::class, 'storeUpdate'])->name('admin.configuration-settings.store');
+    Route::get('/admin/configuration-settings/{id}', [ConfigurationSettingController::class, 'edit'])->name('admin.configuration-settings.edit');
 });
 
 Route::get('/get-subregions/{regionId}', [RegionController::class, 'getSubRegions'])->name('get.subregions');

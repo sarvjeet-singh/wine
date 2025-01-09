@@ -108,7 +108,6 @@
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
         $('#questionnaireForm').on('submit', function(e) {
@@ -120,15 +119,7 @@
                 data: $(this).serialize(), // Form data
                 success: function(response) {
                     if (response.success) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: response.message,
-                            icon: 'success',
-                            confirmButtonText: 'OK',
-                        }).then(() => {
-                            // Optional: Redirect or perform other actions after success
-                            // window.location.reload(); // Reload the page
-                        });
+                        showToast("Success", response.message, "success");
                     }
                 },
                 error: function(xhr) {
@@ -138,19 +129,9 @@
                             .map((errorArray) => errorArray.join(', '))
                             .join('<br>');
 
-                        Swal.fire({
-                            title: 'Validation Errors',
-                            html: errorMessages, // Use HTML to allow line breaks
-                            icon: 'error',
-                            confirmButtonText: 'OK',
-                        });
+                        showToast("Error", errorMessages, "error");
                     } else {
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'An error occurred. Please try again.',
-                            icon: 'error',
-                            confirmButtonText: 'OK',
-                        });
+                        showToast("Error", "An error occurred while updating the questionnaire.", "error");
                     }
                 },
             });

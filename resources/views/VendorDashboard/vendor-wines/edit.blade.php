@@ -230,9 +230,9 @@
         </div>
         <div class="col-md-6">
 
-            <label for="abv_rs" class="form-label">Alcohol By Volume</label>
+            <label for="abv" class="form-label">Alcohol By Volume</label>
             <div class="input-group">
-                <input type="text" class="form-control percent" name="abv" id="abv"
+                <input type="text" class="form-control" name="abv" id="abv"
                     value="{{ old('abv', $wine->abv) }}">
                 <span class="input-group-text">%</span>
             </div>

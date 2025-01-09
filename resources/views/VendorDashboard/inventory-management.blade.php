@@ -77,13 +77,13 @@
                             <input type="hidden" name="type" value="vendor">
                             <div class="row align-items-end mt-3">
                                 <!-- <div class="col-sm-4 col-12">
-                                                <label class="form-label">Apply Value</label>
-                                                <select class="form-control" name="booking_date_option">
-                                                    <option value="booked">Booked Dates</option>
-                                                    <option value="packaged">Package Dates</option>
-                                                    <option value="blocked">Blocked Dates</option>
-                                                </select>
-                                            </div> -->
+                                                        <label class="form-label">Apply Value</label>
+                                                        <select class="form-control" name="booking_date_option">
+                                                            <option value="booked">Booked Dates</option>
+                                                            <option value="packaged">Package Dates</option>
+                                                            <option value="blocked">Blocked Dates</option>
+                                                        </select>
+                                                    </div> -->
                                 <div class="col-sm-4 col-12">
                                     <label class="form-label">Select Season</label>
                                     @php
@@ -135,7 +135,7 @@
                                             $seasons['winter']['year'] = $nextYear; // Future winter season
                                         }
                                     @endphp
-                                    <select class="form-control season-clender" id="seasonSelect">
+                                    <select class="form-control form-select season-clender" id="seasonSelect">
                                         @foreach ($seasons as $key => $season)
                                             <option value="{{ $key }}">
                                                 {{ $season['name'] }} {{ $season['year'] }} ({{ $season['start'] }} -
@@ -184,11 +184,11 @@
                             </div>
 
                             <!-- <div class="row mt-5">
-                                            <div class="col-sm-12 text-center">
-                                                <button type="submit" class="btn wine-btn" id="dateform_submit"
-                                                    disabled>Update</button>
-                                            </div>
-                                        </div> -->
+                                                    <div class="col-sm-12 text-center">
+                                                        <button type="submit" class="btn wine-btn" id="dateform_submit"
+                                                            disabled>Update</button>
+                                                    </div>
+                                                </div> -->
                         </form>
                     </div>
                 </div>
@@ -553,13 +553,35 @@
                                                             .serialize(),
                                                         type: 'post',
                                                         success: function(
-                                                            success
+                                                            response
                                                             ) {
-                                                            Swal.fire(
-                                                                'Saved!',
-                                                                '',
-                                                                'success'
-                                                                );
+                                                            Swal.fire({
+                                                                    title: 'Saved!',
+                                                                    text: 'Your booking date has been successfully saved.',
+                                                                    icon: 'success',
+                                                                    confirmButtonText: 'Okay'
+                                                                })
+                                                                .then(
+                                                                    (
+                                                                        result) => {
+                                                                        if (result
+                                                                            .isConfirmed
+                                                                            ) {
+                                                                            location
+                                                                                .reload();
+                                                                        }
+                                                                    }
+                                                                    );
+                                                        },
+                                                        error: function(
+                                                            xhr
+                                                            ) {
+                                                            Swal.fire({
+                                                                title: 'Error',
+                                                                text: 'There was an issue saving your booking date. Please try again.',
+                                                                icon: 'error',
+                                                                confirmButtonText: 'Okay'
+                                                            });
                                                         }
                                                     });
                                                 }
@@ -815,6 +837,20 @@
                                     timer: 2000
                                 }).then(function() {
                                     location.reload(); // Reload the page
+                                });
+                            },
+                            error: function(xhr) {
+                                $(".overlay-loader").hide();
+                                let errorMessage =
+                                    'An error occurred while publishing the season.';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMessage = xhr.responseJSON.message;
+                                }
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: errorMessage,
+                                    icon: 'error',
+                                    showConfirmButton: true,
                                 });
                             }
                         });

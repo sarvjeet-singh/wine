@@ -46,6 +46,7 @@ class Vendor extends Model
         'password_updated',
         'host',
         'short_code',
+        'email_sent_at',
     ];
     protected static function boot()
     {

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\View;
 use App\Mail\VendorMail;
 use App\Models\Vendor;
+use App\Models\VendorAmenity;
+use App\Models\Amenity;
 use App\Models\Country;
 use App\Models\Region;
 use App\Models\SubRegion;
@@ -17,8 +19,10 @@ use App\Models\Category;
 use App\Models\SubCategory;
 use App\Models\Establishment;
 use App\Models\Cuisine;
+use App\Models\Experience;
 use App\Models\FarmingPractice;
 use App\Models\MaxGroup;
+use App\Models\Order;
 use App\Models\TastingOption;
 use App\Models\PricePoint;
 use App\Models\AccountStatus;
@@ -30,6 +34,10 @@ use App\Models\VendorNonLicenseMetadata;
 use App\Models\Questionnaire;
 use App\Models\VendorQuestionnaire;
 use App\Models\VendorMediaGallery;
+use App\Models\VendorWine;
+use App\Models\Inquiry;
+use App\Models\WinerySubscription;
+use Intervention\Image\Facades\Image;
 use DB;
 use Log;
 use Mail;
@@ -41,6 +49,7 @@ use App\Models\VendorSocialMedia;
 use App\Models\VendorStripeDetail;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class VendorController extends Controller
 {
@@ -139,6 +148,12 @@ class VendorController extends Controller
             'phone' => 'nullable|string|max:20',
             'description' => 'nullable|string|max:1000',
             'vendor_type' => 'required|string|max:255',
+            'custom_password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/'
+            ],
         ];
 
         // if ($action == 'store') {
@@ -424,7 +439,33 @@ class VendorController extends Controller
 
             $qrCodePath = 'images/VendorQRCodes/' . $vendor->vendor_name . '-' . $vendor->short_code . '.png';
 
-            QrCode::format('png')->size(200)->generate($qrCodeData, public_path($qrCodePath));
+            // QrCode::format('png')->size(200)->generate($qrCodeData, public_path($qrCodePath));
+            $qrCode = QrCode::format('png')
+                ->size(350) // Set the size of the QR code
+                ->margin(1) // Add some margin around the QR code
+                ->generate($qrCodeData);
+
+            $qrCodeTempPath = 'images/VendorQRCodes/' . $vendor->vendor_name . '-' . $vendor->short_code . '_temp.png';
+            $qrCodeTempPath = public_path($qrCodeTempPath);
+            file_put_contents($qrCodeTempPath, $qrCode);
+
+            // Load the QR code image
+            $qrCodeImage = Image::make($qrCodeTempPath);
+
+            // Prepare the circular background with the logo
+            $logoPath = public_path('images/logo-leaf.png');
+            if (file_exists($logoPath)) {
+                $logo = Image::make($logoPath)->resize(65, 65); // Resize the logo
+                // Add the circular canvas with the logo to the center of the QR code
+                $qrCodeImage->insert($logo, 'center');
+            }
+
+            // Save the final QR code with the logo
+            $qrCodeImage->save(public_path($qrCodePath));
+
+            // Clean up the temporary file
+            unlink($qrCodeTempPath);
+
 
             // Save the QR code path to the vendor
             $vendor->qr_code = $qrCodePath;
@@ -436,7 +477,7 @@ class VendorController extends Controller
                 $password = null;
 
                 if (empty($user)) {
-                    $password = Str::random(8);
+                    $password = $data['custom_password'] ?? Str::random(8);
                     $user = User::create([
                         'email' => $data['email'],
                         'password' => Hash::make($password),
@@ -449,6 +490,7 @@ class VendorController extends Controller
                     $user->firstname = $data['vendor_first_name'];
                     $user->lastname = $data['vendor_last_name'];
                     $user->contact_number = $data['phone'];
+                    // $user->password = $data['custom_password'] ?? Hash::make($password);
                     $user->role = 'vendor';
                     $user->save();
                 }
@@ -466,7 +508,11 @@ class VendorController extends Controller
                     'password' => $password,
                     'vendor' => $vendor
                 ];
-                Mail::to($to)->send(new VendorMail($vendorData, 'emails.vendor.vendor_login_details_email', $subject));
+                $send = Mail::to($to)->send(new VendorMail($vendorData, 'emails.vendor.vendor_login_details_email', $subject));
+                if ($send) {
+                    $vendor->email_sent_at = \Carbon\Carbon::now();
+                    $vendor->save();
+                }
                 // if ($vendor->vendor_type == 'winery') {
                 //     Mail::to($to)->send(new VendorMail($vendorData, 'emails.vendor.winery_vendor_login_details_email', $subject));
                 // } else if ($vendor->vendor_type == 'licensed' || $vendor->vendor_type == 'non-licensed') {
@@ -656,24 +702,49 @@ class VendorController extends Controller
         return response()->json($vendors);
     }
 
-    public function accountStatus($id)
-    {
-        $vendor = Vendor::find($id);
-        $accountStatuses = AccountStatus::where('status', 1)->get();
-        $pricePoints = PricePoint::where('status', 1)->get();
-        return view('admin.vendors.account-status', compact('vendor', 'accountStatuses', 'pricePoints'));
-    }
+    // public function accountStatus($id)
+    // {
+    //     $vendor = Vendor::find($id);
+    //     $accountStatuses = AccountStatus::where('status', 1)->get();
+    //     $pricePoints = PricePoint::where('status', 1)->get();
+    //     return view('admin.vendors.account-status', compact('vendor', 'accountStatuses', 'pricePoints'));
+    // }
 
     public function updateAccountStatus(Request $request, $id)
     {
-        $vendor = Vendor::find($id);
-        if ($vendor->account_status != $request->account_status) {
-            $vendor->account_status_updated_at = \Carbon\Carbon::now();
+        try {
+            $vendor = Vendor::findOrFail($id); // Use findOrFail to handle invalid IDs
+
+            // Update account status and track the change timestamp
+            if ($vendor->account_status != $request->account_status) {
+                $vendor->account_status_updated_at = \Carbon\Carbon::now();
+            }
+
+            $vendor->account_status = $request->account_status;
+            $vendor->price_point = $request->price_point ?? $vendor->price_point ?? null;
+
+            // Save the updates
+            $vendor->save();
+
+            // Return success response
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Account status updated successfully.'
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Handle case where Vendor is not found
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Vendor not found.'
+            ], 404);
+        } catch (\Exception $e) {
+            // Handle general exceptions
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while updating the account status.',
+                'error' => $e->getMessage() // Optional: Include error details for debugging
+            ], 500);
         }
-        $vendor->account_status = $request->account_status;
-        $vendor->price_point = $request->price_point;
-        $vendor->save();
-        return redirect()->back()->with('success', 'Account status updated successfully');
     }
 
     public function checkVendorCombination(Request $request)
@@ -702,6 +773,10 @@ class VendorController extends Controller
         //     'redirect' => "register" // Replace 'register' with your desired redirect route
         // ]);
         // echo $qrCodeData; die;
+        // $subscriptionId = "sub_1QFa1xSC0b81aLgQzARwakB6";
+        // $vendorId = WinerySubscription::where('stripe_subscription_id', $subscriptionId)
+        //         ->value('vendor_id');
+        // echo $vendorId; die;
         $vendor = Vendor::with('user')->find(2);
         $data = [
             "username" => $vendor->user->email,
@@ -726,7 +801,72 @@ class VendorController extends Controller
 
     public function getExperienceTab($id)
     {
-        return view('admin.vendors.ajax.curative-experience');
+        $vendor = Vendor::find($id);
+        $experiences = Experience::where('vendor_id', $id)->get();
+        return view('admin.vendors.ajax.curative-experience', compact('experiences', 'vendor'));
+    }
+
+    public function updateExperience(Request $request, $id)
+    {
+        try {
+            // Initialize rules and messages
+            $rules = [];
+            $messages = [];
+
+            // Get existing experiences
+            $existingExperiences = Experience::where('vendor_id', $id)->get();
+
+            // Iterate through up to three experiences
+            for ($i = 0; $i < 3; $i++) {
+                $experienceData = $request->input("experience.$i");
+
+                if ($experienceData['title'] == null) {
+                    continue;
+                }
+
+                // Check if any field is filled
+                if ($experienceData['title'] || $experienceData['upgradefee'] || $experienceData['currenttype'] || $experienceData['description']) {
+                    // Define validation rules and messages
+                    $rules["experience.$i.title"] = 'required';
+                    $rules["experience.$i.upgradefee"] = 'required';
+                    $rules["experience.$i.currenttype"] = 'required';
+                    $rules["experience.$i.description"] = 'required|max:250';
+
+                    $messages["experience.$i.title.required"] = 'The experience ' . ($i + 1) . ' title is required.';
+                    $messages["experience.$i.upgradefee.required"] = 'The experience ' . ($i + 1) . ' upgrade fee is required.';
+                    $messages["experience.$i.currenttype.required"] = 'The experience ' . ($i + 1) . ' extension type is required.';
+                    $messages["experience.$i.description.required"] = 'The experience ' . ($i + 1) . ' description is required.';
+                    $messages["experience.$i.description.max"] = 'The experience ' . ($i + 1) . ' description may not be greater than 250 characters.';
+
+                    // Validate the request
+                    $request->validate($rules, $messages);
+
+                    // Update or create experience
+                    if (isset($existingExperiences[$i])) {
+                        $existingExperiences[$i]->update($experienceData);
+                    } else {
+                        Experience::create(array_merge($experienceData, ['vendor_id' => $id, 'user_id' => 1]));
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Curated experiences updated successfully.',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Handle validation errors
+            return response()->json([
+                'success' => false,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating experiences.',
+            ], 500);
+        }
     }
 
     public function getStripeDetailsTab($id)
@@ -868,7 +1008,54 @@ class VendorController extends Controller
 
     public function getAccessCredentialsTab($id)
     {
-        return view('admin.vendors.ajax.access-credentials');
+        $vendor = Vendor::find($id);
+        return view('admin.vendors.ajax.access-credentials', compact('vendor'));
+    }
+
+    public function updateAccessCredentials(Request $request, $vendorid)
+    {
+        try {
+            // Validate the input data
+            $request->validate([
+                'firstname' => 'required|string|max:255',
+                'lastname' => 'required|string|max:255',
+                'contact_number' => 'required|string|max:15', // Adjust max length as needed
+            ]);
+            $vendor = Vendor::find($vendorid);
+            // Perform the update
+            $updated = User::where('id', $vendor->user_id)->update([
+                'firstname' => $request->firstname,
+                'lastname' => $request->lastname,
+                'contact_number' => $request->contact_number,
+            ]);
+
+            // Check if the update was successful
+            if ($updated) {
+                // Refresh the authenticated user instance
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'User updated successfully.',
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'User update failed.',
+            ], 500);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Handle validation errors
+            return response()->json([
+                'success' => false,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            // Handle other exceptions
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred.',
+            ], 500);
+        }
     }
 
     public function getMediaGalleryTab($id)
@@ -879,110 +1066,351 @@ class VendorController extends Controller
     }
 
     public function uploadMedia(Request $request)
-	{
-		$vendor = Vendor::find($request->vendorid);
-		$vendor_media_type = '';
-		if ($request->vendorImage) {
-			$vendor_media_type = 'image';
-			list($type, $data) = explode(';', $request->vendorImage);
-			list(, $data) = explode(',', $data);
-			$data = base64_decode($data);
+    {
+        $vendor = Vendor::find($request->vendorid);
+        $vendor_media_type = '';
+        if ($request->vendorImage) {
+            $vendor_media_type = 'image';
+            list($type, $data) = explode(';', $request->vendorImage);
+            list(, $data) = explode(',', $data);
+            $data = base64_decode($data);
 
-			// Generate a random filename
-			$filename = Str::random(10) . '.png';
+            // Generate a random filename
+            $filename = Str::random(10) . '.png';
 
-			// Create the vendor-specific directory if it doesn't exist
-			$vendorDir = public_path('images/VendorImages/' . $vendor->vendor_name);
-			if (!File::exists($vendorDir)) {
-				File::makeDirectory($vendorDir, 0777, true, true);
-			}
+            // Create the vendor-specific directory if it doesn't exist
+            $vendorDir = public_path('images/VendorImages/' . $vendor->vendor_name);
+            if (!File::exists($vendorDir)) {
+                File::makeDirectory($vendorDir, 0777, true, true);
+            }
 
-			// Save the image to the directory
-			$filePath = $vendorDir . '/' . $filename;
-			file_put_contents($filePath, $data);
+            // Save the image to the directory
+            $filePath = $vendorDir . '/' . $filename;
+            file_put_contents($filePath, $data);
 
-			// Save the media information to the database
-			$VendorMediaGallery = new VendorMediaGallery;
-			$VendorMediaGallery->vendor_media = 'images/VendorImages/' . $vendor->vendor_name . '/' . $filename;
-			$VendorMediaGallery->vendor_media_type = 'image';
-			$VendorMediaGallery->vendor_id = $vendor->id;
+            // Save the media information to the database
+            $VendorMediaGallery = new VendorMediaGallery;
+            $VendorMediaGallery->vendor_media = 'images/VendorImages/' . $vendor->vendor_name . '/' . $filename;
+            $VendorMediaGallery->vendor_media_type = 'image';
+            $VendorMediaGallery->vendor_id = $vendor->id;
 
-			// Check if there are no existing media for this vendor
-			$existingMediaCount = VendorMediaGallery::where('vendor_id', $vendor->id)->where('is_default', 1)->count();
-			if ($existingMediaCount === 0) {
-				$VendorMediaGallery->is_default = 1; // Make this the default image
-			}
+            // Check if there are no existing media for this vendor
+            $existingMediaCount = VendorMediaGallery::where('vendor_id', $vendor->id)->where('is_default', 1)->count();
+            if ($existingMediaCount === 0) {
+                $VendorMediaGallery->is_default = 1; // Make this the default image
+            }
 
-			$VendorMediaGallery->save();
-		}
-		if ($request->youtube_link) {
-			$urlParts = parse_url($request->youtube_link);
-			if (isset($urlParts['query'])) {
-				parse_str($urlParts['query'], $query);
-				$videolink = isset($query['v']) ? "https://www.youtube.com/embed/" . $query['v'] : $request->youtube_link;
-			} else {
-				$videolink = $request->youtube_link;
-			}
+            $VendorMediaGallery->save();
+        }
+        if ($request->youtube_link) {
+            $urlParts = parse_url($request->youtube_link);
+            if (isset($urlParts['query'])) {
+                parse_str($urlParts['query'], $query);
+                $videolink = isset($query['v']) ? "https://www.youtube.com/embed/" . $query['v'] : $request->youtube_link;
+            } else {
+                $videolink = $request->youtube_link;
+            }
 
-			$vendor_media_type = 'youtube';
-			$VendorMediaGallery = new VendorMediaGallery;
-			$VendorMediaGallery->vendor_media = $videolink;
-			$VendorMediaGallery->vendor_media_type = 'youtube';
-			$VendorMediaGallery->vendor_id = $vendor->id;
-			$VendorMediaGallery->save();
-			$filePath = $videolink;
-		}
-		return response()->json(['status' => 'success', 'path' => $filePath, 'type' => $vendor_media_type, 'mediaid' => $VendorMediaGallery->id]);
-	}
+            $vendor_media_type = 'youtube';
+            $VendorMediaGallery = new VendorMediaGallery;
+            $VendorMediaGallery->vendor_media = $videolink;
+            $VendorMediaGallery->vendor_media_type = 'youtube';
+            $VendorMediaGallery->vendor_id = $vendor->id;
+            $VendorMediaGallery->save();
+            $filePath = $videolink;
+        }
+        return response()->json(['status' => 'success', 'path' => $filePath, 'type' => $vendor_media_type, 'mediaid' => $VendorMediaGallery->id]);
+    }
 
     public function deleteMedia(Request $request)
-	{
-		$media = VendorMediaGallery::findOrFail($request->mediaId);
+    {
+        $media = VendorMediaGallery::findOrFail($request->mediaId);
 
-		// Check if the image is the default
-		if ($media->is_default) {
-			return response()->json([
-				'status' => 'error',
-				'message' => 'Default media cannot be deleted. Please set another media as default before deleting this one.'
-			], 400);
-		}
+        // Check if the image is the default
+        if ($media->is_default) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Default media cannot be deleted. Please set another media as default before deleting this one.'
+            ], 400);
+        }
 
-		// Delete the file from the filesystem if it's an image
-		if ($media->vendor_media_type == "image") {
-			$filePath = public_path($media->vendor_media);
-			if (File::exists($filePath)) {
-				File::delete($filePath);
-			}
-		}
+        // Delete the file from the filesystem if it's an image
+        if ($media->vendor_media_type == "image") {
+            $filePath = public_path($media->vendor_media);
+            if (File::exists($filePath)) {
+                File::delete($filePath);
+            }
+        }
 
-		// Delete the record from the database
-		$media->delete();
+        // Delete the record from the database
+        $media->delete();
 
-		return response()->json(['status' => 'success']);
-	}
+        return response()->json(['status' => 'success']);
+    }
 
-	public function setDefaultMedia(Request $request, $vendorId)
-	{
-		// Validate the media ID
-		$request->validate([
-			'mediaId' => 'required|exists:vendor_media_galleries,id',
-		]);
+    public function setDefaultMedia(Request $request, $vendorId)
+    {
+        // Validate the media ID
+        $request->validate([
+            'mediaId' => 'required|exists:vendor_media_galleries,id',
+        ]);
 
-		// Find the media by ID
-		$media = VendorMediaGallery::findOrFail($request->mediaId);
+        // Find the media by ID
+        $media = VendorMediaGallery::findOrFail($request->mediaId);
 
-		// Ensure the media belongs to the vendor
-		if ($media->vendor_id != $vendorId) {
-			return response()->json(['status' => 'error', 'message' => 'Unauthorized action.'], 403);
-		}
+        // Ensure the media belongs to the vendor
+        if ($media->vendor_id != $vendorId) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized action.'], 403);
+        }
 
-		// Reset all media is_default to 0 for this vendor
-		VendorMediaGallery::where('vendor_id', $vendorId)->update(['is_default' => 0]);
+        // Reset all media is_default to 0 for this vendor
+        VendorMediaGallery::where('vendor_id', $vendorId)->update(['is_default' => 0]);
 
-		// Set the current media as default
-		$media->is_default = 1;
-		$media->save();
+        // Set the current media as default
+        $media->is_default = 1;
+        $media->save();
 
-		return response()->json(['status' => 'success', 'message' => 'Media set as logo successfully.']);
-	}
+        return response()->json(['status' => 'success', 'message' => 'Media set as logo successfully.']);
+    }
+
+    public function getAmenitiesTab($id)
+    {
+        $vendor = Vendor::findOrFail($id);
+        $amenities = Amenity::where('amenity_status', 'active')
+            ->with(['vendors' => function ($query) use ($id) {
+                $query->where('vendor_id', $id);
+            }]);
+        if (strtolower($vendor->vendor_type) == 'accommodation') {
+            $amenities = $amenities->where('vendor_type', 'accommodation');
+        } else if (strtolower($vendor->vendor_type) == 'excursion' || strtolower($vendor->vendor_type) == 'winery') {
+            $amenities = $amenities->where('vendor_type', NULL);
+        }
+        $amenities = $amenities->get();
+        return view('admin.vendors.ajax.amenities', compact('vendor', 'amenities'));
+    }
+
+    public function updateAmenities(Request $request, $id)
+    {
+        try {
+            $amenityId = $request->amenity_id;
+            $status = $request->status ? 'active' : 'inactive';
+
+            // Update or create vendor amenity
+            $vendorAmenity = VendorAmenity::updateOrCreate(
+                ['vendor_id' => $id, 'amenity_id' => $amenityId],
+                ['status' => $status]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Amenity status updated successfully.',
+            ]);
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Error updating amenity: ' . $e->getMessage(), [
+                'vendor_id' => $id,
+                'amenity_id' => $request->amenity_id,
+            ]);
+
+            // Return a JSON response with error
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update amenity status. Please try again later.',
+            ], 500);
+        }
+    }
+
+    public function getBookingUtilityTab($id)
+    {
+        $vendor = Vendor::find($id);
+        if (!$vendor) {
+            return redirect()->back()->with('error', 'Vendor not found.');
+        }
+        if (strtolower($vendor->vendor_type) === 'winery') {
+            $vendor->load('wineryMetadata');
+            $vendor->metadata = $vendor->wineryMetadata;
+            unset($vendor->excursionMetadata);
+        } elseif (strtolower($vendor->vendor_type) === 'excursion') {
+            $vendor->load('excursionMetadata');
+            $vendor->metadata = $vendor->excursionMetadata;
+            unset($vendor->excursionMetadata);
+        } elseif (strtolower($vendor->vendor_type) === 'accommodation') {
+            $vendor->load('accommodationMetadata');
+            $vendor->metadata = $vendor->accommodationMetadata;
+            unset($vendor->accommodationMetadata);
+        }
+        return view('admin.vendors.ajax.booking-utility', compact('vendor'));
+    }
+
+    public function updateBookingUtility(Request $request, $id)
+    {
+        $vendor = Vendor::find($id);
+        if (!$vendor) {
+            return response()->json(['status' => 'error', 'message' => 'Vendor not found.'], 404);
+        }
+
+        $required_fields = [
+            'process_type' => 'required|string|in:one-step,two-step,redirect-url',
+            'redirect_url_type' => 'nullable|required_if:process_type,redirect-url|string|in:http://,https://',
+            'redirect_url' => 'nullable|required_if:process_type,redirect-url',
+            'applicable_taxes_amount' => 'nullable|required_if:apply_applicable_taxes,1|string|max:255',
+        ];
+
+        if (strtolower($vendor->vendor_type) == 'accommodation') {
+            $required_fields = array_merge($required_fields, [
+                'checkin_start_time' => 'required',
+                'checkout_time' => 'required',
+                'security_deposit_amount' => 'nullable|required_if:apply_security_deposit,1|string|max:255',
+                'cleaning_fee_amount' => 'nullable|required_if:apply_cleaning_fee,1|string|max:255',
+                'pet_boarding' => 'nullable|required_if:apply_pet_boarding,1|string|max:255',
+                'host' => 'nullable|string|max:255',
+            ]);
+        }
+
+        $validated = $request->validate($required_fields);
+
+        try {
+            $vendor->host = $request->host ?? null;
+            $vendor->save();
+
+            if (strtolower($vendor->vendor_type) == 'accommodation') {
+                $metdata = VendorAccommodationMetadata::firstOrNew(['vendor_id' => $id]);
+                $metdata->cleaning_fee_amount = $request->cleaning_fee_amount;
+                $metdata->checkout_time = $request->checkout_time ?
+                    Carbon::createFromFormat('h:i A', $request->checkout_time)->format('H:i:s') : null;
+                $metdata->checkin_start_time = $request->checkin_start_time ?
+                    Carbon::createFromFormat('h:i A', $request->checkin_start_time)->format('H:i:s') : null;
+                $metdata->checkin_end_time = $request->checkin_end_time ?
+                    Carbon::createFromFormat('h:i A', $request->checkin_end_time)->format('H:i:s') : null;
+                $metdata->pet_boarding = $request->pet_boarding;
+                $metdata->booking_minimum = $request->booking_minimum;
+                $metdata->booking_maximum = $request->booking_maximum;
+                $metdata->security_deposit_amount = $request->security_deposit_amount;
+            }
+
+            if (strtolower($vendor->vendor_type) == 'excursion') {
+                $metdata = VendorExcursionMetadata::firstOrNew(['vendor_id' => $id]);
+            }
+
+            if (strtolower($vendor->vendor_type) == 'winery') {
+                $metdata = VendorWineryMetadata::firstOrNew(['vendor_id' => $id]);
+            }
+
+            $metdata->process_type = $request->process_type;
+            $metdata->redirect_url = $request->redirect_url_type . $request->redirect_url;
+            $metdata->applicable_taxes_amount = $request->applicable_taxes_amount;
+            $metdata->save();
+
+            return response()->json(['status' => 'success', 'message' => 'Booking utility updated successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'An error occurred while updating booking utility.'], 500);
+        }
+    }
+
+    public function updateVendorPolicy(Request $request, $id)
+    {
+        $validated = $request->validate([
+            // Other validation rules
+            'policy' => 'required|string|in:open,partial,closed'
+        ]);
+
+        try {
+            $vendor = Vendor::find($id);
+            if ($vendor) {
+                $vendor->policy = $request->policy;
+                $vendor->save();
+                return response()->json(['status' => 'success', 'message' => 'Vendor policy updated successfully.']);
+            } else {
+                return response()->json(['status' => 'error', 'message' => 'Vendor not found.'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'An error occurred while updating vendor policy.'], 500);
+        }
+    }
+
+    public function getSettingsTab($id)
+    {
+        $vendor = Vendor::find($id);
+        $vendor_type = strtolower($vendor->vendor_type);
+        $inventoryTypes = InventoryType::with('subCategories')->get();
+        $subCategories = SubCategory::whereHas('category', function ($query) use ($vendor_type) {
+            $query->where('slug', $vendor_type);
+        })->get();
+        switch (strtolower($vendor_type)) {
+            case 'excursion':
+                $vendor->load('excursionMetadata');
+                $metadata = $vendor->excursionMetadata;
+                break;
+            case 'winery':
+                $vendor->load('wineryMetadata');
+                $metadata = $vendor->wineryMetadata;
+                break;
+            case 'accommodation':
+                $vendor->load('accommodationMetadata');
+                $metadata = $vendor->accommodationMetadata;
+                break;
+            case 'licensed':
+                $vendor->load('licenseMetadata');
+                $metadata = $vendor->licenseMetadata;
+                break;
+            case 'non-licensed':
+                $vendor->load('nonLicenseMetadata');
+                $metadata = $vendor->nonLicenseMetadata;
+                break;
+                // Add other cases as necessary
+        }
+        $VendorMediaGallery = VendorMediaGallery::where('vendor_id', $id)->get();
+        return view('admin.vendors.ajax.settings', compact('vendor', 'metadata', 'VendorMediaGallery', 'inventoryTypes', 'subCategories'));
+    }
+
+    public function getSystemAdminTab($id)
+    {
+        $vendor = Vendor::find($id);
+        return view('admin.vendors.ajax.system-admin', compact('vendor'));
+    }
+
+    public function getWineTab($id)
+    {
+        $vendor = Vendor::find($id);
+        $wines = VendorWine::where('vendor_id', $id)->get();
+        return view('admin.vendors.ajax.wine-listing', compact('vendor', 'wines'));
+    }
+    public function viewWineDetails($id, $wine_id)
+    {
+        $vendor = Vendor::find($id);
+        $wine = VendorWine::find($wine_id);
+        return view('admin.vendors.ajax.wine-view', compact('wine', 'vendor'));
+    }
+
+    public function updateWineFee($id, $wine_id, Request $request)
+    {
+        $request->validate([
+            'stocking_fee' => 'required|numeric',
+        ]);
+        // update wine commission_delivery_fee
+        $wine = VendorWine::find($wine_id);
+        // $price = calculateStockingFeeAndPrice($wine->cost);
+        $wine->commission_delivery_fee = $request['stocking_fee'];
+        $wine->price = $wine->cost + $request['stocking_fee'];
+        $updated = $wine->save();
+        if ($updated) {
+            return response()->json(['status' => 'success', 'message' => 'Wine commission updated successfully.']);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'An error occurred while updating wine commission.'], 500);
+        }
+    }
+
+
+
+    public function getInquiriesTab(Request $request, $id)
+    {
+        $inquiries = Inquiry::with('vendor')->where('vendor_id', $id)->get();
+        return view('admin.vendors.ajax.booking-inquiries', compact('inquiries'));
+    }
+
+    public function getTransactionTab(Request $request, $id)
+    {
+        $orders = Order::with('vendor')->where('vendor_id', $id)->get();
+        return view('admin.vendors.ajax.transaction', compact('orders'));
+    }
 }

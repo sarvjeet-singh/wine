@@ -29,6 +29,7 @@ use App\Models\FarmingPractice;
 use App\Models\SubRegion;
 use App\Models\Establishment;
 use App\Models\Cuisine;
+use Illuminate\Support\Facades\Http;
 
 use DB;
 use Illuminate\Support\Facades\Auth;
@@ -37,6 +38,7 @@ use App\Models\Order;
 use Illuminate\Support\Facades\Validator;
 use App\Models\BusinessHour;
 use App\Models\TastingOption;
+use App\Helpers\SeasonHelper;
 
 class FrontEndController extends Controller
 {
@@ -207,9 +209,11 @@ class FrontEndController extends Controller
     private function getAccommodationDetails($short_code)
     {
         // Check if the vendor slug exists
+        $currentDate = now();
         $vendor = Vendor::with('sub_regions', 'sub_category', 'countryName', 'accommodationMetadata')->where('short_code', $short_code)->first();
         $socialLinks = $vendor->socialMedia()->first();
         $amenities = $vendor->amenities()->get();
+        $season = SeasonHelper::getSeasonAndPrice($currentDate, $vendor->id);
         // If the vendor does not exist, redirect to the homepage
         if (!$vendor) {
             return redirect('/');
@@ -217,7 +221,7 @@ class FrontEndController extends Controller
 
         $vendor->load('mediaGallery');
         // If the vendor exists, proceed with the logic to show the accommodation details
-        return view('FrontEnd.accommodation-details', compact('vendor', 'socialLinks', 'amenities'));
+        return view('FrontEnd.accommodation-details', compact('vendor', 'socialLinks', 'amenities', 'season'));
     }
 
     private function getWineryDetails($short_code)
@@ -321,7 +325,7 @@ class FrontEndController extends Controller
         $current_date =  time(); // gets the current timestamp
         $bookedAndBlockeddates = [];
         $checkOutOnly = [];
-        if ($vendor->inventory_type == "Premises") {
+        if ($vendor->inventory_type == 2) {
             $booked = DB::table('booking_dates')->where('vendor_id',  $vendor_id)->where('booking_type', '!=', 'packaged')->select('start_date', 'end_date')->get();
             $cojoin = DB::table('booking_dates')->where('vendor_id',  $vendor_id)->where('booking_type', 'packaged')->select('start_date', 'end_date')->get();
 
@@ -349,12 +353,26 @@ class FrontEndController extends Controller
             }
 
             for ($i = $current_date; $i <= $end_date; $i += 86400) {
-                if (in_array("spring", $season_types) && date('Y-m-d', $i) >= date($current_year . '-03-21') && date('Y-m-d', $i) <= date($current_year . '-06-20')) {
-                } elseif (in_array("summer", $season_types) && date('Y-m-d', $i) >= date($current_year . '-06-21') && date('Y-m-d', $i) <= date($current_year . '-09-20')) {
-                } elseif (in_array("fall", $season_types) && date('Y-m-d', $i) >= date($current_year . '-09-21') && date('Y-m-d', $i) <= date($current_year . '-12-20')) {
-                } elseif (in_array("winter", $season_types) && date('Y-m-d', $i) >= date($current_year . '-12-21') && date('Y-m-d', $i) <= date($winterYear . '-03-20')) {
+                $currentDate = date('Y-m-d', $i);
+
+                // Determine the correct year for winter's ending date
+                $winterYear = (date('m-d', $i) >= '12-21') ? date('Y', $i) + 1 : date('Y', $i);
+                $currentYear = date('Y', $i); // Adjust current year dynamically
+
+                if (
+                    (in_array("spring", $season_types) && $currentDate >= date($currentYear . '-03-21') && $currentDate <= date($currentYear . '-06-20')) ||
+                    (in_array("summer", $season_types) && $currentDate >= date($currentYear . '-06-21') && $currentDate <= date($currentYear . '-09-20')) ||
+                    (in_array("fall", $season_types) && $currentDate >= date($currentYear . '-09-21') && $currentDate <= date($currentYear . '-12-20')) ||
+                    (in_array("winter", $season_types) && (
+                        ($currentDate >= date($currentYear . '-12-21') && $currentDate <= date($currentYear . '-12-31')) ||
+                        ($currentDate >= date($winterYear . '-01-01') && $currentDate <= date($winterYear . '-03-20'))
+                    ))
+                ) {
+                    // Date is within one of the selected seasons
+                    continue;
                 } else {
-                    $dates[] = date('Y-m-d', $i); // formats each date in "YYYY-MM-DD" format and prints it
+                    // Date is unavailable
+                    $dates[] = $currentDate;
                 }
             }
 
@@ -671,6 +689,19 @@ class FrontEndController extends Controller
             'subject' => 'required|string|max:255',
             'message' => 'required|string',
         ]);
+        // Send request to Google's reCAPTCHA API
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => env('GOOGLE_RECAPTCHA_SECRET'), // Replace with your Secret Key
+            'response' => $request->input('g-recaptcha-response'),
+            'remoteip' => $request->ip(),
+        ]);
+
+        $responseBody = json_decode($response->getBody(), true);
+
+        // Check if reCAPTCHA is valid and has a good score
+        if (!$responseBody['success'] || $responseBody['score'] < 0.5) {
+            return back()->withErrors(['captcha' => 'reCAPTCHA verification failed. Please try again.']);
+        }
 
         // Retrieve request data
         $fname = $request->input('fname');
@@ -693,7 +724,17 @@ class FrontEndController extends Controller
         ])->render();
 
         // Send email using Laravel's Mail facade
-        sendEmail($to, $subject, $emailContent);
+        // sendEmail(env('ADMIN_EMAIL'), $subject, $emailContent);
+        $send = Mail::send([], [], function ($message) use ($emailContent) {
+            $message->to(env('ADMIN_EMAIL'), 'Wine Country Admin')
+                ->subject('New Contact Form Submission')
+                // ->from('collaborate@winecountryweekends.ca', 'Wine Country Admin')
+                ->html($emailContent); // Set the HTML content
+        });
+
+        if ($send === null) {
+            return back()->withErrors(['error' => 'There was an error sending your message. Please try again.']);
+        }
 
         // Redirect to the specified route after successful submission
         return redirect()->route('contact-us')->with('success', 'Your message has been sent successfully!');
@@ -1344,6 +1385,15 @@ class FrontEndController extends Controller
             $vendor_type = 'accommodation';
         }
 
+        $vendorCount = Vendor::where('vendor_type', $vendor_type)
+            ->where(function ($query) {
+                $query->where('account_status', 1)
+                    ->orWhere('account_status', 2)
+                    ->orWhere('account_status', 3);
+            })
+            ->orderBy('name', 'asc')
+            ->count();
+
         $subCategories = SubCategory::whereHas('category', function ($query) use ($vendor_type) {
             $query->where('slug', $vendor_type);
         })->get();
@@ -1352,8 +1402,16 @@ class FrontEndController extends Controller
         $cuisines = Cuisine::where('status', 1)->orderBy('name', 'asc')->get();
         $tastingOptions = TastingOption::where('status', 1)->get();
         $farmingPractices = FarmingPractice::where('status', 1)->get();
-        $cities = Vendor::where('vendor_type', $vendor_type)->orderBy('city', 'asc')->distinct()->pluck('city');
-        return view('FrontEnd.vendor-type', compact('vendor_type', 'subCategories', 'subRegions', 'establishments', 'cuisines', 'tastingOptions', 'cities', 'type', 'farmingPractices'));
+        $cities = Vendor::where('vendor_type', $vendor_type)
+            ->where(function ($query) {
+                $query->where('account_status', 1)
+                    ->orWhere('account_status', 2)
+                    ->orWhere('account_status', 3);
+            })
+            ->orderBy('city', 'asc')
+            ->distinct()
+            ->pluck('city');
+        return view('FrontEnd.vendor-type', compact('vendor_type', 'subCategories', 'subRegions', 'establishments', 'cuisines', 'tastingOptions', 'cities', 'type', 'farmingPractices', 'vendorCount'));
     }
 
     public function getVendorTypeList($vendor_type, Request $request)
