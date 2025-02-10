@@ -56,8 +56,7 @@
                                 <label for="firstname" class="col-form-label">{{ __('Given Name(s)') }}</label>
                                 <input id="firstname" type="text"
                                     class="form-control required @error('firstname') is-invalid @enderror" name="firstname"
-                                    value="{{ old('firstname') }}" autocomplete="firstname" autofocus
-                                    placeholder="">
+                                    value="{{ old('firstname') }}" autocomplete="firstname" autofocus placeholder="">
 
                                 @error('firstname')
                                     <span class="invalid-feedback" role="alert">
@@ -69,8 +68,7 @@
                                 <label for="lastname" class="col-form-label">{{ __('Last/Surname') }}</label>
                                 <input id="lastname" type="text"
                                     class="form-control required @error('lastname') is-invalid @enderror" name="lastname"
-                                    value="{{ old('lastname') }}" autocomplete="lastname" autofocus
-                                    placeholder="">
+                                    value="{{ old('lastname') }}" autocomplete="lastname" autofocus placeholder="">
 
                                 @error('lastname')
                                     <span class="invalid-feedback" role="alert">
@@ -81,19 +79,37 @@
                         </div>
 
                         <div class="row mb-3 mt-4">
-                            <label for="email" class="col-form-label">{{ __('eMail Address') }}</label>
-                            <div class="col-md-12" style="position:relative">
-                                <i class="fa-solid fa-envelope login-custom-icon"></i>
-                                <input id="email" type="email"
-                                    class="form-control left-with-icon required @error('email') is-invalid @enderror"
-                                    name="email" value="{{ old('email') }}" autocomplete="email" autofocus
-                                    placeholder="">
+                            <div class="col-md-6">
+                                <label for="email" class="col-form-label">{{ __('eMail Address') }}</label>
+                                <div style="position:relative">
+                                    <i class="fa-solid fa-envelope login-custom-icon"></i>
+                                    <input id="email" type="email"
+                                        class="form-control left-with-icon required @error('email') is-invalid @enderror"
+                                        name="email" value="{{ old('email') }}" autocomplete="email" autofocus
+                                        placeholder="">
 
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
+                                    @error('email')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="col-form-label">{{ __('Phone Number') }}</label>
+                                <div style="position:relative">
+                                    <i class="fa-solid fa-phone login-custom-icon"></i>
+                                    <input id="phone" type="tel"
+                                        class="form-control phone-number left-with-icon @error('phone') is-invalid @enderror"
+                                        name="phone" value="{{ old('phone') }}" autocomplete="phone" autofocus
+                                        placeholder="">
+
+                                    @error('phone')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 
@@ -104,14 +120,14 @@
                                     <i class="fa-solid fa-lock login-custom-icon"></i>
                                     <input id="password" type="password"
                                         class="form-control left-with-icon gpassword @error('password') is-invalid @enderror"
-                                        name="password" required autocomplete="new-password"
-                                        placeholder="">
+                                        name="password" required autocomplete="new-password" placeholder="">
                                     <i class="fa-solid fa-eye togglePassword password-custom-icon"></i>
                                     {{-- <span id="password-strength"
                                         style="position:relative; top:100%; left:0; font-size:0.8em; color:red;"></span> --}}
                                 </div>
                                 {{-- @error('password') --}}
-                                <span class="theme-color mt-1" role="alert" style="display: inline-block;line-height: normal;font-size: 14px;">
+                                <span class="theme-color mt-1" role="alert"
+                                    style="display: inline-block;line-height: normal;font-size: 14px;">
                                     <strong>Password must contain uppercase, lowercase, number, and special
                                         character</strong>
                                 </span>
@@ -132,8 +148,8 @@
                         <div class="row mb-0">
                             <input type="hidden" name="g-recaptcha-response" id="recaptcha-token">
                             <div class="col-md-12 text-center">
-                                <button type="submit" class="wine-btn register-continue">
-                                    {{ __('Continue') }}
+                                <button type="submit" class="wine-btn">
+                                    {{ __('Register') }}
                                 </button>
                             </div>
                         </div>
@@ -153,10 +169,10 @@
                             </div>
                         </div>
                         <!-- <div class="row mb-5">
-                            <div class="col-md-12 text-center">
-                                Already Have an account? <a href="{{ route('login') }}" class="fw-bold">Sign In</a>
-                            </div>
-                        </div> -->
+                                        <div class="col-md-12 text-center">
+                                            Already Have an account? <a href="{{ route('login') }}" class="fw-bold">Sign In</a>
+                                        </div>
+                                    </div> -->
                     </form>
                     <hr>
                     <div class="current-benifits mb-5">
@@ -182,7 +198,7 @@
 
 
     <!-- Modal -->
-    <div class="modal fade" id="registerterms" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="registerterms" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-body">
@@ -238,7 +254,7 @@
                             <!-- <div class="alert alert-danger msg" id="CAPTCHAError" style="display:none;">Skill Testing code is required.</div> -->
                             <!-- @error('captcha')
         <div class="alert alert-danger">Skill Testing code is required.</div>
-    @enderror -->
+        @enderror -->
                         </div>
                     </div>
 
@@ -249,7 +265,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 @endsection
 
 @section('js')
@@ -258,11 +274,48 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         $(document).ready(function() {
+            $('.phone-number').on('input', function() {
+                const $input = $(this);
+                const cursorPosition = $input.prop('selectionStart');
+                const rawValue = $input.val().replace(/\D/g, ''); // Remove all non-digit characters
+                let formattedValue = '';
+
+                // Format the phone number
+                if (rawValue.length > 3 && rawValue.length <= 6) {
+                    formattedValue = rawValue.slice(0, 3) + '-' + rawValue.slice(3);
+                } else if (rawValue.length > 6) {
+                    formattedValue =
+                        rawValue.slice(0, 3) +
+                        '-' +
+                        rawValue.slice(3, 6) +
+                        '-' +
+                        rawValue.slice(6, 10);
+                } else {
+                    formattedValue = rawValue;
+                }
+
+                // Update the input value
+                $input.val(formattedValue);
+
+                // Restore cursor position
+                const adjustedPosition =
+                    cursorPosition + (formattedValue.length - rawValue.length);
+                $input[0].setSelectionRange(adjustedPosition, adjustedPosition);
+            });
             // Add custom password validation method
             $.validator.addMethod("strongPassword", function(value) {
                 return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
             }, "Password must contain uppercase, lowercase, number, and special character");
-
+            $.validator.addMethod(
+                "phoneNumberFormat",
+                function(value, element) {
+                    const rawValue = value.replace(/\D/g, ''); // Remove all non-digit characters
+                    // Check if the number follows the desired format (e.g., ###-###-####)
+                    const isValidFormat = /^\d{3}-\d{3}-\d{4}$/.test(value);
+                    return this.optional(element) || (rawValue.length === 10 && isValidFormat);
+                },
+                "Please enter a valid phone number in the format ###-###-####"
+            );
             // Initialize jQuery Validation for the registration form
             $('#guestregisterform').validate({
                 rules: {
@@ -278,6 +331,21 @@
                                 _token: "{{ csrf_token() }}", // Send CSRF token for security
                                 email: function() {
                                     return $("#email")
+                                        .val(); // Send email value to backend for uniqueness check
+                                }
+                            }
+                        }
+                    },
+                    phone: {
+                        // required: true,
+                        phoneNumberFormat: true,
+                        remote: {
+                            url: "{{ route('check.phone') }}", // Correct route to check email uniqueness
+                            type: "post",
+                            data: {
+                                _token: "{{ csrf_token() }}", // Send CSRF token for security
+                                phone: function() {
+                                    return $("#phone")
                                         .val(); // Send email value to backend for uniqueness check
                                 }
                             }
@@ -300,6 +368,11 @@
                         required: "Please enter an email address",
                         email: "Please enter a valid email address",
                         remote: "Email already exists try another one"
+                    },
+                    phone: {
+                        required: "Please enter your phone number",
+                        phoneNumberFormat: "Please enter a valid phone number in the format ###-###-####",
+                        remote: "Phone number already exists try another one"
                     },
                     password: {
                         required: "Please provide a password",
@@ -325,7 +398,7 @@
                 },
                 submitHandler: function(form) {
                     // Show the terms modal when the form passes the initial validation
-                    $('#registerterms').modal('show');
+                    form.submit();
                 }
             });
 

@@ -19,6 +19,7 @@
                                         <th width="20%">Title</th>
                                         <th width="20%">Meta Key</th>
                                         <th width="20%">Meta Value</th>
+                                        <th width="20%">Status</th>
                                         <th width="20%">Action</th>
                                     </tr>
                                 </thead>
@@ -30,10 +31,12 @@
                                                 <td>{{ $setting->title }}</td>
                                                 <td>{{ $setting->key }}</td>
                                                 <td>{{ $setting->value }}</td>
+                                                <td class="{{ $setting->status ? 'text-success' : 'text-danger' }}">
+                                                    {{ $setting->status ? 'Active' : 'Inactive' }}
+                                                </td>
                                                 <td>
                                                     <a href="javascript:void(0);" data-bs-target="#addInfo"
-                                                        class="text-white edit-btn"
-                                                        data-id="{{ $setting->id }}">
+                                                        class="text-white edit-btn" data-id="{{ $setting->id }}">
                                                         <i class="fa fa-edit"></i>
                                                     </a>
                                                 </td>
@@ -85,6 +88,10 @@
                                 placeholder="Enter Value" required>
                             <label for="value">Value</label>
                         </div>
+                        <div>
+                            <input type="checkbox" class="form-check-input" name="status" value="1" id="status">
+                            <label for="status">Status</label>
+                        </div>
                     </div>
 
                     <div class="modal-footer">
@@ -113,7 +120,7 @@
                     },
                     value: {
                         required: true,
-                        minlength: 3
+                        minlength: 1
                     }
                 },
                 messages: {
@@ -152,11 +159,13 @@
                         data: $(form).serialize(),
                         success: function(response) {
                             // Handle success response
-                            if (response.status === 'success') {
+                            if (response.status) {
                                 showToast("Success", response.message, "success");
                                 // Close the modal
                                 $('#addInfo').modal('hide');
-                                location.reload();
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
                             }
                         },
                         error: function(xhr) {
@@ -180,11 +189,14 @@
                             const data = response.data;
 
                             // Populate the form fields
-                            $("#addInfoForm input[name='id']").val(data.id).prop("readonly", true);
-                            $("#addInfoForm input[name='title']").val(data.title).prop("readonly", true);
+                            $("#addInfoForm input[name='id']").val(data.id).prop("readonly",
+                                true);
+                            $("#addInfoForm input[name='title']").val(data.title).prop(
+                                "readonly", true);
                             $("#addInfoForm input[name='key']").val(data.key).prop("readonly",
                                 true); // Disable key editing
                             $("#addInfoForm input[name='value']").val(data.value);
+                            $("#addInfoForm input[name='status']").prop("checked", data.status);
 
                             // Set modal title
                             // $("#addInfoLabel").text("Edit Configuration Setting");

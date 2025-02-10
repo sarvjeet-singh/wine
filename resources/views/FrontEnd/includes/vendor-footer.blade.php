@@ -11,6 +11,8 @@
                             class="text-decoration-none text-dark">Guest Rewards</a></li>
                     <li class="mb-sm-0 mb-2"><a href="{{ route('about-us') }}"
                             class="text-decoration-none text-dark">About Us</a></li>
+                    <li class="mb-sm-0 mb-2"><a href="{{ route('terms') }}" class="text-decoration-none text-dark">Terms
+                            & Conditions</a></li>
                     <li class=""><a href="{{ route('contact-us') }}"
                             class="text-decoration-none text-dark">Contact Us</a></li>
                 </ul>
@@ -84,5 +86,20 @@
     document.addEventListener('scroll', onScroll);
 </script>
 <!-- /Header Scroll JS -->
-
-<script></script>
+@if(!empty(config('site.tawk_code')))
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+    var Tawk_API = Tawk_API || {},
+        Tawk_LoadStart = new Date();
+    (function() {
+        var s1 = document.createElement("script"),
+            s0 = document.getElementsByTagName("script")[0];
+        s1.async = true;
+        s1.src = '{{ config('site.tawk_code') }}';
+        s1.charset = 'UTF-8';
+        s1.setAttribute('crossorigin', '*');
+        s0.parentNode.insertBefore(s1, s0);
+    })();
+</script>
+<!--End of Tawk.to Script-->
+@endif

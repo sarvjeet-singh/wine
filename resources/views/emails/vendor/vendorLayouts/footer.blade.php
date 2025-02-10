@@ -33,6 +33,7 @@
             </li>
         </ul>
     </div> --}}
+    <p style="text-align: center;"><strong>Please do not reply to this email.  This address is for outgoing mail only and is not monitored.  If you wish to reach us for any matter please direct your email to the address of a known individual or use our <a href="{{route('contact-us')}}">“Contact Us”</a> form for all general inquiries. </strong></p>
     <p>&copy; 2024 Wine Country Weekends. All rights reserved.</p>
 </div>
 <!-- /Email Footer -->

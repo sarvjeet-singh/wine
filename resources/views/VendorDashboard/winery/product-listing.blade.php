@@ -128,12 +128,12 @@
 
                                                     <!-- <div class="d-flex align-items-center justify-content-between mb-1">
 
-                                                                        <h6 class="wine-title mb-0 fw-bold"><a
-                                                                                href="{{ route('winery-shop.detail', ['wineid' => $wine->id, 'shopid' => $wine->vendor_id, 'vendorid' => $vendorid]) }}">{{ $vendor->vendor_name }}</a>
+                                                                            <h6 class="wine-title mb-0 fw-bold"><a
+                                                                                    href="{{ route('winery-shop.detail', ['wineid' => $wine->id, 'shopid' => $wine->vendor_id, 'vendorid' => $vendorid]) }}">{{ $vendor->vendor_name }}</a>
 
-                                                                        </h6>
+                                                                            </h6>
 
-                                                                    </div> -->
+                                                                        </div> -->
 
                                                     <h5 class="fw-bold mb-1">{{ $wine->series }}
 
@@ -149,14 +149,22 @@
                                                         class="rs-value d-flex align-items-center justify-content-between gap-1">
                                                         <h6 class="fs-7 mb-0 fw-bold">Residual Sugars</h6>
                                                         <p class="fs-7 mb-0">
-                                                            {{ $wine->rs ? getResidualSugars($wine->rs, $wine->rs_value) : '-' }}</p>
+                                                            {{ $wine->rs ? getResidualSugars($wine->rs, $wine->rs_value) : '-' }}
+                                                        </p>
                                                     </div>
                                                     <div
                                                         class="varietal-values d-flex align-items-center justify-content-between gap-1">
                                                         <h6 class="fs-7 mb-0 fw-bold">Varietal</h6>
-                                                        <p class="fs-7 mb-0">{{ $wine->grape_varietals ?? '-' }}</p>
+                                                        @php
+                                                            $grape_varietals = '-';
+                                                            if (!empty($wine->grape_varietals)) {
+                                                                $grape_varietals = explode(',', $wine->grape_varietals);
+                                                                $grape_varietals = $grape_varietals[0];
+                                                            }
+                                                        @endphp
+                                                        <p class="fs-7 mb-0">{{ $grape_varietals }}</p>
                                                     </div>
-                                                    @if ($vendor->account_status == 1)
+                                                @if ($vendor->account_status == 1)
                                                         <div>
                                                             <div
                                                                 class="d-flex align-items-center justify-content-between gap-2 mt-2">
@@ -190,22 +198,22 @@
                                                                 <p class="wine-price fw-bold mb-0">${{ $wine->price }}</p>
                                                             </div>
                                                             <!-- <div
-                                                                                                            class="d-flex align-items-center justify-content-between gap-2 mt-3">
-                                                                                                            <div class="cart-btn text-end">
-                                                                                                                <a href="javascript:void(0)" data-type="bottle"
-                                                                                                                    data-id="{{ $wine->id }}"
-                                                                                                                    class="btn wine-btn add-to-cart w-100">Add Bottle</a>
-                                                                                                            </div>
-                                                                                                            <div class="cart-btn text-end">
-                                                                                                                @if ($wine->inventory > 12)
+                                                                                                                class="d-flex align-items-center justify-content-between gap-2 mt-3">
+                                                                                                                <div class="cart-btn text-end">
+                                                                                                                    <a href="javascript:void(0)" data-type="bottle"
+                                                                                                                        data-id="{{ $wine->id }}"
+                                                                                                                        class="btn wine-btn add-to-cart w-100">Add Bottle</a>
+                                                                                                                </div>
+                                                                                                                <div class="cart-btn text-end">
+                                                                                                                    @if ($wine->inventory > 12)
     <a href="javascript:void(0)" data-type="case"
-                                                                                                                    data-id="{{ $wine->id }}"
-                                                                                                                    class="btn wine-btn add-to-cart w-100">Add Case</a>
+                                                                                                                        data-id="{{ $wine->id }}"
+                                                                                                                        class="btn wine-btn add-to-cart w-100">Add Case</a>
 @else
     <a href="javascript:void(0)" title="Low Inventory" class="btn wine-btn w-100 disabled">Add Case</a>
     @endif
-                                                                                                            </div>
-                                                                                                        </div> -->
+                                                                                                                </div>
+                                                                                                            </div> -->
                                                             <div
                                                                 class="d-flex align-items-center justify-content-between gap-2 mt-3">
                                                                 <div class="input-group">
@@ -219,8 +227,9 @@
 
                                                                     <input type="text" id="quantity" name="quantity"
                                                                         class="form-control input-number quantity"
-                                                                        value="1" min="1" oninput="this.value = this.value < this.min ? this.min : this.value"
-                                                                        max="{{ $wine->inventory }}" >
+                                                                        value="1" min="1"
+                                                                        oninput="this.value = this.value < this.min ? this.min : this.value"
+                                                                        max="{{ $wine->inventory }}">
                                                                     <span class="input-group-btn">
                                                                         <button type="button"
                                                                             class="quantity-right-plus btn btn-success btn-number"
@@ -234,7 +243,7 @@
                                                                     <a href="javascript:void(0)"
                                                                         data-id="{{ $wine->id }}"
                                                                         class="btn wine-btn add-to-cart"
-                                                                        data-quantity="{{$wine->inventory > 12 ? 12 : 1}}">Add
+                                                                        data-quantity="{{ $wine->inventory > 12 ? 12 : 1 }}">Add
                                                                         to Cart</a>
                                                                     {{-- @else
                                                                     <a href="javascript:void(0)" title="Low Inventory"

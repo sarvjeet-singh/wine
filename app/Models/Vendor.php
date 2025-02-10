@@ -47,6 +47,9 @@ class Vendor extends Model
         'host',
         'short_code',
         'email_sent_at',
+        'stripe_account_id',
+        'stripe_onboarding_account_status',
+        'settlement_duration',
     ];
     protected static function boot()
     {

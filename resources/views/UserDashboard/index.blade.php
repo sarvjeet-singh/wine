@@ -77,13 +77,15 @@
                         </div>
                     </div>
                     <div class="col-xl-3 col-6">
-                        <div class="top-boxes">
-                            <div class="box-image">
-                                <img src="{{ asset('images/icons/amount-box-icon.png') }}">
+                        <a href="{{ route('wallet-history') }}">
+                            <div class="top-boxes">
+                                <div class="box-image">
+                                    <img src="{{ asset('images/icons/amount-box-icon.png') }}">
+                                </div>
+                                <div class="box-points">${{ $balance }}</div>
+                                <div class="box-text">Bottle Bucks</div>
                             </div>
-                            <div class="box-points">$25</div>
-                            <div class="box-text">Bottle Bucks</div>
-                        </div>
+                        </a>
                     </div>
                     <div class="col-xl-3 col-6">
                         <div class="top-boxes">
@@ -120,7 +122,8 @@
                                 </div>
                             </div>
                             <div class="information-box-body">
-                                <div class="box-body-label">{{Auth::user()->profile_image ? 'Profile Image' : 'Upload Profile Image'}}</div>
+                                <div class="box-body-label">
+                                    {{ Auth::user()->profile_image ? 'Profile Image' : 'Upload Profile Image' }}</div>
                                 <div class="row g-3 mt-sm-3 mt-2">
                                     <div class="col-md-4 profile-parent">
                                         <img src="{{ Auth::user()->profile_image ? asset('images/UserProfile/' . Auth::user()->profile_image) : asset('images/UserProfile/default-profile.png') }}"
@@ -143,7 +146,11 @@
                                                 <div class="box-body-information">{{ Auth::user()->lastname }}</div>
                                             </div>
                                             <div class="col-sm-5 mb-sm-0 mb-2">
-                                                <div class="box-body-label">Email / Username:</div>
+                                                <div class="box-body-label">Email / Username: @if (!empty(Auth::user()->email_verified_at))
+                                                        <i class="fas fa-check-circle text-success"
+                                                            title="Email Verified"></i>
+                                                    @endif
+                                                </div>
                                                 <div class="box-body-information">{{ Auth::user()->email }}</div>
                                             </div>
 
@@ -168,7 +175,8 @@
                                             <div class="col-sm-4 mb-sm-0 mb-2">
                                                 <div class="box-body-label">Member Since</div>
                                                 <div class="box-body-information">
-                                                    {{ Auth::user()->created_at->format('Y-m-d') }}</div>
+                                                    {{ toLocalTimezone(Auth::user()->created_at, getUserTimezone()) }}
+                                                </div>
                                             </div>
                                             <div class="col-sm-3 mb-sm-0 mb-2">
                                                 <div class="box-body-label">User Role:</div>
@@ -260,7 +268,9 @@
                                     </div>
                                     <div class="col-md-3 mb-sm-0 mb-2">
                                         <div class="box-body-label">Province/State:</div>
-                                        <div class="box-body-information">{{ Auth::user()->state }}</div>
+                                        <div class="box-body-information">
+                                            {{ Auth::user()->country == 'Other' ? Auth::user()->other_state : Auth::user()->state }}
+                                        </div>
                                     </div>
                                     <div class="col-md-4 mt-sm-2">
                                         <div class="box-body-label">Postal Code/Zip:</div>
@@ -268,41 +278,44 @@
                                     </div>
                                     <div class="col-md-4 mt-sm-2">
                                         <div class="box-body-label">Country:</div>
-                                        <div class="box-body-information">{{ Auth::user()->country }}</div>
+                                        <div class="box-body-information">
+                                            {{ Auth::user()->country == 'Other' ? Auth::user()->other_country : Auth::user()->country }}
+                                        </div>
                                     </div>
                                     <div class="col-md-4 mt-sm-2">
                                         <div class="box-body-label">Contact Ph#:</div>
                                         <div class="box-body-information">{{ Auth::user()->contact_number }}</div>
                                     </div>
                                 </div>
-                                @if(!empty(Auth::user()->government_proof_front))
-                                <div class="row mt-5">
-                                    <div class="col-sm-12 text-sm-start text-center">
-                                        <button id="show_id" class="btn wine-btn">View ID</button>
-                                    </div>
-                                </div>
-                                <div class="row mt-3" id="proof-images">
-                                    <div class="d-flex">
-                                        <div class="col-sm-4">
-                                            <div class="image-container">
-                                                <img src="images/GovermentProof/{{ Auth::user()->government_proof_front }}"
-                                                    height="200px" width="200px" class="zoomable-image">
-                                            </div>
+                                @if (!empty(Auth::user()->government_proof_front))
+                                    <div class="row mt-5">
+                                        <div class="col-sm-12 text-sm-start text-center">
+                                            <button id="show_id" class="btn wine-btn">View ID</button>
                                         </div>
-                                        {{-- <div class="col-sm-4">
+                                    </div>
+                                    <div class="row mt-3" id="proof-images">
+                                        <div class="d-flex">
+                                            <div class="col-sm-4">
+                                                <div class="image-container">
+                                                    <img src="images/GovermentProof/{{ Auth::user()->government_proof_front }}"
+                                                        height="200px" width="200px" class="zoomable-image">
+                                                </div>
+                                            </div>
+                                            {{-- <div class="col-sm-4">
                                             <div class="image-container">
                                                 <img src="images/GovermentProof/{{ Auth::user()->government_proof_back }}"
                                                     height="200px" width="200px" class="zoomable-image">
                                             </div>
                                         </div> --}}
+                                        </div>
                                     </div>
-                                </div>
                                 @else
-                                <div class="row mt-5">
-                                    <div class="col-sm-12 text-sm-start text-center">
-                                        <a href="{{ route('user-guest-registry') }}" class="btn wine-btn">Add Government ID Proof</a>
+                                    <div class="row mt-5">
+                                        <div class="col-sm-12 text-sm-start text-center">
+                                            <a href="{{ route('user-guest-registry') }}" class="btn wine-btn">Add
+                                                Government ID Proof</a>
+                                        </div>
                                     </div>
-                                </div>
                                 @endif
                                 {{-- <div class="box-body-label mt-5">See Emergency Contact</div>
                                 <div class="row mt-3">
@@ -339,7 +352,8 @@
                     <div class="modal-body text-center pb-4">
                         <img src="{{ asset('images/icons/clapping.png') }}">
                         <h3 class="fw-bold mt-4">Congrats</h3>
-                        <p class="fs-5">You have earned <span class="theme-color fw-bold">$25</span> Bottle Bucks just
+                        <p class="fs-5">You have earned <span class="theme-color fw-bold">${{ $balance }}</span>
+                            Bottle Bucks just
                             for registering</p>
                     </div>
                 </div>

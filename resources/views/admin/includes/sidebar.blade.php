@@ -62,5 +62,17 @@
                 <span class="link_name">Manage Review & Testimonial</span>
             </a>
         </li>
+        <li class="position-relative">
+            <a href="{{route('admin.wallet.index')}}">
+                <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
+                <span class="link_name">Manage Bottle Bucks</span>
+            </a>
+        </li>
+        <li class="position-relative">
+            <a href="{{route('admin.configuration-settings')}}">
+                <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
+                <span class="link_name">Configuration Settings </span>
+            </a>
+        </li>
     </ul>
 </div>

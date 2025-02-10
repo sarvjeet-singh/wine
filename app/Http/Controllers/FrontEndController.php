@@ -29,7 +29,9 @@ use App\Models\FarmingPractice;
 use App\Models\SubRegion;
 use App\Models\Establishment;
 use App\Models\Cuisine;
+use App\Models\Wallet;
 use Illuminate\Support\Facades\Http;
+use App\Helpers\TimezoneHelper;
 
 use DB;
 use Illuminate\Support\Facades\Auth;
@@ -60,6 +62,18 @@ class FrontEndController extends Controller
      */
     public function home()
     {
+        // // Convert local to UTC
+        // $utcTime = TimezoneHelper::toUTC('2025-01-13 10:00:00', 'America/New_York');
+        // echo $utcTime; // Outputs: 2025-01-13 15:00:00
+
+        // // Convert UTC to local
+        // $localTime = TimezoneHelper::toLocal('2025-01-13 15:00:00', 'America/New_York');
+        // echo $localTime; // Outputs: 2025-01-13 10:00:00
+
+        // // Get user's timezone
+        // $userTimezone = TimezoneHelper::getUserTimezone();
+        // echo $userTimezone;
+        
         $reviews = Review::where('review_status', 'approved')->get();
         return view('FrontEnd.home', compact('reviews'));
     }
@@ -209,10 +223,10 @@ class FrontEndController extends Controller
     private function getAccommodationDetails($short_code)
     {
         // Check if the vendor slug exists
-        $currentDate = now();
         $vendor = Vendor::with('sub_regions', 'sub_category', 'countryName', 'accommodationMetadata')->where('short_code', $short_code)->first();
         $socialLinks = $vendor->socialMedia()->first();
         $amenities = $vendor->amenities()->get();
+        $currentDate = now();
         $season = SeasonHelper::getSeasonAndPrice($currentDate, $vendor->id);
         // If the vendor does not exist, redirect to the homepage
         if (!$vendor) {
@@ -307,12 +321,6 @@ class FrontEndController extends Controller
 
     public function manage_sub_regionsPost(Request $request)
     {
-        // $user_data = Auth::user();
-        // if($user_data){
-        // 	$user_id = $user_data->id;
-        // }else{
-        // 	$user_id = null;
-        // }
         $vendor_id = $request->vendor_id;
         $vendor = Vendor::find($vendor_id);
         $dates = array();
@@ -325,6 +333,7 @@ class FrontEndController extends Controller
         $current_date =  time(); // gets the current timestamp
         $bookedAndBlockeddates = [];
         $checkOutOnly = [];
+        $checkInOnly = [];
         if ($vendor->inventory_type == 2) {
             $booked = DB::table('booking_dates')->where('vendor_id',  $vendor_id)->where('booking_type', '!=', 'packaged')->select('start_date', 'end_date')->get();
             $cojoin = DB::table('booking_dates')->where('vendor_id',  $vendor_id)->where('booking_type', 'packaged')->select('start_date', 'end_date')->get();
@@ -376,32 +385,29 @@ class FrontEndController extends Controller
                 }
             }
 
-            // if(count($booked_dates)){
-            // 	foreach ($booked_dates as $value){
-            // 		$diff=date_diff(date_create($value->check_in),date_create($value->check_out));
-            // 		$days = $diff->format("%a").",";
-            // 		$check_in = $value->check_in;
-            // 		array_push($dates,$value->check_in);
-            // 		for ($day = 1; $day <= $days; $day++) {
-            // 			$check_in = date('Y-m-d', strtotime(($check_in . ' 1 day')));
-            // 			array_push($dates,$check_in);
-            // 		}
-            // 	}
-            // }
-
             if (count($booked)) {
                 foreach ($booked as $value) {
                     $diff = date_diff(date_create($value->start_date), date_create($value->end_date));
                     $days = $diff->format("%a") . ",";
                     $start_date = $value->start_date;
-                    $checkOutOnly[] =  date('Y-m-d', strtotime(($start_date . '-1 day')));
-                    array_push($bookedAndBlockeddates, $value->start_date);
-                    for ($day = 1; $day <= $days; $day++) {
-                        $start_date = date('Y-m-d', strtotime(($start_date . '1 day')));
-                        array_push($bookedAndBlockeddates, $start_date);
+                    $end_date = $value->end_date;
+                    $checkOutOnly[] =  $start_date;
+                    $checkInOnly[] =  $end_date;
+                    // array_push($bookedAndBlockeddates, $value->start_date);
+                    $inside_start_date = date('Y-m-d', strtotime(($start_date . '-1 day')));
+                    for ($day = 0; $day <= $days; $day++) {
+                        $inside_start_date = date('Y-m-d', strtotime(($inside_start_date . '1 day')));
+                        if (in_array($inside_start_date, $checkOutOnly)) {
+                            continue;
+                        }
+                        if (in_array($inside_start_date, $checkInOnly)) {
+                            continue;
+                        }
+                        array_push($bookedAndBlockeddates, $inside_start_date);
                     }
                 }
             }
+
             if (count($cojoin)) {
                 foreach ($cojoin as $value) {
                     $diff = date_diff(date_create($value->start_date), date_create($value->end_date));
@@ -468,6 +474,7 @@ class FrontEndController extends Controller
         $data['dates'] = $dates;
         $data['bookedAndBlockeddates']  = $bookedAndBlockeddates;
         $data['checkOutOnly']           = $checkOutOnly;
+        $data['checkInOnly']           = $checkInOnly;
         // $data['booking_minimum']        = isset($VendorBookingSeason->booking_min) ? $VendorBookingSeason->booking_min : '';
         // $data['booking_maximum']        = isset($VendorBookingSeason->booking_max) ? $VendorBookingSeason->booking_max : '';
         // $data['refund_policy']          = isset($VendorBookingSeason->refund_policy) ? $VendorBookingSeason->refund_policy : '';
@@ -935,12 +942,15 @@ class FrontEndController extends Controller
         if (!$vendor) {
             return redirect()->route('home')->with('error', 'Vendor not found');
         }
-
+        $wallet = Wallet::where('customer_id', Auth::user()->id)->first();
 
         $vendor->load('mediaGallery');
 
+        $currentDate = now();
+        $season = SeasonHelper::getSeasonAndPrice($currentDate, $vendor->id);
+
         // Return the view with the booking details
-        return view('FrontEnd.checkout', compact('booking', 'vendor', 'inquiry'));
+        return view('FrontEnd.checkout', compact('booking', 'vendor', 'inquiry', 'wallet', 'season'));
     }
 
     public function getVendorDetails($vendorid)
@@ -1729,6 +1739,9 @@ class FrontEndController extends Controller
     public function detailsShortCode($short_code, Request $request)
     {
         $vendor = Vendor::where('short_code', $short_code)->first();
+        if (!$vendor) {
+            abort(404);
+        }
         if (strtolower($vendor->vendor_type) == 'accommodation') {
             return $this->getAccommodationDetails($short_code);
         } else if (strtolower($vendor->vendor_type) == 'winery') {

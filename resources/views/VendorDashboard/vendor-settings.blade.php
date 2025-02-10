@@ -484,7 +484,7 @@
                                 <!-- Add method="PUT" if you are updating -->
                                 <div class="row g-3 mt-1">
                                     <div class="col-12">
-                                        <div>
+                                        <div class="mb-1">
                                             <label for="vendor_sub_category"
                                                 class="form-label fw-bold">{{ ucfirst($vendor->vendor_type) }}
                                                 Sub-Type*</label>
@@ -493,7 +493,7 @@
                                             @if (count($subCategories) > 0)
                                                 @foreach ($subCategories as $subCategory)
                                                     <div class="col-lg-6 col-12">
-                                                        <div class="form-check mb-3" style="min-height: 70px;">
+                                                        <div class="form-check mb-3">
                                                             <input class="form-check-input" type="radio"
                                                                 name="vendor_sub_category"
                                                                 id="vendor_sub_category_{{ $subCategory->id }}"

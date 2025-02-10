@@ -23,18 +23,6 @@ class OrderTransaction extends Model
         'expiry',
     ];
 
-    // Accessor to convert the Unix timestamp to Y-m-d H:i:s format
-    public function getTransactionCreatedAtAttribute($value)
-    {
-        return \Carbon\Carbon::createFromTimestamp($value)->format('Y-m-d H:i:s');
-    }
-
-    // Mutator to ensure Unix timestamp is saved correctly
-    public function setTransactionCreatedAtAttribute($value)
-    {
-        $this->attributes['transaction_created_at'] = \Carbon\Carbon::parse($value)->timestamp;
-    }
-
     // If you have a relation to the Order model
     public function order()
     {

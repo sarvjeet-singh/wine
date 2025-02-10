@@ -24,9 +24,9 @@
                                 <tr>
                                     <td>#{{ $order->id }}</td>
                                     <td>{{ $order->vendor->vendor_name }}</td>
-                                    <td>{{ $order->created_at->format('m/d/Y') }}</td>
+                                    <td>{{ toLocalTimezone($order->created_at, getUserTimezone()) }}</td>
                                     <td>${{ $order->order_total }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($order->check_in_at)->format('m/d/Y') ?? 'N/A' }}</td>
+                                    <td>{{ toLocalTimezone($order->check_in_at, getUserTimezone()) ?? 'N/A' }}</td>
                                     <td><a href="{{ route('user.orderDetail', $order->id) }}" class="btn btn-primary">View
                                     </td>
                                 </tr>

@@ -14,7 +14,17 @@ class Order extends Model
 
     // Define the fillable fields for mass assignment
     protected $fillable = [
-        'user_id',
+        'name',
+        'email',
+        'phone',
+        'street_address',
+        'suite',
+        'city',
+        'state',
+        'country',
+        'postal_code',
+        'suite',
+        'customer_id',
         'vendor_id',
         'check_in_at',
         'check_out_at',
@@ -32,6 +42,7 @@ class Order extends Model
         'tax_rate',
         'order_total',
         'inquiry_id',
+        'wallet_used',
     ];
 
     // If experiences_selected is stored as JSON, you can cast it to an array

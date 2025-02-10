@@ -29,6 +29,7 @@
                                         <th>Username</th>
                                         <th>Vendor Type</th>
                                         <th>Vendor Name</th>
+                                        <th>Submission Date</th>
                                         <th width="15%">Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -46,6 +47,7 @@
                                             </td>
                                             <td>{{ ucfirst($review->vendor->vendor_type) }}</td>
                                             <td>{{ $review->vendor->vendor_name }}</td>
+                                            <td>{{ $review->created_at->format('m/d/Y') }}</td>
                                             <td>{{ ucfirst($review->review_status) }}</td>
                                             <td>
                                                 <a href="{{ route('admin.reviews.show', $review->id) }}"

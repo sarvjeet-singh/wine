@@ -94,31 +94,49 @@
             grid-template-columns: 1fr 1fr;
         }
     </style>
+    @if (Auth::guard('customer')->check() && !Auth::guard('customer')->user()->email_verified_at)
+        <div class="alert alert-warning" role="alert">
+            Your email isn't verified yet. Verify it now to continue with your checkout.
+            <a id="resend-verification-email" href="javascript:void(0);">Verify Your Email</a>
+        </div>
+    @endif
+    {{-- @if (empty(Auth::guard('customer')->user()->phone_verified_at))
+        <div class="alert alert-warning" role="alert">
+            Your phone number isn't verified yet. Verify it now to continue with your checkout. <a href="#">Verify Your
+                Phone Number</a>
+        </div>
+    @endif --}}
+    {{-- @if (empty(Auth::guard('customer')->user()->form_guest_registry_filled))
+        <div class="alert alert-warning" role="alert">
+            Kindly fill out the Guest Registry form to continue with your checkout. <a
+                href="{{ route('user-guest-registry') }}">Fill out the Guest Registry form</a>
+        </div>
+    @endif --}}
     <div class="container mt-5 frontend detail-page">
         <div class="row g-xxl-5">
             <div class="col-lg-8">
                 <div class="card mb-4 border-0">
                     <!-- <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
 
-                                        <div id="propertyCarouse3" class="" data-ride="carousel">
+                                                                                                    <div id="propertyCarouse3" class="" data-ride="carousel">
 
-                                            <div class="owl-carousel owl-theme">
-                                                @if ($vendor->mediaGallery->isNotEmpty())
+                                                                                                        <div class="owl-carousel owl-theme">
+                                                                                                            @if ($vendor->mediaGallery->isNotEmpty())
     @foreach ($vendor->mediaGallery as $media)
     <div class="item">
-                                                            @if ($media->vendor_media_type === 'youtube')
+                                                                                                                        @if ($media->vendor_media_type === 'youtube')
     <iframe width="100%" height="300px" src="{{ $media->vendor_media }}"
-                                                                    frameborder="0" allowfullscreen></iframe>
+                                                                                                                                frameborder="0" allowfullscreen></iframe>
 @elseif ($media->vendor_media_type === 'image')
     <img src="{{ asset($media->vendor_media) }}" alt="Image"
-                                                                    class="img-fluid">
+                                                                                                                                class="img-fluid">
     @endif
-                                                        </div>
+                                                                                                                    </div>
     @endforeach
     @endif
-                                            </div>
-                                        </div>
-                                    </div> -->
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div> -->
 
                     <div class="single-main-slider">
                         <div class="container">
@@ -127,9 +145,32 @@
                                     <div class="property-gallery-main">
                                         @if ($vendor->mediaGallery->isNotEmpty())
                                             @foreach ($vendor->mediaGallery as $media)
-                                                <div class="item">
-                                                    <img src="{{ asset($media->vendor_media) }}">
-                                                </div>
+                                                @if ($media->vendor_media_type == 'image')
+                                                    <div class="item">
+                                                        <img src="{{ asset($media->vendor_media) }}">
+                                                    </div>
+                                                @else
+                                                    @php
+                                                        // Extract YouTube Video ID from URL
+                                                        preg_match(
+                                                            '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/',
+                                                            $media->vendor_media,
+                                                            $matches,
+                                                        );
+                                                        $videoId = $matches[1] ?? null;
+                                                    @endphp
+                                                    <div class="item">
+                                                        @if ($videoId)
+                                                            <div class="item">
+                                                                <a href="{{ $media->vendor_media }}" target="_blank">
+                                                                    <img src="https://img.youtube.com/vi/{{ $videoId }}/hqdefault.jpg"
+                                                                        alt="YouTube Thumbnail"
+                                                                        style="width: 100%; border-radius: 10px;">
+                                                                </a>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         @endif
                                     </div>
@@ -139,9 +180,17 @@
                                     <div class="property-gallery-thumb">
                                         @if ($vendor->mediaGallery->isNotEmpty())
                                             @foreach ($vendor->mediaGallery as $media)
-                                                <div class="item">
-                                                    <img src="{{ asset($media->vendor_media) }}">
-                                                </div>
+                                                @if ($media->vendor_media_type == 'image')
+                                                    <div class="item">
+                                                        <img src="{{ asset($media->vendor_media) }}">
+                                                    </div>
+                                                @else
+                                                    <div class="item">
+                                                        <iframe width="100%" height="390px"
+                                                            src="{{ $media->vendor_media }}" frameborder="0"
+                                                            allowfullscreen></iframe>
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         @endif
                                     </div>
@@ -306,10 +355,13 @@
                                     </label>
                                 </div>
                                 <div class="text-end">
+                                    {{-- && !empty(Auth::guard('customer')->user()->phone_verified_at) --}}
                                     @if (!Auth::guard('vendor')->check())
                                         @if (Auth::check())
+                                            {{-- @if (!empty(Auth::guard('customer')->user()->email_verified_at) && !empty(Auth::guard('customer')->user()->form_guest_registry_filled)) --}}
                                             <button type="button" class="btn book-btn" id="confirm_booking_btn">Process
                                                 Payment</button>
+                                            {{-- @endif --}}
                                         @else
                                             <div class="d-flex align-items-center justify-content-end gap-3">
                                                 <!-- <p class="mb-0 fw-bold">You must be logged-in to initiate a booking</p> -->
@@ -334,11 +386,13 @@
                         </div>
                         <div class="d-flex justify-content-between">
                             <span class="fa-lg">Booking Rate:</span>
-                            <strong class="fa-lg text-muted">${{ $season['price'] ?? $vendor->pricing->current_rate ?? 0 }}/Night</strong>
+                            <strong
+                                class="fa-lg text-muted">${{ $season['price'] ?? ($vendor->pricing->current_rate ?? 0) }}/Night</strong>
                         </div>
                         <div class="d-flex justify-content-between">
                             <span class="fa-lg">Square Footage:</span>
-                            <strong class="fa-lg text-muted">{{ $vendor->accommodationMetadata->square_footage ?? 0 }}</strong>
+                            <strong
+                                class="fa-lg text-muted">{{ $vendor->accommodationMetadata->square_footage ?? 0 }}</strong>
                         </div>
                         <div class="d-flex justify-content-between">
                             <span class="fa-lg">Minimum Booking:</span>
@@ -592,23 +646,23 @@
                                     <tbody class="roomList">
 
                                         <!-- <tr>
-                                                                                                                                                                <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
-                                                                                                                                                                <td>Standard</td>
-                                                                                                                                                                <td class="room-avail">Available</td>
-                                                                                                                                                                <td>
-                                                                                                                                                                    <span class="room-price d-block fw-bold mb-2">$499/per night</span>
-                                                                                                                                                                    <button class="btn">Select Room</button>
-                                                                                                                                                                </td>
-                                                                                                                                                            </tr>
-                                                                                                                                                            <tr>
-                                                                                                                                                            <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
-                                                                                                                                                                <td>Standard</td>
-                                                                                                                                                                <td class="room-not-avail">Not Available</td>
-                                                                                                                                                                <td>
-                                                                                                                                                                    <span class="room-price d-block fw-bold mb-2">$499/per night</span>
-                                                                                                                                                                    <button class="btn">Select Room</button>
-                                                                                                                                                                </td>
-                                                                                                                                                            </tr> -->
+                                                                                                                                                                                                                            <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
+                                                                                                                                                                                                                            <td>Standard</td>
+                                                                                                                                                                                                                            <td class="room-avail">Available</td>
+                                                                                                                                                                                                                            <td>
+                                                                                                                                                                                                                                <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+                                                                                                                                                                                                                                <button class="btn">Select Room</button>
+                                                                                                                                                                                                                            </td>
+                                                                                                                                                                                                                        </tr>
+                                                                                                                                                                                                                        <tr>
+                                                                                                                                                                                                                        <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
+                                                                                                                                                                                                                            <td>Standard</td>
+                                                                                                                                                                                                                            <td class="room-not-avail">Not Available</td>
+                                                                                                                                                                                                                            <td>
+                                                                                                                                                                                                                                <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+                                                                                                                                                                                                                                <button class="btn">Select Room</button>
+                                                                                                                                                                                                                            </td>
+                                                                                                                                                                                                                        </tr> -->
                                     </tbody>
                                 </table>
                             </div>
@@ -723,7 +777,8 @@
             });
         });
 
-        function bookingdates(allcojoinDates, unavailableDates, bookedAndBlockeddates, checkOutOnly, allcojoinDatess) {
+        function bookingdates(allcojoinDates, unavailableDates, bookedAndBlockeddates, checkOutOnly, checkInOnly,
+            allcojoinDatess) {
             const monthNames = ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"
             ];
@@ -731,13 +786,13 @@
             var currentYear = new Date().getFullYear();
             var NextYear = currentYear + 1;
             seasonEndDate = new Date(monthNames[seasonDate.getMonth()] + seasonDate.getDate() + ", " + NextYear);
-            
+
             if ($(window).width() < 768) {
                 daterangepickerMobile('input[name="datefilter"]', seasonDate, seasonEndDate, allcojoinDates,
-                    unavailableDates, bookedAndBlockeddates, checkOutOnly, allcojoinDatess);
+                    unavailableDates, bookedAndBlockeddates, checkOutOnly, checkInOnly, allcojoinDatess);
             } else {
                 daterangepickerDesktop('input[name="datefilter"]', seasonDate, seasonEndDate, allcojoinDates,
-                    unavailableDates, bookedAndBlockeddates, checkOutOnly, allcojoinDatess);
+                    unavailableDates, bookedAndBlockeddates, checkOutOnly, checkInOnly, allcojoinDatess);
             }
 
             $('input[name="datefilter"]').click();
@@ -766,9 +821,11 @@
                     }
 
                     if (rangeContainsInvalidDates) {
-                        alert(
-                            'The selected date range includes unavailable dates. Please choose a different range.'
-                        );
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Oops! Some of the dates you selected are already booked. Please choose another date range to continue.',
+                        });
                         var daterangepicker = $('input[name="datefilter"]').data('daterangepicker');
                         if (daterangepicker) {
                             // Reset the date range picker
@@ -786,6 +843,8 @@
                     } else {
                         $('#fromdate').val(picker.startDate.format('YYYY-MM-DD'));
                         $('#todate').val(picker.endDate.format('YYYY-MM-DD'));
+                        $('#fromdate').next(".error-message").remove();
+                        $('#todate').next(".error-message").remove();
                     }
                 }
                 // $.each(bookedAndBlockeddates, function(index, value) {
@@ -834,7 +893,7 @@
         }
 
         function daterangepickerDesktop(target, seasonDate, seasonEndDate, allcojoinDates = "", unavailableDates = "",
-            bookedAndBlockeddates = "", checkOutOnly = "", allcojoinDatess = "") {
+            bookedAndBlockeddates = "", checkOutOnly = "", checkInOnly = "", allcojoinDatess = "") {
             $(target).daterangepicker({
                 parentEl: "#datepicker-container",
                 startDate: seasonDate,
@@ -888,13 +947,18 @@
                             return "checkoutonly";
                         }
                     }
+                    for (let i = 0; i < checkInOnly.length; i++) {
+                        if (currDate == checkInOnly[i] && $.inArray(checkInOnly[i], unavailableDates) == -1) {
+                            return "checkinonly";
+                        }
+                    }
                 }
 
             });
         }
 
         function daterangepickerMobile(target, seasonDate, seasonEndDate, allcojoinDates = "", unavailableDates = "",
-            bookedAndBlockeddates = "", checkOutOnly = "") {
+            bookedAndBlockeddates = "", checkOutOnly = "", checkInOnly = "") {
             $(target).daterangepicker({
                 parentEl: "#datepicker-container",
                 startDate: seasonDate,
@@ -971,50 +1035,74 @@
                 allcojoinDates = data.cojoinDates;
                 allcojoinDatess = data.cojoinDatess;
                 checkOutOnly = data.checkOutOnly;
-                bookingdates(allcojoinDates, unavailableDates, bookedAndBlockeddates, checkOutOnly,
+                checkInOnly = data.checkInOnly;
+                bookingdates(allcojoinDates, unavailableDates, bookedAndBlockeddates, checkOutOnly, checkInOnly,
                     allcojoinDatess);
             }
         });
 
         $(document).delegate("#confirm_booking_btn", "click", function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Clear previous error messages
+            $(".error-message").remove();
+
+            // Get values from the form
             var startDate = $("#fromdate").val();
             var endDate = $("#todate").val();
             var Travelvalue = $("#Travelvalue").val();
             var visitvalue = $("#visitvalue").val();
             var vendor_id = $(".v_id").val();
 
-            if (startDate == 0 & endDate == 0) {
-                alert("Please Select check-in Dates!");
-                return false;
+            // Initialize a flag to track validation errors
+            var hasError = false;
+
+            // Check for validation errors and display messages
+            if (!startDate || !endDate) {
+                $("#fromdate").after("<div class='error-message text-danger'>Please select check-in dates!</div>");
+                hasError = true;
             }
-            if (Travelvalue == 0) {
-                alert("Please Fill Number in Travel Party!");
-                return false;
+            if (!Travelvalue || Travelvalue == 0) {
+                $("#Travelvalue").after(
+                    "<div class='error-message text-danger'>Please fill in the number in travel party!</div>");
+                hasError = true;
             }
-            if (visitvalue == 0) {
-                alert("Please Select Nature of visit!");
+            if (!visitvalue || visitvalue == 0) {
+                $("#visitvalue").after(
+                    "<div class='error-message text-danger'>Please select the nature of the visit!</div>");
+                hasError = true;
+            }
+
+            // If there are validation errors, stop execution
+            if (hasError) {
                 return false;
             }
 
-            // $(".overlay-loader").show();
+            // If validation passes, make the AJAX request
             $.ajax({
-                type: 'POST',
+                type: "POST",
                 url: "{{ route('check.availability', ['vendorid' => $vendor->id]) }}",
-                data: $('#process_payment').serialize(),
+                data: $("#process_payment").serialize(),
                 dataType: "json",
                 success: function(response) {
                     if (response.inventory_type == "2") {
                         if (response.status == "error") {
-                            alert(response.message);
+                            alert(response.message); // Optional: Handle server-side errors
                             return false;
                         }
                         $("#process_payment").submit();
                     } else {
-                        $('.roomList').html(response.view);
-                        $("#RoomsModal").modal('show');
+                        $(".roomList").html(response.view);
+                        $("#RoomsModal").modal("show");
                     }
-                }
+                },
             });
+        });
+
+        // Event listener to remove error messages when the user starts typing
+        $(document).on("input change", "#fromdate, #todate, #Travelvalue, #visitvalue", function() {
+            // Remove the error message for the specific field
+            $(this).next(".error-message").remove();
         });
         $(document).on('click', '.btn-increase', function() {
             var roomId = $(this).data('room-id');
@@ -1127,6 +1215,15 @@
             asNavFor: $gl
         });
 
+        // **Fix autoplay issue for YouTube videos**
+        $gl.on('beforeChange', function(event, slick, currentSlide, nextSlide) {
+            let iframe = $('.property-gallery-main').find('iframe');
+            iframe.each(function() {
+                let src = $(this).attr('src');
+                $(this).attr('src', src); // Stop video when changing slide
+            });
+        });
+
         function handleCarouselsHeight() {
             if (window.matchMedia("(min-width: 1024px)").matches) {
                 const gl2H = $(".property-gallery-thumb").height();
@@ -1180,6 +1277,49 @@
                     top: target.offsetTop - document.querySelector(".sticky").offsetHeight,
                     behavior: "smooth"
                 });
+            });
+        });
+    </script>
+    <script>
+        $(document).on('click', '#resend-verification-email', function() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to resend the verification email?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, resend it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('customer.verification.resend') }}", // Laravel route
+                        type: "POST", // HTTP method
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
+                                'content') // CSRF token for security
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: response.message,
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        },
+                        error: function(xhr) {
+                            const errorMessage = xhr.responseJSON?.message ||
+                                'Failed to resend verification email.';
+                            Swal.fire({
+                                title: 'Error',
+                                text: errorMessage,
+                                icon: 'error',
+                                showConfirmButton: true
+                            });
+                        }
+                    });
+                }
             });
         });
     </script>

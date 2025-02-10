@@ -7,10 +7,8 @@
         <p style="font-size: 18px; margin: 10px 0 24px 0;">Dear <strong
                 style="color: #118c97;">{{ $vendorData['user']->firstname ?? 'Vendor' }}</strong>,</p>
 
-        <p>Welcome to the vendor admin section of our marketplace platform. You have been assigned administrative access and
-            are now able to use the following credentials to manage the <strong
-                style="color: #118c97;">[{{ $vendorData['vendor']->vendor_name ?? 'Vendor' }}]</strong> account and any other
-            vendor account you may be associated with.</p>
+        <p>Welcome to the e-commerce section of our marketplace platform.  The link below will log you into your  <strong
+                style="color: #118c97;">[{{ $vendorData['vendor']->vendor_name ?? 'Vendor' }}]</strong> account and any other vendor account you may become associated with.</p>
 
         <div class="credentials">
             <p>eMail/Username: <span style="color:#28405e;">{{ $vendorData['user']->email ?? '' }}</span></p>
@@ -19,12 +17,9 @@
             @endif
         </div>
 
-        <p>Your participation in our <strong style="color: #118c97;">“Guest Rewards Program”</strong> and/or <strong
-                style="color: #118c97;">Support Local Initiative”</strong> also means an improved ranking position for your
-            vendor profile in our directories. Administrative access will enable you to manage content in real time (i.e.
-            media gallery, business hours, B2B wine catalogue, amenities, etc.)..</p>
+        <p>Administrative access will enable you to manage content in real time (i.e. Wine Catalogue, Business Hours, Media Gallery, Amenities, etc.).  You may also set your password to something more personal and soon you will also be able to assign admin access to other members of your staff or team.</p>
 
-        <p>You may update your password to something more suitable after logging in for the first time..</p>
+        <p>The listing of your wines will ultimately make it easier for resellers and other vendors to source your products (i.e. B2B sales).  Subscription and stocking fees are required before we actively recommend/broker the sale of your wines to resellers.  You can view plan options from the link on your dashboard.  Finally, you will need to initiate a Stripe, payment gateway account, to facilitate the direct sale of wines via our platform.</p>
 
         <div>
             <a href="{{ route('vendor.login') }}" target="_blank" class="button"
@@ -34,13 +29,10 @@
                 in to Your Account</a>
         </div>
 
-        <p>We look forward to working with you.</p>
+        <p>We look forward to your input and feedback.</p>
 
         <h4 style="color: #118c97; margin-bottom: 16px;">Cheers!</h4>
 
         <h4 style="color: #118c97;">The WCW Marketing Team</h4>
-
-        <p>Please DO NOT REPLY to any email from this address. It is for outgoing mail only and is not monitored.</p>
-
     </div>
 @endsection

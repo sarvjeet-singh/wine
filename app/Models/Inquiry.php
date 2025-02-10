@@ -10,7 +10,7 @@ class Inquiry extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'vendor_id',
         'check_in_at',
         'check_out_at',
@@ -28,6 +28,15 @@ class Inquiry extends Model
         'tax_rate',
         'order_total',
         'inquiry_status',
+        'name',
+        'email',
+        'phone',
+        'street_address',
+        'suite',
+        'city',
+        'country',
+        'state',
+        'postal_code',
     ];
 
     public function user()

@@ -6,10 +6,8 @@ use App\Services\StripeSubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use App\Models\Subscription;
 use App\Models\Vendor;
 use App\Models\WinerySubscription;
-use Stripe\Checkout\Session as StripeSession;
 
 use Exception;
 

@@ -77,13 +77,13 @@
                             <input type="hidden" name="type" value="vendor">
                             <div class="row align-items-end mt-3">
                                 <!-- <div class="col-sm-4 col-12">
-                                                        <label class="form-label">Apply Value</label>
-                                                        <select class="form-control" name="booking_date_option">
-                                                            <option value="booked">Booked Dates</option>
-                                                            <option value="packaged">Package Dates</option>
-                                                            <option value="blocked">Blocked Dates</option>
-                                                        </select>
-                                                    </div> -->
+                                                            <label class="form-label">Apply Value</label>
+                                                            <select class="form-control" name="booking_date_option">
+                                                                <option value="booked">Booked Dates</option>
+                                                                <option value="packaged">Package Dates</option>
+                                                                <option value="blocked">Blocked Dates</option>
+                                                            </select>
+                                                        </div> -->
                                 <div class="col-sm-4 col-12">
                                     <label class="form-label">Select Season</label>
                                     @php
@@ -184,11 +184,11 @@
                             </div>
 
                             <!-- <div class="row mt-5">
-                                                    <div class="col-sm-12 text-center">
-                                                        <button type="submit" class="btn wine-btn" id="dateform_submit"
-                                                            disabled>Update</button>
-                                                    </div>
-                                                </div> -->
+                                                        <div class="col-sm-12 text-center">
+                                                            <button type="submit" class="btn wine-btn" id="dateform_submit"
+                                                                disabled>Update</button>
+                                                        </div>
+                                                    </div> -->
                         </form>
                     </div>
                 </div>
@@ -549,12 +549,13 @@
                                                     $.ajax({
                                                         url: "{{ route('addbookingdate.form', ['vendorid' => $vendorid]) }}",
                                                         data: $(
-                                                                '#dateform')
+                                                                '#dateform'
+                                                                )
                                                             .serialize(),
                                                         type: 'post',
                                                         success: function(
                                                             response
-                                                            ) {
+                                                        ) {
                                                             Swal.fire({
                                                                     title: 'Saved!',
                                                                     text: 'Your booking date has been successfully saved.',
@@ -563,19 +564,20 @@
                                                                 })
                                                                 .then(
                                                                     (
-                                                                        result) => {
+                                                                        result
+                                                                        ) => {
                                                                         if (result
                                                                             .isConfirmed
-                                                                            ) {
+                                                                        ) {
                                                                             location
                                                                                 .reload();
                                                                         }
                                                                     }
-                                                                    );
+                                                                );
                                                         },
                                                         error: function(
                                                             xhr
-                                                            ) {
+                                                        ) {
                                                             Swal.fire({
                                                                 title: 'Error',
                                                                 text: 'There was an issue saving your booking date. Please try again.',
@@ -719,7 +721,9 @@
                         dataSrc: function(json) {
                             $(".overlay-loader").hide();
                             if (action == "delete") {
-                                Swal.fire('Deleted!', '', 'success');
+                                Swal.fire('Deleted!', '', 'success').then(() => {
+                                    location.reload();
+                                });
                             }
                             return json.data;
                         }

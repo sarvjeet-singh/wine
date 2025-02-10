@@ -42,7 +42,7 @@
 $(document).ready(function(){
     setTimeout(function () {
         $(".alert-success").alert('close');
-    }, 3000);
+    }, 10000);
     $(window).scroll(function() {
         var scroll = $(window).scrollTop();
 

@@ -23,7 +23,7 @@
                                         {{ session('success') }}
                                     </div>
                                 @endif
-                            <form method="post" action="{{ route('user.update.address') }}">
+                                <form method="post" action="{{ route('user.update.address') }}">
                                     @csrf
                                     <div class="row mt-3">
                                         <div class="col-sm-6 col-12 mb-sm-0 mb-3">
@@ -69,27 +69,51 @@
                                         <div class="col-sm-6 col-12">
                                             <label class="form-label">Country</label>
                                             <select name="country" id="country" class="form-select">
-                                                @if (count(getCountries()) > 0)
-                                                    <option value="">Select Country</option>
-                                                    @foreach (getCountries() as $country)
-                                                        <option value="{{ $country->name }}"
-                                                            {{ old('country', Auth::user()->country ?? '') == $country->name ? 'selected' : '' }}>
-                                                            {{ $country->name }}
-                                                        </option>
-                                                    @endforeach
-                                                @endif
+                                                <option value="">Select Country</option>
+                                                @foreach (getCountries() as $country)
+                                                    <option data-id="{{ $country->id }}" value="{{ $country->name }}"
+                                                        {{ old('country', Auth::user()->country ?? '') == $country->name ? 'selected' : '' }}>
+                                                        {{ $country->name }}
+                                                    </option>
+                                                @endforeach
+                                                <option value="Other"
+                                                    {{ old('country', Auth::user()->is_other_country ? 'Other' : '') == 'Other' ? 'selected' : '' }}>
+                                                    Other
+                                                </option>
                                             </select>
                                             @error('country')
                                                 <div class="text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3">
-                                            <label class="form-label">Province/State<span
-                                                    class="required-filed">*</span></label>
-                                            <input type="text" class="form-control" name="state"
-                                                value="{{ old('state', Auth::user()->state) }}"
-                                                placeholder="Enter Province/State">
+
+                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3" id="state-wrapper" style="display: none;">
+                                            <label class="form-label">State</label>
+                                            <select name="state" id="state" class="form-select">
+                                                <option value="">Select State</option>
+                                                {{-- States will be dynamically loaded via JS --}}
+                                            </select>
                                             @error('state')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3" id="other-country-wrapper"
+                                            style="display: none;">
+                                            <label class="form-label">Other Country</label>
+                                            <input type="text" name="other_country" id="other-country"
+                                                class="form-control"
+                                                value="{{ old('other_country', Auth::user()->other_country ?? '') }}">
+                                            @error('other_country')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3" id="other-state-wrapper"
+                                            style="display: none;">
+                                            <label class="form-label">Other State</label>
+                                            <input type="text" name="other_state" id="other-state" class="form-control"
+                                                value="{{ old('other_state', Auth::user()->other_state ?? '') }}">
+                                            @error('other_state')
                                                 <div class="text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -98,8 +122,8 @@
                                         <div class="col-sm-6 col-12">
                                             <label for="email" class="form-label">Postal Code/Zip<span
                                                     class="required-filed">*</span></label>
-                                            <input type="text" class="form-control" name="postal_code"  maxlength="7"
-                        oninput="formatPostalCode(this)"
+                                            <input type="text" class="form-control" name="postal_code" maxlength="7"
+                                                oninput="formatPostalCode(this)"
                                                 value="{{ old('postal_code', Auth::user()->postal_code) }}"
                                                 placeholder="Enter Postal Code/Zip">
                                             @error('postal_code')
@@ -198,7 +222,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        aria-label="Close">Close</button>
                     <button type="button" class="btn btn-primary image-crop">Crop & Save</button>
                 </div>
             </div>
@@ -234,7 +259,7 @@
                                     display: true,
                                     size: [100, 100],
                                     wrapper: '#custom-preview-wrapper',
-                                    useImageSize: true 
+                                    useImageSize: true
                                 }
                             });
                         }, 500);
@@ -268,6 +293,7 @@
                 e.target.value = formattedValue;
             });
         });
+
         function formatPostalCode(input) {
             // Remove all non-alphanumeric characters and convert to uppercase
             let value = input.value.replace(/\W/g, '').toUpperCase();
@@ -279,6 +305,104 @@
 
             // Update the input value
             input.value = value;
+        }
+        $(document).ready(function() {
+            $('#state').select2({
+                placeholder: "Select Province/State",
+                allowClear: true,
+                width: '100%',
+                dropdownCssClass: 'select2-dropdown-searchable'
+            });
+        });
+        $(document).ready(function() {
+            const countryDropdown = $('#country');
+            const stateDropdown = $('#state');
+            const stateWrapper = $('#state-wrapper');
+            const otherCountryWrapper = $('#other-country-wrapper');
+            const otherStateWrapper = $('#other-state-wrapper');
+
+            // Function to toggle visibility of fields based on country selection
+            function toggleFields(country) {
+                if (country === 'Other') {
+                    stateWrapper.hide();
+                    stateDropdown.val('');
+                    otherCountryWrapper.show();
+                    otherStateWrapper.show();
+                } else {
+                    stateWrapper.show();
+                    otherCountryWrapper.hide();
+                    otherStateWrapper.hide();
+                }
+            }
+
+            // Function to load states dynamically and preselect a state if provided
+            function loadStates(countryId, selectedState = null) {
+                if (countryId) {
+                    $.ajax({
+                        url: '{{ route('get.states') }}',
+                        type: 'GET',
+                        data: {
+                            country_id: countryId
+                        },
+                        success: function(response) {
+                            stateDropdown.empty().append('<option value="">Select State</option>');
+                            if (response.success) {
+                                $.each(response.states, function(type, states) {
+                                    const optgroup = $('<optgroup>').attr('label',
+                                        capitalizeFirstLetter(type));
+                                    $.each(states, function(index, state) {
+                                        const option = $('<option>')
+                                            .val(state.name)
+                                            .text(state.name)
+                                            .prop('selected', state.name ==
+                                                selectedState);
+                                        optgroup.append(option);
+                                    });
+                                    stateDropdown.append(optgroup);
+                                });
+                            }
+                        },
+                        error: function() {
+                            alert('Failed to load states.');
+                        }
+                    });
+                }
+            }
+
+            // Handle initial page load
+            const savedCountry = '{{ old('country', Auth::user()->country ?? '') }}';
+            const savedState = '{{ old('state', Auth::user()->state ?? '') }}';
+            const isOtherCountry = savedCountry === 'Other';
+            toggleFields(savedCountry);
+
+            if (!isOtherCountry && savedCountry) {
+                const selectedCountryId = countryDropdown.find(`option[value="${savedCountry}"]`).data('id');
+                loadStates(selectedCountryId, savedState);
+            }
+
+            // Handle country dropdown change
+            countryDropdown.change(function() {
+                const selectedOption = $(this).find(':selected');
+                const country = $(this).val();
+                const countryId = selectedOption.data('id');
+
+                toggleFields(country);
+
+                //if (country !== 'Other') {
+                    loadStates(countryId);
+                //}
+                if(country !== 'Other'){
+                    $("#other-country").val('');
+                    $("#other-state").val('');
+                }
+            });
+        });
+
+
+
+        function capitalizeFirstLetter(string) {
+            if (!string) return ''; // Handle empty or null strings
+            return string.charAt(0).toUpperCase() + string.slice(1);
         }
     </script>
 @endsection

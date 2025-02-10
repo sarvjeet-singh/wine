@@ -16,7 +16,7 @@ class VendorAuthController extends Controller
     public function showLoginForm()
     {
         if (Auth::guard('vendor')->check()) {
-            return redirect('/vendor-dashboard/' . Auth::guard('vendor')->user()->id);
+            return redirect(route('vendor-dashboard',Auth::guard('vendor')->user()->id));
         }
         return view('auth.vendor-login');
     }
@@ -34,9 +34,9 @@ class VendorAuthController extends Controller
             $vendor = Vendor::where('user_id', $user->id)->first();
             if ($vendor) {
                 if ($user->password_updated == 0) {
-                    return redirect()->intended('/vendor-change-password/' . $vendor->id);
+                    return redirect()->intended(route('vendor-change-password', $vendor->id));
                 }
-                return redirect()->intended('/vendor-dashboard/' . $vendor->id);
+                return redirect()->intended(route('vendor-dashboard', $vendor->id));
             }
         }
 

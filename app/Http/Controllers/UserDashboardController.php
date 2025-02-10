@@ -17,6 +17,8 @@ use App\Models\Review;
 use App\Models\VendorSuggest;
 use App\Models\Order;
 use App\Models\Inquiry;
+use App\Models\Wallet;
+use Mews\Captcha\Captcha;
 
 use \illuminate\Support\Facades\DB;
 use \illuminate\Support\Facades\Auth;
@@ -31,7 +33,7 @@ class UserDashboardController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:customer');
+        $this->middleware(['auth:customer', 'check.terms']);
     }
 
     public function userDashboard()
@@ -42,7 +44,20 @@ class UserDashboardController extends Controller
             $first_login = true;
             Auth::user()->update(['first_login' => false]);
         }
-        return view('UserDashboard.index', compact('first_login'));
+        $wallet = Wallet::where('customer_id', Auth::user()->id)->first();
+        $balance = $wallet ? $wallet->balance : 0;
+        return view('UserDashboard.index', compact('first_login', 'balance'));
+    }
+
+    public function refreshCaptcha(Request $request, Captcha $captcha)
+    {
+        // Generate a new CAPTCHA image
+        $captchaData = $captcha->create('default', true);
+        // Return the new CAPTCHA image and its key (if needed)
+        return response()->json([
+            'captcha' => $captchaData['img'],
+            // 'captchaKey' => $captchaData['key'],
+        ]);
     }
 
     public function userSettingsSocialUpdate(Request $request)
@@ -82,17 +97,20 @@ class UserDashboardController extends Controller
 
     public function userSettingsAccountUpdate(Request $request)
     {
-
         $userId = Auth::id();
         // Validation rules
         $rules = [
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
             'display_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers,email,' . $userId,
+            // 'email' => 'required|email|unique:customers,email,' . $userId,
             'gender' => 'required|in:Male,Female,Other', // example validation for gender
             'age_range' => 'required', // example validation for age range
-            // 'date_of_birth' => 'string|max:255'
+            'date_of_birth' => [
+                'nullable',
+                'date',
+                'before:' . now()->subYears(5)->format('Y-m-d'),
+            ],
         ];
 
         // Custom validation messages (optional)
@@ -133,7 +151,10 @@ class UserDashboardController extends Controller
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
         $user->display_name = $request->display_name;
-        $user->email = $request->email;
+        // if ($user->email != $request->email) {
+        //     $user->email_verified_at = null;
+        // }
+        // $user->email = $request->email;
         $user->gender = $request->gender;
         $user->age_range = $request->age_range;
         $user->date_of_birth = $request->date_of_birth;
@@ -187,18 +208,26 @@ class UserDashboardController extends Controller
     public function userSettingsUpdatePassword(Request $request)
     {
         // Validation rules
-        // Validation rules
         $rules = [
-            'current_password' => 'required|string',
+            'current_password' => [
+                'required_if:password_present,true',
+                'string',
+                function ($attribute, $value, $fail) use ($request) {
+                    // Skip if the user doesn't have a current password
+                    if ($request->password_present && !Hash::check($value, Auth::user()->password)) {
+                        $fail('Current password is incorrect.');
+                    }
+                }
+            ],
             'new_password' => [
                 'required',
                 'string',
                 'min:8',
                 'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@$!%*#?&])[A-Za-z0-9@$!%*#?&]{8,}$/',
                 'confirmed',
-                // Custom rule to check that the new password is not the same as the current one
+                // Custom rule to ensure new password isn't the same as the current password
                 function ($attribute, $value, $fail) use ($request) {
-                    if ($value === $request->current_password) {
+                    if ($request->password_present && Hash::check($value, Auth::user()->password)) {
                         $fail('New password cannot be the same as the current password.');
                     }
                 }
@@ -206,9 +235,9 @@ class UserDashboardController extends Controller
             'new_password_confirmation' => 'required|same:new_password',
         ];
 
-        // Custom validation messages (optional)
+        // Custom validation messages
         $messages = [
-            'current_password.required' => 'Current password is required.',
+            'current_password.required_if' => 'Current password is required.',
             'new_password.required' => 'New password is required.',
             'new_password.min' => 'New password must be at least 8 characters.',
             'new_password.regex' => 'New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
@@ -216,16 +245,12 @@ class UserDashboardController extends Controller
             'new_password_confirmation.same' => 'New password confirmation does not match the new password.',
         ];
 
+        // Check if the user has a password in the database
+        $user = Auth::user();
+        $request->merge(['password_present' => !is_null($user->password)]);
+
         // Validate the request
         $request->validate($rules, $messages);
-
-        // Get the currently authenticated user
-        $user = Auth::user();
-
-        // Check if the current password matches the user's password
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors(['current_password' => 'Current password is incorrect.']);
-        }
 
         // Update the user's password
         $user->password = Hash::make($request->new_password);
@@ -233,9 +258,7 @@ class UserDashboardController extends Controller
 
         // Check if the user wants to log out after updating the password
         if ($request->has('logout_after_change')) {
-            // Log the user out
             Auth::logout();
-            // Redirect to the login page with a success message
             return redirect('/login')->with('success', 'Password updated successfully. Please log in with your new password.');
         }
 
@@ -305,27 +328,42 @@ class UserDashboardController extends Controller
     public function userAddressUpdate(Request $request)
     {
         $messages = [
-            'city.required' => 'The city field is required.',
+            'contact_number.required' => 'The contact number field is required.',
+            'country.required' => 'The country field is required.',
             'state.required' => 'The state field is required.',
-            'postal_code.required' => 'The postal code field is required.'
+            'other_country.required' => 'The other country field is required.',
+            'other_state.required' => 'The other state field is required.',
+            'city.required' => 'The city field is required.',
+            'postal_code.required' => 'The postal code field is required.',
+            'street_address.required' => 'The street address field is required.',
         ];
 
         $request->validate([
+            'street_address' => 'required',
+            'contact_number' => 'required',
+            'country' => 'required',
+            'state' => 'required_unless:country,Other',
+            'other_country' => 'nullable|string|max:255|required_if:country,Other',
+            'other_state' => 'nullable|string|max:255|required_if:country,Other',
             'city' => 'required',
-            'state' => 'required',
             'postal_code' => 'required',
         ], $messages);
 
-        $user = auth()->user();
+        $user = Auth::guard('customer')->user();
+        $isOtherCountry = $request->input('country') === 'Other';
 
         // Update user details
         $user->contact_number = $request->contact_number;
         $user->street_address = $request->street_address;
         $user->suite          = $request->suite;
         $user->city           = $request->city;
-        $user->state          = $request->state;
+        $user->state          = $request->state ?? null;
         $user->postal_code    = $request->postal_code;
         $user->country        = $request->country;
+        $user->is_other_country = $isOtherCountry;
+        $user->other_country = $request->other_country;
+        $user->other_state = $request->other_state;
+        $user->form_guest_registry_filled = 1;
         $user->save();
         return redirect()->back()->with('success', 'Guest Registry updated successfully.');
     }
@@ -462,7 +500,7 @@ class UserDashboardController extends Controller
         VendorSuggest::create($validated);
 
         // Define email parameters
-        $to = "sarvjeetsingh.slinfy@gmail.com";
+        $to = env('ADMIN_EMAIL');
         $subject = 'New Vendor Suggestion';
         $emailContent = view('emails.vendor_suggestion', [
             'validated' => $validated,
@@ -478,7 +516,7 @@ class UserDashboardController extends Controller
 
     public function orders()
     {
-        $orders = Order::with('vendor')->where('user_id', Auth::user()->id)->get();
+        $orders = Order::with('vendor')->where('customer_id', Auth::user()->id)->get();
         return view('UserDashboard.my-transactions', compact('orders'));
     }
 
@@ -491,7 +529,7 @@ class UserDashboardController extends Controller
 
     public function inquiries()
     {
-        $inquiries = Inquiry::with('vendor')->where('user_id', Auth::user()->id)->get();
+        $inquiries = Inquiry::with('vendor')->where('customer_id', Auth::user()->id)->get();
         return view('UserDashboard.my-inquiries', compact('inquiries'));
     }
 
@@ -507,5 +545,10 @@ class UserDashboardController extends Controller
         $user_faqs = FaqSection::with('questions')->where('account_type', 'user')->get();
         // print_r($user_faqs); die;
         return view('UserDashboard.user-faq', compact('user_faqs'));
+    }
+
+    public function emailTemplateCheck()
+    {
+        return view('emails.accommodation_inquiry');
     }
 }

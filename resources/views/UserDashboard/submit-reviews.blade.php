@@ -111,6 +111,7 @@
 
 @section('js')
 <script>
+    $("#buisness_vendor_name").select2();
     $(document).ready(function() {
 		$(".my-rating-5").starRating({
 			starSize: 20,

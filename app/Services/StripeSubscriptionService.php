@@ -81,7 +81,6 @@ class StripeSubscriptionService
             $subscription = StripeSubscription::retrieve($subscriptionId);
             // Fetch the payment method associated with the subscription
             $paymentMethodId = $subscription->default_payment_method;
-            print_r($subscription); die;
             $paymentMethod = PaymentMethod::retrieve($paymentMethodId);
 
             // Prepare the data to return, including last four digits
@@ -204,6 +203,7 @@ class StripeSubscriptionService
         } else {
             $customer = Customer::retrieve($vendor->vendor_stripe_id);
         }
+        $taxRateId = env('STRIPE_TAX_RATE_ID');
         $subscription = StripeSubscription::create([
             'customer' => $customer->id,
             'items' => [[
@@ -211,6 +211,7 @@ class StripeSubscriptionService
             ]],
             'payment_behavior' => 'default_incomplete', // To collect payment details and confirm subscription
             'expand' => ['latest_invoice.payment_intent'],
+            'default_tax_rates' => [$taxRateId],
         ]);
         $price = Price::retrieve($priceId);
         $winerySubscription = WinerySubscription::create([

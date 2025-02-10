@@ -61,7 +61,7 @@ body {
     text-decoration: none;
     padding: 10px 20px;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 16px;
 }
 </style>
 </head>

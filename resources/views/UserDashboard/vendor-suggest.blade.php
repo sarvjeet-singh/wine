@@ -146,6 +146,7 @@
             </div>
         </div>
     </div>
+    @include('UserDashboard.includes.logout_modal')
 @endsection
 @section('js')
     <script>

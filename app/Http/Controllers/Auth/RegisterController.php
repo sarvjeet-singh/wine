@@ -11,18 +11,18 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\SendOtpMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\View;
 use Stripe\Stripe;
 use Stripe\Customer as StripeCustomer;
 use App\Models\Customer;
-use Session;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
-use Mews\Captcha\Captcha;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Session;
 
 class RegisterController extends Controller
 {
@@ -64,8 +64,6 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        // print_r($data);
-        // exit;
         return Validator::make($data, [
             'firstname' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z]+$/'],
             'lastname' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z]+$/'],
@@ -80,8 +78,10 @@ class RegisterController extends Controller
                 'regex:/[0-9]/',       // must contain at least one number
                 'regex:/[@$!%*#?&]/',  // must contain a special character
             ],
-            // 'captcha' => ['required'],
-            // 'g-recaptcha-response' => ['required']
+            'phone' => [
+                'nullable',
+                'regex:/^\d{3}-\d{3}-\d{4}$/', // Enforces ###-###-#### format
+            ],
         ]);
     }
 
@@ -106,15 +106,17 @@ class RegisterController extends Controller
     {
         // echo "<pre>";print_r($data);
         // exit;
-        $token = Str::random(60);
+        // $token = Str::random(60);
         $user = Customer::create([
             'firstname' => $data['firstname'],
             'email' => $data['email'],
             'lastname' => $data['lastname'],
             'password' => Hash::make($data['password']),
             'role' => 'Member',
-            'login_token' => $token,
-            'ip_address' => request()->ip()
+            'contact_number' => $data['phone'] ? $data['phone'] : null,
+            'phone_otp' => rand(100000, 999999),
+            // 'login_token' => $token,
+            'ip_address' => getClientIp()
         ]);
 
         // Refer by vendor
@@ -137,7 +139,6 @@ class RegisterController extends Controller
         // $emailContent = View::make('emails.welcome', ['username' => $user->name, 'loginLink' => $loginLink])->render();
         // sendEmail($user->email, $subject, $emailContent);
         // Send email verification notification
-        $user->sendEmailVerificationNotification();
         return $user;
 
         // return redirect()->route('verification.notice');
@@ -164,90 +165,121 @@ class RegisterController extends Controller
         if (!$isCanada) {
             return back()->withErrors(['location' => 'Our services are currently only available to residents of Canada.  We apologize for any inconvenience.']);
         }
-
+        
         $user = $this->create($request->all());
+        
+        $user->sendEmailVerificationNotification();
+        if (config('site.phone_verification') == 1) {
+            Session::put('unverified_phone', $user->contact_number);
+            // Session::put('unverified_email', $user->email);
+            $user->phone_otp = rand(100000, 999999);
+            $user->save();
+            // $otp = $user->phone_otp;
 
+            // Mail::to($request->email)->send(new SendOtpMail($otp, $user->firstname));
+            // sendSms($phone, $message);
+            return redirect()->route('verify-phone-otp')->with('success', 'We’ve sent an OTP to your phone. Enter it to verify your account!');
+        }
         // Instead of logging in, redirect to the login page
-        return redirect()->route('login')->with('success', 'We’ve sent a verification link to your inbox. Click it to activate your account!');
+        return redirect()->route('customer.login')->with('success', 'We’ve sent a verification link to your inbox. Click it to activate your account!');
     }
 
-    public function validateCaptcha(Request $request)
+    public function verifyOtpForm(Request $request)
     {
-        // Get the user input for CAPTCHA from the form
-        $userCaptcha = $request->input('captcha');
-
-        // Retrieve the CAPTCHA key from the session
-        $sessionCaptchaKey = Session::get('captcha.key');
-
-        // Check if the CAPTCHA is provided and matches the session key
-        if (empty($userCaptcha)) {
-            return response()->json(['success' => false, 'message' => 'CAPTCHA is required.']);
+        // if (!Session::has('unverified_phone')) {
+        if (!Session::has('unverified_phone')) {
+            return redirect()->route('customer.login');
         }
-
-        // Use bcrypt or hash_check (depending on your encryption method) to compare the CAPTCHA input
-        if (password_verify($userCaptcha, $sessionCaptchaKey)) {
-            return response()->json(['success' => true]);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Invalid CAPTCHA.']);
-        }
+        return view('auth.customer-verify');
     }
 
-    public function refreshCaptcha(Request $request, Captcha $captcha)
+    public function verifyPhoneOtp(Request $request)
     {
-        // Generate a new CAPTCHA image
-        $captchaData = $captcha->create('default', true);
-        // Return the new CAPTCHA image and its key (if needed)
-        return response()->json([
-            'captcha' => $captchaData['img'],
-            // 'captchaKey' => $captchaData['key'],
+        // if (!Session::has('unverified_phone')) {
+        if (!Session::has('unverified_phone')) {
+            return redirect()->route('customer.login');
+        }
+        $request->validate([
+            'otp' => 'required',
         ]);
-    }
 
-    public function registerSocial(Request $request)
-    {
-        try {
-            $request->validate([
-                'password' => [
-                    'nullable',
-                    'string',
-                    'min:8',
-                    'confirmed',
-                    'regex:/[A-Z]/',       // must contain at least one uppercase letter
-                    'regex:/[a-z]/',       // must contain at least one lowercase letter
-                    'regex:/[0-9]/',       // must contain at least one number
-                    'regex:/[@$!%*#?&]/',  // must contain a special character
-                ],
-                'terms' => 'required',
-            ]);
-            $data = $request->all();
-            $user = Session::get('user');
-            $name = explode(' ', $user->name);
-            $user = [
-                'firstname' => $name[0] ?? "",
-                'email' => $user['email'],
-                'lastname' => $name[1] ?? "",
-                'role' => 'Member',
-                'email_verified_at' => now(),
-                'ip_address' => request()->ip()
-            ];
-            if (isset($data['password']) && !empty($data['password'])) {
-                $user['password'] = Hash::make($data['password']);
-            }
-            if (isset($_COOKIE['refer_by']) && !empty($_COOKIE['refer_by'])) {
-                $vendor = Vendor::where('short_code', $_COOKIE['refer_by'])->first();
-                if ($vendor->id) {
-                    $user['guestrewards'] = $vendor->vendor_name;
-                    $user['guestrewards_vendor_id'] = $vendor->id;
-                    // delete cookie
-                    setcookie('refer_by', '', time() - 3600, "/");
-                }
-            }
-            $user = Customer::create($user);
-            Session::forget('user');
-            Auth::login($user);
+
+        // $user = Customer::where('contact_number', Session::get('unverified_phone'))->first();
+        $user = Customer::where('contact_number', Session::get('unverified_phone'))->first();
+
+        if ($user->phone_otp == $request->otp) {
+            $user->phone_verified_at = now();
+            // if ($user->phone_otp == $request->otp) {
+            //     $user->email_verified_at = now();
+            $user->save();
+
+            Auth::guard('customer')->login($user);
+
             return redirect()->route('user-dashboard');
-        } catch (\Exception $e) {
-            return redirect()->route('login')->withErrors('error', $e->getMessage());
+        } else {
+            return back()->with(
+                'error',
+                'The provided OTP is incorrect.'
+            );
         }
     }
+
+    public function resendOtp(Request $request)
+    {
+        $user = Customer::where('contact_number', Session::get('unverified_phone'))->first();
+        $user->phone_otp = rand(100000, 999999);
+        $user->save();
+        $otp = $user->phone_otp;
+        // Mail::to($user->email)->send(new SendOtpMail($otp, $user->firstname));
+        // sendSms($phone, $message);
+        return back()->with('success', 'We’ve sent an OTP to your email. Enter it to verify your account!');
+    }
+
+    // public function registerSocial(Request $request)
+    // {
+    //     try {
+    //         $request->validate([
+    //             'password' => [
+    //                 'nullable',
+    //                 'string',
+    //                 'min:8',
+    //                 'confirmed',
+    //                 'regex:/[A-Z]/',       // must contain at least one uppercase letter
+    //                 'regex:/[a-z]/',       // must contain at least one lowercase letter
+    //                 'regex:/[0-9]/',       // must contain at least one number
+    //                 'regex:/[@$!%*#?&]/',  // must contain a special character
+    //             ],
+    //             'terms' => 'required',
+    //         ]);
+    //         $data = $request->all();
+    //         $user = Session::get('user');
+    //         $name = explode(' ', $user->name);
+    //         $user = [
+    //             'firstname' => $name[0] ?? "",
+    //             'email' => $user['email'],
+    //             'lastname' => $name[1] ?? "",
+    //             'role' => 'Member',
+    //             'email_verified_at' => now(),
+    //             'ip_address' => getClientIp(),
+    //         ];
+    //         if (isset($data['password']) && !empty($data['password'])) {
+    //             $user['password'] = Hash::make($data['password']);
+    //         }
+    //         if (isset($_COOKIE['refer_by']) && !empty($_COOKIE['refer_by'])) {
+    //             $vendor = Vendor::where('short_code', $_COOKIE['refer_by'])->first();
+    //             if ($vendor->id) {
+    //                 $user['guestrewards'] = $vendor->vendor_name;
+    //                 $user['guestrewards_vendor_id'] = $vendor->id;
+    //                 // delete cookie
+    //                 setcookie('refer_by', '', time() - 3600, "/");
+    //             }
+    //         }
+    //         $user = Customer::create($user);
+    //         Session::forget('user');
+    //         Auth::login($user);
+    //         return redirect()->route('user-dashboard');
+    //     } catch (\Exception $e) {
+    //         return redirect()->route('login')->withErrors('error', $e->getMessage());
+    //     }
+    // }
 }

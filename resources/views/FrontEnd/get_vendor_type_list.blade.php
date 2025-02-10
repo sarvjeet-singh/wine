@@ -227,14 +227,14 @@
                             {{-- <a href="{{ !Auth::guard('customer')->check() ? route('check-login', 'book-now') : $urll }}"
                                 class="text-decoration-none text-white btn book-btn book-now-btn">Book Now</a> --}}
                             <a href="{{ $urll }}"
-                                class="text-decoration-none text-white btn book-btn book-now-btn">Book Now</a>
+                                class="text-decoration-none text-white btn book-btn book-now-btn">Shop</a>
                         @else
                             @if (strtolower($vendor->vendor_type) == 'accommodation' ||
                                     strtolower($vendor->vendor_type) == 'winery' ||
                                     strtolower($vendor->vendor_type) == 'excursion')
                                 @if (Auth::guard('customer')->check())
                                     <button class="btn book-btn vendorinqurey text-white"
-                                        data-id="{{ $vendor->id }}">
+                                        data-id="{{ $vendor->id }}" data-name="{{ $vendor->vendor_name }}">
                                         Inquiry
                                     </button>
                                 @else

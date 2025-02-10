@@ -739,6 +739,8 @@
             });
             $(document).delegate('.vendorinqurey', 'click', function() {
                 $("#inquiryvendorid").val($(this).attr('data-id'));
+                console.log($(this).attr('data-name'));
+                $("#vendor-name").text($(this).attr('data-name'));
                 $('#enquiryModal').modal('show');
             })
             $('#accommodationForm').on('submit', function(e) {

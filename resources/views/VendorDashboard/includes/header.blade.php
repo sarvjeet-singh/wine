@@ -49,7 +49,7 @@
                         <ul class="dropdown-menu p-0" style="max-height: 300px; overflow: auto;">
                             @foreach ($vendors as $vendor)
                                 <li>
-                                    <a class="dropdown-item fs-7" href="{{ url('/vendor-dashboard', ['vendorId' => $vendor->id]) }}">{{ $vendor->vendor_name }}</a>
+                                    <a class="dropdown-item fs-7" href="{{ route('vendor-dashboard', $vendor->id) }}">{{ $vendor->vendor_name }}</a>
                                 </li>
                             @endforeach
                             <li>

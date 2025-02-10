@@ -44,6 +44,9 @@ use App\Models\VendorNonLicenseMetadata;
 use \illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\InquiryApprovedMail;
+use App\Mail\InquiryRejectedMail;
 use DB;
 use Hash;
 
@@ -537,7 +540,8 @@ class VendorController extends Controller
 			$vendor->metadata = $vendor->accommodationMetadata;
 			unset($vendor->accommodationMetadata);
 		}
-		return view('VendorDashboard.vendor-booking-utility', compact('vendor'));
+		$stripeDetail = VendorStripeDetail::where('vendor_id', $vendorid)->count();
+		return view('VendorDashboard.vendor-booking-utility', compact('vendor', 'stripeDetail'));
 	}
 
 	public function updateVendorPolicy(Request $request)
@@ -1037,10 +1041,20 @@ class VendorController extends Controller
 			return response()->json(['error' => 'Inquiry not found.'], 404);
 		}
 
+		// Fetch customer details
+		$customer = Customer::find($inquiry->customer_id);
+		$vendor = Vendor::find($inquiry->vendor_id);
+    
+		if (!$customer || empty($customer->email)) {
+			return response()->json(['error' => 'Customer email not found.'], 404);
+		}
+
 		// Update the inquiry status to 'approved' (define status code accordingly, e.g., 1 for approved)
 		$inquiry->inquiry_status = 1; // Assuming 1 is for "approved"
 		$inquiry->apk = Str::uuid();
 		$inquiry->save();
+		// Send email to the customer
+		Mail::to($customer->email)->send(new InquiryApprovedMail($inquiry, $vendor));
 
 		return response()->json(['success' => true, 'message' => 'Inquiry approved successfully.']);
 	}
@@ -1054,9 +1068,18 @@ class VendorController extends Controller
 			return response()->json(['error' => 'Inquiry not found.'], 404);
 		}
 
+		$customer = Customer::find($inquiry->customer_id);
+		$vendor = Vendor::find($inquiry->vendor_id);
+    
+		if (!$customer || empty($customer->email)) {
+			return response()->json(['error' => 'Customer email not found.'], 404);
+		}
+
 		// Update the inquiry status to 'rejected' (define status code accordingly, e.g., 2 for rejected)
 		$inquiry->inquiry_status = 2; // Assuming 2 is for "rejected"
 		$inquiry->save();
+
+		Mail::to($customer->email)->send(new InquiryRejectedMail($inquiry, $vendor));
 
 		return response()->json(['success' => true, 'message' => 'Inquiry rejected successfully.']);
 	}

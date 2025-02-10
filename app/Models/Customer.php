@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Http\Controllers\WalletController;
 
 class Customer extends Authenticatable implements MustVerifyEmail
 {
@@ -57,6 +58,9 @@ class Customer extends Authenticatable implements MustVerifyEmail
         'state',
         'postal_code',
         'country',
+        'is_other_country',
+        'other_country',
+        'other_state',
         'government_proof_front',
         'government_proof_back',
         'medical_physical_concerns',
@@ -67,6 +71,10 @@ class Customer extends Authenticatable implements MustVerifyEmail
         'password_updated',
         'ip_address',
         'email_verified_at',
+        'phone_otp',
+        'phone_verified_at',
+        'form_guest_registry_filled',
+        'terms_accepted_at',
     ];
 
     /**
@@ -111,5 +119,14 @@ class Customer extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new CustomerResetPasswordNotification($token));
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($customer) {
+            app(WalletController::class)->assignBonus($customer);
+        });
     }
 }

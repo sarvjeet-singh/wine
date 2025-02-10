@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Password;
+use Session;
+use Mews\Captcha\Captcha;
+
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendWelcomeCustomerMail;
 
 class CustomerAuthController extends Controller
 {
@@ -28,10 +33,8 @@ class CustomerAuthController extends Controller
                 'email' => 'required|email',
                 'password' => 'required',
             ]);
-
             if (Auth::guard('customer')->attempt($credentials)) {
                 $user = Auth::guard('customer')->user();
-
                 // Check if the user's email is verified
                 if (!$user || !$user->hasVerifiedEmail()) {
                     // Logout the user to avoid partial session issues
@@ -43,31 +46,91 @@ class CustomerAuthController extends Controller
                 }
                 $request->session()->regenerate();
                 return redirect()->route('user-dashboard');
+            } else {
+                return back()->withErrors([
+                    'email' => 'The provided credentials do not match our records.',
+                ]);
             }
         } catch (\Exception $e) {
-
             return back()->withErrors([
                 'email' => 'The provided credentials do not match our records.',
             ]);
         }
     }
 
-    public function resend(Request $request)
+    public function showTermsPopup()
+    {
+        return view('UserDashboard.terms-popup'); // Return a view for the popup
+    }
+
+    public function acceptTerms(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:customers,email',
+            'terms' => 'required',
+            'captcha' => 'required',
         ]);
 
-        $user = Customer::where('email', $request->email)->first();
+        // Retrieve the CAPTCHA key from the session
+        $sessionCaptchaKey = Session::get('captcha.key');
+        if (!$sessionCaptchaKey) {
+            return response()->json(['success' => false, 'message' => 'CAPTCHA session key is missing.']);
+        }
 
+        // Verify user input against session key
+        if (password_verify($request->input('captcha'), $sessionCaptchaKey)) {
+            // Assuming you need to store the acceptance in the user's profile
+            $user = Auth::guard('customer')->user();
+            $user->terms_accepted_at = now(); // Update the terms acceptance
+            $user->save();
+
+            return response()->json(['success' => true, 'message' => 'Terms and conditions accepted.']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Invalid CAPTCHA. Please try again.']);
+        }
+    }
+
+    public function resend(Request $request)
+    {
+        // Validate the request
+        if (Auth::guard('customer')->check()) {
+            $user = Auth::guard('customer')->user();
+        } else {
+            $request->validate([
+                'email' => 'required|email|exists:customers,email',
+            ]);
+
+            // Find the user
+            $user = Customer::where('email', $request->email)->first();
+        }
+
+        // Check if the email is already verified
         if ($user->hasVerifiedEmail()) {
-            return redirect()->route('customer.login')->with('error', 'Your email is already verified.');
+            $message = 'Your email is already verified.';
+
+            // Check if it's an AJAX request
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 400); // 400 Bad Request
+            }
+
+            return redirect()->route('customer.login')->with('error', $message);
         }
 
         // Send the verification email
         $user->sendEmailVerificationNotification();
+        $successMessage = 'Verification link has been resent to your email address.';
 
-        return redirect()->route('customer.login')->with('success', 'Verification link has been resent to your email address.');
+        // Check if it's an AJAX request
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $successMessage,
+            ]);
+        }
+
+        return redirect()->route('customer.login')->with('success', $successMessage);
     }
 
     public function logout(Request $request)
@@ -83,28 +146,24 @@ class CustomerAuthController extends Controller
     {
         // Retrieve the user by ID
         $user = Customer::findOrFail($id);
-
+        // Check if the email is already verified
+        if ($user->hasVerifiedEmail()) {
+            return redirect()->route('customer.login')->with(['error' => 'This verification link has expired. Please request a new one.']);
+        }
         // Check if the hash matches the user's email verification hash
         if (hash_equals($hash, sha1($user->getEmailForVerification()))) {
             // Fulfill the email verification (mark the email as verified)
-            if (!$user->hasVerifiedEmail()) {
-                $user->markEmailAsVerified();
-            }
+            $user->markEmailAsVerified();
 
             // Log the user in
             Auth::guard('customer')->login($user);
-
+            Mail::to($user->email)->send(new SendWelcomeCustomerMail($user->firstname));
             // Redirect to the dashboard with success message
             return redirect()->route('user-dashboard')->with('success', 'Email verified successfully. Welcome to your dashboard!');
-
-
-
-            // Redirect with success message
-            // return redirect()->route('customer.login')->with('success', 'Email verified successfully.');
         }
 
         // If verification fails, return an error
-        return redirect()->route('customer.login')->withErrors(['error' => 'Invalid verification link.']);
+        return redirect()->route('customer.login')->with(['error' => 'Invalid verification link.']);
     }
 
     public function showForgotPasswordForm()
@@ -166,5 +225,36 @@ class CustomerAuthController extends Controller
         return $status === Password::PASSWORD_RESET
             ? redirect()->route('customer.login')->with('success', 'Password has been reset. Please login.')
             : back()->withErrors(['email' => 'The provided password reset token is invalid.']);
+    }
+
+    public function validateCaptcha(Request $request)
+    {
+        $request->validate([
+            'captcha' => 'required|string',
+        ]);
+
+        // Retrieve CAPTCHA key from session
+        $sessionCaptchaKey = Session::get('captcha.key');
+        if (!$sessionCaptchaKey) {
+            return response()->json(false, 200);
+        }
+
+        // Verify user input against session key
+        if (password_verify($request->input('captcha'), $sessionCaptchaKey)) {
+            return response()->json(true, 200);
+        }
+
+        return response()->json(false, 200);
+    }
+
+    public function refreshCaptcha(Request $request, Captcha $captcha)
+    {
+        // Generate a new CAPTCHA image
+        $captchaData = $captcha->create('default', true);
+        // Return the new CAPTCHA image and its key (if needed)
+        return response()->json([
+            'captcha' => $captchaData['img'],
+            // 'captchaKey' => $captchaData['key'],
+        ]);
     }
 }

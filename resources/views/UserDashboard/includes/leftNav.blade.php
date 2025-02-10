@@ -42,6 +42,13 @@
                     <span class="ms-1 d-none d-sm-inline">Submit Reviews</span>
                 </a>
             </li>
+            <li class="nav-item {{ request()->is('user/wallet-history*') ? 'active' : '' }}">
+                <a href="{{ route('wallet-history') }}" class="nav-link px-sm-2 px-3 align-middle">
+                    <img src="{{ asset('images/icons/rating_icon_grey.png') }}"
+                        data-image="{{ asset('images/icons/rating_icon') }}">
+                    <span class="ms-1 d-none d-sm-inline">Bottle Bucks History</span>
+                </a>
+            </li>
             <li class="nav-item {{ request()->is('vendor-suggest*') ? 'active' : '' }}">
                 <a href="{{ route('vendorsuggest') }}" class="nav-link px-sm-2 px-3 align-middle">
                     <img src="{{ asset('images/icons/referral_icon_grey.png') }}"

@@ -1,24 +1,25 @@
 <div style="text-align: center;">
-    <img src="images/logo.png" style="width:200px;" alt="Logo">
-    {{-- <div class="social-icons">
+    <img src="images/logo.png" style="width:180px;" alt="Logo">
+    <div class="social-icons">
         <ul>
             <li>
                 <a href="#">
-                    <img src="{{ asset('images/FrontEnd/image 13.png') }}" style="width:27px; height: 27px;" alt="Instagram">
+                    <img src="{{ asset('images/FrontEnd/instagram.png') }}" style="width:27px; height: 27px;" alt="Instagram">
                 </a>
             </li>
             <li>
                 <a href="#">
-                    <img src="{{ asset('images/FrontEnd/image 12.png') }}" style="width:26px; height: 26px;" alt="YouTube">
+                    <img src="{{ asset('images/FrontEnd/youtube.png') }}" style="width:26px; height: 26px;" alt="YouTube">
                 </a>
             </li>
             <li>
                 <a href="#">
-                    <img src="{{ asset('images/FrontEnd/image 11.png') }}" style="width:26px; height: 26px;" alt="TikTok">
+                    <img src="{{ asset('images/FrontEnd/tiktok.png') }}" style="width:26px; height: 26px;" alt="TikTok">
                 </a>
             </li>
             <li>
-                <a href="#"><img src="{{ asset('images/FrontEnd/image 10.png') }}" style="width:26px; height: 26px;" alt="Facebook">
+                <a href="#">
+                    <img src="{{ asset('images/FrontEnd/facebook.png') }}" style="width:26px; height: 26px;" alt="Facebook">
                 </a>
             </li>
             <li>
@@ -28,12 +29,14 @@
             </li>
             <li>
                 <a href="#">
-                    <img src="{{ asset('images/FrontEnd/image 9.png') }}" style="width:26px; height: 26px;" alt="LinkedIn">
+                    <img src="{{ asset('images/FrontEnd/linkedin.png') }}" style="width:26px; height: 26px;" alt="LinkedIn">
                 </a>
             </li>
         </ul>
-    </div> --}}
+    </div>
 </div>
 <div class="footer">
-    &copy; 2024 Wine Country Weekends | All Rights Reserved
+    &copy; {{ date('Y') }} Wine Country Weekends | All Rights Reserved
+</div>
+<!-- /Email Footer -->
 </div>

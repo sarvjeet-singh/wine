@@ -19,15 +19,34 @@
             --theme-secondary-color: #fcf8e4;
         }
     </style>
+
+
+    <meta name="title" content="Book Accommodations, Wineries, and Excursions - Wine Country Weekends">
+    <meta name="description"
+        content="Discover and book unique accommodations, exclusive winery tours, and exciting excursions. Plan your perfect getaway with us!">
+    <meta name="keywords" content="accommodation booking, winery tours, excursions, travel packages, luxury stays">
+    <meta name="author" content="Wine Country Weekends">
+    <meta property="og:title" content="Book Unique Stays and Experiences">
+    <meta property="og:description"
+        content="Experience luxury accommodations, exclusive winery visits, and thrilling excursions. Book now for an unforgettable adventure!">
+    <meta property="og:image" content="https://winecountryweekends.ca/images/FrontEnd/wine.jpg">
+    <meta property="og:url" content="https://winecountryweekends.ca/accommodations">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Wine Country Weekends">
+    <meta property="og:image:alt" content="Preview of accommodation, winery, and excursion">
+    <meta property="og:image:width" content="1920">
+    <meta property="og:image:height" content="1281">
+
     <!-- Link to your CSS file -->
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap.min.css') }}">
     <link rel="stylesheet"
-        href="https://www.jqueryscript.net/demo/Responsive-Mobile-friendly-Image-Cropper-With-jQuery-rcrop/dist/rcrop.min.css">
+        href="{{ asset('asset/FrontEnd/css/rcrop.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/dataTables.dataTables.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/star-rating-svg.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/select2.min.css') }}" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ asset('asset/FrontEnd/css/owl.carousel.min.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ asset('asset/FrontEnd/css/owl.theme.default.min.css') }}?v={{ time() }}">
@@ -72,7 +91,7 @@
     <!-- Include the latest version of jQuery -->
 
     <script
-        src="https://www.jqueryscript.net/demo/Responsive-Mobile-friendly-Image-Cropper-With-jQuery-rcrop/dist/rcrop.min.js">
+        src="{{ asset('asset/FrontEnd/js/rcrop.js') }}">
     </script>
     <script src="{{ asset('asset/js/dataTables.min.js') }}"></script>
     <script src="{{ asset('asset/js/select2.min.js') }}"></script>

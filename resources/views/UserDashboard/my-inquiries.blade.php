@@ -25,9 +25,9 @@
                                 <tr>
                                     <td>#{{ $inquiry->id }}</td>
                                     <td>{{ $inquiry->vendor->vendor_name }}</td>
-                                    <td>{{ $inquiry->created_at->format('m/d/Y') }}</td>
+                                    <td>{{ toLocalTimezone($inquiry->created_at, getUserTimezone()) }}</td>
                                     <td>${{ $inquiry->order_total }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($inquiry->check_in_at)->format('m/d/Y') ?? 'N/A' }}</td>
+                                    <td>{{ toLocalTimezone($inquiry->check_in_at, getUserTimezone()) ?? 'N/A' }}</td>
                                     @switch($inquiry->inquiry_status)
                                         @case(0)
                                             <td class="pending-text">Pending</td>

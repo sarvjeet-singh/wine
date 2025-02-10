@@ -70,5 +70,7 @@ class Kernel extends HttpKernel
         // Other middleware
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
         'check.vendorid' => \App\Http\Middleware\CheckVendorAuthorization::class,
+        'check.terms' => \App\Http\Middleware\CheckTermsAccepted::class,
+        'checkPasswordUpdated' => \App\Http\Middleware\CheckPasswordUpdated::class,
     ];
 }

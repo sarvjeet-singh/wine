@@ -221,4 +221,12 @@ class LoginController extends Controller
 
         return response()->json(!$exists); // Returns true if email is unique, false if it exists
     }
+
+    public function checkPhone(Request $request)
+    {
+        $phone = $request->input('phone');
+        $exists = Customer::where('contact_number', $phone)->exists();
+
+        return response()->json(!$exists); // Returns true if email is unique, false if it exists
+    }
 }

@@ -7,6 +7,8 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Auth;
 use Session;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendWelcomeCustomerMail;
 
 class GoogleController extends Controller
 {
@@ -24,13 +26,24 @@ class GoogleController extends Controller
             if ($findUser) {
                 Auth::login($findUser);
             } else {
-                if(isset($user->name) && !empty($user->name)){
-                    $name = explode(' ', $user->name);
-                    $user->firstname = $name[0];
-                    $user->lastname = $name[1];
+                if (isset($user['name']) && !empty($user['name'])) {
+                    $name = explode(' ', $user['name']);
                 }
-                Session::put('user', $user);
-                return view('auth.register-social', ['user' => $user]);
+                $addUser = [
+                    'firstname' => $name[0] ?? "",
+                    'email' => $user['email'],
+                    'lastname' => $name[1] ?? "",
+                    'role' => 'Member',
+                    'email_verified_at' => now(),
+                    'ip_address' => getClientIp(),
+                ];
+
+                $newUser = Customer::create($addUser);
+                
+                // Session::put('user', $user);
+                Auth::login($newUser);
+                Mail::to($newUser->email)->send(new SendWelcomeCustomerMail($newUser->firstname));
+                // return view('auth.register-social', ['user' => $user]);
             }
 
             return redirect()->intended('user-dashboard');

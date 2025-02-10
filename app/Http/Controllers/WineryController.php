@@ -49,6 +49,14 @@ class WineryController extends Controller
 
     public function products($shopid, $vendorid)
     {
+        $shopActive = Vendor::where('id', $shopid)
+            ->where(function ($query) {
+                $query->where('account_status', '1')
+                    ->orWhere('account_status', '2');
+            })->first();
+        if(!$shopActive) {
+            return redirect()->route('winery-shop.index', ['vendorid' => $vendorid]);
+        }
         //'wineReviews', 
         $dates = VendorWine::where('vendor_id', $shopid)
             ->select('vintage_date')

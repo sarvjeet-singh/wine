@@ -15,6 +15,7 @@ class ConfigurationSetting extends Model
         'title',
         'key',
         'value',
+        'status',
         'created_by',
         'updated_by',
     ];

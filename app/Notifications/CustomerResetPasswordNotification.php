@@ -25,8 +25,9 @@ class CustomerResetPasswordNotification extends Notification
 
         return (new MailMessage)
             ->subject('Reset Password Notification')
-            ->line('You are receiving this email because we received a password reset request for your account.')
-            ->action('Reset Password', $resetUrl)
-            ->line('If you did not request a password reset, no further action is required.');
+            ->view('emails.customer.reset-password', [
+                'resetUrl' => $resetUrl,
+                'user' => $notifiable,
+            ]); // Use your custom template
     }
 }

@@ -61,6 +61,6 @@ class SeasonHelper
             $price = $pricing->special_price_value;
         }
 
-        return ['season' => $currentSeason, 'price' => number_format($price, '2', '.')];
+        return ['season' => $currentSeason, 'price' => $price];
     }
 }

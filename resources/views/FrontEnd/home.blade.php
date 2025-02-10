@@ -32,14 +32,15 @@
                             <li>Await a response from one of our Experience Curators</li>
                         </ul>
                         <p>Whatever option you choose, join our <a
-                                @if(!authCheck()['is_logged_in']) href="{{ route('register') }}" @else href="{{ route('guest-rewards') }}" @endif>Guest
+                                @if (!authCheck()['is_logged_in']) href="{{ route('register') }}" @else href="{{ route('guest-rewards') }}" @endif>Guest
                                 Rewards</a> program for the best value and experience.</p>
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-5 m-auto text-center">
                     <div class="sec-btn mt-md-0 mt-3">
                         <button type="button">
-                            <a @if(!authCheck()['is_logged_in']) href="{{ route('register') }}" @else href="{{ route('guest-rewards') }}" @endif>Guest
+                            <a
+                                @if (!authCheck()['is_logged_in']) href="{{ route('register') }}" @else href="{{ route('guest-rewards') }}" @endif>Guest
                                 Rewards <i class="fa-solid fa-angle-right"></i></a>
                         </button>
                     </div>
@@ -146,7 +147,8 @@
             </div>
             <div class="sec-btm-btn text-center position-relative">
                 <button type="button">
-                    <a @if (!authCheck()['is_logged_in']) href="{{ route('register') }}" @else href="{{ route('guest-rewards') }}" @endif>Guest
+                    <a
+                        @if (!authCheck()['is_logged_in']) href="{{ route('register') }}" @else href="{{ route('guest-rewards') }}" @endif>Guest
                         Rewards <i class="fa-solid fa-arrow-right"></i></a>
                 </button>
             </div>
@@ -176,11 +178,12 @@
                                             <div
                                                 class="d-flex align-items-center justify-content-lg-start justify-content-center mt-3">
                                                 <div class="user-img">
-                                                    <img src="{{ (isset($review->customer->profile_image) && $review->customer->profile_image) ? asset('images/UserProfile/' . $review->customer->profile_image) : asset('images/UserProfile/default-profile.png') }}"
+                                                    <img src="{{ isset($review->customer->profile_image) && $review->customer->profile_image ? asset('images/UserProfile/' . $review->customer->profile_image) : asset('images/UserProfile/default-profile.png') }}"
                                                         alt="User Pic">
                                                 </div>
                                                 <div class="user-name">
-                                                    <p>{{ $review->customer->firstname ?? "" }} {{ $review->customer->lastname ?? "" }}</p>
+                                                    <p>{{ $review->customer->firstname ?? '' }}
+                                                        {{ $review->customer->lastname ?? '' }}</p>
                                                     <div class="rating-star theme-color d-flex"
                                                         data-rating="{{ $review->avg('rating') ?? 0.0 }}">
                                                     </div>
@@ -202,6 +205,31 @@
 @endsection
 
 @section('js')
+    @if (config('site.google_search_console_tag'))
+        <!-- Google Tag Manager -->
+        <script>
+            (function(w, d, s, l, i) {
+                w[l] = w[l] || [];
+                w[l].push({
+                    'gtm.start': new Date().getTime(),
+                    event: 'gtm.js'
+                });
+                var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s),
+                    dl = l != 'dataLayer' ? '&l=' + l : '';
+                j.async = true;
+                j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+                f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', '{{ config('site.google_search_console_tag') }}');
+        </script>
+        <!-- End Google Tag Manager -->
+
+        <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ config('site.google_search_console_tag') }}"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->
+    @endif
     <script>
         $('.premiere-accom-slider').owlCarousel({
             loop: true,
@@ -222,5 +250,24 @@
             autoplay: true,
             autoplayTimeout: 4000 // 4 seconds
         });
+        // Get the client's timezone name
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        fetch('/set-timezone', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        'content') // For Laravel
+                },
+                body: JSON.stringify({
+                    timezone: timezone
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Timezone saved successfully:", data);
+            })
+            .catch(error => console.error("Error saving timezone:", error));
     </script>
 @endsection

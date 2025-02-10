@@ -490,75 +490,99 @@
 
 
                                         <!-- Checkout Payment -->
+                                        <!-- Payment Methods Section -->
+                                        <div id="payment-methods-container">
+                                            <h4 class="fw-bold">Saved Payment Methods</h4>
+                                            <input type="hidden" id="selectedPaymentMethodId" name="payment_method_id"
+                                                value="">
+                                            <!-- Payment Methods List (Will be populated by AJAX) -->
+                                            <ul id="payment-methods-list" class="list-group"></ul>
+                                            <!-- "Use a New Card" Option -->
+                                            <div class="form-check mb-2">
+                                                <input type="radio" name="payment_method_select" value="new"
+                                                    id="use-new-card" class="form-check-input">
+                                                <label for="use-new-card" class="form-check-label fw-bold">Use a New
+                                                    Card</label>
+                                            </div>
+                                        </div>
+                                        <div id="checkout-payment-form" class="d-none">
+                                            <!-- "Back to Saved Cards" Option -->
+                                            <div class="form-check mb-2">
+                                                <input type="radio" name="payment_method_select" value="saved"
+                                                    id="back-to-saved" class="form-check-input">
+                                                <label for="back-to-saved" class="form-check-label fw-bold">Use a Saved
+                                                    Card</label>
+                                            </div>
+                                            <div class="cart-box p-4">
 
-                                        <div class="cart-box p-4">
+                                                <h4 class="fw-bold">Checkout Payment Form</h4>
 
-                                            <h4 class="fw-bold">Checkout Payment Form</h4>
+                                                <div class="checkout-box border-top mt-3 pt-3">
 
-                                            <div class="checkout-box border-top mt-3 pt-3">
+                                                    <form action="">
 
-                                                <form action="">
+                                                        <div class="row g-sm-3 g-2">
 
-                                                    <div class="row g-sm-3 g-2">
+                                                            <div id="card-container">
 
-                                                        <div id="card-container">
+                                                                <div class="row">
 
-                                                            <div class="row">
+                                                                    <div class="col-12">
 
-                                                                <div class="col-12">
-
-                                                                    <div id="card-errors" style="color:red"></div>
-
-                                                                </div>
-
-                                                            </div>
-
-                                                            <div class="mb-2">
-
-                                                                <label for="cc-name">Card Holder Name</label>
-
-                                                                <input type="text" class="form-control mt-2"
-                                                                    id="cc-name" placeholder="Card Holder Name">
-
-                                                            </div>
-
-                                                            <div class="row">
-
-                                                                <div class="col-12 col-md-12">
-
-                                                                    <div class="form-floating mb-2">
-
-                                                                        <div id="cc-number"></div>
-
-                                                                        <label for="cc-number">Card number</label>
-
-                                                                    </div>
-
-                                                                </div>
-
-                                                            </div>
-
-                                                            <div class="row">
-
-                                                                <div class="col-md-6">
-
-                                                                    <div class="form-floating">
-
-                                                                        <div id="cc-expiry"></div>
-
-                                                                        <label for="cc-expiry">MM/AA</label>
+                                                                        <div id="card-errors" style="color:red"></div>
 
                                                                     </div>
 
                                                                 </div>
 
-                                                                <div class="col-md-6">
+                                                                <div class="mb-2">
 
-                                                                    <div class="form-floating">
+                                                                    <label for="cc-name">Card Holder Name</label>
 
-                                                                        <div id="cc-cvc"></div>
+                                                                    <input type="text" class="form-control mt-2"
+                                                                        id="cc-name" placeholder="Card Holder Name">
 
-                                                                        <label for="cc-cvc">CVV</label>
+                                                                </div>
+
+                                                                <div class="row">
+
+                                                                    <div class="col-12 col-md-12">
+
+                                                                        <div class="form-floating mb-2">
+
+                                                                            <div id="cc-number"></div>
+
+                                                                            <label for="cc-number">Card number</label>
+
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                </div>
+
+                                                                <div class="row">
+
+                                                                    <div class="col-md-6">
+
+                                                                        <div class="form-floating">
+
+                                                                            <div id="cc-expiry"></div>
+
+                                                                            <label for="cc-expiry">MM/AA</label>
+
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                    <div class="col-md-6">
+
+                                                                        <div class="form-floating">
+
+                                                                            <div id="cc-cvc"></div>
+
+                                                                            <label for="cc-cvc">CVV</label>
+
+                                                                        </div>
 
                                                                     </div>
 
@@ -568,23 +592,19 @@
 
                                                         </div>
 
-                                                        <div class="col-12">
+                                                    </form>
 
-                                                            <button id="pay-button" type="button"
-                                                                class="btn book-btn wine-btn w-100 text-uppercase mt-2"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#tyModal">Pay</button>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                </form>
+                                                </div>
 
                                             </div>
+                                        </div>
+                                        <div class="col-12">
+
+                                            <button id="pay-button" type="button"
+                                                class="btn book-btn wine-btn w-100 text-uppercase mt-2"
+                                                data-bs-toggle="modal" data-bs-target="#tyModal">Pay</button>
 
                                         </div>
-
                                     </div>
 
                                 </div>
@@ -615,7 +635,7 @@
     <script src="https://js.stripe.com/v3/"></script>
 
     <script>
-        var stripe = Stripe("{{ $vendor->stripeDetails->stripe_publishable_key }}");
+        var stripe = Stripe("{{ env('STRIPE_KEY') }}");
 
         var elements = stripe.elements();
 
@@ -670,12 +690,6 @@
             }
 
         });
-
-
-
-
-
-
 
         cardNumber.mount('#cc-number');
 
@@ -1004,56 +1018,184 @@
     </script>
 
     <script>
-        function handlePayment(clientSecret, order_id) {
-            stripe.confirmCardPayment(clientSecret, {
-                payment_method: {
-                    card: cardNumber, // Ensure cardNumber is properly initialized
+        async function savePaymentMethod(paymentMethodId) {
+            const response = await fetch("{{ route('vendor.save-payment-method', $vendorid) }}", {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": $('meta[name="csrf-token"]').attr('content'),
                 },
-            }).then((result) => {
-                if (result.error) {
+                body: JSON.stringify({
+                    payment_method_id: paymentMethodId
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                console.log("Payment method saved successfully.");
+            } else {
+                console.error("Failed to save payment method:", data.error);
+            }
+        }
+        async function createPaymentIntent(paymentMethodId, order_id) {
+            try {
+                const response = await fetch(
+                    "{{ route('vendor.create-payment-intent', ['shopid' => $shopid, 'vendorid' => $vendorid]) }}", {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-Token": $('meta[name="csrf-token"]').attr('content'),
+                        },
+                        body: JSON.stringify({
+                            payment_method_id: paymentMethodId,
+                            order_id: order_id,
+                        }),
+                    });
+
+                const data = await response.json();
+                if (data.client_secret) {
+                    return data; // Return the payment intent data
+                } else {
+                    console.error("Error creating payment intent:", data.error);
+                    return null;
+                }
+            } catch (error) {
+                console.error("Request failed:", error);
+                return null;
+            }
+        }
+
+        async function handlePayment(clientSecret, order_id, intentType) {
+            const paymentMethodId = $("#selectedPaymentMethodId").val(); // Get selected payment method ID
+            let paymentMethod = null;
+
+            if (paymentMethodId) {
+                // Use saved payment method
+                paymentMethod = paymentMethodId;
+            } else {
+                try {
+                    // Create a new payment method
+                    let result = await stripe.createPaymentMethod({
+                        type: 'card',
+                        card: cardNumber, // Use your Stripe Elements card element here
+                        billing_details: {
+                            name: $('#cc-name').val(), // Cardholder name
+                        }
+                    });
+
+                    if (result.error) {
+                        Swal.fire({
+                            title: "Payment failed",
+                            text: result.error.message,
+                            icon: "error",
+                            confirmButtonText: "OK"
+                        });
+                        restorePayButton();
+                        return; // Stop execution if there's an error
+                    }
+
+                    paymentMethod = result.paymentMethod.id; // Get the created payment method ID
+                    savePaymentMethod(paymentMethod); // Save the payment method if needed
+                } catch (error) {
+                    console.error("Error creating payment method:", error);
                     Swal.fire({
-                        title: "Payment failed",
-                        text: result.error.message,
+                        title: "Error",
+                        text: "There was an error creating the payment method.",
                         icon: "error",
                         confirmButtonText: "OK"
                     });
-                    restorePayButton(); // Restore the button after failure
-                } else if (result.paymentIntent.status === "requires_action") {
-                    stripe.handleCardAction(clientSecret).then((result) => {
-                        if (result.error) {
-                            Swal.fire({
-                                title: "Authentication failed",
-                                text: result.error.message,
-                                icon: "error",
-                                confirmButtonText: "OK"
-                            });
-                            restorePayButton(); // Restore the button after failure
-                        } else {
-                            confirmPayment(result.paymentIntent.id, order_id);
-                        }
-                    });
-                } else if (result.paymentIntent.status === "succeeded") {
-                    storeTransactionDetails({
-                        order_id: order_id,
-                        payment_intent_id: result.paymentIntent.id,
-                        status: "succeeded",
-                    });
-
-                    Swal.fire({
-                        title: "Payment successful!",
-                        text: "Your payment has been processed successfully.",
-                        icon: "success",
-                        timer: 2000,
-                        showConfirmButton: false
-                    }).then(() => {
-                        window.location.href =
-                            '{{ route('winery.vendor.order.detail', ['orderid' => ':orderid', 'vendorid' => $vendorid]) }}'
-                            .replace(':orderid', order_id);
-                        resetCheckoutForm(); // Reset the checkout form
-                        restorePayButton(); // Restore the button after success
-                    });
+                    restorePayButton();
+                    return;
                 }
-            });
+            }
+
+            try {
+                // Create PaymentIntent
+                let intent = await createPaymentIntent(paymentMethod, order_id);
+
+                if (intent && intent.client_secret) {
+                    proceedWithPayment(paymentMethod, intent, order_id);
+                } else {
+                    throw new Error("Failed to retrieve client_secret from PaymentIntent.");
+                }
+            } catch (error) {
+                console.error("Error creating PaymentIntent:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "There was an issue creating the payment intent.",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+                restorePayButton();
+            }
+        }
+
+        function proceedWithPayment(paymentMethod, intent, order_id) {
+            if (intent.error) {
+                Swal.fire({
+                    title: "Payment failed",
+                    text: result.error.message,
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+                restorePayButton(); // Restore the button after failure
+            } else if (intent.status === "requires_action") {
+                stripe.confirmCardPayment(intent.client_secret).then((result) => {
+                    if (result.error) {
+                        Swal.fire({
+                            title: "Authentication failed",
+                            text: result.error.message,
+                            icon: "error",
+                            confirmButtonText: "OK"
+                        });
+                        restorePayButton(); // Restore the button after failure
+                    }
+                    //  else {
+                    //     confirmPayment(intent.id, order_id); // Confirm payment
+                    // }
+                });
+            } else if (intent.status === "succeeded") {
+                storeTransactionDetails({
+                    order_id: order_id,
+                    payment_intent_id: intent.id,
+                    status: "succeeded",
+                });
+
+                Swal.fire({
+                    title: "Payment successful!",
+                    text: "Your payment has been processed successfully.",
+                    icon: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href =
+                        '{{ route('winery.vendor.order.detail', ['orderid' => ':orderid', 'vendorid' => $vendorid]) }}'
+                        .replace(':orderid', order_id);
+                    resetCheckoutForm(); // Reset the checkout form
+                    restorePayButton(); // Restore the button after success
+                });
+            } else if (intent.status === "requires_capture") {
+                storeTransactionDetails({
+                    order_id: order_id,
+                    payment_intent_id: intent.id,
+                    status: "requires_capture",
+                });
+
+                Swal.fire({
+                    title: "Payment successful!",
+                    text: "Your payment has been authorized successfully.",
+                    icon: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href =
+                        '{{ route('winery.vendor.order.detail', ['orderid' => ':orderid', 'vendorid' => $vendorid]) }}'
+                        .replace(':orderid', order_id);
+                    resetCheckoutForm(); // Reset the checkout form
+                    restorePayButton(); // Restore the button after success
+                });
+            }
         }
 
         function confirmPayment(paymentIntentId, order_id) {
@@ -1071,6 +1213,7 @@
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.success) {
+                        // Payment was successful
                         storeTransactionDetails({
                             order_id: order_id,
                             payment_intent_id: paymentIntentId,
@@ -1091,8 +1234,10 @@
                             restorePayButton(); // Restore the button after success
                         });
                     } else if (data.requires_action) {
-                        handlePayment(data.client_secret, order_id);
+                        // If 3D Secure or any additional authentication is needed
+                        handlePayment(data.client_secret, order_id, "paymentIntent");
                     } else {
+                        // Payment confirmation failed
                         Swal.fire({
                             title: "Payment confirmation failed",
                             text: "Please try again.",
@@ -1142,6 +1287,10 @@
                     formData.append(key, value);
                 }
 
+                if ($("#selectedPaymentMethodId").val() != null) {
+                    formData.append("payment_method_id", $("#selectedPaymentMethodId").val());
+                }
+
                 fetch('{{ route('winery.checkout-post', ['shopid' => $shopid, 'vendorid' => $vendorid]) }}', {
                         method: "POST",
                         headers: {
@@ -1152,12 +1301,12 @@
                     })
                     .then((response) => response.json())
                     .then((data) => {
-                        if (data.client_secret && data.order_id) {
-                            handlePayment(data.client_secret, data.order_id);
-                        } else {
-                            console.error("Missing client_secret or order_id in response:", data);
-                            restorePayButton(); // Restore the button if data is missing
-                        }
+                        // if (data.client_secret && data.order_id) {
+                        handlePayment(data.client_secret, data.order_id, data.intent_type);
+                        // } else {
+                        //     console.error("Missing client_secret or order_id in response:", data);
+                        //     restorePayButton(); // Restore the button if data is missing
+                        // }
                     })
                     .catch((error) => {
                         console.error("Error:", error);
@@ -1322,5 +1471,200 @@
             if (!string) return ''; // Handle empty or null strings
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
+    </script>
+    <script>
+        $(document).ready(function() {
+            let vendorId = {{ $vendorid }}; // Replace with actual vendor ID dynamically
+
+            // Fetch and display saved payment methods
+            // Switch to new card form
+            $("#use-new-card").on("change", function() {
+                $("#checkout-payment-form").removeClass("d-none");
+                $("#payment-methods-container").addClass("d-none");
+                $("#selectedPaymentMethodId").val('');
+            });
+
+            // Switch back to saved cards
+            $("#back-to-saved").on("change", function() {
+                $("#payment-methods-container").removeClass("d-none");
+                $("#checkout-payment-form").addClass("d-none");
+
+                const selectedPaymentMethodId = $("input[name='payment-method']:checked").val();
+
+                // Set the hidden field with the selected payment method ID
+                if (selectedPaymentMethodId) {
+                    $("#selectedPaymentMethodId").val(selectedPaymentMethodId);
+                }
+            });
+
+            // AJAX call to load payment methods
+            function loadPaymentMethods() {
+                $.ajax({
+                    url: "{{ route('vendor.list-payment-methods', ':vendorid') }}".replace(':vendorid',
+                        vendorId),
+                    type: "GET",
+                    success: function(data) {
+                        let response = data.data;
+                        let methodsList = $("#payment-methods-list");
+                        methodsList.empty(); // Clear existing payment methods
+
+                        if (response.length === 0) {
+                            methodsList.append(
+                                '<li class="list-group-item">No saved payment methods.</li>');
+                        } else {
+                            response.forEach(function(method) {
+                                // Check if it's the default method
+                                let isDefault = method.is_default;
+                                $("#selectedPaymentMethodId").val(method.id);
+                                // If the payment method is default, show a badge and disable the buttons
+                                let defaultBadge = isDefault ?
+                                    '<span class="badge bg-success">Default</span>' : '';
+
+                                let buttonSection = !isDefault ? `
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-sm btn-primary make-default-payment" data-id="${method.id}">
+                                <i class="fa-solid fa-star"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger remove-payment" data-id="${method.id}">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    ` : ''; // If default, no buttons will be shown
+
+                                // Format the expiry date
+                                let expDate = method.exp_month && method.exp_year ?
+                                    `${method.exp_month}/${method.exp_year}` :
+                                    'N/A';
+
+                                // Add the payment method list item
+                                methodsList.append(`
+                        <li class="list-group-item">
+                            <!-- Button Section (only for non-default methods) -->
+                            ${buttonSection}
+                            <!-- Radio Button + Card Details -->
+                            <div class="d-flex align-items-center">
+                                <input type="radio" name="payment-method" value="${method.id}" id="payment-method-${method.id}" 
+                                    class="select-payment-method me-2" ${isDefault ? 'checked' : ''}>
+                                <span class="fw-bold">${method.brand} •••• ${method.last4} ${defaultBadge}</span>
+                            </div>
+                            <!-- Expiry Date -->
+                            <div class="mt-2">
+                                <span>Expiry: ${expDate}</span>
+                            </div>
+                        </li>
+                    `);
+                            });
+                        }
+                    },
+                    error: function() {
+                        $("#payment-methods-list").html(
+                            '<li class="list-group-item text-danger">Failed to load payment methods.</li>'
+                        );
+                    }
+                });
+            }
+
+            // Call function to load payment methods
+            loadPaymentMethods();
+
+            // Remove payment method
+            $(document).on("click", ".remove-payment", function() {
+                let methodId = $(this).data("id");
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This payment method will be removed permanently.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, remove it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('vendor.remove-payment-method', ':vendorid') }}"
+                                .replace(':vendorid', vendorId),
+                            type: "POST",
+                            data: {
+                                payment_method_id: methodId
+                            },
+                            headers: {
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                    "content") // For Laravel CSRF protection
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "Your payment method has been removed.",
+                                    icon: "success",
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                loadPaymentMethods(); // Refresh the list
+                            },
+                            error: function() {
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: "Failed to remove payment method.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+            $(document).on("click", ".make-default-payment", function() {
+                let methodId = $(this).data("id");
+
+                Swal.fire({
+                    title: "Set as Default?",
+                    text: "Do you want to set this card as your default payment method?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, Set as Default"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('vendor.set-default-payment-method', ':vendorid') }}"
+                                .replace(':vendorid', vendorId),
+                            type: "POST",
+                            data: {
+                                payment_method_id: methodId
+                            },
+                            headers: {
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                                    "content") // CSRF Protection
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: "Updated!",
+                                    text: "Your default payment method has been updated.",
+                                    icon: "success",
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                loadPaymentMethods(); // Refresh the list
+                            },
+                            error: function() {
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: "Failed to update default payment method.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+            $(document).on('change', '.select-payment-method', function() {
+                let selectedPaymentMethodId = $(this).val();
+
+                // Optionally, update some element or send an AJAX request to set the selected payment method
+                $("#selectedPaymentMethodId").val(selectedPaymentMethodId);
+                // You can use AJAX here to update the backend or handle further logic
+            });
+        });
     </script>
 @endsection

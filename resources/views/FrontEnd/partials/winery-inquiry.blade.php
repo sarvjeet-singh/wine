@@ -6,7 +6,7 @@
 
             <div class="modal-header flex-column text-center position-relative border-0">
 
-                <h2 class="modal-title fs-4 text-uppercase theme-color" id="enquiryModal">Winery Inquiry</h2>
+                <h2 class="modal-title fs-4 text-uppercase theme-color" id="enquiryModal"><span id="vendor-name">Winery</span> Inquiry</h2>
 
                 <p class="mb-0">To initiate an inquiry please complete and submit this form. An Experience
 

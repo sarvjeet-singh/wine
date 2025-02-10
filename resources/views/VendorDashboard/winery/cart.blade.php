@@ -34,7 +34,7 @@
                         <div class="cart-sec px-xl-2 py-xl-4 py-2">
 
                             {{-- ({{ ($cart && $cart->items->count()) ? $cart->items->count() : 0 }}) --}}
-
+                            
                             <h3 class="fs-5 fw-bold mb-3">Your Cart </h3>
 
                             @if ($cart && $cart->items->count() > 0)
@@ -132,36 +132,41 @@
 
                                                                 </td>
 
-                                                                <td>                                    
-                                                                    <div class="d-flex align-items-center gap-2">
-                                                                    <div class="input-group">
-                                                                        <span class="input-group-btn">
-                                                                            <button type="button"
-                                                                                class="quantity-left-minus btn btn-danger btn-number"
-                                                                                data-type="minus" data-field="">
-                                                                                <span
-                                                                                    class="glyphicon glyphicon-minus">-</span>
-                                                                            </button>
-                                                                        </span>
-                                                                        <input type="text" id="quantity_{{ $item->product->id }}"
-                                                                            class="form-control input-number quantity"
-                                                                            value="{{ $item->quantity }}" min="1" max="{{$item->product->inventory}}">
-                                                                        <span class="input-group-btn">
-                                                                            <button type="button"
-                                                                                class="quantity-right-plus btn btn-success btn-number"
-                                                                                data-type="plus" data-field="">
-                                                                                <span
-                                                                                    class="glyphicon glyphicon-plus">+</span>
-                                                                            </button>
-                                                                        </span>
-                                                                    </div>
-                                                                    <div>
-                                                                        <button 
-                                                                            data-product-id="{{ $item->product->id }}"
-                                                                            data-vendor-id="{{ $vendorid }}"
-                                                                            data-shop-id="{{ $item->product->vendor_id }}"
-                                                                            class="btn btn-primary update-quantity"><i class="fa-solid fa-arrows-rotate"></i></button>
-                                                                    </div>
+                                                                <td>
+                                                                    <div class="d-flex align-items-center gap-2"
+                                                                        style="max-width: 150px;">
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-btn">
+                                                                                <button type="button"
+                                                                                    class="quantity-left-minus btn btn-danger btn-number"
+                                                                                    data-type="minus" data-field="">
+                                                                                    <span
+                                                                                        class="glyphicon glyphicon-minus">-</span>
+                                                                                </button>
+                                                                            </span>
+                                                                            <input type="text"
+                                                                                id="quantity_{{ $item->product->id }}"
+                                                                                class="form-control input-number quantity"
+                                                                                value="{{ $item->quantity }}"
+                                                                                min="1"
+                                                                                max="{{ $item->product->inventory }}">
+                                                                            <span class="input-group-btn">
+                                                                                <button type="button"
+                                                                                    class="quantity-right-plus btn btn-success btn-number"
+                                                                                    data-type="plus" data-field="">
+                                                                                    <span
+                                                                                        class="glyphicon glyphicon-plus">+</span>
+                                                                                </button>
+                                                                            </span>
+                                                                        </div>
+                                                                        <div>
+                                                                            <button
+                                                                                data-product-id="{{ $item->product->id }}"
+                                                                                data-vendor-id="{{ $vendorid }}"
+                                                                                data-shop-id="{{ $item->product->vendor_id }}"
+                                                                                class="btn btn-primary update-quantity"><i
+                                                                                    class="fa-solid fa-arrows-rotate"></i></button>
+                                                                        </div>
                                                                     </div>
                                                                 </td>
 
@@ -212,7 +217,7 @@
 
                                     <div class="col-md-4">
 
-                                        <div class="cart-box p-4">
+                                        <div class="cart-box p-4" style="max-width: 350px;margin-inline: auto;">
 
                                             @php $total = $cart->items->count() @endphp
 
@@ -310,7 +315,8 @@
 
                     $.ajax({
 
-                        url: '/winery-shop/cart/remove/' + productId + '/' + shopId + '/' +
+                        url: "{{ URL::to('/') }}" + '/vendor/winery-shop/cart/remove/' +
+                            productId + '/' + shopId + '/' +
 
                             vendorId,
 
@@ -376,7 +382,7 @@
 
         });
 
-        $(document).on("click", '.update-quantity',function() {
+        $(document).on("click", '.update-quantity', function() {
 
             var productId = $(this).data('product-id');
 
@@ -410,7 +416,8 @@
 
                     $.ajax({
 
-                        url: '/winery-shop/cart/update/' + productId + '/' + shopId + '/' +
+                        url: "{{ URL::to('/') }}" + '/vendor/winery-shop/cart/update/' +
+                            productId + '/' + shopId + '/' +
 
                             vendorId,
 

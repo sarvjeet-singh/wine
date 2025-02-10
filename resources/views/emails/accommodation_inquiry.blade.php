@@ -3,97 +3,65 @@
 @section('title', 'Accommodation Inquiry')
 
 @section('content')
-    <div class="content">
-        <div class="section">
-            <p style="margin: 0;">Dear Admin,</p>
-            <p style="margin-top: 10px;">A new accommodation inquiry has been submitted. Below are the details:</p>
-        </div>
-
-        <!-- Accommodation Inquiries -->
-        <div class="info-outer" style="margin-top: 30px;">
-            <div class="section">
-                <div class="main-title">Accommodation Inquiries</div>
-                <div class="section-title">Guest Information</div>
-                <table class="details-table">
-                    <tr>
-                        <th width="40%">User/Travelers Full Name</th>
-                        <td width="60%">{{$inquiryData['user']->firstname ?? ''}} {{$inquiryData['user']->lastname ?? ''}}</td>
-                    </tr>
-                    <tr>
-                        <th width="40%">eMail</th>
-                        <td width="60%">{{$inquiryData['user']->email ?? ''}}</td>
-                    </tr>
-                    <tr>
-                        <th width="40%">Phone: (if available)</th>
-                        <td width="60%">+1 {{$inquiryData['user']->phone ?? ''}}</td>
-                    </tr>
-                </table>
+    <div class="info-outer" style="margin-top: 30px;">
+        <div class="section" style="background-color: #f9f9f9;padding: 20px;border-radius: 15px;">
+            <div class="main-title">Accommodation Inquiries</div>
+            <div style="margin-bottom: 30px;">
+                <div class="section-title" style="color: #c0a144;">Guest Information</div>
+                <div>
+                    <div style="margin-bottom: 10px;"><strong>User/Travelers Full Name:</strong> <span>{{$inquiryData['user']->firstname ?? ''}} {{$inquiryData['user']->lastname ?? ''}}</span>
+                    </div>
+                    <div style="margin-bottom: 10px;"><strong>eMail:</strong> <span>{{$inquiryData['user']->email ?? ''}}</span></div>
+                    <div><strong>Phone: (if available):</strong> <span>+1 {{$inquiryData['user']->contact_number ?? ''}}</span></div>
+                </div>
             </div>
-
-            <div class="section">
-                <div class="section-title">Vendor Information</div>
-                <table class="details-table">
-                    <tr>
-                        <th width="40%">Category</th>
-                        <td width="60%">Accommodation</td>
-                    </tr>
-                    <tr>
-                        <th width="40%">Sub-Category</th>
-                        <td width="60%">{{$inquiryData['vendor']->sub_category->name ?? ''}}</td>
-                    </tr>
-                    <tr>
-                        <th width="40%">Business/Vendor Name</th>
-                        <td width="60%">{{$inquiryData['vendor']->vendor_name ?? ''}}</td>
-                    </tr>
-                    <tr>
-                        <th width="40%">Street Address</th>
-                        <td width="60%">{{$inquiryData['vendor']->street_address ?? ''}}</td>
-                    </tr>
-                    <tr>
-                        <th width="40%">City / Town</th>
-                        <td width="60%">{{$inquiryData['vendor']->city ?? ''}}</td>
-                    </tr>
-                    <tr>
-                        <th width="40%">Business / Vendor Phone:</th>
-                        <td width="60%">+1 {{$inquiryData['vendor']->vendor_phone ?? ''}}</td>
-                    </tr>
-                </table>
+            <div style="margin-bottom: 30px;">
+                <div class="section-title" style="color: #c0a144;">Vendor Information</div>
+                <div>
+                    <div style="margin-bottom: 10px;"><strong>Category: </strong> <span>{{ucfirst($inquiryData['vendor']->vendor_type) ?? ''}}</span></div>
+                    <div style="margin-bottom: 10px;"><strong>Sub-Category: </strong> <span>{{$inquiryData['vendor']->sub_category->name ?? ''}}</span></div>
+                    <div style="margin-bottom: 10px;"><strong>Business/Vendor Name: </strong> <span>{{$inquiryData['vendor']->vendor_name ?? ''}}</span></div>
+                    <div style="margin-bottom: 10px;"><strong>Street Address: </strong> <span>{{$inquiryData['vendor']->street_address ?? ''}}</span>
+                    </div>
+                    <div style="margin-bottom: 10px;"><strong>City/Town: </strong> <span>{{$inquiryData['vendor']->city ?? ''}}</span></div>
+                    <div style="margin-bottom: 10px;"><strong>Business/Vendor Phone: </strong> <span>+1 {{$inquiryData['vendor']->vendor_phone ?? ''}}</span>
+                    </div>
+                </div>
             </div>
-
             <div class="section">
-                <div class="section-title">Inquiry Details</div>
+                <div class="section-title" style="color: #c0a144;">Inquiry Details</div>
                 <table class="details-table">
                     <tr>
-                        <th width="40%">Arrival/Check-in Date</th>
-                        <td width="60%">{{$inquiryData['inquiry']['check_in_date'] ?? ''}}</td>
+                        <th width="50%">What is your tentative arrival/check-in date?</th>
+                        <td width="50%">{{$inquiryData['inquiry']['check_in_date'] ?? ''}}</td>
                     </tr>
                     <tr>
-                        <th width="40%">Departure/Check-out Date</th>
-                        <td width="60%">{{$inquiryData['inquiry']['check_out_date'] ?? ''}}</td>
+                        <th width="50%">What is your tentative departure/check-out date?</th>
+                        <td width="50%">{{$inquiryData['inquiry']['check_out_date'] ?? ''}}</td>
                     </tr>
                     <tr>
-                        <th width="40%">Nature of Visit</th>
-                        <td width="60%">{{$inquiryData['inquiry']['visit_nature'] ?? ''}}</td>
+                        <th width="50%">What is the nature of your visit?</th>
+                        <td width="50%">{{$inquiryData['inquiry']['visit_nature'] ?? ''}}</td>
                     </tr>
                     <tr>
-                        <th width="40%">Number of Guests</th>
-                        <td width="60%">{{$inquiryData['inquiry']['number_of_guests'] ?? ''}}</td>
+                        <th width="50%">How many guests in your travel party?</th>
+                        <td width="50%">{{$inquiryData['inquiry']['number_of_guests'] ?? ''}}</td>
                     </tr>
                     <tr>
-                        <th width="40%">Preferred Accommodation</th>
-                        <td width="60%">{{$inquiryData['inquiry']['accommodation_type'] ?? ''}}</td>
+                        <th width="50%">What is your preferred accommodation type?</th>
+                        <td width="50%">{{$inquiryData['inquiry']['accommodation_type'] ?? ''}}</td>
                     </tr>
                     <tr>
-                        <th width="40%">Number of Rooms</th>
-                        <td width="60%">{{$inquiryData['inquiry']['rooms_or_beds'] ?? ''}}</td>
+                        <th width="50%">Please indicate the number of rooms required?</th>
+                        <td width="50%">{{$inquiryData['inquiry']['rooms_or_beds'] ?? ''}}</td>
                     </tr>
                     <tr>
-                        <th width="40%">Preferred City/Town</th>
-                        <td width="60%">{{$inquiryData['inquiry']['city'] ?? ''}}</td>
+                        <th width="50%">In what city/town would you prefer to be accommodated?</th>
+                        <td width="50%">{{$inquiryData['inquiry']['city'] ?? ''}}</td>
                     </tr>
                     <tr>
-                        <th width="40%">Additional Comments</th>
-                        <td width="60%">{{$inquiryData['inquiry']['additional_comments'] ?? ''}}</td>
+                        <th width="50%">Additional Comments</th>
+                        <td width="50%">{{$inquiryData['inquiry']['additional_comments'] ?? ''}}</td>
                     </tr>
                 </table>
             </div>

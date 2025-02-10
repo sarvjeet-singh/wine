@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class VendorMediaGallery extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'vendor_id',
+        'vendor_media', 
+        'vendor_media_type', 
+        'is_default', 
+    ];
 }

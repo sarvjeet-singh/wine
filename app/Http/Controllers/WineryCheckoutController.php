@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AdminSetting;
 use Illuminate\Http\Request;
 
 use App\Models\WineryCart;
@@ -17,11 +16,23 @@ use Illuminate\Support\Facades\Crypt;
 use DB;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use App\Services\StripeService;
+
 
 class WineryCheckoutController extends Controller
 {
+    private $stripeService;
+
+    public function __construct(StripeService $stripeService)
+    {
+        $this->stripeService = $stripeService;
+    }
     public function index($shopid, $vendorid)
     {
+        $shop = Vendor::find($shopid);
+        if($shop->stripe_onboarding_account_status != 'active') {
+            return redirect()->back()->with('error', 'We\'re sorry, but this vendor is not accepting new orders or payments at the moment due to an inactive payment account. Please try again later or choose a different vendor.');
+        }
         $cart = WineryCart::with('items.product')
             ->where('user_id', Auth::id())
             ->where('shop_id', $shopid)
@@ -44,18 +55,18 @@ class WineryCheckoutController extends Controller
 
         $cartTotal = number_format($cartTotal, 2, '.', '');
 
-        $deliveryData = AdminSetting::where('option_name', 'delivery_fee')->first();
-        $deliveryFee = $deliveryData ? $deliveryData->option_value : 0.00;
+        $deliveryFee = config('site.wine_delivery_charges', 0.00);
+        // $deliveryFee = $deliveryData ? $deliveryData->option_value : 0.00;
 
         // Set delivery fee to zero if total quantity is 12 or more
         if ($totalQuantity >= 12) {
             $deliveryFee = 0.00;
         }
 
-        $vendor = Vendor::with('stripeDetails')->find($shopid);
-        if(!isset($vendor->stripeDetails->stripe_publishable_key) && !isset($vendor->stripeDetails->stripe_secret_key)) {
-            return redirect()->route('cart.index', ['shopid' => $shopid, 'vendorid' => $vendorid])->with('error', 'Payment server error.');
-        }
+        $vendor = Vendor::find($shopid);
+        // if(!isset($vendor->stripeDetails->stripe_publishable_key) && !isset($vendor->stripeDetails->stripe_secret_key)) {
+        //     return redirect()->route('cart.index', ['shopid' => $shopid, 'vendorid' => $vendorid])->with('error', 'Payment server error.');
+        // }
         return view('VendorDashboard.winery.checkout', compact('shopid', 'vendorid', 'vendor', 'cartTotal', 'deliveryFee'));
     }
 
@@ -113,21 +124,25 @@ class WineryCheckoutController extends Controller
 
         $cartTotal = number_format($cartTotal, 2, '.', '');
 
-        $deliveryData = AdminSetting::where('option_name', 'delivery_fee')->first();
-        $deliveryFee = $deliveryData ? $deliveryData->option_value : 0.00;
+        $deliveryFee = config('site.wine_delivery_charges', 0.00);
+        // $deliveryFee = $deliveryData ? $deliveryData->option_value : 0.00;
 
         // Set delivery fee to zero if total quantity is 12 or more
         if ($totalQuantity >= 12) {
             $deliveryFee = 0.00;
         }
-        
+
+        if ((!empty($request->input('delivery_type')) && $request->input('delivery_type') != 'delivery')) {
+            $deliveryFee = 0.00;
+        }
+
         DB::beginTransaction();
         $data = [
             'user_id' => Auth::id(),
             'vendor_buyer_id' => $vendorid,
             'vendor_seller_id' => $shopid,
             'subtotal_price' => $cartTotal, // Total cart amount
-            'delivery_charges' => (!empty($request->input('delivery_type')) && $request->input('delivery_type') == 'delivery') ? $deliveryFee : 0.00, // Total cart amount
+            'delivery_charges' => $deliveryFee, // Total cart amount
             'total_price' => $cartTotal + $deliveryFee, // Total cart amount
             'status' => 'pending',
             // Billing Details
@@ -156,6 +171,7 @@ class WineryCheckoutController extends Controller
             'shipping_country' => $request->input('shipping_country'),
         ];
 
+
         try {
             // Step 1: Create the Order
             $order = WineryOrder::create($data);
@@ -178,46 +194,27 @@ class WineryCheckoutController extends Controller
 
             DB::commit();
 
-            // Set up customer information
-            $customerName = $request->input('billing_first_name') . ' ' . $request->input('billing_last_name');
-
-            // Step 3: Create Payment Intent
-            $description = "Order Payment for Customer Name $customerName and Order ID: " . $order->id;
-
-
-            $customerAddress = [
-                'line1' => $request->input('billing_street'),
-                'line2' => $request->input('billing_street2'),
-                'city' => $request->input('billing_city'),
-                'state' => $request->input('billing_state'),
-                'postal_code' => $request->input('billing_postal_code'),
-                'country' => 'CA',
-            ];
-
-            $stripeDetail = VendorStripeDetail::where('vendor_id', $shopid)->first();
-            Stripe::setApiKey(Crypt::decryptString($stripeDetail->stripe_secret_key));
-
-            $intent = PaymentIntent::create([
-                'amount' => $cartTotal * 100,
-                'currency' => 'usd',
-                'description' => $description,
-                'payment_method_types' => ['card'],
-                'shipping' => [
-                    'name' => $customerName,
-                    'address' => $customerAddress,
-                ],
-                'metadata' => [
-                    'customer_email' => $request->input('shipping_email'),
-                    'customer_name' => $customerName,
-                ],
-            ]);
-            //return response()->json(['client_secret' => $intent->client_secret]);
-
-
+            
+            Stripe::setApiKey(env('STRIPE_SECRET'));
+            $vendor = Vendor::find($vendorid);
+            if (empty($request->input('payment_method_id'))) {
+                if (!$vendor->vendor_stripe_id) {
+                    $vendor_data = [
+                        'email' => $vendor->vendor_email,
+                        'name' => $vendor->name,
+                    ];
+                    $vendor->vendor_stripe_id = $this->stripeService->createCustomer($vendor_data);
+                    $vendor->save();
+                }
+                // Create a Setup Intent for saving the payment method
+                $intent = $this->stripeService->setupIntent($vendor->vendor_stripe_id);
+                $intent_type = "setupIntent";
+            }
 
             return response()->json([
                 'message' => 'Order placed successfully!',
-                'client_secret' => $intent->client_secret,
+                'client_secret' => $intent->client_secret ?? "",
+                'intent_type' => $intent_type ?? "",
                 'order_id' => $order->id
             ], 201);
         } catch (\Exception $e) {
@@ -242,8 +239,7 @@ class WineryCheckoutController extends Controller
             ], 200);
         }
         $order = WineryOrder::find($order_id);
-        $stripeDetail = VendorStripeDetail::where('vendor_id', $order->vendor_seller_id)->first();
-        Stripe::setApiKey(Crypt::decryptString($stripeDetail->stripe_secret_key));
+        Stripe::setApiKey(env('STRIPE_SECRET'));
         $paymentIntent = \Stripe\PaymentIntent::retrieve($payment_intent_id);
         $transactionData = [
             'winery_order_id' => $order_id,

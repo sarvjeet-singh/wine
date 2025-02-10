@@ -20,8 +20,13 @@ use App\Http\Controllers\WineryOrderController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\CustomerPaymentController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TimezoneController;
+use App\Http\Controllers\WalletController;
+use App\Http\Controllers\Admin\WalletController as AdminWalletController;
+use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\VendorStripeDetailController;
 // use App\Http\Controllers\MigrationController;
 use illuminate\Support\Facades\Auth;
@@ -35,6 +40,8 @@ use App\Http\Controllers\Admin\WineCatalogueController as AdminWineCatalogueCont
 use App\Http\Controllers\Admin\UserEmailController as AdminUserEmailController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\StripeController as AdminStripeController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\Auth\VendorAuthController;
 use App\Http\Controllers\Admin\ConfigurationSettingController;
@@ -44,6 +51,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\FrontendInquiryController;
 use App\Http\Controllers\CommandController;
+use Mews\Captcha\CaptchaController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -64,16 +72,18 @@ use Illuminate\Support\Facades\Artisan;
 */
 
 Auth::routes(['verify' => true, 'login' => false]);
+Route::get('captcha/{config?}', [CaptchaController::class, 'getCaptcha'])->name('captcha');
+Route::post('/set-timezone', [TimezoneController::class, 'setTimezone']);
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 Route::post('register-social', [RegisterController::class, 'registerSocial'])->name('register.social');
 Route::get('/privacy', function () {
     return view('FrontEnd.privacy');
-});
+})->name('privacy');
 Route::get('/terms', function () {
     return view('FrontEnd.terms');
-});
+})->name('terms');
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
@@ -95,8 +105,8 @@ Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
     return redirect('/customer/login')->withErrors(['error' => 'Invalid verification link.']);
 })->middleware('signed')->name('verification.verify');
 
-Route::post('/validate-captcha', [RegisterController::class, 'validateCaptcha'])->name('validate-captcha');
-Route::get('/refresh-captcha', [RegisterController::class, 'refreshCaptcha'])->name('refresh-captcha');
+Route::post('/validate-captcha', [CustomerAuthController::class, 'validateCaptcha'])->name('validate-captcha');
+Route::get('/refresh-captcha', [CustomerAuthController::class, 'refreshCaptcha'])->name('refresh-captcha');
 Route::post('email/resend', [LoginController::class, 'resend'])
     ->middleware(['throttle:6,1'])
     ->name('verification.resend');
@@ -104,6 +114,8 @@ Route::post('email/resend', [LoginController::class, 'resend'])
 Route::post('email/customer/resend', [CustomerAuthController::class, 'resend'])
     ->middleware(['throttle:6,1'])
     ->name('customer.verification.resend');
+Route::get('/terms-popup', [CustomerAuthController::class, 'showTermsPopup'])->name('customer.terms.popup');
+Route::post('/terms-popup', [CustomerAuthController::class, 'acceptTerms'])->name('customer.terms.popup.post');
 Route::get('customer/email/verify/{id}/{hash}', [CustomerAuthController::class, 'verifyEmail'])->name('customer.verify.email');
 // Forgot Password
 Route::get('customer/forgot-password', [CustomerAuthController::class, 'showForgotPasswordForm'])->name('customer.password.request');
@@ -116,6 +128,7 @@ Route::post('customer/reset-password', [CustomerAuthController::class, 'resetPas
 
 
 Route::post('/check-email', [LoginController::class, 'checkEmail'])->name('check.email');
+Route::post('/check-phone', [LoginController::class, 'checkPhone'])->name('check.phone');
 
 Route::get('/get-states', [CommonController::class, 'getStates'])->name('get.states');
 Route::get('/send-weekly-email', [CommandController::class, 'sendWeeklyRegisteredUsers']);
@@ -128,6 +141,10 @@ Route::post('/email/verification-notification', function (Request $request) {
 
 Route::post('/register', [RegisterController::class, 'showRegistrationForm'])->name('register-form');
 Route::post('/registertion', [RegisterController::class, 'register'])->name('registertion');
+Route::get('/verify-phone-otp', [RegisterController::class, 'verifyOtpForm'])->name('verify-phone-otp');
+Route::post('/verify-phone-otp', [RegisterController::class, 'verifyPhoneOtp'])->name('verify-phone-otp-post');
+Route::get('/resend-otp', [RegisterController::class, 'resendOtp'])->name('resend-otp');
+
 // Define the error route if needed
 Route::get('/some-error-route', function () {
     return 'Error: Vendor not found.';
@@ -247,36 +264,53 @@ Route::get('user/inquiries/{id}', [UserDashboardController::class, 'inquiryDetai
 Route::post('orders/authorize-payment', [OrderController::class, 'authorizePayment'])->name('orders.authorize-payment');
 Route::post('orders/send-inquiry', [OrderController::class, 'sendInquiry'])->name('orders.send-inquiry');
 
-
+// ================= CUSTOMER ============== //
+// Stripe Routes for customer
+Route::get('/user/list-payment-methods', [CustomerPaymentController::class, 'listPaymentMethods'])->name('customer.list-payment-methods');
+Route::post('/user/set-default-payment-method', [CustomerPaymentController::class, 'setDefaultPaymentMethod'])->name('customer.set-default-payment-method');
+Route::get('/user/get-default-payment-method', [CustomerPaymentController::class, 'getDefaultPaymentMethod'])->name('customer.get-default-payment-method');
+Route::post('/user/remove-payment-method', [CustomerPaymentController::class, 'removePaymentMethod'])->name('customer.remove-payment-method');
+Route::post('/user/payment-return', [CustomerPaymentController::class, 'paymentReturn'])->name('customer.payment.return');
+Route::post('/user/setup-intent', [CustomerPaymentController::class, 'createSetupIntent'])->name('customer.setup-intent');
+Route::post('/user/save-payment-method', [CustomerPaymentController::class, 'savePaymentMethod'])->name('customer.save-payment-method');
+Route::post('/user/create-payment-intent/{vendorid}', [CustomerPaymentController::class, 'createPaymentIntent'])->name('customer.create-payment-intent');
+Route::post('/user/confirm-payment', [CustomerPaymentController::class, 'confirmPayment'])->name('customer.confirm-payment');
+Route::post('/user/store-order-transaction-details', [OrderController::class, 'storeTransactionDetails'])->name('store-order-transaction-details');
+Route::get('/user/wallet-history', [WalletController::class, 'walletHistory'])->name('wallet-history');
 
 // ================= VENDOR ============== //
-Route::group(['middleware' => ['auth:vendor', 'check.vendorid']], function () {
-    Route::get('/vendor-change-password/{vendorid}', [VendorController::class, 'changePassword'])->name('vendor-change-password');
-    Route::post('/vendor-password-update/{vendorid}', [VendorController::class, 'passwordUpdate'])->name('vendor-password-update');
-    Route::post('/vendor-skip-password/{vendorid}', [VendorController::class, 'skipPassword'])->name('vendor-skip-password');
-    Route::get('/vendor-dashboard/{vendorid}', [VendorController::class, 'getVendorDetails'])->name('vendor-dashboard');
-    Route::get('/vendor-contact-detail/{vendorid?}', function () {
+Route::get('/vendor/handle-stripe-callback/', [VendorStripeDetailController::class, 'handleStripeCallback'])->name('handle-stripe-callback');
+Route::group(['middleware' => ['auth:vendor', 'checkPasswordUpdated', 'check.vendorid']], function () {
+    Route::post('/vendor/setup-intent/{vendorid}', [PaymentController::class, 'createSetupIntent'])->name('vendor.setup-intent');
+    Route::post('/vendor/save-payment-method/{vendorid}', [PaymentController::class, 'savePaymentMethod'])->name('vendor.save-payment-method');
+    Route::post('/vendor/create-payment-intent/{shopid}/{vendorid}', [PaymentController::class, 'createPaymentIntent'])->name('vendor.create-payment-intent');
+    Route::post('/vendor/payment-return/{vendorid}', [PaymentController::class, 'paymentReturn'])->name('payment.return');
+    Route::get('/vendor/change-password/{vendorid}', [VendorController::class, 'changePassword'])->name('vendor-change-password');
+    Route::post('/vendor/password-update/{vendorid}', [VendorController::class, 'passwordUpdate'])->name('vendor-password-update');
+    Route::post('/vendor/skip-password/{vendorid}', [VendorController::class, 'skipPassword'])->name('vendor-skip-password');
+    Route::get('/vendor/dashboard/{vendorid}', [VendorController::class, 'getVendorDetails'])->name('vendor-dashboard');
+    Route::get('/vendor/contact-detail/{vendorid?}', function () {
         return view('VendorDashboard.vendor-contact-detail');
     })->name('vendor-contact-detail');
-    Route::get('/vendor-curated-experience/{vendorid?}', [VendorController::class, 'getCuratedExperience'])->name('vendor-curated-experience');
-    Route::post('/update-curated-experience/{vendorid?}', [VendorController::class, 'updateCuratedExperience'])->name('update.CuratedExperience');
-    Route::get('/vendor-pricing/{vendorid?}', [VendorController::class, 'getVendorPricing'])->name('vendor-pricing');
-    Route::post('/vendor-pricing-update/{vendorid}', [VendorController::class, 'updateVendorPricing'])->name('vendor-pricing-update');
-    Route::get('/vendor-booking-utility/{vendorid?}', [VendorController::class, 'getBookingUtility'])->name('vendor-booking-utility');
-    Route::post('/vendor-settings-booking-utility/{vendorid?}', [VendorController::class, 'updateVendorBookingUtility'])->name('vendor-settings-booking-utility');
-    Route::post('/vendor-policy-update/{vendorid}', [VendorController::class, 'updateVendorPolicy'])->name('vendor-settings-policy');
-    Route::get('/vendor-settings/{vendorid?}', [VendorController::class, 'getVendorSettings'])->name('vendor-settings');
-    Route::get('/vendor-amenities/{vendorid?}', [VendorController::class, 'getVendorAmenities'])->name('vendor-amenities');
-    Route::post('/vendor-settings-property-details/{vendorid?}', [VendorController::class, 'VendorSettingsPropertyDetails'])->name('vendor-settings-property-details');
-    Route::post('/vendor-settings-booking/{vendorid?}', [VendorController::class, 'VendorSettingsBooking'])->name('vendor-settings-booking');
-    Route::post('/vendor-social-media-update/{vendorid}', [VendorController::class, 'updateVendorSocialMedia'])->name('vendor-social-media-update');
-    Route::post('/vendor-questionnaire-update/{vendorid}', [VendorController::class, 'updateQuestionnaireMedia'])->name('vendor-questionnaire-update');
-    Route::get('/vendor-questionnaire/{vendorid}', [VendorController::class, 'questionnaire'])->name('vendor-questionnaire');
-    Route::get('/vendor-access-credentials/{vendorid}', [VendorController::class, 'accessCredentials'])->name('vendor-access-credentials');
+    Route::get('/vendor/curated-experience/{vendorid?}', [VendorController::class, 'getCuratedExperience'])->name('vendor-curated-experience');
+    Route::post('/update/curated-experience/{vendorid?}', [VendorController::class, 'updateCuratedExperience'])->name('update.CuratedExperience');
+    Route::get('/vendor/pricing/{vendorid?}', [VendorController::class, 'getVendorPricing'])->name('vendor-pricing');
+    Route::post('/vendor/pricing-update/{vendorid}', [VendorController::class, 'updateVendorPricing'])->name('vendor-pricing-update');
+    Route::get('/vendor/booking-utility/{vendorid?}', [VendorController::class, 'getBookingUtility'])->name('vendor-booking-utility');
+    Route::post('/vendor/settings-booking-utility/{vendorid?}', [VendorController::class, 'updateVendorBookingUtility'])->name('vendor-settings-booking-utility');
+    Route::post('/vendor/policy-update/{vendorid}', [VendorController::class, 'updateVendorPolicy'])->name('vendor-settings-policy');
+    Route::get('/vendor/settings/{vendorid?}', [VendorController::class, 'getVendorSettings'])->name('vendor-settings');
+    Route::get('/vendor/amenities/{vendorid?}', [VendorController::class, 'getVendorAmenities'])->name('vendor-amenities');
+    Route::post('/vendor/settings-property-details/{vendorid?}', [VendorController::class, 'VendorSettingsPropertyDetails'])->name('vendor-settings-property-details');
+    Route::post('/vendor/settings-booking/{vendorid?}', [VendorController::class, 'VendorSettingsBooking'])->name('vendor-settings-booking');
+    Route::post('/vendor/social-media-update/{vendorid}', [VendorController::class, 'updateVendorSocialMedia'])->name('vendor-social-media-update');
+    Route::post('/vendor/questionnaire-update/{vendorid}', [VendorController::class, 'updateQuestionnaireMedia'])->name('vendor-questionnaire-update');
+    Route::get('/vendor/questionnaire/{vendorid}', [VendorController::class, 'questionnaire'])->name('vendor-questionnaire');
+    Route::get('/vendor/access-credentials/{vendorid}', [VendorController::class, 'accessCredentials'])->name('vendor-access-credentials');
 
-    Route::get('/vendor-media-gallary/{vendorid?}', [VendorController::class, 'getVendorMediaGallery'])->name('vendor-media-gallary');
-    Route::post('/vendor-logo-delete/{vendorid?}', [VendorController::class, 'deleteVendorLogo'])->name('vendor-logo-delete');
-    Route::post('/vendor-media-delete/{vendorid?}', [VendorController::class, 'deleteVendorMedia'])->name('vendor-media-delete');
+    Route::get('/vendor/media-gallary/{vendorid?}', [VendorController::class, 'getVendorMediaGallery'])->name('vendor-media-gallary');
+    Route::post('/vendor/logo-delete/{vendorid?}', [VendorController::class, 'deleteVendorLogo'])->name('vendor-logo-delete');
+    Route::post('/vendor/media-delete/{vendorid?}', [VendorController::class, 'deleteVendorMedia'])->name('vendor-media-delete');
     Route::post('/vendor/media/set-default/{vendorid?}', [VendorController::class, 'setDefaultMedia'])->name('vendor-media-set-default');
 
     Route::post('/vendor/upload-media/{vendorid?}', [VendorController::class, 'uploadMedia'])->name('vendor.upload_media');
@@ -284,56 +318,57 @@ Route::group(['middleware' => ['auth:vendor', 'check.vendorid']], function () {
     Route::post('/vendor/amenities/{vendorid?}', [VendorController::class, 'VendorAmenitiesSave'])->name('vendor.amenities.save');
 
 
-    Route::get('/reviews-testimonial/{vendorid?}', [VendorController::class, 'getReviewsTestimonial'])->name('reviews-testimonial');
+    Route::get('/vendor/reviews-testimonial/{vendorid?}', [VendorController::class, 'getReviewsTestimonial'])->name('reviews-testimonial');
 
-    Route::get('/inventory-management/{vendorid?}', [VendorController::class, 'inventoryManagement'])->name('inventory-management');
+    Route::get('/vendor/inventory-management/{vendorid?}', [VendorController::class, 'inventoryManagement'])->name('inventory-management');
     // Route::get('/home', [HomeController::class, 'index'])->name('home');
     // Route::post('/manage_sub_regionsPost', [VendorController::class, 'manage_sub_regionsPost'])->name('manage_sub_regionsPost');
-    Route::get('/manage-booking-utility-ajax/{vendorid?}', [VendorController::class, 'manageBookingUtilityAjax'])->name('manage.booking.utility.ajax');
-    Route::post('/booking-utility-save/{vendorid?}', [VendorController::class, 'booking_utilitySave'])->name('booking_utility.save');
-    Route::get('/getManageDates/{vendorid?}', [VendorController::class, 'getManageDates'])->name('get.Manage.Dates');
-    Route::post('/ManageDatesDelete/{vendorid?}', [VendorController::class, 'ManageDatesDelete'])->name('dates.delete');
-    Route::post('/publish_dates_update/{vendorid?}', [VendorController::class, 'publishDatesUpdate'])->name('publish_dates.update');
-    Route::post('/addbookingdate/{vendorid?}', [VendorController::class, 'addbookingdate'])->name('addbookingdate.form');
+    Route::get('/vendor/manage-booking-utility-ajax/{vendorid?}', [VendorController::class, 'manageBookingUtilityAjax'])->name('manage.booking.utility.ajax');
+    Route::post('/vendor/booking-utility-save/{vendorid?}', [VendorController::class, 'booking_utilitySave'])->name('booking_utility.save');
+    Route::get('/vendor/getManageDates/{vendorid?}', [VendorController::class, 'getManageDates'])->name('get.Manage.Dates');
+    Route::post('/vendor/ManageDatesDelete/{vendorid?}', [VendorController::class, 'ManageDatesDelete'])->name('dates.delete');
+    Route::post('/vendor/publish_dates_update/{vendorid?}', [VendorController::class, 'publishDatesUpdate'])->name('publish_dates.update');
+    Route::post('/vendor/addbookingdate/{vendorid?}', [VendorController::class, 'addbookingdate'])->name('addbookingdate.form');
 
     // Rooms
-    Route::get('/vendor-manage-rooms/{vendorid?}', [VendorController::class, 'manageVendorRooms'])->name('manage.rooms');
-    Route::post('/vendor-manage-rooms-save/{vendorid?}', [VendorController::class, 'manageVendorRoomsSave'])->name('manage.rooms.save');
+    Route::get('/vendor/manage-rooms/{vendorid?}', [VendorController::class, 'manageVendorRooms'])->name('manage.rooms');
+    Route::post('/vendor/manage-rooms-save/{vendorid?}', [VendorController::class, 'manageVendorRoomsSave'])->name('manage.rooms.save');
     Route::delete('/vendor/rooms/{vendorid?}', [VendorController::class, 'deleteRoom'])->name('vendor.rooms.delete');
 
+    Route::put('/vendor/inquiries/{id}/approve/{vendorid?}', [VendorController::class, 'inquiryApprove'])->name('inquiry.approve');
+    Route::put('/vendor/inquiries/{id}/reject/{vendorid?}', [VendorController::class, 'inquiryReject'])->name('inquiry.reject');
     Route::get('/vendor/transactions/{vendorid?}', [VendorController::class, 'orders'])->name('vendor-transactions');
     Route::get('vendor/transactions/{id}/{vendorid?}', [VendorController::class, 'orderDetail'])->name('vendor.orderDetail');
     Route::get('/vendor/inquiries/{vendorid?}', [VendorController::class, 'inquiries'])->name('vendor-inquiries');
     Route::get('/vendor/inquiries/{id}/{vendorid?}', [VendorController::class, 'inquiryDetail'])->name('vendor.inquiryDetail');
-    Route::put('/inquiries/{id}/approve/{vendorid?}', [VendorController::class, 'inquiryApprove'])->name('inquiry.approve');
-    Route::put('/inquiries/{id}/reject/{vendorid?}', [VendorController::class, 'inquiryReject'])->name('inquiry.reject');
     Route::get('/business-hours/{vendorid?}', [VendorSettingController::class, 'getBusinessHours'])->name('business-hours.index');
     Route::put('/business-hours/{vendorid?}', [VendorSettingController::class, 'updateBusinessHours'])->name('business-hours.update');
 
-    Route::get('vendor-wines/{vendorid?}', [VendorWineController::class, 'index'])->name('vendor-wines.index');
-    Route::get('vendor-wines/add/{vendorid?}', [VendorWineController::class, 'add'])->name('vendor-wines.add');
-    Route::post('vendor-wines/store/{vendorid?}', [VendorWineController::class, 'store'])->name('vendor-wines.store');
-    Route::get('vendor-wines/edit/{id}/{vendorid?}', [VendorWineController::class, 'edit'])->name('vendor-wines.edit');
-    Route::put('vendor-wines/update/{id}/{vendorid?}', [VendorWineController::class, 'update'])->name('vendor-wines.update');
-    Route::post('/vendor-wines/delete/{id}/{vendorid?}', [VendorWineController::class, 'delete'])->name('vendor-wines.destroy');
-    Route::put('vendor-metadata/update/{vendorid?}', [VendorController::class, 'updateMetadata'])->name('vendor.metadata.update');
+    Route::get('/vendor/vendor-wines/{vendorid?}', [VendorWineController::class, 'index'])->name('vendor-wines.index');
+    Route::get('/vendor/vendor-wines/add/{vendorid?}', [VendorWineController::class, 'add'])->name('vendor-wines.add');
+    Route::post('/vendor/vendor-wines/store/{vendorid?}', [VendorWineController::class, 'store'])->name('vendor-wines.store');
+    Route::get('/vendor/vendor-wines/edit/{id}/{vendorid?}', [VendorWineController::class, 'edit'])->name('vendor-wines.edit');
+    Route::put('/vendor/vendor-wines/update/{id}/{vendorid?}', [VendorWineController::class, 'update'])->name('vendor-wines.update');
+    Route::post('/vendor/vendor-wines/delete/{id}/{vendorid?}', [VendorWineController::class, 'delete'])->name('vendor-wines.destroy');
+    Route::put('/vendorvendor-metadata/update/{vendorid?}', [VendorController::class, 'updateMetadata'])->name('vendor.metadata.update');
     Route::put('vendor/user-details-update/{vendorid?}', [VendorController::class, 'userDetailsUpdate'])->name('user.details.update');
-    Route::get('vendor-faqs/{vendorid?}', [VendorController::class, 'vendorFaqs'])->name('vendor-faqs');
-    Route::get('vendor/social-media/{vendorid?}', [VendorController::class, 'vendorSocialMedia'])->name('vendor-social-media');
-    Route::get('vendor/referrals/{vendorid?}', [VendorController::class, 'vendorReferrals'])->name('vendor-referrals');
+    Route::get('/vendorvendor-faqs/{vendorid?}', [VendorController::class, 'vendorFaqs'])->name('vendor-faqs');
+    Route::get('/vendor/social-media/{vendorid?}', [VendorController::class, 'vendorSocialMedia'])->name('vendor-social-media');
+    Route::get('/vendor/referrals/{vendorid?}', [VendorController::class, 'vendorReferrals'])->name('vendor-referrals');
 
     // Subscription Routes
-    Route::get('/subscription/list/{vendorid?}', [SubscriptionController::class, 'index'])->name('subscription.index');
-    Route::get('/subscribe/{vendorid?}', [SubscriptionController::class, 'createCheckoutSession']);
-    Route::get('/subscription/success/{vendorid?}', [SubscriptionController::class, 'success'])->name('subscription.success');
-    Route::get('/subscription/cancel/{vendorid?}', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
-    Route::post('/subscription/create-payment-intent/{vendorid?}', [SubscriptionController::class, 'createPaymentIntent'])->name('subscription.createPaymentIntent');
-    Route::post('/subscription/update-status/{vendorid?}', [SubscriptionController::class, 'updateStatus'])->name('subscription.updateStatus');
+    Route::get('/vendor/subscription/list/{vendorid?}', [SubscriptionController::class, 'index'])->name('subscription.index');
+    Route::get('/vendor/subscribe/{vendorid?}', [SubscriptionController::class, 'createCheckoutSession']);
+    Route::get('/vendor/subscription/success/{vendorid?}', [SubscriptionController::class, 'success'])->name('subscription.success');
+    Route::get('/vendor/subscription/cancel/{vendorid?}', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    Route::post('/vendor/subscription/create-payment-intent/{vendorid?}', [SubscriptionController::class, 'createPaymentIntent'])->name('subscription.createPaymentIntent');
+    Route::post('/vendor/subscription/update-status/{vendorid?}', [SubscriptionController::class, 'updateStatus'])->name('subscription.updateStatus');
     // Cancel subscription route
-    Route::post('/subscription/cancel-subscription/{vendorid?}', [SubscriptionController::class, 'cancelSubscription'])->name('subscription.cancel');
-    Route::get('/subscription/get-subscription/{vendorid?}', [SubscriptionController::class, 'showSubscriptionDetail'])->name('subscription.detail');
+    Route::post('/vendor/subscription/cancel-subscription/{vendorid?}', [SubscriptionController::class, 'cancelSubscription'])->name('subscription.cancel');
+    Route::get('/vendor/subscription/get-subscription/{vendorid?}', [SubscriptionController::class, 'showSubscriptionDetail'])->name('subscription.detail');
     Route::get('/vendor/stripe-details/{vendorid?}', [VendorStripeDetailController::class, 'show'])->name('stripe.details.show');
-    Route::post('/vendor/update-stripe-details/{vendorid?}', [VendorStripeDetailController::class, 'update'])->name('stripe.details.update');
+
+    // Route::post('/vendor/update-stripe-details/{vendorid?}', [VendorStripeDetailController::class, 'update'])->name('stripe.details.update');
 
     // Route::post('/subscribe', [SubscriptionController::class, 'createSubscription'])->name('create.subscription');
     // Route::post('/unsubscribe/{subscriptionId}', [SubscriptionController::class, 'cancelSubscription'])->name('cancel.subscription');
@@ -345,24 +380,33 @@ Route::group(['middleware' => ['auth:vendor', 'check.vendorid']], function () {
 
 
     // Winery Shop Routes
-    Route::get('winery-shop/{vendorid?}', [WineryController::class, 'index'])->name('winery-shop.index');
-    Route::get('winery-shop/products/{shopid}/{vendorid?}', [WineryController::class, 'products'])->name('winery-shop.products');
-    Route::get('winery-shop/product-detail/{wineid}/{shopid}/{vendorid?}', [WineryController::class, 'detail'])->name('winery-shop.detail');
-    Route::get('winery-shop/cart/{shopid}/{vendorid?}', [WineryCartController::class, 'index'])->name('cart.index');
-    Route::post('winery-shop/cart/add/{shopid}/{vendorid?}', [WineryCartController::class, 'add'])->name('cart.add');
-    Route::delete('winery-shop/cart/remove/{productId}/{shopid}/{vendorid?}', [WineryCartController::class, 'remove'])->name('cart.remove');
-    Route::patch('winery-shop/cart/update/{productId}/{shopid}/{vendorid?}', [WineryCartController::class, 'update'])->name('cart.update');
-    Route::get('winery-shop/checkout/{shopid}/{vendorid?}', [WineryCheckoutController::class, 'index'])->name('winery.checkout');
-    Route::post('winery-shop/checkout/{shopid}/{vendorid?}', [WineryCheckoutController::class, 'checkout'])->name('winery.checkout-post');
-    Route::post('winery-shop/reviews/store/{vendorid?}', [WineReviewController::class, 'store'])->name('winery.reviews.store');
-    Route::get('winery-orders/shop/{vendorid?}', [WineryOrderController::class, 'shopOrders'])->name('winery.shop.orders');
-    Route::get('winery-orders/shop/detail/{orderid}/{vendorid?}', [WineryOrderController::class, 'shopOrderDetail'])->name('winery.shop.order.detail');
-    Route::post('winery-orders/shop/update-status/{orderid}/{vendorid?}', [WineryOrderController::class, 'shopOrderUpdateStatus'])->name('winery.shop.order.update-status');
-    Route::get('winery-orders/vendor/{vendorid?}', [WineryOrderController::class, 'vendorOrders'])->name('winery.vendor.orders');
-    Route::get('winery-orders/vendor/detail/{orderid}/{vendorid?}', [WineryOrderController::class, 'vendorOrderDetail'])->name('winery.vendor.order.detail');
-    Route::post('/create-payment-intent/{vendorid?}', [PaymentController::class, 'createPaymentIntent'])->name('create-payment-intent');
-    Route::post('/confirm-payment/{vendorid?}', [PaymentController::class, 'confirmPayment'])->name('confirm-payment');
-    Route::post('/winery-shop/store-winery-shop-transaction-details/{vendorid?}', [WineryCheckoutController::class, 'storeTransactionDetails'])->name('store-winery-shop-transaction-details');
+    Route::get('/vendor/winery-shop/{vendorid?}', [WineryController::class, 'index'])->name('winery-shop.index');
+    Route::get('/vendor/winery-shop/products/{shopid}/{vendorid?}', [WineryController::class, 'products'])->name('winery-shop.products');
+    Route::get('/vendor/winery-shop/product-detail/{wineid}/{shopid}/{vendorid?}', [WineryController::class, 'detail'])->name('winery-shop.detail');
+    Route::get('/vendor/winery-shop/cart/{shopid}/{vendorid?}', [WineryCartController::class, 'index'])->name('cart.index');
+    Route::post('/vendor/winery-shop/cart/add/{shopid}/{vendorid?}', [WineryCartController::class, 'add'])->name('cart.add');
+    Route::delete('/vendor/winery-shop/cart/remove/{productId}/{shopid?}/{vendorid?}', [WineryCartController::class, 'remove'])->name('vendor.cart.remove');
+    Route::patch('/vendor/winery-shop/cart/update/{productId}/{shopid?}/{vendorid?}', [WineryCartController::class, 'update'])->name('vendor.cart.update');
+    Route::get('/vendor/winery-shop/checkout/{shopid}/{vendorid?}', [WineryCheckoutController::class, 'index'])->name('winery.checkout');
+    Route::post('/vendor/winery-shop/checkout/{shopid}/{vendorid?}', [WineryCheckoutController::class, 'checkout'])->name('winery.checkout-post');
+    Route::post('/vendor/winery-shop/reviews/store/{vendorid?}', [WineReviewController::class, 'store'])->name('winery.reviews.store');
+    Route::get('/vendor/winery-orders/shop/{vendorid?}', [WineryOrderController::class, 'shopOrders'])->name('winery.shop.orders');
+    Route::get('/vendor/winery-orders/shop/detail/{orderid}/{vendorid?}', [WineryOrderController::class, 'shopOrderDetail'])->name('winery.shop.order.detail');
+    Route::post('/vendor/winery-orders/shop/update-status/{orderid}/{vendorid?}', [WineryOrderController::class, 'shopOrderUpdateStatus'])->name('winery.shop.order.update-status');
+    Route::get('/vendor/winery-orders/vendor/{vendorid?}', [WineryOrderController::class, 'vendorOrders'])->name('winery.vendor.orders');
+    Route::get('/vendor/winery-orders/vendor/detail/{orderid}/{vendorid?}', [WineryOrderController::class, 'vendorOrderDetail'])->name('winery.vendor.order.detail');
+
+    // Payment Routes
+    Route::get('/vendor/list-payment-methods/{vendorid?}', [PaymentController::class, 'listPaymentMethods'])->name('vendor.list-payment-methods');
+    Route::post('/vendor/set-default-payment-method/{vendorid?}', [PaymentController::class, 'setDefaultPaymentMethod'])->name('vendor.set-default-payment-method');
+    Route::get('/vendor/get-default-payment-method/{vendorid?}', [PaymentController::class, 'getDefaultPaymentMethod'])->name('vendor.get-default-payment-method');
+    Route::post('/vendor/remove-payment-method/{vendorid?}', [PaymentController::class, 'removePaymentMethod'])->name('vendor.remove-payment-method');
+    Route::post('/vendor/payment-return/{vendorid?}', [PaymentController::class, 'paymentReturn'])->name('payment.return');
+
+
+    Route::post('/vendor/create-payment-intent/{vendorid?}', [PaymentController::class, 'createPaymentIntent'])->name('create-payment-intent');
+    Route::post('/vendor/confirm-payment/{vendorid?}', [PaymentController::class, 'confirmPayment'])->name('confirm-payment');
+    Route::post('/vendor/winery-shop/store-winery-shop-transaction-details/{vendorid?}', [WineryCheckoutController::class, 'storeTransactionDetails'])->name('store-winery-shop-transaction-details');
 });
 // ================= ADMIN ============== //
 
@@ -394,6 +438,7 @@ Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name
 Route::post('/admin/login', [AdminLoginController::class, 'login']);
 Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
 
+// Admin routes protected by middleware
 Route::middleware(['auth:admin'])->group(function () {
     Route::post('/check-vendor-combination', [AdminVendorController::class, 'checkVendorCombination'])->name('check.vendor.combination');
     Route::get('/admin/filter/search', [AdminVendorController::class, 'filterSearch'])->name('admin.vendors.search');
@@ -458,6 +503,17 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::get('admin/vendors/vendor-details/{id}/ajax-inquiries', [AdminVendorController::class, 'getInquiriesTab'])->name('admin.vendor.details.ajax-inquiries');
     Route::get('admin/vendors/vendor-details/{id}/ajax-transactions', [AdminVendorController::class, 'getTransactionTab'])->name('admin.vendor.details.ajax-transactions');
 
+
+    Route::post('admin/stripe/create-standard-account/{id}', [AdminStripeController::class, 'createStandardAccount'])->name('stripe.createStandardAccount');
+    // Route::get('admin/stripe/standard-account-link/{id}', [AdminStripeController::class,'createStandardAccountLink'])->name('stripe.standard.account.link');
+
+    // Route::get('/stripe/refresh', function () {
+    //     return redirect('/dashboard'); // Redirect users after refresh
+    // })->name('stripe.refresh');
+
+    // Route::get('/stripe/return', function () {
+    //     return redirect('/dashboard'); // Redirect users after onboarding
+    // })->name('stripe.return');
     // Common Routes
     // Route::prefix('admin/{entity}')->group(function () {
     //     Route::get('/', function ($entity) {
@@ -515,12 +571,17 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::get('/admin/configuration-settings', [ConfigurationSettingController::class, 'index'])->name('admin.configuration-settings');
     Route::post('/admin/configuration-settings', [ConfigurationSettingController::class, 'storeUpdate'])->name('admin.configuration-settings.store');
     Route::get('/admin/configuration-settings/{id}', [ConfigurationSettingController::class, 'edit'])->name('admin.configuration-settings.edit');
+
+    Route::get('/admin/bottle-bucks/index', [AdminWalletController::class, 'index'])->name('admin.wallet.index');
+    Route::get('/admin/bottle-bucks/create', [AdminWalletController::class, 'create'])->name('admin.wallet.create');
+    Route::post('/admin/bottle-bucks/store', [AdminWalletController::class, 'store'])->name('admin.wallet.store');
+    Route::get('/admin/customer/search', [AdminCustomerController::class, 'search'])->name('admin.customer.search');
 });
 
 Route::get('/get-subregions/{regionId}', [RegionController::class, 'getSubRegions'])->name('get.subregions');
 Route::get('/get-subcategories/{categoryId}', [CategoryController::class, 'getSubcategories'])->name('getSubcategories');
 Route::post('/webhook/stripe', [StripeWebhookController::class, 'handleWebhook']);
-Route::get('/vendorEmailTest', [AdminVendorController::class, 'vendorEmailTest']);
+Route::get('/emailTemplateCheck', [UserDashboardController::class, 'emailTemplateCheck']);
 
 // Route::get('/generate-short-codes', function () {
 //     Artisan::call('vendor:add-short-code');

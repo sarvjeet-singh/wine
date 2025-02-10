@@ -65,7 +65,7 @@
                                     <label class="form-label">Contact Phone</label>
                                     <div>
                                         <input type="text"
-                                            class="form-control @error('contact_number') is-invalid @enderror"
+                                            class="form-control phone-number @error('contact_number') is-invalid @enderror"
                                             name="contact_number"
                                             value="{{ old('contact_number', Auth::user()->contact_number) }}"
                                             placeholder="Enter Phone number">
@@ -180,4 +180,38 @@
             </div>
         </div>
     </div>
+@endsection
+@section('js')
+<script>
+    $(document).ready(function() {
+        $('.phone-number').on('input', function() {
+            const $input = $(this);
+            const cursorPosition = $input.prop('selectionStart');
+            const rawValue = $input.val().replace(/\D/g, ''); // Remove all non-digit characters
+            let formattedValue = '';
+
+            // Format the phone number
+            if (rawValue.length > 3 && rawValue.length <= 6) {
+                formattedValue = rawValue.slice(0, 3) + '-' + rawValue.slice(3);
+            } else if (rawValue.length > 6) {
+                formattedValue =
+                    rawValue.slice(0, 3) +
+                    '-' +
+                    rawValue.slice(3, 6) +
+                    '-' +
+                    rawValue.slice(6, 10);
+            } else {
+                formattedValue = rawValue;
+            }
+
+            // Update the input value
+            $input.val(formattedValue);
+
+            // Restore cursor position
+            const adjustedPosition =
+                cursorPosition + (formattedValue.length - rawValue.length);
+            $input[0].setSelectionRange(adjustedPosition, adjustedPosition);
+        });
+    });
+</script>
 @endsection

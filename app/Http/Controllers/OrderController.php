@@ -13,9 +13,24 @@ use App\Models\Order;
 use App\Models\OrderTransaction;
 use App\Models\Vendor;
 use App\Models\Inquiry;
+use App\Models\Wallet;
+use App\Http\Controllers\WalletController;
+use App\Services\StripeService;
+use App\Helpers\SeasonHelper;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VendorInquiryMail;
 
 class OrderController extends Controller
 {
+
+    private $stripeService;
+
+    public function __construct(StripeService $stripeService)
+    {
+        $this->stripeService = $stripeService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -76,36 +91,47 @@ class OrderController extends Controller
 
     public function authorizePayment(Request $request)
     {
-        $paymentMethodId = $request->paymentMethodId;
-        $user = $user = Auth::user();
-        Stripe::setApiKey(env('STRIPE_SECRET'));
+        $request->validate([
+            // Billing Address
+            'name' => 'required|string',
+            'email_address' => 'required|string',
+            'contact_number' => 'required|string',
+            'street_address' => 'required|string',
+            'suite' => 'nullable|string',
+            'city' => 'required|string',
+            'country' => 'required|string',
+            'state' => 'required|string',
+            'postal_code' => 'required|string',
+            "payment_method_id" => 'nullable|string',
+            'wallet_used' => 'required|string',
+        ]);
 
         try {
-            $paymentMethod = PaymentMethod::retrieve($paymentMethodId);
-            $paymentMethod->attach(['customer' => $user->stripe_id]);
-
-            //     // Update the customer's default payment method
-            Customer::update($user->stripe_id, [
-                'invoice_settings' => [
-                    'default_payment_method' => $paymentMethodId,
-                ],
-            ]);
-
             $booking = Session::get('booking');
-            $user = Auth::user();
             $booking_data = $request->all();
+            $customer = Auth::guard('customer')->user();
+            $currentDate = now();
+            $season = SeasonHelper::getSeasonAndPrice($currentDate, $booking['vendor_id']);
+            $wallet_used = 0.00;
+            $wallet = Wallet::where('customer_id', Auth::guard('customer')->user()->id)->first();
+            if ($request->wallet_used > 0 && ($wallet->balance >= $request->wallet_used)) {
+                $wallet_used = $request->wallet_used;
+            }
+            if (isset($booking_data['selectedExperiences']) && !empty($booking_data['selectedExperiences'])) {
+                $booking_data['selectedExperiences'] = json_decode($booking_data['selectedExperiences'], true);
+            }
             $total_experiences = number_format(array_sum(array_column($booking_data['selectedExperiences'], 'value')), 2, '.', '');
             $vendor = Vendor::with('pricing')->where('id', $booking['vendor_id'])->first();
             $cleaning_fee = number_format(!empty($vendor->accommodationMetadata->cleaning_fee_amount) ? $vendor->accommodationMetadata->cleaning_fee_amount : 0, 2, '.', '');
             $security_deposit = number_format(!empty($vendor->accommodationMetadata->security_deposit_amount) ? $vendor->accommodationMetadata->security_deposit_amount : 0, 2, '.', '');
             $pet_fee = number_format(!empty($vendor->accommodationMetadata->pet_boarding) ? $vendor->accommodationMetadata->pet_boarding : 0, 2, '.', '');
             $tax_rate = !empty($vendor->accommodationMetadata->applicable_taxes_amount) ? $vendor->accommodationMetadata->applicable_taxes_amount : '';
-            $sub_total = ($vendor->pricing->current_rate * $booking['days']) + $total_experiences + $cleaning_fee + $security_deposit + $pet_fee;
+            $sub_total = ($season['price'] * $booking['days']) + $total_experiences + $cleaning_fee + $security_deposit + $pet_fee - $wallet_used;
             $tax = ($sub_total * $tax_rate) / 100;
             $grand_total = $sub_total + $tax;
 
             $inquiry = null;
-            $rate_basic = $vendor->pricing->current_rate;
+            $rate_basic = $season['price'];
             $experiences_total = number_format($total_experiences, 2, '.', '');
 
             $order_total = number_format($grand_total, 2, '.', '');
@@ -122,72 +148,88 @@ class OrderController extends Controller
                 $inquiry_id = $inquiry->id;
             }
 
+            if ($customer->form_guest_registry_filled != 1) {
+                $customer->contact_number = $request->contact_number;
+                $customer->street_address = $request->street_address;
+                $customer->suite = $request->suite;
+                $customer->city = $request->city;
+                $customer->country = $request->country;
+                $customer->state = $request->state;
+                $customer->postal_code = $request->postal_code;
+                $customer->other_country = $request->other_country;
+                $customer->other_state = $request->other_state;
+                if ($customer->country == 'Other') {
+                    $customer->is_other_country = 1;
+                }
+                $customer->form_guest_registry_filled = 1;
+                $customer->save();
+            }
+
             $order = [
-                'user_id' => Auth::user()->id,
+                'customer_id' => Auth::guard('customer')->user()->id,
                 'vendor_id' => $booking['vendor_id'],
+                'name' => $request->name,
+                'email' => $request->email_address,
+                'phone' => $request->contact_number,
+                'street_address' => $request->street_address,
+                'suite' => $request->suite,
+                'city' => $request->city,
+                'state' => $request->state,
+                'country' => $request->country,
+                'postal_code' => $request->postal_code,
                 'check_in_at' => $booking['start_date'],
                 'check_out_at' => $booking['end_date'],
                 'nights_count' => $booking['days'],
                 'travel_party_size' => $booking['number_travel_party'],
                 'visit_purpose' => $booking['nature_of_visit'],
                 'rate_basic' => $rate_basic,
-                'guest_name' => $user->firstname . ' ' . $user->lastname,
-                'guest_email' => $user->email,
+                'guest_name' => $customer->firstname . ' ' . $customer->lastname,
+                'guest_email' => $customer->email,
                 'experiences_selected' => json_encode($booking_data['selectedExperiences'], JSON_UNESCAPED_UNICODE),
                 'experiences_total' => $experiences_total,
                 'cleaning_fee' => $cleaning_fee,
                 'security_deposit' => $security_deposit,
                 'pet_fee' => $pet_fee,
                 'tax_rate' => $tax_rate,
+                'wallet_used' => $wallet_used,
                 'order_total' => $order_total,
                 'inquiry_id' => $inquiry_id,
             ];
-
             // Create order
             $order = Order::create($order);
-
-            // Stripe payment
-            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
-            $stripe_detail = $stripe->customers->retrieve($user->stripe_id, []);
-
-            $payment_intent = $stripe->paymentIntents->create([
-                'amount' => (float) ($order->order_total * 100),
-                'currency' => 'usd',
-                'customer' => $user->stripe_id,
-                // 'application_fee_amount' => $company_total,
-                // 'error_on_requires_action' => true,
-                'confirm' => true,
-                'capture_method' => 'manual',
-                'payment_method' => $stripe_detail->invoice_settings->default_payment_method,
-                // 'transfer_data' => ['destination' => $agent->connect_id],
-                'automatic_payment_methods' => ['enabled' => true, 'allow_redirects' => 'never'],
-                'metadata' => [
-                    'order_id' => $order->id,
-                    'customer_id' => $user->id,
-                    'vendor_id' => $booking['vendor_id'],
-                ]
-            ]);
-            if ($payment_intent) {
-                $orderTransaction = OrderTransaction::create([
-                    'order_id' => $order->id,
-                    'payment_type' => $payment_intent->payment_method_types[0],
-                    'transaction_id' => $payment_intent->id,
-                    'transaction_status' => $payment_intent->status,
-                    'transaction_amount' => number_format($payment_intent->amount / 100, 2, '.', ''),
-                    'transaction_currency' => $payment_intent->currency,
-                    // 'transaction_created_at' => \Carbon\Carbon::createFromTimestamp($payment_intent->created)->format('Y-m-d H:i:s'),
-                ]);
-                if (!empty($order) && !empty($orderTransaction)) {
-                    Session::forget('booking');
-                    if(!empty($inquiry)){
-                        $inquiry->update(['inquiry_status' => 3]);
-                    }
-                    return response()->json(['success' => true, "redirect_url" => route('user.orderDetail', $order->id), "message" => 'Order created successfully', 'order_id' => $order->id]);
-                } else {
-                    return response()->json(['success' => false, "data" => [], "message" => 'Something went wrong try again']);
-                }
+            if($wallet_used > 0){
+                app(WalletController::class)->useWallet($customer, $wallet_used, $order->id);
             }
-            //     return response()->json(['success' => true]);
+            $customer = Auth::guard('customer')->user();
+            // Create a Stripe Customer if needed
+            if (!$customer->stripe_id) {
+                $customer_data = [
+                    'email' => $customer->email,
+                    'name' => $customer->firstname . ' ' . $customer->lastname,
+                    'phone' => $customer->contact_number,
+                ];
+                $customer->stripe_id = $this->stripeService->createCustomer($customer_data);
+                $customer->save();
+            }
+            // Create a Setup Intent for saving the payment method
+            $setupIntent = $this->stripeService->setupIntent($customer->stripe_id);
+            if (!empty($order)) {
+                Session::forget('booking');
+                if (!empty($inquiry)) {
+                    $inquiry->update(['inquiry_status' => 3]);
+                }
+                return response()->json(
+                    [
+                        'success' => true,
+                        "client_secret" => $setupIntent->client_secret,
+                        "intent_type" => 'setup_intent',
+                        "message" => 'Order created successfully',
+                        'order_id' => $order->id
+                    ]
+                );
+            } else {
+                return response()->json(['success' => false, "data" => [], "message" => 'Something went wrong try again']);
+            }
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
@@ -195,30 +237,65 @@ class OrderController extends Controller
 
     public function sendInquiry(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            // Billing Address
+            'name' => 'required|string',
+            'email_address' => 'required|string',
+            'contact_number' => 'required|string',
+            'street_address' => 'required|string',
+            'suite' => 'nullable|string',
+            'city' => 'required|string',
+            'country' => 'required|string',
+            'state' => 'required|string',
+            'postal_code' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'error' => $validator->errors()
+                ]
+            );
+        }
         $booking = Session::get('booking');
-        $user = Auth::user();
+        $customer = Auth::guard('customer')->user();
         $booking_data = $request->all();
+        $currentDate = now();
+        $season = SeasonHelper::getSeasonAndPrice($currentDate, $booking['vendor_id']);
+        if (isset($booking_data['selectedExperiences']) && !empty($booking_data['selectedExperiences'])) {
+            $booking_data['selectedExperiences'] = json_decode($booking_data['selectedExperiences'], true);
+        }
         $total_experiences = number_format(array_sum(array_column($booking_data['selectedExperiences'], 'value')), 2, '.', '');
         $vendor = Vendor::with('pricing')->where('id', $booking['vendor_id'])->first();
         $cleaning_fee = number_format(!empty($vendor->accommodationMetadata->cleaning_fee_amount) ? $vendor->accommodationMetadata->cleaning_fee_amount : 0, 2, '.', '');
         $security_deposit = number_format(!empty($vendor->accommodationMetadata->security_deposit_amount) ? $vendor->accommodationMetadata->security_deposit_amount : 0, 2, '.', '');
         $pet_fee = number_format(!empty($vendor->accommodationMetadata->pet_boarding) ? $vendor->accommodationMetadata->pet_boarding : 0, 2, '.', '');
         $tax_rate = !empty($vendor->accommodationMetadata->applicable_taxes_amount) ? $vendor->accommodationMetadata->applicable_taxes_amount : '';
-        $sub_total = ($vendor->pricing->current_rate * $booking['days']) + $total_experiences + $cleaning_fee + $security_deposit + $pet_fee;
+        $sub_total = ($season['price'] * $booking['days']) + $total_experiences + $cleaning_fee + $security_deposit + $pet_fee;
         $tax = ($sub_total * $tax_rate) / 100;
         $grand_total = $sub_total + $tax;
 
         $inquiryData = [
-            'user_id' => Auth::user()->id,
+            'customer_id' => Auth::user()->id,
             'vendor_id' => $booking['vendor_id'],
+            'name' => $request->name,
+            'email' => $request->email_address,
+            'phone' => $request->contact_number,
+            'street_address' => $request->street_address,
+            'suite' => $request->suite,
+            'city' => $request->city,
+            'state' => $request->state,
+            'country' => $request->country,
+            'postal_code' => $request->postal_code,
             'check_in_at' => $booking['start_date'],
             'check_out_at' => $booking['end_date'],
             'nights_count' => $booking['days'],
             'travel_party_size' => $booking['number_travel_party'],
             'visit_purpose' => $booking['nature_of_visit'],
-            'rate_basic' => $vendor->pricing->current_rate,
-            'guest_name' => $user->firstname . ' ' . $user->lastname,
-            'guest_email' => $user->email,
+            'rate_basic' => $season['price'],
+            'guest_name' => $customer->firstname . ' ' . $customer->lastname,
+            'guest_email' => $customer->email,
             'experiences_selected' => json_encode($booking_data['selectedExperiences'], JSON_UNESCAPED_UNICODE),
             'experiences_total' => $total_experiences,
             'cleaning_fee' => number_format($cleaning_fee, 2, '.', ''),
@@ -231,9 +308,55 @@ class OrderController extends Controller
         $inquiry = Inquiry::create($inquiryData);
         if (!empty($inquiry)) {
             Session::forget('booking');
+            Mail::to($vendor->vendor_email)->send(new VendorInquiryMail($inquiryData, $vendor));
             return response()->json(['success' => true, "redirect_url" => route('user-inquiries', $vendor->id), "message" => 'Inquiry sent successfully', 'inquiry_id' => $inquiry->id]);
         } else {
             return response()->json(['success' => false, "data" => [], "message" => 'Something went wrong try again']);
         }
+    }
+
+    public function storeTransactionDetails(Request $request)
+    {
+        $order_id = $request->input('order_id');
+        $payment_intent_id = $request->input('payment_intent_id');
+        $transaction = OrderTransaction::where('order_id', $order_id)->first();
+        if ($transaction) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Transaction already exists for this order.',
+                // 'transaction' => $transaction
+            ], 200);
+        }
+        $order = Order::find($order_id);
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+        $paymentIntent = \Stripe\PaymentIntent::retrieve($payment_intent_id);
+        $transactionData = [
+            'order_id' => $order_id,
+            'payment_type' => 'card',
+            'transaction_id' => $paymentIntent->id,
+            'transaction_status' => $paymentIntent->status,
+            'transaction_amount' => $paymentIntent->amount / 100, // Stripe amount is in cents
+            'transaction_currency' => $paymentIntent->currency,
+            'transaction_created_at' => \Carbon\Carbon::createFromTimestamp($paymentIntent->created)->toDateTimeString(),
+            'card_brand_name' => $paymentIntent->charges->data[0]->payment_method_details->card->brand ?? null,
+            'cc_number' => $paymentIntent->charges->data[0]->payment_method_details->card->last4 ?? null,
+            'expiry' => ""
+        ];
+        $transaction = OrderTransaction::create($transactionData);
+
+        if (!empty($transaction)) {
+            $customer = Auth::guard('customer')->user();
+            app(WalletController::class)->addCashback($customer, $transaction->transaction_amount, $order_id);
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaction details stored successfully.',
+                'transaction' => $transaction
+            ], 201);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to store transaction details.',
+        ], 500);
     }
 }

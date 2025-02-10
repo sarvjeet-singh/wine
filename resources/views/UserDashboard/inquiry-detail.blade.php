@@ -20,8 +20,8 @@
 
 
         /*.summary-content-sec.invoice-sec .sec-head {
-            background-color: #f9f9f9;
-        }*/
+                    background-color: #f9f9f9;
+                }*/
         .summary-content-sec.invoice-sec .booking-details .sec-head {
             border-radius: 24px 24px 0 0;
         }
@@ -92,7 +92,8 @@
                                 <div class="main-head py-3 text-center position-relative">
 
                                     <h2 class="fw-bold fs-4 mb-0" style="color: #c0a144;">Inquiry Detail</h2>
-                                    <a href="javascript:void(0)" onclick="history.back()" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back</a>
+                                    <a href="javascript:void(0)" onclick="history.back()" class="back-btn"><i
+                                            class="fa-solid fa-arrow-left"></i> Back</a>
 
                                 </div>
 
@@ -245,28 +246,70 @@
 
                                                 <div class="row gx-5 gy-2">
 
+                                                    {{-- Guest Name --}}
                                                     <div class="col-md-6">
-
                                                         <div class="d-flex align-items-center justify-content-between mb-2">
-
                                                             <p class="info-label mb-0 fw-bold">Guest Name</p>
-
-                                                            <p class="mb-0">{{ $inquiry->guest_name }}</p>
-
+                                                            <p class="mb-0">{{ $inquiry->name }}</p>
                                                         </div>
+                                                    </div>
 
+                                                    {{-- Guest Email --}}
+                                                    <div class="col-md-6">
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <p class="info-label mb-0 fw-bold">Guest Email</p>
+                                                            <p class="mb-0">{{ $inquiry->email }}</p>
+                                                        </div>
+                                                    </div>
+                                                    {{-- Contact Information --}}
+                                                    <div class="col-md-6">
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <p class="info-label mb-0 fw-bold">Contact Number</p>
+                                                            <p class="mb-0">{{ $inquiry->phone }}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Address --}}
+                                                    <div class="col-md-6">
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <p class="info-label mb-0 fw-bold">Street Address</p>
+                                                            <p class="mb-0">{{ $inquiry->street_address }}</p>
+                                                        </div>
                                                     </div>
 
                                                     <div class="col-md-6">
-
                                                         <div class="d-flex align-items-center justify-content-between">
-
-                                                            <p class="info-label mb-0 fw-bold">Guest Email</p>
-
-                                                            <p class="mb-0">{{ $inquiry->guest_email }}</p>
-
+                                                            <p class="info-label mb-0 fw-bold">Suite</p>
+                                                            <p class="mb-0">{{ $inquiry->suite ?? 'N/A' }}</p>
                                                         </div>
+                                                    </div>
 
+                                                    <div class="col-md-6">
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <p class="info-label mb-0 fw-bold">City</p>
+                                                            <p class="mb-0">{{ $inquiry->city }}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <p class="info-label mb-0 fw-bold">State</p>
+                                                            <p class="mb-0">{{ $inquiry->state }}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <p class="info-label mb-0 fw-bold">Country</p>
+                                                            <p class="mb-0">{{ $inquiry->country }}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <p class="info-label mb-0 fw-bold">Postal Code</p>
+                                                            <p class="mb-0">{{ $inquiry->postal_code }}</p>
+                                                        </div>
                                                     </div>
 
                                                 </div>
@@ -339,7 +382,8 @@
 
                                                     <div class="col-md-6">
 
-                                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                                        <div
+                                                            class="d-flex align-items-center justify-content-between mb-2">
 
                                                             <p class="info-label mb-0 fw-bold">Cleaning Fees</p>
 
@@ -363,7 +407,8 @@
 
                                                     <div class="col-md-6">
 
-                                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                                        <div
+                                                            class="d-flex align-items-center justify-content-between mb-2">
 
                                                             <p class="info-label mb-0 fw-bold">Security Deposit</p>
 

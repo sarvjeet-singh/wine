@@ -33,7 +33,7 @@
                                     <div class="d-flex align-items-center justify-content-between">
                                         <p class="info-label mb-0 fw-bold">Vendor Contact Name </p>
                                         <p class="mb-0 text-end">
-                                            {{ $order->vendorSeller->user->first_name . ' ' . $order->vendorSeller->user->last_name }}
+                                            {{ $order->vendorSeller->user->firstname . ' ' . $order->vendorSeller->user->lastname }}
                                         </p>
                                     </div>
                                 </div>

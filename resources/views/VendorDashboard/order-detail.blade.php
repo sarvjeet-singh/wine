@@ -9,7 +9,6 @@
 @section('content')
 
     <style>
-
         .summary-content-sec.invoice-sec {
 
             max-width: 980px;
@@ -25,9 +24,11 @@
             background-color: #348a96;
 
         }
+
         .summary-content-sec.invoice-sec .detail-outer-box {
-           border-radius: 24px;
+            border-radius: 24px;
         }
+
         .summary-content-sec.invoice-sec .booking-details .sec-head {
 
             border-radius: 24px 24px 0 0;
@@ -38,6 +39,7 @@
         .summary-content-sec.invoice-sec .sec-head h3 svg {
             padding-right: 5px;
         }
+
         .summary-content-sec.invoice-sec .detail-outer-box svg path {
 
             fill: #ffffff;
@@ -61,22 +63,24 @@
             color: #129647;
 
         }
-.summary-content-sec.invoice-sec .main-head {
-    padding-inline: 70px;
-}
-a.back-btn {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    z-index: 1;    
-    font-size: 18px;
-}
-a.back-btn svg {
-    padding-right: 2px;
-    height: 16px;
-}
 
+        .summary-content-sec.invoice-sec .main-head {
+            padding-inline: 70px;
+        }
+
+        a.back-btn {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            z-index: 1;
+            font-size: 18px;
+        }
+
+        a.back-btn svg {
+            padding-right: 2px;
+            height: 16px;
+        }
     </style>
 
 
@@ -96,7 +100,8 @@ a.back-btn svg {
                         <div class="main-head py-3 text-center position-relative">
 
                             <h2 class="fw-bold fs-4 mb-0">Order Detail</h2>
-                            <a href="javascript:void(0);" onclick="history.back()" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back</a>
+                            <a href="javascript:void(0);" onclick="history.back()" class="back-btn"><i
+                                    class="fa-solid fa-arrow-left"></i> Back</a>
 
                         </div>
 
@@ -289,7 +294,6 @@ a.back-btn svg {
                                 <div class="sec-head px-4 py-3">
 
                                     <h3 class="text-white fw-bold fs-6 mb-0"><i
-
                                             class="fa-solid fa-pen-to-square"></i>Curated Experience</h3>
 
                                 </div>
@@ -299,7 +303,6 @@ a.back-btn svg {
                                     <div class="row gx-5 gy-2">
 
                                         @foreach ($experiences as $experience)
-
                                             <div class="col-12">
 
                                                 <div class="d-flex align-items-center justify-content-between">
@@ -311,7 +314,6 @@ a.back-btn svg {
                                                 </div>
 
                                             </div>
-
                                         @endforeach
 
                                     </div>
@@ -407,7 +409,6 @@ a.back-btn svg {
                                             <li class="mb-0">
 
                                                 @if ($vendor->policy == 'partial')
-
                                                     A full refund minus transaction fees will be issued upon request
 
                                                     up to 7 days
@@ -421,17 +422,13 @@ a.back-btn svg {
                                                     credit or rain
 
                                                     cheque may be issued to guests at the vendor’s discretion.
-
                                                 @elseif($vendor->policy == 'open')
-
                                                     A full refund minus transaction fees will be issued upon request
 
                                                     up to 24 hours
 
                                                     prior to the check-in date indicated.
-
                                                 @elseif($vendor->policy == 'closed')
-
                                                     All bookings are final. No portion of your transaction will be
 
                                                     refunded. A
@@ -441,7 +438,6 @@ a.back-btn svg {
                                                     vendor’s
 
                                                     discretion.
-
                                                 @endif
 
                                             </li>
@@ -469,16 +465,11 @@ a.back-btn svg {
                                     @php
 
                                         $sub_total =
-
                                             $order->rate_basic * $order->nights_count +
-
                                             $order->experiences_total +
-
                                             $order->cleaning_fee +
-
                                             $order->security_deposit +
-
-                                            $order->pet_fee;
+                                            $order->pet_fee - $order->wallet_used;
 
                                         $tax = ($sub_total * $order->tax_rate) / 100;
 
@@ -491,7 +482,16 @@ a.back-btn svg {
                                         <p class="fw-bold mb-0">${{ number_format($sub_total, 2, '.', '') }}</p>
 
                                     </div>
+                                    @if ($order->wallet_used != 0)
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
 
+                                            <p class="fw-bold mb-0">Bottle Bucks Used:</p>
+
+                                            <p class="fw-bold mb-0">
+                                                ${{ number_format($order->wallet_used, 2, '.', '') }}</p>
+
+                                        </div>
+                                    @endif
                                     <div class="d-flex align-items-center justify-content-between mb-2">
 
                                         <p class="fw-bold mb-0">Taxes:</p>
@@ -538,43 +538,41 @@ a.back-btn svg {
 
                                         <thead></thead>
 
-                                            <tr>
+                                        <tr>
 
-                                                <th>Transaction ID</th>
+                                            <th>Transaction ID</th>
 
-                                                <th>Transaction Date</th>
+                                            <th>Transaction Date</th>
 
-                                                <th>Transaction Amount</th>
+                                            <th>Transaction Amount</th>
 
-                                            </tr>
+                                        </tr>
 
                                         </thead>
 
                                         <tbody>
 
-                                            @if(count($order->orderTransactions) > 0)
+                                            @if (count($order->orderTransactions) > 0)
 
-                                            @foreach ($order->orderTransactions as $key => $orderTransaction)
+                                                @foreach ($order->orderTransactions as $key => $orderTransaction)
+                                                    <tr>
 
-                                            <tr>
+                                                        <td>{{ $orderTransaction->transaction_id }}</td>
 
-                                                <td>{{ $orderTransaction->transaction_id }}</td>
+                                                        <td>{{ date('m/d/Y', strtotime($orderTransaction->created_at)) }}
+                                                        </td>
 
-                                                <td>{{ date('m/d/Y', strtotime($orderTransaction->created_at)) }}</td>
+                                                        <td>${{ number_format($orderTransaction->transaction_amount, 2, '.', '') }}
+                                                        </td>
 
-                                                <td>${{ number_format($orderTransaction->transaction_amount, 2, '.', '') }}</td>
-
-                                            </tr>
-
-                                            @endforeach
-
+                                                    </tr>
+                                                @endforeach
                                             @else
+                                                <tr>
 
-                                            <tr>
+                                                    <td colspan="3" class="text-center">No Transactions Found</td>
 
-                                                <td colspan="3" class="text-center">No Transactions Found</td>
-
-                                            </tr>
+                                                </tr>
 
                                             @endif
 
@@ -609,4 +607,3 @@ a.back-btn svg {
 @section('js')
 
 @endsection
-

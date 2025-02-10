@@ -107,7 +107,7 @@
                                                     class="required-filed">*</span></label>
                                             <input type="text"
                                                 class="form-control @error('firstname') is-invalid @enderror"
-                                                name="firstname" value="{{ Auth::user()->firstname }}"
+                                                name="firstname" value="{{ old('firstname', Auth::user()->firstname) }}"
                                                 placeholder="Enter your first name">
                                             @error('firstname')
                                                 <span class="invalid-feedback" role="alert">
@@ -120,8 +120,8 @@
                                             <label class="form-label">Last Name<span class="required-filed">*</span></label>
                                             <input type="text"
                                                 class="form-control @error('lastname') is-invalid @enderror" name="lastname"
-                                                value="{{ Auth::user()->lastname }}" placeholder="Enter your last name">
-                                            @error('firslastnametname')
+                                                value="{{ old('lastname', Auth::user()->lastname) }}" placeholder="Enter your last name">
+                                            @error('lastname')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
                                                 </span>
@@ -135,7 +135,7 @@
                                                     class="required-filed">*</span></label>
                                             <input type="text"
                                                 class="form-control @error('display_name') is-invalid @enderror"
-                                                name="display_name" value="{{ Auth::user()->display_name }}"
+                                                name="display_name" value="{{ old('display_name', Auth::user()->display_name) }}"
                                                 placeholder="Enter your Display name">
                                             @error('display_name')
                                                 <span class="invalid-feedback" role="alert">
@@ -147,7 +147,7 @@
                                             <label class="form-label">eMail Address<span
                                                     class="required-filed">*</span></label>
                                             <input type="email" class="form-control  @error('email') is-invalid @enderror"
-                                                name="email" value="{{ Auth::user()->email }}"
+                                                name="email" disabled value="{{ old('email', Auth::user()->email) }}"
                                                 placeholder="Enter your eMail Address">
                                             @error('email')
                                                 <span class="invalid-feedback" role="alert">
@@ -205,8 +205,13 @@
                                         <div class="col-sm-6 col-12">
                                             <label for="DOB" class="form-label">Date of Birth</label>
                                             <input type="date" class="form-control" name="date_of_birth"
-                                                value="{{ Auth::user()->date_of_birth }}" max="{{ date('Y-M-D') }}">
-
+                                                value="{{ old('date_of_birth', Auth::user()->date_of_birth) }}"
+                                                max="{{ now()->subYears(5)->format('m/d/Y') }}">
+                                            @error('date_of_birth')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="row mt-5">
@@ -245,8 +250,9 @@
                                     @endif
                                     <div class="row mt-3 g-3">
                                         <div class="col-md-4 col-12">
-                                            <input type="checkbox" class="custom-checkbox social-media-checkbox" id="Facebook"
-                                                name="facebook_checkbox" {{ Auth::user()->facebook ? 'checked' : '' }}>
+                                            <input type="checkbox" class="custom-checkbox social-media-checkbox"
+                                                id="Facebook" name="facebook_checkbox"
+                                                {{ Auth::user()->facebook ? 'checked' : '' }}>
                                             <label for="Facebook">Facebook</label>
                                             <input type="text" class="form-control mt-2" id="facebook"
                                                 name="facebook" {{ !Auth::user()->facebook ? 'disabled' : '' }}
@@ -256,8 +262,9 @@
 
                                         </div>
                                         <div class="col-md-4 col-12">
-                                            <input type="checkbox" class="custom-checkbox social-media-checkbox" id="Instagram"
-                                                name="instagram_checkbox" {{ Auth::user()->instagram ? 'checked' : '' }}>
+                                            <input type="checkbox" class="custom-checkbox social-media-checkbox"
+                                                id="Instagram" name="instagram_checkbox"
+                                                {{ Auth::user()->instagram ? 'checked' : '' }}>
                                             <label for="Instagram">Instagram</label>
                                             <input type="text" class="form-control mt-2" id="instagram"
                                                 name="instagram" {{ !Auth::user()->instagram ? 'disabled' : '' }}
@@ -266,8 +273,9 @@
                                             <div class="error" id="instagram-error"></div>
                                         </div>
                                         <div class="col-md-4 col-12">
-                                            <input type="checkbox" class="custom-checkbox social-media-checkbox" id="Youtube"
-                                                name="youtube_checkbox" {{ Auth::user()->youtube ? 'checked' : '' }}>
+                                            <input type="checkbox" class="custom-checkbox social-media-checkbox"
+                                                id="Youtube" name="youtube_checkbox"
+                                                {{ Auth::user()->youtube ? 'checked' : '' }}>
                                             <label for="Youtube">Youtube</label>
                                             <input type="text" class="form-control mt-2" id="youtube"
                                                 name="youtube" {{ !Auth::user()->youtube ? 'disabled' : '' }}
@@ -278,8 +286,9 @@
                                     </div>
                                     <div class="row mt-md-3 mt-1 g-3">
                                         <div class="col-md-4 col-12">
-                                            <input type="checkbox" class="custom-checkbox social-media-checkbox" id="Tiktok"
-                                                name="tiktok_checkbox" {{ Auth::user()->tiktok ? 'checked' : '' }}>
+                                            <input type="checkbox" class="custom-checkbox social-media-checkbox"
+                                                id="Tiktok" name="tiktok_checkbox"
+                                                {{ Auth::user()->tiktok ? 'checked' : '' }}>
                                             <label for="Tiktok">Tik Tok</label>
                                             <input type="text" class="form-control mt-2" id="tiktok"
                                                 name="tiktok" {{ !Auth::user()->tiktok ? 'disabled' : '' }}
@@ -288,8 +297,9 @@
                                             <div class="error" id="tiktok-error"></div>
                                         </div>
                                         <div class="col-md-4 col-12">
-                                            <input type="checkbox" class="custom-checkbox social-media-checkbox" id="Twitter"
-                                                name="twitter_checkbox" {{ Auth::user()->twitter ? 'checked' : '' }}>
+                                            <input type="checkbox" class="custom-checkbox social-media-checkbox"
+                                                id="Twitter" name="twitter_checkbox"
+                                                {{ Auth::user()->twitter ? 'checked' : '' }}>
                                             <label for="Twitter">Twitter</label>
                                             <input type="text" class="form-control mt-2" id="twitter"
                                                 name="twitter" {{ !Auth::user()->twitter ? 'disabled' : '' }}
@@ -298,8 +308,9 @@
                                             <div class="error" id="twitter-error"></div>
                                         </div>
                                         <div class="col-md-4 col-12">
-                                            <input type="checkbox" class="custom-checkbox social-media-checkbox" id="Linkedin"
-                                                name="linkedin_checkbox" {{ Auth::user()->linkedin ? 'checked' : '' }}>
+                                            <input type="checkbox" class="custom-checkbox social-media-checkbox"
+                                                id="Linkedin" name="linkedin_checkbox"
+                                                {{ Auth::user()->linkedin ? 'checked' : '' }}>
                                             <label for="Linkedin">Linkedin</label>
                                             <input type="text" class="form-control mt-2" id="linkedin"
                                                 name="linkedin" {{ !Auth::user()->linkedin ? 'disabled' : '' }}
@@ -473,14 +484,14 @@
                             </div>
                             <div class="information-box-body">
                                 <!-- @if ($errors->any())
-                                                <div class="alert alert-danger">
-                                                    <ul>
-                                                        @foreach ($errors->all() as $error)
+                                                                        <div class="alert alert-danger">
+                                                                            <ul>
+                                                                                @foreach ($errors->all() as $error)
     <li>{{ $error }}</li>
     @endforeach
-                                                    </ul>
-                                                </div>
-                                            @endif -->
+                                                                            </ul>
+                                                                        </div>
+                                                                    @endif -->
 
                                 @if (session('success'))
                                     <div class="alert alert-success">
@@ -523,9 +534,11 @@
                                                         @if (Auth::user()->guestrewards == 'Other') checked @endif
                                                         @if (!empty(Auth::user()->guestrewards)) disabled @endif> Other
                                                 </label>
-                                                <input type="text" @if (!empty(Auth::user()->guest_referral_other)) disabled @else style="display:none" @endif class="guest_referral_other"
-                                                value="{{ Auth::user()->guest_referral_other }}"
-                                                name="guest_referral_other">
+                                                <input type="text"
+                                                    @if (!empty(Auth::user()->guest_referral_other)) disabled @else style="display:none" @endif
+                                                    class="guest_referral_other"
+                                                    value="{{ Auth::user()->guest_referral_other }}"
+                                                    name="guest_referral_other">
                                             </div>
                                         </div>
                                         <div class="col-md-4 col-12">
@@ -716,6 +729,7 @@
                 <!-- User Referral section End -->
 
                 <!-- User Update Password Start -->
+
                 <div class="row mt-5">
                     <div class="col-sm-12">
                         <div class="information-box update-pwd-sec">
@@ -732,27 +746,28 @@
                                 @endif
                                 <form method="post" action="{{ route('user-settings-update-password') }}">
                                     @csrf
-                                    <div class="row mt-3">
-                                        <div class="col-md-6 col-12">
-                                            <label class="form-label">Current Password<span
-                                                    class="required-filed">*</span></label>
-                                            <div style="position:relative;">
-                                                <input type="password"
-                                                    class="form-control @error('current_password') is-invalid @enderror"
-                                                    name="current_password" placeholder="Enter your current password"
-                                                    id="current_password">
-                                                <i class="fa-solid fa-eye toggle-password"
-                                                    onclick="togglePasswordVisibility('current_password')"
-                                                    style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer;"></i>
-                                                @error('current_password')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
+                                    @if (Auth::user()->password != null)
+                                        <div class="row mt-3">
+                                            <div class="col-md-6 col-12">
+                                                <label class="form-label">Current Password<span
+                                                        class="required-filed">*</span></label>
+                                                <div style="position:relative;">
+                                                    <input type="password"
+                                                        class="form-control @error('current_password') is-invalid @enderror"
+                                                        name="current_password" placeholder="Enter your current password"
+                                                        id="current_password">
+                                                    <i class="fa-solid fa-eye toggle-password"
+                                                        onclick="togglePasswordVisibility('current_password')"
+                                                        style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer;"></i>
+                                                    @error('current_password')
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $message }}</strong>
+                                                        </span>
+                                                    @enderror
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-
+                                    @endif
                                     <div class="row mt-md-3 mt-0 g-3">
                                         <div class="col-md-6 col-12">
                                             <label class="form-label">New Password<span
@@ -896,7 +911,8 @@
         });
 
         $('.guestrewards').change(function() {
-            $(".gurest_vendorlist, .gurest_social_media, .guestreward_user, .gurest_local_vendorlist, .guest_referral_other").hide();
+            $(".gurest_vendorlist, .gurest_social_media, .guestreward_user, .gurest_local_vendorlist, .guest_referral_other")
+                .hide();
             if ($(this).val() == "Niagara Region Vendor") {
                 $(".gurest_vendorlist").show();
             } else if ($(this).val() == "Support Local Vendor") {
@@ -904,7 +920,7 @@
             } else if ($(this).val() == "Search Engine Results") {} else if ($(this).val() ==
                 "Social Media Content") {
                 $(".gurest_social_media").show();
-            } else if($(this).val() == "Other") {
+            } else if ($(this).val() == "Other") {
                 $(".guest_referral_other").show();
             }
         });
@@ -1081,6 +1097,23 @@
                     $(".guestreward_user").show();
                 }
             });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const dateInput = document.querySelector('input[name="date_of_birth"]');
+            const today = new Date();
+            const maxDate = new Date();
+
+            maxDate.setFullYear(today.getFullYear() - 5); // Minimum age: 5 years
+
+            const formattedMaxDate = `${String(maxDate.getMonth() + 1).padStart(2, '0')}/` +
+                `${String(maxDate.getDate()).padStart(2, '0')}/` +
+                `${maxDate.getFullYear()}`;
+
+            dateInput.max = maxDate.toISOString().split('T')[0]; // Required for type="date" validation
+            dateInput.setAttribute('data-max-display', formattedMaxDate); // Optional, for display
+
+            // Optionally, set a placeholder or tooltip with the formatted date
+            dateInput.placeholder = "MM/DD/YYYY";
         });
     </script>
 @endsection

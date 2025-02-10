@@ -65,7 +65,7 @@
 
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label for="" class="form-label">Series</label>
+                    <label for="" class="form-label">Series Name</label>
 
                     <input type="text" name="series" class="form-control" id="Series">
                 </div>
@@ -77,7 +77,7 @@
                                 <label for="varietal_type" class="form-label">Grape Varietals</label>
                             </div>
                             <div class="w-75" style="width: 61.5% !important">
-                                <label for="varietal_blend" class="form-label">Varietal/Blend</label>
+                                <label for="varietal_blend" class="form-label">Blend Percentage</label>
                             </div>
                         </div>
                         <div class="dynamic-field">
@@ -199,12 +199,12 @@
             <!-- <label for="" class="form-label">Inventory</label> -->
             <div class="d-flex align-items-center gap-2">
                 <div>
-                    <label for="casesInput" class="form-label">Case</label>
+                    <label for="casesInput" class="form-label">Cases</label>
                     <input type="number" class="form-control w-100" id="casesInput" min="0"
                         placeholder="Enter cases" style="width: 50%;">
                 </div>
                 <div>
-                    <label for="bottlesInput" class="form-label">Bottle</label>
+                    <label for="bottlesInput" class="form-label">Bottles</label>
                     <input type="number" class="form-control w-100" id="bottlesInput" min="0"
                         placeholder="Enter bottles" style="width: 50%;">
                 </div>
@@ -213,11 +213,18 @@
         </div>
 
         <div class="col-md-6">
+            <div class="d-flex align-items-center gap-2">
+                <div>
+                    <label for="" class="form-label">Inventory</label>
+                    <input type="number" class="form-control w-100 readonly" id="totalInventory" readonly
+                     style="width: 50%;">
+                </div>
+                <div>
+                    <label for="" class="form-label">SKU</label>
+                    <input type="text" class="form-control w-100" style="width: 50%;" name="sku" id="sku">
 
-            <label for="" class="form-label">SKU</label>
-
-            <input type="text" class="form-control" name="sku" id="sku">
-
+                </div>
+            </div>
         </div>
 
 
@@ -502,6 +509,7 @@
             var totalBottles = (cases * 12) + bottles;
 
             $('#inventory').val(totalBottles);
+            $('#totalInventory').val(totalBottles);
         }
 
         // Function to display cases and bottles from a given total number of bottles

@@ -68,7 +68,7 @@
 
                                         <p class="mb-0 text-end">
 
-                                            {{ $order->vendorBuyer->user->first_name . ' ' . $order->vendorBuyer->user->last_name }}
+                                            {{ $order->vendorBuyer->user->firstname . ' ' . $order->vendorBuyer->user->lastname }}
 
                                         </p>
 

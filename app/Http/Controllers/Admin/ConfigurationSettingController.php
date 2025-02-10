@@ -40,15 +40,19 @@ class ConfigurationSettingController extends Controller
                 'title' => 'required|string|max:255',
                 'key'   => 'required|string|max:255|unique:configuration_settings,key,' . $request->id,
                 'value' => 'required|string',
+                'status' => 'nullable|boolean',
             ]);
 
+            // add slashes to the value
+            $validatedData['value'] = !empty($validatedData['value']) ? addslashes($validatedData['value']) : '';
+            $validatedData['status'] = !empty($validatedData['status']) ? 1 : 0;
             if ($request->id) {
                 // Update existing record
                 $setting = ConfigurationSetting::findOrFail($request->id);
                 $setting->update($validatedData);
 
                 return response()->json([
-                    'status'  => "success",
+                    'status'  => true,
                     'message' => 'Settings updated successfully.',
                 ]);
             }
@@ -57,13 +61,13 @@ class ConfigurationSettingController extends Controller
             ConfigurationSetting::create($validatedData);
 
             return response()->json([
-                'status'  => "success",
+                'status'  => true,
                 'message' => 'Settings created successfully.',
             ]);
         } catch (\Exception $e) {
             // Handle any exceptions and return an error response
             return response()->json([
-                'status'  => "error",
+                'status'  => false,
                 'message' => 'An error occurred: ' . $e->getMessage(),
             ], 500);
         }

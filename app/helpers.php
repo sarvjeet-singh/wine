@@ -3,6 +3,7 @@
 use App\Models\Review;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Helpers\TimezoneHelper;
 
 // use Auth;
 
@@ -31,7 +32,7 @@ if (! function_exists('sendEmail')) {
         $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
 
         // More headers
-        $headers .= 'From: <collaborate@winecountryweekends.ca>' . "\r\n";
+        $headers .= 'From: <system@winecountryweekends.ca>' . "\r\n";
 
         mail($to, $subject, $emailContent, $headers);
     }
@@ -235,11 +236,11 @@ if (!function_exists('getResidualSugars')) {
     function getResidualSugars(?string $key = null, $value = null)
     {
         $options = [
-            '0-1' => $value . ' g/l (Bone Dry)',
-            '1-9' => $value . ' g/l (Dry)',
-            '10-49' => $value . ' g/l (Off Dry)',
-            '50-120' => $value . ' g/l (Semi-Sweet)',
-            '120+' => $value . ' g/l (Sweet)',
+            '0-1' => $value ?? '0-1' . ' g/l (Bone Dry)',
+            '1-9' => $value ?? '1-9' . ' g/l (Dry)',
+            '10-49' => $value ?? '10-49' . ' g/l (Off Dry)',
+            '50-120' => $value ?? '50-120' . ' g/l (Semi-Sweet)',
+            '120+' => $value ?? '120+' . ' g/l (Sweet)',
         ];
 
         if ($key === null) {
@@ -298,7 +299,7 @@ if (! function_exists('getEstablishmentById')) {
 if (! function_exists('getAccountStatusById')) {
     function getAccountStatusById($id)
     {
-        return \App\Models\AccountStatus::find($id)->pluck('name')->first();
+        return \App\Models\AccountStatus::find($id)->pluck('name');
     }
 }
 
@@ -434,6 +435,64 @@ if (!function_exists('isCanadaIP')) {
         } catch (Exception $e) {
             // Log or handle errors as needed
             return false;
+        }
+    }
+}
+if (!function_exists('getClientIp')) {
+    function getClientIp()
+    {
+        $ip = null;
+
+        // Check for forwarded IPs (could be IPv4 or IPv6)
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            // Get the first IP from the X-Forwarded-For header, which could be IPv4 or IPv6
+            $forwardedIps = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            foreach ($forwardedIps as $forwardedIp) {
+                $forwardedIp = trim($forwardedIp);
+                if (filter_var($forwardedIp, FILTER_VALIDATE_IP)) {
+                    return $forwardedIp;
+                }
+            }
+        }
+
+        // Fallback to REMOTE_ADDR
+        if (!empty($_SERVER['REMOTE_ADDR'])) {
+            $ip = $_SERVER['REMOTE_ADDR'];
+            if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                return $ip;
+            }
+        }
+
+        return $ip;
+    }
+
+    if (!function_exists('time_elapsed')) {
+        /**
+         * Format a timestamp into a human-readable "time ago" format.
+         *
+         * @param string|DateTime|Carbon $timestamp
+         * @return string
+         */
+        function time_elapsed($timestamp)
+        {
+            // Ensure $timestamp is a Carbon instance
+            $date = \Carbon\Carbon::parse($timestamp);
+    
+            // Return the "time ago" format
+            return $date->diffForHumans();
+        }
+    }
+
+    if(!function_exists('getUserTimezone')) {
+        function getUserTimezone() {
+            $timezone = TimezoneHelper::getUserTimezone();
+            return $timezone;
+        }
+    }
+    if(!function_exists('toLocalTimezone')) {
+        function toLocalTimezone($utcTimestamp, $timezone, $time = false) {
+            $timezone = TimezoneHelper::toLocal($utcTimestamp, $timezone, $time);
+            return $timezone;
         }
     }
 }

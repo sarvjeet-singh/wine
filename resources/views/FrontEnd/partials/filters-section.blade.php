@@ -19,7 +19,7 @@
                 </button>
             </div>
             <div class="filter-mob-box d-sm-none d-block">
-                <button class="filter-icon"><i class="fa-solid fa-filter"></i></button>
+                <button class="filter-icon"><i class="fa-solid fa-sliders"></i></button>
             </div>
         </div>
         <!-- /Filter Search Box -->

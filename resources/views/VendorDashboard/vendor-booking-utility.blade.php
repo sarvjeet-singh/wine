@@ -122,7 +122,7 @@
                                             <input type="number" class="form-control" id="security-deposit-amount"
                                                 name="security_deposit_amount"
                                                 value="{{ old('security_deposit_amount', !empty($vendor->metadata->security_deposit_amount) ? $vendor->metadata->security_deposit_amount : '') }}"
-                                                placeholder="Enter Security Deposit">
+                                                placeholder="Enter Security Deposit" step="0.01">
                                         </div>
                                         @error('security_deposit_amount')
                                             <span class="text-danger">{{ $message }}</span>
@@ -139,7 +139,7 @@
                                             <input type="number" class="form-control" id="applicable-taxes-amount"
                                                 name="applicable_taxes_amount"
                                                 value="{{ old('applicable_taxes_amount', !empty($vendor->metadata->applicable_taxes_amount) ? $vendor->metadata->applicable_taxes_amount : '') }}"
-                                                placeholder="Enter Applicable Taxes">
+                                                placeholder="Enter Applicable Taxes" step="0.01">
                                         </div>
                                         @error('applicable_taxes_amount')
                                             <span class="text-danger">{{ $message }}</span>
@@ -156,7 +156,7 @@
                                             <input type="number" class="form-control" id="cleaning-fee-amount"
                                                 name="cleaning_fee_amount"
                                                 value="{{ old('cleaning_fee_amount', !empty($vendor->metadata->cleaning_fee_amount) ? $vendor->metadata->cleaning_fee_amount : '') }}"
-                                                placeholder="Enter Cleaning Fee">
+                                                placeholder="Enter Cleaning Fee" step="0.01">
                                         </div>
                                         @error('cleaning_fee_amount')
                                             <span class="text-danger">{{ $message }}</span>
@@ -173,7 +173,7 @@
                                             <input type="number" class="form-control" id="pet-boarding-amount"
                                                 name="pet_boarding"
                                                 value="{{ old('pet_boarding', !empty($vendor->metadata->pet_boarding) ? $vendor->metadata->pet_boarding : '') }}"
-                                                placeholder="Enter Pet Boarding Fee">
+                                                placeholder="Enter Pet Boarding Fee" step="0.01">
                                         </div>
                                         @error('pet_boarding')
                                             <span class="text-danger">{{ $message }}</span>

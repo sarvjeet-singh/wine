@@ -65,7 +65,8 @@
                                         <label>Account Status</label>
                                     </div>
                                     <div class="col-sm-7 text-right">
-                                        <span>{{ !empty($vendor->account_status) ? getAccountStatusById($vendor->account_status) : '' }}</span>
+                                        
+                                        <span>{{ !empty($vendor->account_status) ? $vendor->accountStatus->name : '' }}</span>
                                     </div>
                                     <div class="col-sm-5">
                                         <label>Current Rate</label>

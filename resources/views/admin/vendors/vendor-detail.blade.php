@@ -1,7 +1,6 @@
 @extends('admin.layouts.app')
 @section('content')
     <link rel="stylesheet" href="{{ asset('asset/css/select2.min.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css" />
     <link rel="stylesheet" href="{{ asset('asset/admin/css/jquery-ui.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/admin/css/jquery-ui-timepicker-addon.min.css') }}">
     <style>
