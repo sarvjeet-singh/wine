@@ -7,12 +7,13 @@ use Exception;
 use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
 use Stripe\Product as StripeProduct;
-use Stripe\PaymentIntent;
 use Stripe\Customer;
 use Stripe\Price;
 use Stripe\PaymentMethod;
 use App\Models\WinerySubscription;
 use Stripe\Subscription as StripeSubscription;
+use App\Models\Plan;
+use App\Models\Vendor;
 
 class StripeSubscriptionService
 {
@@ -211,7 +212,7 @@ class StripeSubscriptionService
             ]],
             'payment_behavior' => 'default_incomplete', // To collect payment details and confirm subscription
             'expand' => ['latest_invoice.payment_intent'],
-            'default_tax_rates' => [$taxRateId],
+            // 'default_tax_rates' => [$taxRateId],
         ]);
         $price = Price::retrieve($priceId);
         $winerySubscription = WinerySubscription::create([
@@ -241,5 +242,45 @@ class StripeSubscriptionService
         //     'currency' => $price->currency,
 
         // ]);
+    }
+
+    /**
+     * Create a new subscription for a vendor in Stripe, and update the user's
+     * subscription in your database.
+     *
+     * @param User $user
+     * @param Plan $plan
+     * @return \Stripe\Subscription
+     * @throws \Exception
+     */
+    public function createSubscription(Vendor $vendor, Plan $plan)
+    {
+        // Get tax IDs for the plan
+        $taxIds = $plan->taxes()
+            ->where('active', true)
+            ->pluck('stripe_tax_id')
+            ->toArray();
+
+        try {
+            // Create subscription with taxes
+            $subscription = StripeSubscription::create([
+                'customer' => $vendor->stripe_id,
+                'items' => [
+                    ['price' => $plan->stripe_plan_id],
+                ],
+                'default_tax_rates' => $taxIds
+            ]);
+
+            // Update user's subscription in your database
+            $vendor->subscription()->create([
+                'stripe_subscription_id' => $subscription->id,
+                'plan_id' => $plan->id,
+                'status' => $subscription->status,
+            ]);
+
+            return $subscription;
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to create subscription: ' . $e->getMessage());
+        }
     }
 }

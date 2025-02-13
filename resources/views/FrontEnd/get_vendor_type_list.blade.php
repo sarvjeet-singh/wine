@@ -132,84 +132,89 @@
                 </div>
                 <p class="desc mb-3">{{ $vendor->description }}</p>
                 <div class="property-feature mb-sm-0 mb-3">
-                <ul class="room-info-inner heading d-flex justify-content-between list-unstyled p-0 pt-sm-3 gap-1">
-                    @if (strtolower($vendor->vendor_type) == 'accommodation')
-                        <li class="fw-bold"> Bedrooms</li>
-                        <li class="fw-bold">Washrooms</li>
-                        <li class="fw-bold">Beds / Sleeps</li>
-                    @endif
-                    @if (strtolower($vendor->vendor_type) == 'winery')
-                        <li class="fw-bold">Farming Practices</li>
-                    @endif
-                    @if (strtolower($vendor->vendor_type) == 'excursion' || strtolower($vendor->vendor_type) == 'winery')
-                        <li class="fw-bold">Max Group</li>
-                    @endif
-                    @if (strtolower($vendor->vendor_type) == 'excursion')
-                        <li class="fw-bold">Establishment/Facility</li>
-                    @endif
-                    @if (strtolower($vendor->vendor_type) == 'winery')
-                        <li class="fw-bold">Tasting</li>
-                    @endif
-                    @if (strtolower($vendor->vendor_type) == 'winery' ||
-                            strtolower($vendor->vendor_type) == 'accommodation' ||
-                            strtolower($vendor->vendor_type) == 'excursion')
-                        <li class="fw-bold">Price Point</li>
-                    @endif
-                </ul>
-                <ul class="room-info-inner d-flex justify-content-between list-unstyled p-0 border-top pt-sm-3 gap-1">
+                    <ul class="room-info-inner heading d-flex justify-content-between list-unstyled p-0 pt-sm-3 gap-1">
+                        @if (strtolower($vendor->vendor_type) == 'accommodation')
+                            <li class="fw-bold"> Bedrooms</li>
+                            <li class="fw-bold">Washrooms</li>
+                            <li class="fw-bold">Beds / Sleeps</li>
+                        @endif
+                        @if (strtolower($vendor->vendor_type) == 'winery')
+                            <li class="fw-bold">Farming Practices</li>
+                        @endif
+                        @if (strtolower($vendor->vendor_type) == 'excursion' || strtolower($vendor->vendor_type) == 'winery')
+                            <li class="fw-bold">Max Group</li>
+                        @endif
+                        @if (strtolower($vendor->vendor_type) == 'excursion')
+                            <li class="fw-bold">Establishment/Facility</li>
+                        @endif
+                        @if (strtolower($vendor->vendor_type) == 'winery')
+                            <li class="fw-bold">Tasting</li>
+                        @endif
+                        @if (strtolower($vendor->vendor_type) == 'winery' ||
+                                strtolower($vendor->vendor_type) == 'accommodation' ||
+                                strtolower($vendor->vendor_type) == 'excursion')
+                            <li class="fw-bold">Price Point</li>
+                        @endif
+                    </ul>
+                    <ul
+                        class="room-info-inner d-flex justify-content-between list-unstyled p-0 border-top pt-sm-3 gap-1">
 
-                    {{-- Accommodation Details --}}
-                    @if (strtolower($vendor->vendor_type) == 'accommodation')
-                        <li>
-                            {{ !empty($vendor->accommodationMetadata->bedrooms) ? $vendor->accommodationMetadata->bedrooms : '-' }}
-                        </li>
-                        <li>
-                            {{ !empty($vendor->accommodationMetadata->washrooms) ? $vendor->accommodationMetadata->washrooms : '-' }}
-                        </li>
-                        <li>
-                            {{ !empty($vendor->accommodationMetadata->beds) && !empty($vendor->accommodationMetadata->sleeps)
-                                ? $vendor->accommodationMetadata->beds . ' / ' . $vendor->accommodationMetadata->sleeps
-                                : '-' }}
-                        </li>
-                    @endif
+                        {{-- Accommodation Details --}}
+                        @if (strtolower($vendor->vendor_type) == 'accommodation')
+                            <li>
+                                {{ !empty($vendor->accommodationMetadata->bedrooms) ? $vendor->accommodationMetadata->bedrooms : '-' }}
+                            </li>
+                            <li>
+                                {{ !empty($vendor->accommodationMetadata->washrooms) ? $vendor->accommodationMetadata->washrooms : '-' }}
+                            </li>
+                            <li>
+                                {{ !empty($vendor->accommodationMetadata->beds) && !empty($vendor->accommodationMetadata->sleeps)
+                                    ? $vendor->accommodationMetadata->beds . ' / ' . $vendor->accommodationMetadata->sleeps
+                                    : '-' }}
+                            </li>
+                        @endif
 
-                    {{-- Winery Farming Practices --}}
-                    @if (strtolower($vendor->vendor_type) == 'winery')
-                        <li>
-                            {{ !empty($vendor->wineryMetadata->farmingPractices->name) ? $vendor->wineryMetadata->farmingPractices->name : '-' }}
-                        </li>
-                    @endif
+                        {{-- Winery Farming Practices --}}
+                        @if (strtolower($vendor->vendor_type) == 'winery')
+                            <li>
+                                {{ !empty($vendor->wineryMetadata->farmingPractices->name) ? $vendor->wineryMetadata->farmingPractices->name : '-' }}
+                            </li>
+                        @endif
 
-                    {{-- Max Group Size for Winery or Excursion --}}
-                    @if (strtolower($vendor->vendor_type) == 'winery' || strtolower($vendor->vendor_type) == 'excursion')
-                        <li>
-                            {{ !empty($vendor->wineryMetadata->maxGroup->name) ? $vendor->wineryMetadata->maxGroup->name : '-' }}
-                            {{ !empty($vendor->excursionMetadata->maxGroup->name) ? $vendor->excursionMetadata->maxGroup->name : '-' }}
-                        </li>
-                    @endif
+                        {{-- Max Group Size for Winery or Excursion --}}
+                        @if (strtolower($vendor->vendor_type) == 'winery')
+                            <li>
+                                {{ !empty($vendor->wineryMetadata->maxGroup->name) ? $vendor->wineryMetadata->maxGroup->name : '-' }}
 
-                    {{-- Excursion Establishment --}}
-                    @if (strtolower($vendor->vendor_type) == 'excursion')
-                        <li>
-                            {{ !empty($vendor->excursionMetadata->establishments->name) ? $vendor->excursionMetadata->establishments->name : '-' }}
-                        </li>
-                    @endif
+                            </li>
+                        @endif
+                        @if (strtolower($vendor->vendor_type) == 'excursion')
+                            <li>
+                                {{ !empty($vendor->excursionMetadata->maxGroup->name) ? $vendor->excursionMetadata->maxGroup->name : '-' }}
+                            </li>
+                        @endif
+                        {{-- Excursion Establishment --}}
+                        @if (strtolower($vendor->vendor_type) == 'excursion')
+                            <li>
+                                {{ !empty($vendor->excursionMetadata->establishments->name) ? $vendor->excursionMetadata->establishments->name : '-' }}
+                            </li>
+                        @endif
 
-                    {{-- Winery Tasting Options --}}
-                    @if (strtolower($vendor->vendor_type) == 'winery')
-                        <li>
-                            {{ !empty($vendor->wineryMetadata->tastingOptions->name) ? $vendor->wineryMetadata->tastingOptions->name : '-' }}
-                        </li>
-                    @endif
+                        {{-- Winery Tasting Options --}}
+                        @if (strtolower($vendor->vendor_type) == 'winery')
+                            <li>
+                                {{ !empty($vendor->wineryMetadata->tastingOptions->name) ? $vendor->wineryMetadata->tastingOptions->name : '-' }}
+                            </li>
+                        @endif
 
-                    {{-- Price Point --}}
-                    @if (strtolower($vendor->vendor_type) == 'winery' ||
-                            strtolower($vendor->vendor_type) == 'accommodation' ||
-                            strtolower($vendor->vendor_type) == 'excursion')
-                        <li>{{ !empty($vendor->pricePoint->name) ? explode(' ', $vendor->pricePoint->name)[0] : '-' }}
-                        </li>
-                    @endif
-                </ul>
+                        {{-- Price Point --}}
+                        @if (strtolower($vendor->vendor_type) == 'winery' ||
+                                strtolower($vendor->vendor_type) == 'accommodation' ||
+                                strtolower($vendor->vendor_type) == 'excursion')
+                            <li>{{ !empty($vendor->pricePoint->name) ? explode(' ', $vendor->pricePoint->name)[0] : '-' }}
+                            </li>
+                        @endif
+                    </ul>
                 </div>
                 <div class="d-flex gap-2">
                     @if ($vendor->business_hours_count > 0)
@@ -233,8 +238,8 @@
                                     strtolower($vendor->vendor_type) == 'winery' ||
                                     strtolower($vendor->vendor_type) == 'excursion')
                                 @if (Auth::guard('customer')->check())
-                                    <button class="btn book-btn vendorinqurey text-white"
-                                        data-id="{{ $vendor->id }}" data-name="{{ $vendor->vendor_name }}">
+                                    <button class="btn book-btn vendorinqurey text-white" data-id="{{ $vendor->id }}"
+                                        data-name="{{ $vendor->vendor_name }}">
                                         Inquiry
                                     </button>
                                 @else

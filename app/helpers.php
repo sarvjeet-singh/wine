@@ -25,6 +25,13 @@ if (! function_exists('reviewsCount')) {
     }
 }
 
+if (! function_exists('approvedReviewsCount')) {
+    function approvedReviewsCount()
+    {
+        return Review::where('customer_id', Auth::id())->where('review_status', 'approved')->count();
+    }
+}
+
 if (! function_exists('sendEmail')) {
     function sendEmail($to, $subject, $emailContent)
     {
@@ -496,3 +503,34 @@ if (!function_exists('getClientIp')) {
         }
     }
 }
+
+if (! function_exists('currency_symbol')) {
+    /**
+     * Get the currency symbol based on the given currency code.
+     *
+     * @param string $currency
+     * @return string
+     */
+    function currency_symbol($currency)
+    {
+        // uppercase currency code
+        $currency = strtoupper($currency);
+        $currencySymbols = [
+            'USD' => '$',
+            'EUR' => '€',
+            'GBP' => '£',
+            'INR' => '₹',
+            'AUD' => 'A$',
+            'CAD' => 'C$',
+            'JPY' => '¥',
+            'CNY' => '¥',
+            'MXN' => '$',
+            'RUB' => '₽',
+            'BRL' => 'R$',
+            // Add any additional currencies and their symbols here
+        ];
+
+        return $currencySymbols[$currency] ?? '?'; // Return symbol or '?' if not found
+    }
+}
+

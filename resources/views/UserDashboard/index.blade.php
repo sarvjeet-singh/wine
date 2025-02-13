@@ -105,6 +105,15 @@
                             <div class="box-text">Reviews Submitted</div>
                         </div>
                     </div>
+                    <div class="col-xl-3 col-6">
+                        <div class="top-boxes">
+                            <div class="box-image">
+                                <img src="{{ asset('images/icons/reviews-box-icon.png') }}">
+                            </div>
+                            <div class="box-points">{{ approvedReviewsCount() }}</div>
+                            <div class="box-text">Approved Reviews</div>
+                        </div>
+                    </div>
                 </div>
                 <!-- User Profile Box Start -->
                 <div class="row mt-5">

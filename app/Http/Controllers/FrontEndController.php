@@ -41,18 +41,21 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\BusinessHour;
 use App\Models\TastingOption;
 use App\Helpers\SeasonHelper;
+use App\Services\DateCheckerService;
 
 class FrontEndController extends Controller
 {
+    private $dateCheckerService;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
-    {
-        // $this->middleware('auth');
+    public function __construct(
+        DateCheckerService $dateCheckerService
+    ) {
+        $this->dateCheckerService = $dateCheckerService;
     }
 
     /**
@@ -73,7 +76,7 @@ class FrontEndController extends Controller
         // // Get user's timezone
         // $userTimezone = TimezoneHelper::getUserTimezone();
         // echo $userTimezone;
-        
+
         $reviews = Review::where('review_status', 'approved')->get();
         return view('FrontEnd.home', compact('reviews'));
     }
@@ -263,7 +266,11 @@ class FrontEndController extends Controller
         if ($businessHours) {
             // Business is open today
             $openingTime = Carbon::parse($businessHours->opening_time)->format('h:i A');
-            $closingTime = Carbon::parse($businessHours->closing_time)->format('h:i A');
+            if ($businessHours->is_late == 1) {
+                $closingTime = ' (Late Closing)';
+            } else {
+                $closingTime = Carbon::parse($businessHours->closing_time)->format('h:i A');
+            }
             $isOpen = true;
         } else {
             // Business is closed today
@@ -425,7 +432,6 @@ class FrontEndController extends Controller
                     // Convert start_date and end_date to Carbon instances
                     $startDate = Carbon::parse($value->start_date);
                     $endDate = Carbon::parse($value->end_date);
-
                     // Initialize an array to hold dates for the current range
                     $rangeDates = [];
 
@@ -450,6 +456,7 @@ class FrontEndController extends Controller
                 })
                 ->get();
             foreach ($orders as $order) {
+
                 $checkin = Carbon::parse($order->check_in_at);
                 $checkout = Carbon::parse($order->check_out_at)->subDay();
 
@@ -457,7 +464,8 @@ class FrontEndController extends Controller
                 if ($checkin->lt($today)) {
                     $checkin = $today;
                 }
-
+                $checkOutOnly[] =  $checkin;
+                $checkInOnly[] =  $checkout;
                 // Generate dates between checkin and checkout
                 while ($checkin->lte($checkout)) {
                     $bookedAndBlockeddates[] = $checkin->toDateString(); // Add the date to the array
@@ -470,7 +478,11 @@ class FrontEndController extends Controller
             // Sort dates (optional)
             sort($bookedAndBlockeddates);
         }
-
+        
+        $dates_all = $this->dateCheckerService->processVendorDates($vendor_id);
+        $checkInOnly = $this->dateCheckerService->getCheckInOnlyDates();
+        $checkOutOnly = $this->dateCheckerService->getCheckOutOnlyDates();
+        $bookedAndBlockeddates = $this->dateCheckerService->getBlockedDates();
         $data['dates'] = $dates;
         $data['bookedAndBlockeddates']  = $bookedAndBlockeddates;
         $data['checkOutOnly']           = $checkOutOnly;
@@ -948,7 +960,6 @@ class FrontEndController extends Controller
 
         $currentDate = now();
         $season = SeasonHelper::getSeasonAndPrice($currentDate, $vendor->id);
-
         // Return the view with the booking details
         return view('FrontEnd.checkout', compact('booking', 'vendor', 'inquiry', 'wallet', 'season'));
     }

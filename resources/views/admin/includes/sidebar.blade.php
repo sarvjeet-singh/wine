@@ -63,6 +63,18 @@
             </a>
         </li>
         <li class="position-relative">
+            <a href="{{route('admin.plans.index')}}">
+                <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
+                <span class="link_name">Manage Stripe Plans</span>
+            </a>
+        </li>
+        <li class="position-relative">
+            <a href="{{route('admin.taxes.index')}}">
+                <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
+                <span class="link_name">Manage Stripe Taxes</span>
+            </a>
+        </li>
+        <li class="position-relative">
             <a href="{{route('admin.wallet.index')}}">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
                 <span class="link_name">Manage Bottle Bucks</span>

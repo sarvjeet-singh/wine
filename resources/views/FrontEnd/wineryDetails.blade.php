@@ -188,9 +188,11 @@
         }
     </style>
 
-    @if ((Auth::guard('customer')->check() == 1 &&
-        ($user->date_of_birth && \Carbon\Carbon::parse($user->date_of_birth)->age >= 18)) ||
-            Auth::guard('vendor')->check() == 1 || !Auth::check())
+    @if (
+        (Auth::guard('customer')->check() == 1 &&
+            ($user->date_of_birth && \Carbon\Carbon::parse($user->date_of_birth)->age >= 18)) ||
+            Auth::guard('vendor')->check() == 1 ||
+            !Auth::check())
 
         <div class="container mt-5 frontend detail-page">
 
@@ -209,17 +211,36 @@
                                     <div class="left child">
 
                                         <div class="property-gallery-main">
-
                                             @if ($vendor->mediaGallery->isNotEmpty())
                                                 @foreach ($vendor->mediaGallery as $media)
-                                                    <div class="item">
-
-                                                        <img src="{{ asset($media->vendor_media) }}">
-
-                                                    </div>
+                                                    @if ($media->vendor_media_type == 'image')
+                                                        <div class="item">
+                                                            <img src="{{ asset($media->vendor_media) }}">
+                                                        </div>
+                                                    @else
+                                                        @php
+                                                            // Extract YouTube Video ID from URL
+                                                            preg_match(
+                                                                '/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/',
+                                                                $media->vendor_media,
+                                                                $matches,
+                                                            );
+                                                            $videoId = $matches[1] ?? null;
+                                                        @endphp
+                                                        <div class="item">
+                                                            @if ($videoId)
+                                                                <div class="item">
+                                                                    <a href="{{ $media->vendor_media }}" target="_blank">
+                                                                        <img src="https://img.youtube.com/vi/{{ $videoId }}/hqdefault.jpg"
+                                                                            alt="YouTube Thumbnail"
+                                                                            style="width: 100%; border-radius: 10px;">
+                                                                    </a>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    @endif
                                                 @endforeach
                                             @endif
-
                                         </div>
 
                                     </div>
@@ -227,19 +248,22 @@
 
 
                                     <div class="right child">
-
                                         <div class="property-gallery-thumb">
-
                                             @if ($vendor->mediaGallery->isNotEmpty())
                                                 @foreach ($vendor->mediaGallery as $media)
-                                                    <div class="item">
-
-                                                        <img src="{{ asset($media->vendor_media) }}">
-
-                                                    </div>
+                                                    @if ($media->vendor_media_type == 'image')
+                                                        <div class="item">
+                                                            <img src="{{ asset($media->vendor_media) }}">
+                                                        </div>
+                                                    @else
+                                                        <div class="item">
+                                                            <iframe width="100%" height="390px"
+                                                                src="{{ $media->vendor_media }}" frameborder="0"
+                                                                allowfullscreen></iframe>
+                                                        </div>
+                                                    @endif
                                                 @endforeach
                                             @endif
-
                                         </div>
 
                                         <div class="nav-arrows">
@@ -347,7 +371,8 @@
 
                                     <li>{{ $vendor->wineryMetadata->tastingOptions->name ?? '' }}</li>
 
-                                    <li>{{ $vendor->pricePoint->name ?? '-' }}</li>
+                                    <li>{{ !empty($vendor->pricePoint->name) ? explode(' ', $vendor->pricePoint->name)[0] : '-' }}
+                                    </li>
 
                                 </ul>
 
@@ -568,13 +593,13 @@
 
                             </div>
 
-                            <div class="d-flex justify-content-between">
+                            {{-- <div class="d-flex justify-content-between">
 
                                 <span class="fa-lg">Booking Rate:</span>
 
                                 <strong class="fa-lg text-muted"></strong>
 
-                            </div>
+                            </div> --}}
 
                             <div class="d-flex justify-content-between">
 
@@ -1032,39 +1057,39 @@
 
                                         <!-- <tr>
 
-                                                                                                                                                                                                                    <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
+                                                                                                                                                                                                                            <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
 
-                                                                                                                                                                                                                    <td>Standard</td>
+                                                                                                                                                                                                                            <td>Standard</td>
 
-                                                                                                                                                                                                                    <td class="room-avail">Available</td>
+                                                                                                                                                                                                                            <td class="room-avail">Available</td>
 
-                                                                                                                                                                                                                    <td>
+                                                                                                                                                                                                                            <td>
 
-                                                                                                                                                                                                                        <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+                                                                                                                                                                                                                                <span class="room-price d-block fw-bold mb-2">$499/per night</span>
 
-                                                                                                                                                                                                                        <button class="btn">Select Room</button>
+                                                                                                                                                                                                                                <button class="btn">Select Room</button>
 
-                                                                                                                                                                                                                    </td>
+                                                                                                                                                                                                                            </td>
 
-                                                                                                                                                                                                                </tr>
+                                                                                                                                                                                                                        </tr>
 
-                                                                                                                                                                                                                <tr>
+                                                                                                                                                                                                                        <tr>
 
-                                                                                                                                                                                                                <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
+                                                                                                                                                                                                                        <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
 
-                                                                                                                                                                                                                    <td>Standard</td>
+                                                                                                                                                                                                                            <td>Standard</td>
 
-                                                                                                                                                                                                                    <td class="room-not-avail">Not Available</td>
+                                                                                                                                                                                                                            <td class="room-not-avail">Not Available</td>
 
-                                                                                                                                                                                                                    <td>
+                                                                                                                                                                                                                            <td>
 
-                                                                                                                                                                                                                        <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+                                                                                                                                                                                                                                <span class="room-price d-block fw-bold mb-2">$499/per night</span>
 
-                                                                                                                                                                                                                        <button class="btn">Select Room</button>
+                                                                                                                                                                                                                                <button class="btn">Select Room</button>
 
-                                                                                                                                                                                                                    </td>
+                                                                                                                                                                                                                            </td>
 
-                                                                                                                                                                                                                </tr> -->
+                                                                                                                                                                                                                        </tr> -->
 
                                     </tbody>
 
@@ -2164,6 +2189,15 @@
 
             asNavFor: $gl
 
+        });
+
+        // **Fix autoplay issue for YouTube videos**
+        $gl.on('beforeChange', function(event, slick, currentSlide, nextSlide) {
+            let iframe = $('.property-gallery-main').find('iframe');
+            iframe.each(function() {
+                let src = $(this).attr('src');
+                $(this).attr('src', src); // Stop video when changing slide
+            });
         });
 
 

@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('email:weekly-registered-users')->weeklyOn(1, '8:00'); // Every Monday at 8 AM
         $schedule->command('subscriptions:check-expired')->dailyAt('00:00');
         $schedule->command('customers:delete-unverified')->dailyAt('00:00');
-        $schedule->command('email:test')->dailyAt('00:00');
+        // $schedule->command('email:test')->dailyAt('00:00');
         $schedule->command('database:backup')->dailyAt('02:00'); // Runs at 2 AM daily
         $schedule->command('stripe:check-payout-status')->hourly();
         $schedule->command('payments:capture')->daily('00:00');

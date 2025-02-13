@@ -22,7 +22,7 @@
                         <h5 class="theme-color mb-0 fs-6">
                             {{ !empty($vendor->sub_category->name) ? $vendor->sub_category->name : '' }}</h5>
                         <!-- <div class="rating-star d-flex align-items-center"
-                                                                                                                                                                                                data-rating="{{ $vendor->reviews->avg('rating') ?? 0.0 }}"></div> -->
+                                                                                                                                                                                                                        data-rating="{{ $vendor->reviews->avg('rating') ?? 0.0 }}"></div> -->
                     </div>
                     <h3 class="card-title mt-2 mb-2 fw-bold" style="font-size: 15px;">{{ $vendor->vendor_name }}</h3>
                     <div class="info d-flex align-items-baseline gap-2 mb-2">
@@ -75,107 +75,113 @@
                         <div class="guest-details border-bottom p-sm-4 p-3">
                             <h3 class="text-dark fw-bold fs-5 mb-3"><i class="fa-solid fa-user-group"></i> Guest Details
                             </h3>
-                            <form id="checkout-form" method="post" action="">
-                                <div class="row mt-3">
-                                    <div class="col-sm-6 col-12 mb-sm-0 mb-3">
-                                        <label class="form-label">Name</label>
-                                        <input type="text" class="form-control" name="name"
-                                            value="{{ Auth::user()->firstname }} {{ Auth::user()->lastname }}"
-                                            placeholder="Enter Your Name">
+                            @if (empty($inquiry->apk))
+                                <form id="checkout-form" method="post" action="">
+                                    <div class="row mt-3">
+                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3">
+                                            <label class="form-label">Name</label>
+                                            <input type="text" class="form-control" name="name"
+                                                value="{{ Auth::user()->firstname }} {{ Auth::user()->lastname }}"
+                                                placeholder="Enter Your Name">
+                                        </div>
+                                        <div class="col-sm-6 col-12">
+                                            <label class="form-label">eMail</label>
+                                            <input type="email" class="form-control" name="email_address"
+                                                value="{{ Auth::user()->email }}" placeholder="Enter Your eMail">
+                                        </div>
                                     </div>
-                                    <div class="col-sm-6 col-12">
-                                        <label class="form-label">eMail</label>
-                                        <input type="email" class="form-control" name="email_address"
-                                            value="{{ Auth::user()->email }}" placeholder="Enter Your eMail">
+                                    <div class="row mt-3">
+                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3">
+                                            <label class="form-label">Contact Ph#</label>
+                                            <input type="text" class="form-control  phone-number" name="contact_number"
+                                                value="{{ Auth::user()->contact_number }}"
+                                                placeholder="Enter Contact Phone">
+                                        </div>
+                                        <div class="col-sm-6 col-12">
+                                            <label class="form-label">Street Address:</label>
+                                            <input type="text" class="form-control" name="street_address"
+                                                value="{{ Auth::user()->street_address }}"
+                                                placeholder="Enter Street Address:">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-sm-6 col-12 mb-sm-0 mb-3">
-                                        <label class="form-label">Contact Ph#</label>
-                                        <input type="text" class="form-control  phone-number" name="contact_number"
-                                            value="{{ Auth::user()->contact_number }}" placeholder="Enter Contact Phone">
+                                    <div class="row mt-3">
+                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3">
+                                            <label class="form-label">Unit/Suite#</label>
+                                            <input type="text" class="form-control" name="suite"
+                                                value="{{ Auth::user()->suite }}" placeholder="Enter Unit/Suite#">
+                                        </div>
+                                        <div class="col-sm-6 col-12">
+                                            <label class="form-label">City/Town<span class="required-filed">*</span></label>
+                                            <input type="text" class="form-control" name="city"
+                                                value="{{ Auth::user()->city }}" placeholder="Enter City/Town">
+                                        </div>
                                     </div>
-                                    <div class="col-sm-6 col-12">
-                                        <label class="form-label">Street Address:</label>
-                                        <input type="text" class="form-control" name="street_address"
-                                            value="{{ Auth::user()->street_address }}" placeholder="Enter Street Address:">
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-sm-6 col-12 mb-sm-0 mb-3">
-                                        <label class="form-label">Unit/Suite#</label>
-                                        <input type="text" class="form-control" name="suite"
-                                            value="{{ Auth::user()->suite }}" placeholder="Enter Unit/Suite#">
-                                    </div>
-                                    <div class="col-sm-6 col-12">
-                                        <label class="form-label">City/Town<span class="required-filed">*</span></label>
-                                        <input type="text" class="form-control" name="city"
-                                            value="{{ Auth::user()->city }}" placeholder="Enter City/Town">
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-sm-6 col-12">
-                                        <label class="form-label">Country</label>
-                                        <select name="country" id="country" class="form-select">
-                                            <option value="">Select Country</option>
-                                            @foreach (getCountries() as $country)
-                                                <option data-id="{{ $country->id }}" value="{{ $country->name }}"
-                                                    {{ old('country', Auth::user()->country ?? '') == $country->name ? 'selected' : '' }}>
-                                                    {{ $country->name }}
+                                    <div class="row mt-3">
+                                        <div class="col-sm-6 col-12">
+                                            <label class="form-label">Country</label>
+                                            <select name="country" id="country" class="form-select">
+                                                <option value="">Select Country</option>
+                                                @foreach (getCountries() as $country)
+                                                    <option data-id="{{ $country->id }}" value="{{ $country->name }}"
+                                                        {{ old('country', Auth::user()->country ?? '') == $country->name ? 'selected' : '' }}>
+                                                        {{ $country->name }}
+                                                    </option>
+                                                @endforeach
+                                                <option value="Other"
+                                                    {{ old('country', Auth::user()->is_other_country ? 'Other' : '') == 'Other' ? 'selected' : '' }}>
+                                                    Other
                                                 </option>
-                                            @endforeach
-                                            <option value="Other"
-                                                {{ old('country', Auth::user()->is_other_country ? 'Other' : '') == 'Other' ? 'selected' : '' }}>
-                                                Other
-                                            </option>
-                                        </select>
-                                        @error('country')
-                                            <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                            </select>
+                                            @error('country')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
 
-                                    <div class="col-sm-6 col-12 mb-sm-0 mb-3" id="state-wrapper" style="display: none;">
-                                        <label class="form-label">State</label>
-                                        <select name="state" id="state" class="form-select">
-                                            <option value="">Select State</option>
-                                            {{-- States will be dynamically loaded via JS --}}
-                                        </select>
-                                        @error('state')
-                                            <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3" id="state-wrapper"
+                                            style="display: none;">
+                                            <label class="form-label">State</label>
+                                            <select name="state" id="state" class="form-select">
+                                                <option value="">Select State</option>
+                                                {{-- States will be dynamically loaded via JS --}}
+                                            </select>
+                                            @error('state')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
 
-                                    <div class="col-sm-6 col-12 mb-sm-0 mb-3" id="other-country-wrapper"
-                                        style="display: none;">
-                                        <label class="form-label">Other Country</label>
-                                        <input type="text" name="other_country" id="other-country"
-                                            class="form-control"
-                                            value="{{ old('other_country', Auth::user()->other_country ?? '') }}">
-                                        @error('other_country')
-                                            <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3" id="other-country-wrapper"
+                                            style="display: none;">
+                                            <label class="form-label">Other Country</label>
+                                            <input type="text" name="other_country" id="other-country"
+                                                class="form-control"
+                                                value="{{ old('other_country', Auth::user()->other_country ?? '') }}">
+                                            @error('other_country')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
 
-                                    <div class="col-sm-6 col-12 mb-sm-0 mb-3" id="other-state-wrapper"
-                                        style="display: none;">
-                                        <label class="form-label">Other State</label>
-                                        <input type="text" name="other_state" id="other-state" class="form-control"
-                                            value="{{ old('other_state', Auth::user()->other_state ?? '') }}">
-                                        @error('other_state')
-                                            <div class="text-danger">{{ $message }}</div>
-                                        @enderror
+                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3" id="other-state-wrapper"
+                                            style="display: none;">
+                                            <label class="form-label">Other State</label>
+                                            <input type="text" name="other_state" id="other-state"
+                                                class="form-control"
+                                                value="{{ old('other_state', Auth::user()->other_state ?? '') }}">
+                                            @error('other_state')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-sm-12 col-12">
-                                        <label for="email" class="form-label">Postal Code/Zip<span
-                                                class="required-filed">*</span></label>
-                                        <input type="text" class="form-control" name="postal_code" maxlength="7"
-                                            oninput="formatPostalCode(this)" placeholder="Enter Postal Code/Zip"
-                                            value="{{ Auth::user()->postal_code }}">
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 col-12">
+                                            <label for="email" class="form-label">Postal Code/Zip<span
+                                                    class="required-filed">*</span></label>
+                                            <input type="text" class="form-control" name="postal_code" maxlength="7"
+                                                oninput="formatPostalCode(this)" placeholder="Enter Postal Code/Zip"
+                                                value="{{ Auth::user()->postal_code }}">
+                                        </div>
                                     </div>
-                                </div>
-                            </form>
+                                </form>
+                            @endif
                         </div>
                         <div class="booking-details border-bottom p-sm-4 p-3">
                             <h3 class="text-dark fw-bold fs-5 mb-3"><i class="fa-solid fa-calendar-day"></i> Booking
@@ -480,7 +486,7 @@
                                         @if ($inquiry && $inquiry->rate_basic && $inquiry->nights_count)
                                             ${{ $booking_total = number_format($inquiry->rate_basic * $inquiry->nights_count, 2, '.', '') }}
                                         @else
-                                            $0.00
+                                            ${{ isset($season['price']) ? number_format($season['price'], 2, '.', '') : number_format($vendor->pricing->current_rate ?? 0, 2, '.', '') }}
                                         @endif
                                     </p>
                                 </div>
@@ -678,7 +684,8 @@
 
 @section('js')
     <script>
-        const originalButtonText = document.getElementById('submit-button').textContent;
+        const submitButton = document.getElementById('submit-button');
+        const originalButtonText = submitButton ? submitButton.textContent : '';
     </script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
     <script>
@@ -764,75 +771,75 @@
         </script>
     @endif
 
-    @if ($vendor->accommodationMetadata->process_type == 'one-step' || !empty($booking->apk))
-        <script>
-            $('.experience_upgrades').change(function() {
-                experienceCalculation();
+    {{-- @if ($vendor->accommodationMetadata->process_type == 'one-step' || !empty($booking->apk)) --}}
+    <script>
+        $('.experience_upgrades').change(function() {
+            experienceCalculation();
+        });
+
+        function experienceCalculation() {
+            var experience_total = 0;
+            var sub_total = parseFloat($("#sub_total").attr('data-value'));
+
+            // Iterate over all checked checkboxes and sum their values
+            $('.experience_upgrades:checked').each(function() {
+                experience_total += parseFloat($(this).val());
             });
 
-            function experienceCalculation() {
-                var experience_total = 0;
-                var sub_total = parseFloat($("#sub_total").attr('data-value'));
+            // Calculate the total based on the summed experience_total
+            var total = experience_total + sub_total;
 
-                // Iterate over all checked checkboxes and sum their values
-                $('.experience_upgrades:checked').each(function() {
-                    experience_total += parseFloat($(this).val());
-                });
+            // Update the data-value attribute and the displayed total
+            $("#experiencetotal").attr('data-value', experience_total.toFixed(2));
+            $("#experiencetotal").html('$' + experience_total.toFixed(2));
+            $("#total").html('$' + total.toFixed(2)); // Assuming you have an element with id 'total' for the final total
 
-                // Calculate the total based on the summed experience_total
-                var total = experience_total + sub_total;
+            priceCalculation(); // Call your price calculation function
+        }
 
-                // Update the data-value attribute and the displayed total
-                $("#experiencetotal").attr('data-value', experience_total.toFixed(2));
-                $("#experiencetotal").html('$' + experience_total.toFixed(2));
-                $("#total").html('$' + total.toFixed(2)); // Assuming you have an element with id 'total' for the final total
+        function priceCalculation() {
+            var booking_total = parseFloat($("#bookingTotal").attr('data-value')) || 0;
+            var experience_total = parseFloat($("#experiencetotal").attr('data-value')) || 0;
+            var sundry_total = parseFloat($("#sundryTotal").attr('data-value')) || 0;
+            var tax_rate = parseFloat($("#taxTotal").attr('data-value')) || 0;
 
-                priceCalculation(); // Call your price calculation function
+            var wallet_used = parseFloat($('#wallet_used').val()) || 0;
+
+            $("#bottle_bucks").text('$' + wallet_used.toFixed(2));
+
+            // Calculate the subtotal before tax
+            var subtotal = booking_total + experience_total + sundry_total - wallet_used;
+
+            // Calculate the tax based on the subtotal
+            var taxtotal = subtotal * (tax_rate / 100);
+
+            // Calculate the final total including tax
+            var total = subtotal + taxtotal;
+            $("#booking_total").text('$' + booking_total.toFixed(2));
+            $("#experience_total").text('$' + experience_total.toFixed(2));
+            $("#sundry_total").text('$' + sundry_total.toFixed(2));
+            $("#sub_total").text('$' + subtotal.toFixed(2));
+            $("#taxTotal").text('$' + taxtotal.toFixed(2));
+            $("#fulltotal").html('$' + total.toFixed(2));
+        }
+        $(function() {
+            experienceCalculation();
+            priceCalculation();
+        })
+
+        function toggleContent(index) {
+            var content = document.getElementById('collapseExample' + index);
+            var link = document.getElementById('toggleContent' + index);
+            if (content.style.display === "none") {
+                content.style.display = "block";
+                link.textContent = "View Less";
+            } else {
+                content.style.display = "none";
+                link.textContent = "View More";
             }
-
-            function priceCalculation() {
-                var booking_total = parseFloat($("#bookingTotal").attr('data-value')) || 0;
-                var experience_total = parseFloat($("#experiencetotal").attr('data-value')) || 0;
-                var sundry_total = parseFloat($("#sundryTotal").attr('data-value')) || 0;
-                var tax_rate = parseFloat($("#taxTotal").attr('data-value')) || 0;
-
-                var wallet_used = parseFloat($('#wallet_used').val()) || 0;
-
-                $("#bottle_bucks").text('$' + wallet_used.toFixed(2));
-
-                // Calculate the subtotal before tax
-                var subtotal = booking_total + experience_total + sundry_total - wallet_used;
-
-                // Calculate the tax based on the subtotal
-                var taxtotal = subtotal * (tax_rate / 100);
-
-                // Calculate the final total including tax
-                var total = subtotal + taxtotal;
-                $("#booking_total").text('$' + booking_total.toFixed(2));
-                $("#experience_total").text('$' + experience_total.toFixed(2));
-                $("#sundry_total").text('$' + sundry_total.toFixed(2));
-                $("#sub_total").text('$' + subtotal.toFixed(2));
-                $("#taxTotal").text('$' + taxtotal.toFixed(2));
-                $("#fulltotal").html('$' + total.toFixed(2));
-            }
-            $(function() {
-                experienceCalculation();
-                priceCalculation();
-            })
-
-            function toggleContent(index) {
-                var content = document.getElementById('collapseExample' + index);
-                var link = document.getElementById('toggleContent' + index);
-                if (content.style.display === "none") {
-                    content.style.display = "block";
-                    link.textContent = "View Less";
-                } else {
-                    content.style.display = "none";
-                    link.textContent = "View More";
-                }
-            }
-        </script>
-    @endif
+        }
+    </script>
+    {{-- @endif --}}
     <script>
         $(document).ready(function() {
             $("#send-inquiry").on("click", async function() {
@@ -841,7 +848,7 @@
                     $('.experience_upgrades:checked').each(function() {
                         selectedExperiences.push({
                             name: $(this).next('label').text()
-                        .trim(), // Get experience title
+                                .trim(), // Get experience title
                             value: $(this).val() // Get upgrade fee
                         });
                     });
@@ -850,7 +857,7 @@
                         let formData = new FormData(document.getElementById("checkout-form"));
                         formData.append('selectedExperiences', JSON.stringify(selectedExperiences));
                         formData.append('_token',
-                        '{{ csrf_token() }}'); // Ensure CSRF token is included
+                            '{{ csrf_token() }}'); // Ensure CSRF token is included
 
                         $("#send-inquiry").prop("disabled", true).html('Sending...');
 
@@ -1202,7 +1209,7 @@
                         showConfirmButton: false
                     });
 
-                    window.location.href = '{{ route('user.orderDetail', ['id' => ':id']) }}'.replace(':id', order_id);
+                    window.location.href = '{{ route('order.thankyou', ['id' => ':id']) }}'.replace(':id', order_id);
                     // resetCheckoutForm();
                     restorePayButton();
                 } else if (intent.status === "succeeded") {
@@ -1220,7 +1227,7 @@
                         showConfirmButton: false
                     });
 
-                    window.location.href = '{{ route('user.orderDetail', ['id' => ':id']) }}'.replace(':id', order_id);
+                    window.location.href = '{{ route('order.thankyou', ['id' => ':id']) }}'.replace(':id', order_id);
                     // resetCheckoutForm();
                     restorePayButton();
                 } else if (intent.status === "requires_capture") {
@@ -1238,7 +1245,7 @@
                         showConfirmButton: false
                     });
 
-                    window.location.href = '{{ route('user.orderDetail', ['id' => ':id']) }}'.replace(':id', order_id);
+                    window.location.href = '{{ route('order.thankyou', ['id' => ':id']) }}'.replace(':id', order_id);
                     // resetCheckoutForm();
                     restorePayButton();
                 }
@@ -1287,7 +1294,7 @@
                             showConfirmButton: false
                         }).then(() => {
                             window.location.href =
-                                '{{ route('user.orderDetail', ['id' => ':orderid']) }}'.replace(':orderid',
+                                '{{ route('order.thankyou', ['id' => ':orderid']) }}'.replace(':orderid',
                                     order_id);
                             // resetCheckoutForm(); // Reset the checkout form
                             restorePayButton(); // Restore the button after success
@@ -1435,9 +1442,43 @@
             //     return false;
             // }
             const formData = new FormData();
+            @if (isset($inquiry) && !empty($inquiry->apk))
+                const $payButton = $(this);
+                // Save the original button text globally
+
+                // Change button to show spinner
+                $payButton.html(
+                    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'
+                );
+                $payButton.prop('disabled', true); // Disable button to prevent multiple clicks
+
+                // Append data from both forms
+
+                if ($("#selectedPaymentMethodId").val() != null) {
+                    formData.append("payment_method_id", $("#selectedPaymentMethodId").val());
+                }
+                formData.append('wallet_used', $('#wallet_used').val() || 0.00);
+                fetch('{{ route('orders.authorize-payment') }}', {
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-Token": $('meta[name="csrf-token"]').attr('content'),
+                            "Accept": "application/json"
+                        },
+                        body: formData
+                    })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        // if (data.client_secret && data.order_id) {
+                        handlePayment(data.client_secret, data.order_id, data.intent_type);
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        restorePayButton(); // Restore the button on error
+                    });
+            @else
             if ($("#checkout-form").valid()) {
                 const $payButton = $(this);
-                 // Save the original button text globally
+                // Save the original button text globally
 
                 // Change button to show spinner
                 $payButton.html(
@@ -1478,6 +1519,7 @@
                         restorePayButton(); // Restore the button on error
                     });
             }
+            @endif
         });
 
         function storeTransactionDetails(details = null) {

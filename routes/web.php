@@ -41,6 +41,10 @@ use App\Http\Controllers\Admin\UserEmailController as AdminUserEmailController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\StripeController as AdminStripeController;
+use App\Http\Controllers\Admin\TaxController as AdminTaxController;
+use App\Http\Controllers\Admin\PlanController as AdminPlanController;
+use App\Http\Controllers\Admin\PlanSyncController as AdminPlanSyncController;
+use App\Http\Controllers\Admin\TaxSyncController as AdminTaxSyncController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\Auth\VendorAuthController;
@@ -263,7 +267,7 @@ Route::get('user/inquiries/{id}', [UserDashboardController::class, 'inquiryDetai
 
 Route::post('orders/authorize-payment', [OrderController::class, 'authorizePayment'])->name('orders.authorize-payment');
 Route::post('orders/send-inquiry', [OrderController::class, 'sendInquiry'])->name('orders.send-inquiry');
-
+Route::get('/order/thankyou/{id}', [OrderController::class, 'thankYou'])->name('order.thankyou');
 // ================= CUSTOMER ============== //
 // Stripe Routes for customer
 Route::get('/user/list-payment-methods', [CustomerPaymentController::class, 'listPaymentMethods'])->name('customer.list-payment-methods');
@@ -440,6 +444,14 @@ Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('adm
 
 // Admin routes protected by middleware
 Route::middleware(['auth:admin'])->group(function () {
+    Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
+        Route::get('plans/sync', [AdminPlanSyncController::class, 'index'])->name('plans.sync.index');
+        Route::post('plans/sync', [AdminPlanSyncController::class, 'sync'])->name('plans.sync');
+        Route::get('taxes/sync', [AdminTaxSyncController::class, 'index'])->name('taxes.sync.index');
+        Route::post('taxes/sync', [AdminTaxSyncController::class, 'sync'])->name('taxes.sync');
+        Route::resource('plans', AdminPlanController::class)->names('plans');
+        Route::resource('taxes', AdminTaxController::class)->names('taxes');
+    });
     Route::post('/check-vendor-combination', [AdminVendorController::class, 'checkVendorCombination'])->name('check.vendor.combination');
     Route::get('/admin/filter/search', [AdminVendorController::class, 'filterSearch'])->name('admin.vendors.search');
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');

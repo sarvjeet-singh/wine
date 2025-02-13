@@ -91,23 +91,25 @@ class OrderController extends Controller
 
     public function authorizePayment(Request $request)
     {
-        $request->validate([
-            // Billing Address
-            'name' => 'required|string',
-            'email_address' => 'required|string',
-            'contact_number' => 'required|string',
-            'street_address' => 'required|string',
-            'suite' => 'nullable|string',
-            'city' => 'required|string',
-            'country' => 'required|string',
-            'state' => 'required|string',
-            'postal_code' => 'required|string',
-            "payment_method_id" => 'nullable|string',
-            'wallet_used' => 'required|string',
-        ]);
+        $booking = Session::get('booking');
+        if (empty($booking['apk'])) {
+            $request->validate([
+                // Billing Address
+                'name' => 'required|string',
+                'email_address' => 'required|string',
+                'contact_number' => 'required|string',
+                'street_address' => 'required|string',
+                'suite' => 'nullable|string',
+                'city' => 'required|string',
+                'country' => 'required|string',
+                'state' => 'required|string',
+                'postal_code' => 'required|string',
+                "payment_method_id" => 'nullable|string',
+                'wallet_used' => 'required|string',
+            ]);
+        }
 
         try {
-            $booking = Session::get('booking');
             $booking_data = $request->all();
             $customer = Auth::guard('customer')->user();
             $currentDate = now();
@@ -117,10 +119,12 @@ class OrderController extends Controller
             if ($request->wallet_used > 0 && ($wallet->balance >= $request->wallet_used)) {
                 $wallet_used = $request->wallet_used;
             }
+            $total_experiences = 0;
             if (isset($booking_data['selectedExperiences']) && !empty($booking_data['selectedExperiences'])) {
                 $booking_data['selectedExperiences'] = json_decode($booking_data['selectedExperiences'], true);
+                $total_experiences = number_format(array_sum(array_column($booking_data['selectedExperiences'], 'value')), 2, '.', '');
             }
-            $total_experiences = number_format(array_sum(array_column($booking_data['selectedExperiences'], 'value')), 2, '.', '');
+
             $vendor = Vendor::with('pricing')->where('id', $booking['vendor_id'])->first();
             $cleaning_fee = number_format(!empty($vendor->accommodationMetadata->cleaning_fee_amount) ? $vendor->accommodationMetadata->cleaning_fee_amount : 0, 2, '.', '');
             $security_deposit = number_format(!empty($vendor->accommodationMetadata->security_deposit_amount) ? $vendor->accommodationMetadata->security_deposit_amount : 0, 2, '.', '');
@@ -146,9 +150,41 @@ class OrderController extends Controller
                 $tax_rate = $inquiry->tax_rate;
                 $order_total = number_format($inquiry->order_total, 2, '.', '');
                 $inquiry_id = $inquiry->id;
+                if ($customer->form_guest_registry_filled != 1) {
+                    if (!empty($booking['apk'])) {
+                        $customer->contact_number = $inquiry->phone;
+                        $customer->street_address = $inquiry->street_address;
+                        $customer->suite = $inquiry->suite;
+                        $customer->city = $inquiry->city;
+                        $customer->country = $inquiry->country;
+                        $customer->state = $inquiry->state;
+                        $customer->postal_code = $inquiry->postal_code;
+                        // $customer->other_country = $request->other_country;
+                        // $customer->other_state = $request->other_state;
+                        // if ($customer->country == 'Other') {
+                        //     $customer->is_other_country = 1;
+                        // }
+                        $customer->form_guest_registry_filled = 1;
+                        $customer->save();
+                    }
+                }
+
+                if (!empty($booking['apk'])) {
+                    $order = [
+                        'name' => $inquiry->name,
+                        'email' => $inquiry->email,
+                        'phone' => $inquiry->phone,
+                        'street_address' => $inquiry->street_address,
+                        'suite' => $inquiry->suite,
+                        'city' => $inquiry->city,
+                        'state' => $inquiry->state,
+                        'country' => $inquiry->country,
+                        'postal_code' => $inquiry->postal_code,
+                    ];
+                }
             }
 
-            if ($customer->form_guest_registry_filled != 1) {
+            if ($customer->form_guest_registry_filled != 1 && empty($booking['apk'])) {
                 $customer->contact_number = $request->contact_number;
                 $customer->street_address = $request->street_address;
                 $customer->suite = $request->suite;
@@ -165,18 +201,23 @@ class OrderController extends Controller
                 $customer->save();
             }
 
-            $order = [
+            if (empty($booking['apk'])) {
+                $order = [
+                    'name' => $request->name,
+                    'email' => $request->email_address,
+                    'phone' => $request->contact_number,
+                    'street_address' => $request->street_address,
+                    'suite' => $request->suite,
+                    'city' => $request->city,
+                    'state' => $request->state,
+                    'country' => $request->country,
+                    'postal_code' => $request->postal_code,
+                ];
+            }
+
+            $order += [
                 'customer_id' => Auth::guard('customer')->user()->id,
                 'vendor_id' => $booking['vendor_id'],
-                'name' => $request->name,
-                'email' => $request->email_address,
-                'phone' => $request->contact_number,
-                'street_address' => $request->street_address,
-                'suite' => $request->suite,
-                'city' => $request->city,
-                'state' => $request->state,
-                'country' => $request->country,
-                'postal_code' => $request->postal_code,
                 'check_in_at' => $booking['start_date'],
                 'check_out_at' => $booking['end_date'],
                 'nights_count' => $booking['days'],
@@ -185,7 +226,9 @@ class OrderController extends Controller
                 'rate_basic' => $rate_basic,
                 'guest_name' => $customer->firstname . ' ' . $customer->lastname,
                 'guest_email' => $customer->email,
-                'experiences_selected' => json_encode($booking_data['selectedExperiences'], JSON_UNESCAPED_UNICODE),
+                'experiences_selected' => isset($booking_data['selectedExperiences'])
+                    ? json_encode($booking_data['selectedExperiences'], JSON_UNESCAPED_UNICODE)
+                    : '[]',
                 'experiences_total' => $experiences_total,
                 'cleaning_fee' => $cleaning_fee,
                 'security_deposit' => $security_deposit,
@@ -197,7 +240,7 @@ class OrderController extends Controller
             ];
             // Create order
             $order = Order::create($order);
-            if($wallet_used > 0){
+            if ($wallet_used > 0) {
                 app(WalletController::class)->useWallet($customer, $wallet_used, $order->id);
             }
             $customer = Auth::guard('customer')->user();
@@ -263,10 +306,12 @@ class OrderController extends Controller
         $booking_data = $request->all();
         $currentDate = now();
         $season = SeasonHelper::getSeasonAndPrice($currentDate, $booking['vendor_id']);
+        $total_experiences = 0;
         if (isset($booking_data['selectedExperiences']) && !empty($booking_data['selectedExperiences'])) {
             $booking_data['selectedExperiences'] = json_decode($booking_data['selectedExperiences'], true);
+            $total_experiences = number_format(array_sum(array_column($booking_data['selectedExperiences'], 'value')), 2, '.', '');
         }
-        $total_experiences = number_format(array_sum(array_column($booking_data['selectedExperiences'], 'value')), 2, '.', '');
+
         $vendor = Vendor::with('pricing')->where('id', $booking['vendor_id'])->first();
         $cleaning_fee = number_format(!empty($vendor->accommodationMetadata->cleaning_fee_amount) ? $vendor->accommodationMetadata->cleaning_fee_amount : 0, 2, '.', '');
         $security_deposit = number_format(!empty($vendor->accommodationMetadata->security_deposit_amount) ? $vendor->accommodationMetadata->security_deposit_amount : 0, 2, '.', '');
@@ -308,7 +353,9 @@ class OrderController extends Controller
         $inquiry = Inquiry::create($inquiryData);
         if (!empty($inquiry)) {
             Session::forget('booking');
-            Mail::to($vendor->vendor_email)->send(new VendorInquiryMail($inquiryData, $vendor));
+            if (!empty($vendor->vendor_email)) {
+                Mail::to($vendor->vendor_email)->send(new VendorInquiryMail($inquiryData, $vendor));
+            }
             return response()->json(['success' => true, "redirect_url" => route('user-inquiries', $vendor->id), "message" => 'Inquiry sent successfully', 'inquiry_id' => $inquiry->id]);
         } else {
             return response()->json(['success' => false, "data" => [], "message" => 'Something went wrong try again']);
@@ -358,5 +405,13 @@ class OrderController extends Controller
             'success' => false,
             'message' => 'Failed to store transaction details.',
         ], 500);
+    }
+
+    public function thankYou(Request $request, $order_id)
+    {
+        if(Session::has('orderCompleted')) {
+            Session::forget('orderCompleted');
+        }
+        return view('FrontEnd.thank-you', compact('order_id'));
     }
 }

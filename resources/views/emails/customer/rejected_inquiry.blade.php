@@ -26,7 +26,7 @@
             </ul>
         @endif
 
-        <p><strong>Total Amount:</strong> ${{ $inquiry->experiences_total ?? '0.00' }}</p>
+        <p><strong>Total Amount:</strong> ${{ $inquiry->order_total ?? '0.00' }}</p>
 
         <p>Thank you for choosing us!</p>
 

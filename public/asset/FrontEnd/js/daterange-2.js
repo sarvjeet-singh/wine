@@ -366,6 +366,7 @@
                         // console.log(H);
                         0==cojoin&&"cojoinDates"==H&&(H="cojoinDates FirstDates",cojoin=1);
                         "checkoutonly"==H&&(tt="CheckOut Only");
+                        "checkinonly"==H&&(tt="CheckIn Only");
                        "bookedAndBlockeddates"==H&&(W.push("off", "disabled"));
                         !1 !== H && ("string" == typeof H ? W.push(H) : Array.prototype.push.apply(W, H));
                         var j = "",

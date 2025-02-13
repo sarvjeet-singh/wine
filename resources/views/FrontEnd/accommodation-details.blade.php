@@ -118,25 +118,25 @@
                 <div class="card mb-4 border-0">
                     <!-- <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
 
-                                                                                                    <div id="propertyCarouse3" class="" data-ride="carousel">
+                                                                                                            <div id="propertyCarouse3" class="" data-ride="carousel">
 
-                                                                                                        <div class="owl-carousel owl-theme">
-                                                                                                            @if ($vendor->mediaGallery->isNotEmpty())
+                                                                                                                <div class="owl-carousel owl-theme">
+                                                                                                                    @if ($vendor->mediaGallery->isNotEmpty())
     @foreach ($vendor->mediaGallery as $media)
     <div class="item">
-                                                                                                                        @if ($media->vendor_media_type === 'youtube')
+                                                                                                                                @if ($media->vendor_media_type === 'youtube')
     <iframe width="100%" height="300px" src="{{ $media->vendor_media }}"
-                                                                                                                                frameborder="0" allowfullscreen></iframe>
+                                                                                                                                        frameborder="0" allowfullscreen></iframe>
 @elseif ($media->vendor_media_type === 'image')
     <img src="{{ asset($media->vendor_media) }}" alt="Image"
-                                                                                                                                class="img-fluid">
+                                                                                                                                        class="img-fluid">
     @endif
-                                                                                                                    </div>
+                                                                                                                            </div>
     @endforeach
     @endif
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </div> -->
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div> -->
 
                     <div class="single-main-slider">
                         <div class="container">
@@ -646,23 +646,23 @@
                                     <tbody class="roomList">
 
                                         <!-- <tr>
-                                                                                                                                                                                                                            <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
-                                                                                                                                                                                                                            <td>Standard</td>
-                                                                                                                                                                                                                            <td class="room-avail">Available</td>
-                                                                                                                                                                                                                            <td>
-                                                                                                                                                                                                                                <span class="room-price d-block fw-bold mb-2">$499/per night</span>
-                                                                                                                                                                                                                                <button class="btn">Select Room</button>
-                                                                                                                                                                                                                            </td>
-                                                                                                                                                                                                                        </tr>
-                                                                                                                                                                                                                        <tr>
-                                                                                                                                                                                                                        <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
-                                                                                                                                                                                                                            <td>Standard</td>
-                                                                                                                                                                                                                            <td class="room-not-avail">Not Available</td>
-                                                                                                                                                                                                                            <td>
-                                                                                                                                                                                                                                <span class="room-price d-block fw-bold mb-2">$499/per night</span>
-                                                                                                                                                                                                                                <button class="btn">Select Room</button>
-                                                                                                                                                                                                                            </td>
-                                                                                                                                                                                                                        </tr> -->
+                                                                                                                                                                                                                                    <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
+                                                                                                                                                                                                                                    <td>Standard</td>
+                                                                                                                                                                                                                                    <td class="room-avail">Available</td>
+                                                                                                                                                                                                                                    <td>
+                                                                                                                                                                                                                                        <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+                                                                                                                                                                                                                                        <button class="btn">Select Room</button>
+                                                                                                                                                                                                                                    </td>
+                                                                                                                                                                                                                                </tr>
+                                                                                                                                                                                                                                <tr>
+                                                                                                                                                                                                                                <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
+                                                                                                                                                                                                                                    <td>Standard</td>
+                                                                                                                                                                                                                                    <td class="room-not-avail">Not Available</td>
+                                                                                                                                                                                                                                    <td>
+                                                                                                                                                                                                                                        <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+                                                                                                                                                                                                                                        <button class="btn">Select Room</button>
+                                                                                                                                                                                                                                    </td>
+                                                                                                                                                                                                                                </tr> -->
                                     </tbody>
                                 </table>
                             </div>
@@ -809,6 +809,9 @@
                     var startDate = picker.startDate.format('YYYY-MM-DD');
                     var endDate = picker.endDate.format('YYYY-MM-DD');
                     var rangeContainsInvalidDates = false;
+                    var nights = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
+                    var booking_minimum = "{{ $vendor->accommodationMetadata->booking_minimum }}";
+                    var booking_maximum = "{{ $vendor->accommodationMetadata->booking_maximum }}";
 
                     var currentDate = moment(startDate);
                     while (currentDate.isSameOrBefore(moment(endDate))) {
@@ -840,6 +843,31 @@
                             // Optionally hide the date picker
                             daterangepicker.hide();
                         }
+                        $('#fromdate').val('');
+                        $('#todate').val('');
+                    } else if (nights < booking_minimum || nights > booking_maximum) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid Booking Duration',
+                            text: `Please select a stay between ${booking_minimum} and ${booking_maximum} nights.`,
+                        });
+
+                        var daterangepicker = $('input[name="datefilter"]').data('daterangepicker');
+                        if (daterangepicker) {
+                            // Reset the date range picker
+                            daterangepicker.setStartDate(daterangepicker
+                                .startDate); // Set to a default start date if needed
+                            daterangepicker.setEndDate(daterangepicker
+                                .startDate); // Set to a default end date if needed
+
+                            // Optionally clear the input field
+                            $('input[name="datefilter"]').val('');
+
+                            // Optionally hide the date picker
+                            daterangepicker.hide();
+                        }
+                        $('#fromdate').val('');
+                        $('#todate').val('');
                     } else {
                         $('#fromdate').val(picker.startDate.format('YYYY-MM-DD'));
                         $('#todate').val(picker.endDate.format('YYYY-MM-DD'));
@@ -955,6 +983,7 @@
                 }
 
             });
+
         }
 
         function daterangepickerMobile(target, seasonDate, seasonEndDate, allcojoinDates = "", unavailableDates = "",
@@ -1011,6 +1040,11 @@
                     for (let i = 0; i < checkOutOnly.length; i++) {
                         if (currDate == checkOutOnly[i] && $.inArray(checkOutOnly[i], unavailableDates) == -1) {
                             return "checkoutonly";
+                        }
+                    }
+                    for (let i = 0; i < checkInOnly.length; i++) {
+                        if (currDate == checkInOnly[i] && $.inArray(checkInOnly[i], unavailableDates) == -1) {
+                            return "checkinonly";
                         }
                     }
                 }
