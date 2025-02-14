@@ -529,7 +529,10 @@ class UserDashboardController extends Controller
 
     public function inquiries()
     {
-        $inquiries = Inquiry::with('vendor')->where('customer_id', Auth::user()->id)->get();
+        $inquiries = Inquiry::with('vendor')
+        ->where('customer_id', Auth::user()->id)
+        ->orderBy('created_at', 'desc')
+        ->get();
         return view('UserDashboard.my-inquiries', compact('inquiries'));
     }
 

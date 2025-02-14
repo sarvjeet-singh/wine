@@ -267,7 +267,8 @@ Route::get('user/inquiries/{id}', [UserDashboardController::class, 'inquiryDetai
 
 Route::post('orders/authorize-payment', [OrderController::class, 'authorizePayment'])->name('orders.authorize-payment');
 Route::post('orders/send-inquiry', [OrderController::class, 'sendInquiry'])->name('orders.send-inquiry');
-Route::get('/order/thankyou/{id}', [OrderController::class, 'thankYou'])->name('order.thankyou');
+Route::get('/orders/thankyou/{id}', [OrderController::class, 'thankYou'])->name('order.thankyou');
+Route::post('/orders/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 // ================= CUSTOMER ============== //
 // Stripe Routes for customer
 Route::get('/user/list-payment-methods', [CustomerPaymentController::class, 'listPaymentMethods'])->name('customer.list-payment-methods');

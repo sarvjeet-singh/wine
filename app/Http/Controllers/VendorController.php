@@ -1020,7 +1020,10 @@ class VendorController extends Controller
 
 	public function inquiries(Request $request)
 	{
-		$inquiries = Inquiry::with('vendor')->where('vendor_id', $request->vendorid)->get();
+		$inquiries = Inquiry::with('vendor')
+		->where('vendor_id', $request->vendorid)
+		->orderBy('created_at', 'desc')
+		->get();
 		return view('VendorDashboard.my-inquiries', compact('inquiries'));
 	}
 

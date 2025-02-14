@@ -484,20 +484,22 @@ if (!function_exists('getClientIp')) {
         {
             // Ensure $timestamp is a Carbon instance
             $date = \Carbon\Carbon::parse($timestamp);
-    
+
             // Return the "time ago" format
             return $date->diffForHumans();
         }
     }
 
-    if(!function_exists('getUserTimezone')) {
-        function getUserTimezone() {
+    if (!function_exists('getUserTimezone')) {
+        function getUserTimezone()
+        {
             $timezone = TimezoneHelper::getUserTimezone();
             return $timezone;
         }
     }
-    if(!function_exists('toLocalTimezone')) {
-        function toLocalTimezone($utcTimestamp, $timezone, $time = false) {
+    if (!function_exists('toLocalTimezone')) {
+        function toLocalTimezone($utcTimestamp, $timezone, $time = false)
+        {
             $timezone = TimezoneHelper::toLocal($utcTimestamp, $timezone, $time);
             return $timezone;
         }
@@ -534,3 +536,19 @@ if (! function_exists('currency_symbol')) {
     }
 }
 
+if (!function_exists('calculatePlatformProcessingFee')) {
+    /**
+     * Calculate the platform processing fee as 8% of the total.
+     *
+     * @param float $totalAmount
+     * @return float
+     */
+    function calculatePlatformProcessingFee(float $totalAmount, float $feePercentage): float
+    {
+        $feePercentage = $feePercentage ?? 0.00;
+        if($feePercentage < 0) {
+            return 0.00;
+        }
+        return round(($totalAmount * $feePercentage) / 100, 2);
+    }
+}

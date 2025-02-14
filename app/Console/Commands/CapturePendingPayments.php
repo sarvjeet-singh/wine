@@ -12,7 +12,7 @@ use Log;
 
 class CapturePendingPayments extends Command
 {
-    protected $signature = 'payments:capture';
+    protected $signature = 'winery-payments:capture';
     protected $description = 'Capture all payments with requires_capture status after a vendor-specified duration.';
 
     public function __construct()

@@ -20,6 +20,7 @@ use App\Helpers\SeasonHelper;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VendorInquiryMail;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -36,9 +37,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        echo 'here';
-        die;
-        return view('UserDashboard.get-orders');
+        redirect()->route('home');
     }
 
     /**
@@ -214,7 +213,8 @@ class OrderController extends Controller
                     'postal_code' => $request->postal_code,
                 ];
             }
-
+            $platform_service_fee_percentage = config('site.platform_service_fee', 0.00);
+            $platform_service_fee = calculatePlatformProcessingFee($order_total, $platform_service_fee_percentage);
             $order += [
                 'customer_id' => Auth::guard('customer')->user()->id,
                 'vendor_id' => $booking['vendor_id'],
@@ -236,6 +236,7 @@ class OrderController extends Controller
                 'tax_rate' => $tax_rate,
                 'wallet_used' => $wallet_used,
                 'order_total' => $order_total,
+                'platform_service_fee' => $platform_service_fee,
                 'inquiry_id' => $inquiry_id,
             ];
             // Create order
@@ -384,7 +385,7 @@ class OrderController extends Controller
             'transaction_status' => $paymentIntent->status,
             'transaction_amount' => $paymentIntent->amount / 100, // Stripe amount is in cents
             'transaction_currency' => $paymentIntent->currency,
-            'transaction_created_at' => \Carbon\Carbon::createFromTimestamp($paymentIntent->created)->toDateTimeString(),
+            'transaction_created_at' => Carbon::createFromTimestamp($paymentIntent->created)->toDateTimeString(),
             'card_brand_name' => $paymentIntent->charges->data[0]->payment_method_details->card->brand ?? null,
             'cc_number' => $paymentIntent->charges->data[0]->payment_method_details->card->last4 ?? null,
             'expiry' => ""
@@ -409,9 +410,112 @@ class OrderController extends Controller
 
     public function thankYou(Request $request, $order_id)
     {
-        if(Session::has('orderCompleted')) {
+        if (Session::has('orderCompleted')) {
             Session::forget('orderCompleted');
         }
         return view('FrontEnd.thank-you', compact('order_id'));
+    }
+
+    public function cancel(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'cancel_reason' => 'required|string|min:5|max:255'
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+        if ($order->customer_id !== Auth::guard('customer')->user()->id) {
+            return response()->json(['success' => false, 'message' => 'Order does not belong to you.']);
+        }
+
+        if (!empty($order->cancelled)) {
+            return response()->json(['success' => false, 'message' => 'Order is already canceled.']);
+        }
+
+        $transaction = OrderTransaction::where('order_id', $order->id)->first();
+
+        if (!$transaction) {
+            return response()->json(['success' => false, 'message' => 'Transaction not found.'], 404);
+        }
+
+        // Ensure transaction is eligible for voiding
+        if ($transaction->transaction_status !== 'requires_capture') {
+            return response()->json(['success' => false, 'message' => 'Transaction cannot be voided.'], 400);
+        }
+
+        // Check if transaction is older than 6 days
+        $createdDate = Carbon::parse($transaction->created_at);
+        if ($createdDate->diffInDays(Carbon::now()) > 6) {
+            return response()->json(['success' => false, 'message' => 'Transaction is older than 6 days and cannot be voided.'], 400);
+        }
+
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        $paymentIntent = PaymentIntent::retrieve($transaction->transaction_id);
+        $paymentIntent->cancel(); // Cancels the payment intent before capture
+
+        // Update transaction status
+        $transaction->update([
+            'transaction_status' => 'voided',
+        ]);
+
+        $order->update([
+            'cancelled_at' => Carbon::now(),
+            'cancel_reason' => $request->cancel_reason,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Order has been canceled successfully.']);
+    }
+
+    public function vendorCancel(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'cancel_reason' => 'required|string|min:5|max:255'
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+        if ($order->vendor_id !== Auth::guard('vendor')->user()->id) {
+            return response()->json(['success' => false, 'message' => 'Order does not belong to you.']);
+        }
+
+        if (!empty($order->cancelled)) {
+            return response()->json(['success' => false, 'message' => 'Order is already canceled.']);
+        }
+
+        $transaction = OrderTransaction::where('order_id', $order->id)->first();
+
+        if (!$transaction) {
+            return response()->json(['success' => false, 'message' => 'Transaction not found.'], 404);
+        }
+
+        // Ensure transaction is eligible for voiding
+        if ($transaction->transaction_status !== 'requires_capture') {
+            return response()->json(['success' => false, 'message' => 'Transaction cannot be voided.'], 400);
+        }
+
+        // Check if transaction is older than 6 days
+        $createdDate = Carbon::parse($transaction->created_at);
+        if ($createdDate->diffInDays(Carbon::now()) > 6) {
+            return response()->json(['success' => false, 'message' => 'Transaction is older than 6 days and cannot be voided.'], 400);
+        }
+
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        $paymentIntent = PaymentIntent::retrieve($transaction->transaction_id);
+        $paymentIntent->cancel(); // Cancels the payment intent before capture
+
+        // Update transaction status
+        $transaction->update([
+            'transaction_status' => 'voided',
+        ]);
+
+        $order->update([
+            'vendor_cancelled' => true,
+            'cancelled_at' => Carbon::now(),
+            'cancel_reason' => $request->cancel_reason,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Order has been canceled successfully.']);
     }
 }

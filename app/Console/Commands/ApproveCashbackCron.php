@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\WalletTransaction;
+use App\Models\Order;
 
 class ApproveCashbackCron extends Command
 {
@@ -18,7 +19,9 @@ class ApproveCashbackCron extends Command
     public function handle()
     {
         // Fetch transactions that are eligible for cashback approval
-        $transactions = WalletTransaction::where('status', 'pending')->get();
+        $transactions = WalletTransaction::where('status', 'qualified')
+            ->where('created_at', '>=', now()->subDays(7))
+            ->get();
 
         foreach ($transactions as $transaction) {
             // Call the approveCashback function for each transaction
@@ -33,11 +36,21 @@ class ApproveCashbackCron extends Command
 
     public function approveCashback($transaction)
     {
-        // Approve the transaction
-        $transaction->update(['status' => 'approved']);
+        $order_id = $transaction->order_id;
+        $order = Order::find($order_id);
 
-        // Add cashback to wallet balance
-        $wallet = $transaction->wallet;
-        $wallet->update(['balance' => $wallet->balance + $transaction->amount]);
+        // Check if the order is older than 10 days
+        if ($order && $order->created_at->diffInDays(now()) >= 7) {
+            // Approve the transaction
+            $transaction->update(['status' => 'approved']);
+
+            // Add cashback to wallet balance
+            $wallet = $transaction->wallet;
+            $wallet->update(['balance' => $wallet->balance + $transaction->amount]);
+            $this->info("Cashback successfully approved for transaction ID: {$transaction->id}");
+        } else {
+            // Log if the order is too new
+            $this->info("Order for transaction ID {$transaction->id} is less than 7 days old. Cashback not approved.");
+        }
     }
 }

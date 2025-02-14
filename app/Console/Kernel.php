@@ -19,7 +19,8 @@ class Kernel extends ConsoleKernel
         // $schedule->command('email:test')->dailyAt('00:00');
         $schedule->command('database:backup')->dailyAt('02:00'); // Runs at 2 AM daily
         $schedule->command('stripe:check-payout-status')->hourly();
-        $schedule->command('payments:capture')->daily('00:00');
+        $schedule->command('winery-payments:capture')->daily('00:00');
+        $schedule->command('accommodation-payments:capture')->daily('00:00');
         $schedule->command('cashback:approve')->daily('00:00');
         // $schedule->command('database:backup')->hourly();
         // $schedule->call(function () {

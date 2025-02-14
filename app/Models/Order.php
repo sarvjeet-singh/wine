@@ -43,6 +43,8 @@ class Order extends Model
         'order_total',
         'inquiry_id',
         'wallet_used',
+        'platform_service_fee',
+        'cancelled_at',
     ];
 
     // If experiences_selected is stored as JSON, you can cast it to an array

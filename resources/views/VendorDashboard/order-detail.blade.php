@@ -239,6 +239,49 @@
 
                             </div>
 
+                            <div class="information-box mb-3">
+                                <div class="guest-details">
+
+                                    <div class="sec-head border-bottom px-4 py-3">
+
+                                        <h3 class="fw-bold mb-0"><i class="fa-solid fa-user-group"></i>
+
+                                            Cancel Order</h3>
+
+                                    </div>
+
+                                    <div class="px-4 py-3">
+
+                                        <div class="row gx-5 gy-2">
+
+                                            <div class="col-md-6">
+
+                                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                                    @if ($order->cancelled_at != null)
+                                                        <p class="info-label mb-0 fw-bold">Cancel Reason</p>
+
+
+                                                        <p class="mb-0">{{ $order->cancel_reason }}</p>
+                                                    @else
+                                                        <div>
+                                                            <button type="button" class="btn btn-danger"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#cancelOrderModal">Cancel
+                                                                Order</button>
+                                                        </div>
+                                                    @endif
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
                             <div class="guest-details border-bottom">
 
                                 <div class="sec-head px-4 py-3">
@@ -469,7 +512,8 @@
                                             $order->experiences_total +
                                             $order->cleaning_fee +
                                             $order->security_deposit +
-                                            $order->pet_fee - $order->wallet_used;
+                                            $order->pet_fee -
+                                            $order->wallet_used;
 
                                         $tax = ($sub_total * $order->tax_rate) / 100;
 
@@ -599,11 +643,79 @@
 
 
     </div>
-
+    <!-- Cancel Order Modal -->
+    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="cancelOrderForm">
+                        <input type="hidden" id="order_id" value="{{ $order->id }}">
+                        <div class="mb-3">
+                            <label for="cancel_reason" class="form-label">Reason for Cancellation</label>
+                            <textarea class="form-control" id="cancel_reason" rows="3" placeholder="Enter cancellation reason"></textarea>
+                            <span class="text-danger" id="cancel_reason_error"></span>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-danger">Cancel Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
-
-
 @section('js')
+    <script>
+        $(document).ready(function() {
+            $("#cancelOrderForm").submit(function(e) {
+                e.preventDefault(); // Prevent default form submission
 
+                let orderId = $("#order_id").val();
+                let cancelReason = $("#cancel_reason").val();
+                let url = "{{ route('orders.cancel') }}"; // Ensure this matches your route
+
+                // Clear previous errors
+                $("#cancel_reason_error").text("");
+
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        order_id: orderId,
+                        cancel_reason: cancelReason
+                    },
+                    beforeSend: function() {
+                        $("#cancelOrderForm button[type='submit']").prop("disabled", true).text(
+                            "Cancelling...");
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $("#cancelOrderModal").modal("hide");
+                            location.reload(); // Reload to reflect changes
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        let errors = xhr.responseJSON.errors;
+                        if (errors.cancel_reason) {
+                            $("#cancel_reason_error").text(errors.cancel_reason[0]);
+                        }
+                    },
+                    complete: function() {
+                        $("#cancelOrderForm button[type='submit']").prop("disabled", false)
+                            .text("Cancel Order");
+                    }
+                });
+            });
+        });
+    </script>
 @endsection
