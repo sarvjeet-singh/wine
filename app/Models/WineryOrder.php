@@ -37,7 +37,8 @@ class WineryOrder extends Model
         'shipping_state',
         'shipping_postal_code',
         'shipping_country',
-        'delivery'
+        'delivery',
+        'stocking_fee',
     ];
 
     public function wines()

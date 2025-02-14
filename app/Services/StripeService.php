@@ -196,6 +196,10 @@ class StripeService
             'postal_code' => $order->billing_postal_code,
             'country' => 'CA',
         ];
+        $application_fee = $order->stocking_fee;
+        if($order->delivery == 1) {
+            $application_fee += $order->delivery_charges;
+        }
         $paymentIntent = PaymentIntent::create([
             'amount' => $order->total_price * 100,
             'currency' => 'cad',
@@ -218,6 +222,7 @@ class StripeService
             'transfer_data' => [
                 'destination' => $shop->stripe_account_id, // Connect account ID
             ],
+            'application_fee_amount' => $application_fee * 100,
         ]);
 
         return $paymentIntent;

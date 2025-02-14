@@ -111,8 +111,11 @@ class WineryCheckoutController extends Controller
         $cartTotal = 0.00;
         $totalQuantity = 0;
 
+        $stockingFee = 0.00;
+
         if ($cart) {
             foreach ($cart->items as $item) {
+                $stockingFee += $item->product->commission_delivery_fee;
                 $cartTotal += $item->product->price * $item->quantity;
                 $totalQuantity += $item->quantity; // Calculate the total quantity
             }
@@ -143,6 +146,7 @@ class WineryCheckoutController extends Controller
             'vendor_seller_id' => $shopid,
             'subtotal_price' => $cartTotal, // Total cart amount
             'delivery_charges' => $deliveryFee, // Total cart amount
+            'stocking_fee' => $stockingFee,
             'total_price' => $cartTotal + $deliveryFee, // Total cart amount
             'status' => 'pending',
             // Billing Details
