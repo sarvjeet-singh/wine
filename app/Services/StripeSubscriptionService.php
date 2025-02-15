@@ -22,41 +22,6 @@ class StripeSubscriptionService
         Stripe::setApiKey(env('STRIPE_SECRET'));
     }
 
-    public function createSubscriptionOld($user, $vendorId, $planId, $price)
-    {
-        try {
-            $stripeCustomerId = $user->stripe_customer_id;
-
-            if (!$stripeCustomerId) {
-                throw new Exception('No Stripe customer ID found for this user.');
-            }
-
-            // Create a Stripe subscription
-            $subscription = StripeSubscription::create([
-                'customer' => $stripeCustomerId,
-                'items' => [['price' => $planId]],
-            ]);
-
-            // Save subscription in the database
-            $subscriptionRecord = Subscription::create([
-                'user_id' => $user->id,
-                'vendor_id' => $vendorId,
-                'stripe_subscription_id' => $subscription->id,
-                'stripe_plan_id' => $planId,
-                'price' => $price,
-                'status' => 'active',
-                'start_date' => now(),
-                'end_date' => null,
-            ]);
-
-            return $subscriptionRecord;
-        } catch (Exception $e) {
-            // Log and throw a custom exception
-            Log::error('Subscription creation failed: ' . $e->getMessage());
-            throw new Exception("Failed to create subscription: " . $e->getMessage());
-        }
-    }
-
     public function cancelSubscription($subscriptionId)
     {
         try {
@@ -204,16 +169,24 @@ class StripeSubscriptionService
         } else {
             $customer = Customer::retrieve($vendor->vendor_stripe_id);
         }
-        $taxRateId = env('STRIPE_TAX_RATE_ID');
-        $subscription = StripeSubscription::create([
+        $planDetail = Plan::where('stripe_plan_id', $priceId)
+            ->with('taxes:id,stripe_tax_id')
+            ->first();
+        $stripeTaxIds = $planDetail->taxes->pluck('stripe_tax_id')->implode(',');
+        // $taxRateId = env('STRIPE_TAX_RATE_ID');
+        $subscriptionData = [
             'customer' => $customer->id,
             'items' => [[
                 'price' => $priceId
             ]],
             'payment_behavior' => 'default_incomplete', // To collect payment details and confirm subscription
             'expand' => ['latest_invoice.payment_intent'],
-            // 'default_tax_rates' => [$taxRateId],
-        ]);
+            // 'default_tax_rates' => [$stripeTaxIds],
+        ];
+        if(!empty($stripeTaxIds)){
+            $subscriptionData['default_tax_rates'] = [$stripeTaxIds];
+        }
+        $subscription = StripeSubscription::create($subscriptionData);
         $price = Price::retrieve($priceId);
         $winerySubscription = WinerySubscription::create([
             'vendor_id' => $vendor->id,

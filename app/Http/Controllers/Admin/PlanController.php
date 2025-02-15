@@ -55,8 +55,11 @@ class PlanController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'type' => 'required|in:accommodation,winery,excursion,licensed,non-licensed',
+            'features' => 'nullable|string',
             'interval' => 'required|in:day,week,month,year,3months,6months',
             'description' => 'nullable|string',
+            'sort_order' => 'nullable|integer',
             'currency' => [
                 'required',
                 'string',
@@ -98,7 +101,11 @@ class PlanController extends Controller
                 'price' => $request->price,
                 'interval' => $request->interval,
                 'interval_count' => $interval_count,
-                'description' => $request->description
+                'description' => $request->description,
+                'type' => $request->type,
+                'features' => $request->features,
+                'currency' => $request->currency,
+                'sort_order' => $request->sort_order
             ]);
 
             // Attach taxes to plan
@@ -130,6 +137,8 @@ class PlanController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'type' => 'required|in:accommodation,winery,excursion,licensed,non-licensed',
+            'features' => 'nullable|string',
             'interval' => 'required|in:day,week,month,year,3months,6months',
             'description' => 'nullable|string',
             'tax_ids' => 'array'
@@ -182,6 +191,9 @@ class PlanController extends Controller
             // Update Plan in database
             $plan->update([
                 'name' => $request->name,
+                'features' => $request->features,
+                'type' => $request->type,
+                'sort_order' => $request->sort_order,
                 // 'stripe_plan_id' => $price->id, // Assign new Stripe price ID
                 // 'price' => $request->price,
                 // 'interval' => $request->interval,

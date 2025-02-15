@@ -17,6 +17,111 @@
 @section('content')
 
     <div class="col right-side">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="information-box">
+                    <div class="information-box-head">
+                        <div class="box-head-heading d-flex">
+                            <span class="box-head-label theme-color">{{ ucfirst($vendor->vendor_type) }} Subscriptions</span>
+                        </div>
+                    </div>
+                    <div class="information-box-body">
+                        <div class="subscription-plan-sec my-4">
+                            <div class="row g-3">
+                                @php
+                                    $maxPrice = 0.0;
+                                @endphp
+                                @if ($plans)
+                                    @foreach ($plans as $key => $plan)
+                                        @php
+                                            $intervalLabel = '';
+                                            if ($plan->interval == 'day') {
+                                                $intervalLabel = 'Daily';
+                                                $pricePaymentDuration = 365;
+                                            } elseif ($plan->interval == 'week') {
+                                                $intervalLabel = 'Weekly';
+                                                $pricePaymentDuration = 52;
+                                            } elseif ($plan->interval == 'month') {
+                                                if ($plan->interval_count == 1) {
+                                                    $intervalLabel = 'Monthly';
+                                                    $pricePaymentDuration = 12;
+                                                } elseif ($plan->interval_count == 3) {
+                                                    $intervalLabel = 'Quarterly';
+                                                    $pricePaymentDuration = 4;
+                                                } elseif ($plan->interval_count == 6) {
+                                                    $intervalLabel = 'Semi-Annual';
+                                                    $pricePaymentDuration = 2;
+                                                }
+                                            } elseif ($plan->interval == 'year') {
+                                                $intervalLabel = 'Annual';
+                                                $pricePaymentDuration = 1;
+                                            }
+                                            $PlanCalculatedprice = round($plan->price * $pricePaymentDuration, 2);
+                                            $maxPrice = max($maxPrice, $PlanCalculatedprice);
+                                        @endphp
+                                        <div class="col-lg-3 col-md-6">
+                                            <div
+                                                class="plan-inner {{ $activeSubscription && $plan->stripe_plan_id == $activeSubscription['stripe_price_id'] ? 'active-plan' : '' }} bg-white p-3">
+                                                <h3 class="fw-bold fs-5 text-center theme-color">
+                                                    <i class="fa-solid fa-circle-check"></i>
+                                                    {{ $intervalLabel }}
+                                                </h3>
+                                                <h2 class="fw-bold text-center">
+                                                    {{ currency_symbol($plan->currency) }}{{ $plan->price }}</h2>
+                                                @php
+                                                    $discountPercentage =
+                                                        $maxPrice > 0
+                                                            ? round(
+                                                                (($maxPrice - $PlanCalculatedprice) / $maxPrice) * 100,
+                                                                1,
+                                                            )
+                                                            : 0;
+                                                @endphp
+                                                <span class="save-value d-block fw-normal fw-bold fs-6 mt-2 text-center">
+                                                    @if ($discountPercentage > 0)
+                                                        Save {{ $discountPercentage }}%
+                                                    @endif
+                                                </span>
+                                                <span class="d-block fw-normal fs-6 text-center">
+                                                    {{ $pricePaymentDuration }}
+                                                    {{ $pricePaymentDuration == 1 ? 'Payment' : 'Payments' }}
+                                                </span>
+                                                <span class="d-block fw-normal fs-7 mb-3 text-center fst-italic">Equivalent
+                                                    to
+                                                    {{ currency_symbol($plan->currency) }}{{ number_format($PlanCalculatedprice, 2) }}/yr</span>
+                                                <p class="fw-bold mb-2">Benefits:</p>
+                                                {!! $plan->features !!}
+                                                <div class="buy-btn text-center">
+
+                                                    @if ($activeSubscription && $plan->stripe_plan_id == $activeSubscription['stripe_price_id'])
+                                                        <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
+
+                                                        <button class="cancel-subscription-btn btn btn-danger"
+                                                            data-subscription-id="{{ $activeSubscription->stripe_subscription_id }}">
+
+                                                            Cancel Subscription
+
+                                                        </button>
+                                                    @else
+                                                        <a href="javascript:void(0)" data-id="{{ $intervalLabel }}"
+                                                            data-price-id="{{ $plan->stripe_plan_id }}"
+                                                            class="btn wine-btn px-5">Buy Now</a>
+                                                    @endif
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- <div class="col right-side">
         @if (strtolower($vendor->vendor_type) == 'accommodation')
             <!-- Accommodation Subscriptions Start -->
             <div class="row">
@@ -42,7 +147,8 @@
                                                 $6828/yr</span>
                                             <p class="fw-bold mb-2">Benefits:</p>
                                             <ul class="list-unstyled p-0 mb-4">
-                                                <li class="position-relative mb-2">Account Upgrade to <b>“Partner/Full”</b><ul>
+                                                <li class="position-relative mb-2">Account Upgrade to <b>“Partner/Full”</b>
+                                                    <ul>
                                                         <li class="p-0">Media Gallery</li>
                                                         <li class="p-0">Dedicated Vendor Page</li>
                                                         <li class="p-0">Own Payment Gateway</li>
@@ -111,10 +217,7 @@
                                             </ul>
                                             <div class="buy-btn text-center">
 
-                                                @if (
-                                                    $activeSubscription &&
-                                                        env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_QUARTERLY') == $activeSubscription['stripe_price_id']
-                                                )
+                                                @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_QUARTERLY') == $activeSubscription['stripe_price_id'])
                                                     <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
@@ -156,18 +259,17 @@
                                                 <li class="position-relative mb-2">Guest Support (Resolve Issues)</li>
                                                 <li class="position-relative mb-2">Promotional Videos (i.e. Property
                                                     Highlights)</li>
-                                                <li class="position-relative mb-2">Generic SEO & SMO (i.e. Promote Catch All
+                                                <li class="position-relative mb-2">Generic SEO & SMO (i.e. Promote Catch
+                                                    All
                                                     Platform)</li>
-                                                <li class="position-relative mb-2">Content Creation (i.e. Product Placement,
+                                                <li class="position-relative mb-2">Content Creation (i.e. Product
+                                                    Placement,
                                                     Mentions, etc.)</li>
                                                 <li class="position-relative mb-2">Getaway Packages</li>
                                             </ul>
                                             <div class="buy-btn text-center">
 
-                                                @if (
-                                                    $activeSubscription &&
-                                                        env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_SEMI_ANNUAL') == $activeSubscription['stripe_price_id']
-                                                )
+                                                @if ($activeSubscription && env('PLAN_STRIPE_PRICE_ID_ACCOMMODATION_SEMI_ANNUAL') == $activeSubscription['stripe_price_id'])
                                                     <!-- <button type="button" class="btn btn-primary">Active Plan</button> -->
 
                                                     <button class="cancel-subscription-btn btn btn-danger"
@@ -758,7 +860,7 @@
             </div>
         @endif
 
-    </div>
+    </div> --}}
 
     {{-- <div class="col right-side">
 
@@ -842,7 +944,7 @@
 
                     <p><b>Plan Name</b>: <span id="plan-name"></span></p>
 
-                    <p><b>Plan Price</b>: $<span id="plan-price"></span></p>
+                    <p><b>Plan Price</b>: $<span id="plan-price"></span> + Tax</p>
 
                     <form id="payment-form">
 

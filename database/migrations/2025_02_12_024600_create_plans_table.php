@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('interval_count');
             $table->string('currency');
             $table->text('description')->nullable();
+            $table->text('type')->nullable();
+            $table->text('features')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
         });

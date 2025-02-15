@@ -18,6 +18,9 @@ class Plan extends Model
         'description',
         'currency',
         'status',
+        'features',
+        'type',
+        'sort_order',
     ];
 
     public function taxes()

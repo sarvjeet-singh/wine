@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\Vendor;
+use App\Models\Plan;
 use App\Models\WinerySubscription;
 
 use Exception;
@@ -27,10 +28,14 @@ class SubscriptionController extends Controller
             ->where('status', 'active')
             ->orderBy('created_at', 'desc')
             ->first();
+        $plans = Plan::where('status', 1)
+        ->where('type', strtolower($vendor->vendor_type))
+        ->orderBy('sort_order', 'asc')
+        ->get();
         // print_r($activeSubscriptions); die;
         $products = $this->stripeService->getProducts();
         // print_r($products); die;
-        return view('VendorDashboard.winery-subscriptions.index', compact('products', 'vendorid', 'activeSubscription', 'vendor'));
+        return view('VendorDashboard.winery-subscriptions.index', compact('products', 'vendorid', 'activeSubscription', 'vendor', 'plans'));
     }
 
     public function createPaymentIntent(Request $request, $vendorid)

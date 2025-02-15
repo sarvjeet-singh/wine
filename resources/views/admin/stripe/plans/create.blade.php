@@ -104,7 +104,8 @@
                                         <div class="col-md-6">
                                             <div>
                                                 <label for="currency" class="form-label fw-bold">Currency</label>
-                                                <select name="currency" class="form-select @error('currency') is-invalid @enderror">
+                                                <select name="currency"
+                                                    class="form-select @error('currency') is-invalid @enderror">
                                                     <option value="">Select Currency</option>
                                                     @if (count($currencies) > 0)
                                                         @foreach ($currencies as $key => $currency)
@@ -130,6 +131,42 @@
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
                                             </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div>
+                                                <label for="features" class="form-label fw-bold">Features</label>
+                                                <textarea class="form-control @error('features') is-invalid @enderror" name="features" rows="3"
+                                                    placeholder="Plan Feature">{{ old('features', $plan->features ?? '') }}</textarea>
+                                                @error('features')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div>
+                                                <label for="features" class="form-label fw-bold">Vendor Type</label>
+                                                <select name="type" class="form-select" id="type">
+                                                    <option value="">Select Type</option>
+                                                    @if (getCategories())
+                                                        @foreach (getCategories() as $category)
+                                                            <option value="{{ $category['slug'] }}"
+                                                                {{ old('type', $plan->type ?? '') == $category['slug'] ? 'selected' : '' }}>
+                                                                {{ $category['name'] }}</option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                                @error('features')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sort_order">Sort Order</label>
+                                            <select name="sort_order" id="sort_order" class="form-control">
+                                                @foreach (range(1, 100) as $i)
+                                                    <option value="{{ $i }}">{{ $i }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -177,11 +214,13 @@
     </div>
 @endsection
 
-@section('js')
+@push('js')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.9.2/ckeditor.js"></script>
     <script>
         $(document).ready(function() {
             $('select').select2();
+            CKEDITOR.replace( 'features' );
         });
     </script>
-@endsection
+@endpush
