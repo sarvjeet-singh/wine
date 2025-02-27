@@ -77,13 +77,13 @@
                             <input type="hidden" name="type" value="vendor">
                             <div class="row align-items-end mt-3">
                                 <!-- <div class="col-sm-4 col-12">
-                                                            <label class="form-label">Apply Value</label>
-                                                            <select class="form-control" name="booking_date_option">
-                                                                <option value="booked">Booked Dates</option>
-                                                                <option value="packaged">Package Dates</option>
-                                                                <option value="blocked">Blocked Dates</option>
-                                                            </select>
-                                                        </div> -->
+                                                                <label class="form-label">Apply Value</label>
+                                                                <select class="form-control" name="booking_date_option">
+                                                                    <option value="booked">Booked Dates</option>
+                                                                    <option value="packaged">Package Dates</option>
+                                                                    <option value="blocked">Blocked Dates</option>
+                                                                </select>
+                                                            </div> -->
                                 <div class="col-sm-4 col-12">
                                     <label class="form-label">Select Season</label>
                                     @php
@@ -184,11 +184,11 @@
                             </div>
 
                             <!-- <div class="row mt-5">
-                                                        <div class="col-sm-12 text-center">
-                                                            <button type="submit" class="btn wine-btn" id="dateform_submit"
-                                                                disabled>Update</button>
-                                                        </div>
-                                                    </div> -->
+                                                            <div class="col-sm-12 text-center">
+                                                                <button type="submit" class="btn wine-btn" id="dateform_submit"
+                                                                    disabled>Update</button>
+                                                            </div>
+                                                        </div> -->
                         </form>
                     </div>
                 </div>
@@ -243,7 +243,7 @@
         }
 
         function daterangepickerDesktop(target, seasonDate, seasonEndDate, allcojoinDates = "", unavailableDates = "",
-            bookedAndBlockeddates = "", checkOutOnly = "") {
+            bookedAndBlockeddates = "", checkOutOnly = "", checkInOnly = "") {
 
             // unavailableDates = unavailableDates.concat(allcojoinDates);
             // alert(seasonEndDate);
@@ -298,6 +298,12 @@
                             return "checkoutonly";
                         }
                     }
+
+                    for (let i = 0; i < checkInOnly.length; i++) {
+                        if (currDate == checkInOnly[i] && $.inArray(checkInOnly[i], unavailableDates) == -1) {
+                            return "checkinonly";
+                        }
+                    }
                 }
 
             }).on('show.daterangepicker', function(ev, picker) {
@@ -308,7 +314,7 @@
         }
 
         function daterangepickerMobile(target, seasonDate, seasonEndDate, allcojoinDates = "", unavailableDates = "",
-            bookedAndBlockeddates = "", checkOutOnly = "") {
+            bookedAndBlockeddates = "", checkOutOnly = "", checkInOnly = "") {
             $(target).daterangepicker({
                 parentEl: "#datepicker-container",
                 startDate: seasonDate,
@@ -350,6 +356,12 @@
                     for (let i = 0; i < checkOutOnly.length; i++) {
                         if (currDate == checkOutOnly[i] && $.inArray(checkOutOnly[i], unavailableDates) == -1) {
                             return "checkoutonly";
+                        }
+                    }
+
+                    for (let i = 0; i < checkInOnly.length; i++) {
+                        if (currDate == checkInOnly[i] && $.inArray(checkInOnly[i], unavailableDates) == -1) {
+                            return "checkinonly";
                         }
                     }
                 }
@@ -408,6 +420,8 @@
                     var allcojoinDates = data.cojoinDates;
                     var unavailableDates = data.dates;
                     var bookedAndBlockeddates = data.bookedAndBlockeddates;
+                    var checkOutOnly = data.checkOutOnly;
+                    var checkInOnly = data.checkInOnly;
 
                     var seasonDate, seasonEndDate;
                     var today = new Date(); // Get today's date
@@ -467,10 +481,10 @@
                     // Call the appropriate date range picker based on window width (responsive)
                     if ($(window).width() < 768) {
                         daterangepickerMobile('#datefilter_input', seasonDate, seasonEndDate, allcojoinDates,
-                            unavailableDates, bookedAndBlockeddates);
+                            unavailableDates, bookedAndBlockeddates, checkOutOnly, checkInOnly);
                     } else {
                         daterangepickerDesktop('#datefilter_input', seasonDate, seasonEndDate, allcojoinDates,
-                            unavailableDates, bookedAndBlockeddates);
+                            unavailableDates, bookedAndBlockeddates, checkOutOnly, checkInOnly);
                     }
 
                     // Trigger the date range picker click if needed
@@ -550,7 +564,7 @@
                                                         url: "{{ route('addbookingdate.form', ['vendorid' => $vendorid]) }}",
                                                         data: $(
                                                                 '#dateform'
-                                                                )
+                                                            )
                                                             .serialize(),
                                                         type: 'post',
                                                         success: function(
@@ -565,7 +579,7 @@
                                                                 .then(
                                                                     (
                                                                         result
-                                                                        ) => {
+                                                                    ) => {
                                                                         if (result
                                                                             .isConfirmed
                                                                         ) {

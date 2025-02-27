@@ -19,6 +19,7 @@ use App\Services\StripeService;
 use App\Helpers\SeasonHelper;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderCancelledMail;
 use App\Mail\VendorInquiryMail;
 use Carbon\Carbon;
 
@@ -368,29 +369,42 @@ class OrderController extends Controller
         $order_id = $request->input('order_id');
         $payment_intent_id = $request->input('payment_intent_id');
         $transaction = OrderTransaction::where('order_id', $order_id)->first();
-        if ($transaction) {
+        $order = Order::find($order_id);
+
+        if (!$order) {
             return response()->json([
                 'success' => false,
-                'message' => 'Transaction already exists for this order.',
-                // 'transaction' => $transaction
-            ], 200);
+                'message' => 'Order not found.'
+            ], 404);
         }
-        $order = Order::find($order_id);
+
         Stripe::setApiKey(env('STRIPE_SECRET'));
+
         $paymentIntent = \Stripe\PaymentIntent::retrieve($payment_intent_id);
+
+        $order->payment_status = 'processing';
+        $order->save();
+
         $transactionData = [
             'order_id' => $order_id,
             'payment_type' => 'card',
             'transaction_id' => $paymentIntent->id,
             'transaction_status' => $paymentIntent->status,
-            'transaction_amount' => $paymentIntent->amount / 100, // Stripe amount is in cents
+            'transaction_amount' => $paymentIntent->amount / 100, // Convert cents to dollars
             'transaction_currency' => $paymentIntent->currency,
             'transaction_created_at' => Carbon::createFromTimestamp($paymentIntent->created)->toDateTimeString(),
             'card_brand_name' => $paymentIntent->charges->data[0]->payment_method_details->card->brand ?? null,
             'cc_number' => $paymentIntent->charges->data[0]->payment_method_details->card->last4 ?? null,
             'expiry' => ""
         ];
-        $transaction = OrderTransaction::create($transactionData);
+
+        if ($transaction) {
+            // Update existing transaction
+            $transaction->update($transactionData);
+        } else {
+            // Create a new transaction
+            $transaction = OrderTransaction::create($transactionData);
+        }
 
         if (!empty($transaction)) {
             $customer = Auth::guard('customer')->user();
@@ -464,18 +478,24 @@ class OrderController extends Controller
             'cancel_reason' => $request->cancel_reason,
         ]);
 
+        // Send Email Notifications
+        $customerEmail = $order->customer->email;
+        $vendorEmail = $order->vendor->vendor_email;
+
+        Mail::to($customerEmail)->send(new OrderCancelledMail($order, 'customer'));
+        Mail::to($vendorEmail)->send(new OrderCancelledMail($order, 'vendor'));
+
         return response()->json(['success' => true, 'message' => 'Order has been canceled successfully.']);
     }
 
-    public function vendorCancel(Request $request)
+    public function vendorCancel(Request $request, $vendorid)
     {
         $request->validate([
             'order_id' => 'required|exists:orders,id',
             'cancel_reason' => 'required|string|min:5|max:255'
         ]);
-
         $order = Order::findOrFail($request->order_id);
-        if ($order->vendor_id !== Auth::guard('vendor')->user()->id) {
+        if ($order->vendor_id != $vendorid) {
             return response()->json(['success' => false, 'message' => 'Order does not belong to you.']);
         }
 
@@ -516,6 +536,45 @@ class OrderController extends Controller
             'cancel_reason' => $request->cancel_reason,
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Order has been canceled successfully.']);
+        // Send Email Notifications
+        $customerEmail = $order->customer->email;
+        $vendorEmail = $order->vendor->vendor_email;
+
+        Mail::to($customerEmail)->send(new OrderCancelledMail($order, 'customer'));
+        Mail::to($vendorEmail)->send(new OrderCancelledMail($order, 'vendor'));
+
+        return response()->json(['success' => true, 'message' => 'Order has been cancelled successfully.']);
+    }
+
+    public function reauthorizePayment($orderId)
+    {
+        $order = Order::find($orderId);
+
+        $customer = Auth::guard('customer')->user();
+        // Create a Stripe Customer if needed
+        if (!$customer->stripe_id) {
+            $customer_data = [
+                'email' => $customer->email,
+                'name' => $customer->firstname . ' ' . $customer->lastname,
+                'phone' => $customer->contact_number,
+            ];
+            $customer->stripe_id = $this->stripeService->createCustomer($customer_data);
+            $customer->save();
+        }
+        // Create a Setup Intent for saving the payment method
+        $setupIntent = $this->stripeService->setupIntent($customer->stripe_id);
+        if (!empty($order)) {
+            return response()->json(
+                [
+                    'success' => true,
+                    "client_secret" => $setupIntent->client_secret,
+                    "intent_type" => 'setup_intent',
+                    "message" => 'Setup intent created successfully',
+                    'order_id' => $order->id
+                ]
+            );
+        } else {
+            return response()->json(['success' => false, "data" => [], "message" => 'Something went wrong try again']);
+        }
     }
 }

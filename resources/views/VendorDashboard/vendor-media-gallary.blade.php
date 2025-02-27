@@ -219,7 +219,7 @@
                                 <div class="row gy-4">
                                     <div class="col-6 col-sm-4 col-md-3">
                                         <div class="box-gallary-images-column select-box-gallary-images-column"
-                                            @if ($VendorMediaGallery->count() > 6) style="display:none" @endif>
+                                            @if ($VendorMediaGallery->count() > 9) style="display:none" @endif>
                                             <label for="front_License_image"
                                                 class="custom-file-label upload-button mx-auto">
                                                 <i class="fa-solid fa-arrow-up-from-bracket"></i>

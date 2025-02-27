@@ -28,6 +28,7 @@
             <i class="fa-solid fa-angle-right"></i>
             <ul class="sub-menu list-unstyled mt-2">
                 <li class="mb-2"><a href="{{route('admin.vendors')}}">Manage Vendor</a></li>
+                <li class="mb-2"><a href="{{route('admin.vendors.users.index')}}">Manage Vendor Contact</a></li>
                 <li class="mb-2"><a href="{{route('admin.vendors.create')}}">Create vendor</a></li>
             </ul>
         </li>
@@ -41,6 +42,7 @@
                 <li class="mb-2"><a href="{{route('admin.faqs.index')}}">Manage FAQs</a></li>
                 <li class="mb-2"><a href="">Manage Terms & Condition</a></li>
                 <li class="mb-2"><a href="">Manage Questionnaire</a></li>
+                <li class="mb-2"><a href="{{route('admin.cms.refund-policy')}}">Manage Refund Policy</a></li>
             </ul>
         </li>
         <li class="position-relative parent-menu">

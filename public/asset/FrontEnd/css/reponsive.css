@@ -410,6 +410,22 @@ nav.navbar ul li.nav-item {
 .ttk-sec .fa-lg {
     font-size: 16px !important;
 }
+.terms-and-condition-content h1 {
+    font-size: 28px;
+}
+.terms-and-condition-content  h2 {
+    font-size: 20px;
+}
+.summary-content-sec #state-wrapper span.select2-selection {
+    height: 39px;
+}
+.summary-content-sec .refund-policies ul {
+    padding-left: 0 !important;
+}
+.order-thankyou-content p.lead {
+    font-size: 18px;
+    line-height: normal;
+}
 }
 
 @media screen and (max-width: 360px){

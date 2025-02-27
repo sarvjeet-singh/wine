@@ -27,6 +27,7 @@ use App\Http\Controllers\TimezoneController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\Admin\WalletController as AdminWalletController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
+use App\Http\Controllers\Admin\ErrorLogController as AdminErrorLogController;
 use App\Http\Controllers\VendorStripeDetailController;
 // use App\Http\Controllers\MigrationController;
 use illuminate\Support\Facades\Auth;
@@ -49,12 +50,14 @@ use App\Http\Controllers\StripeController;
 use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\Auth\VendorAuthController;
 use App\Http\Controllers\Admin\ConfigurationSettingController;
+use App\Http\Controllers\Admin\CmsPageController as AdminCmsPageController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\FrontendInquiryController;
 use App\Http\Controllers\CommandController;
+use App\Http\Controllers\Admin\Vendor\UserController as AdminVendorUserController;
 use Mews\Captcha\CaptchaController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -266,6 +269,7 @@ Route::get('/user/inquiries', [UserDashboardController::class, 'inquiries'])->na
 Route::get('user/inquiries/{id}', [UserDashboardController::class, 'inquiryDetail'])->name('user.inquiryDetail');
 
 Route::post('orders/authorize-payment', [OrderController::class, 'authorizePayment'])->name('orders.authorize-payment');
+Route::post('orders/reauthorize-payment/{orderId}', [OrderController::class, 'reauthorizePayment'])->name('orders.reauthorize-payment');
 Route::post('orders/send-inquiry', [OrderController::class, 'sendInquiry'])->name('orders.send-inquiry');
 Route::get('/orders/thankyou/{id}', [OrderController::class, 'thankYou'])->name('order.thankyou');
 Route::post('/orders/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
@@ -344,6 +348,7 @@ Route::group(['middleware' => ['auth:vendor', 'checkPasswordUpdated', 'check.ven
     Route::put('/vendor/inquiries/{id}/reject/{vendorid?}', [VendorController::class, 'inquiryReject'])->name('inquiry.reject');
     Route::get('/vendor/transactions/{vendorid?}', [VendorController::class, 'orders'])->name('vendor-transactions');
     Route::get('vendor/transactions/{id}/{vendorid?}', [VendorController::class, 'orderDetail'])->name('vendor.orderDetail');
+    Route::post('/vendor/orders/vendor-cancel/{vendorid?}', [OrderController::class, 'vendorCancel'])->name('orders.vendor-cancel');
     Route::get('/vendor/inquiries/{vendorid?}', [VendorController::class, 'inquiries'])->name('vendor-inquiries');
     Route::get('/vendor/inquiries/{id}/{vendorid?}', [VendorController::class, 'inquiryDetail'])->name('vendor.inquiryDetail');
     Route::get('/business-hours/{vendorid?}', [VendorSettingController::class, 'getBusinessHours'])->name('business-hours.index');
@@ -446,12 +451,22 @@ Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('adm
 // Admin routes protected by middleware
 Route::middleware(['auth:admin'])->group(function () {
     Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
+        Route::get('/error-logs', [AdminErrorLogController::class, 'index'])->name('admin.error.logs');
         Route::get('plans/sync', [AdminPlanSyncController::class, 'index'])->name('plans.sync.index');
         Route::post('plans/sync', [AdminPlanSyncController::class, 'sync'])->name('plans.sync');
         Route::get('taxes/sync', [AdminTaxSyncController::class, 'index'])->name('taxes.sync.index');
         Route::post('taxes/sync', [AdminTaxSyncController::class, 'sync'])->name('taxes.sync');
         Route::resource('plans', AdminPlanController::class)->names('plans');
         Route::resource('taxes', AdminTaxController::class)->names('taxes');
+
+        // refund policy routes
+        Route::get('refund-policy', [AdminCmsPageController::class, 'refundPolicy'])->name('cms.refund-policy');
+        Route::post('refund-policy', [AdminCmsPageController::class, 'updateRefundPolicy'])->name('cms.refund-policy.update');
+
+        // Admin Vendor Users Routes
+        Route::get('/vendor/users/search', [AdminVendorUserController::class, 'search'])->name('vendors.users.search');
+        Route::get('/vendor/users/activate/{id}', [AdminVendorUserController::class, 'activate'])->name('vendor.users.activate');
+        Route::resource('/vendor/users', AdminVendorUserController::class)->names('vendors.users');
     });
     Route::post('/check-vendor-combination', [AdminVendorController::class, 'checkVendorCombination'])->name('check.vendor.combination');
     Route::get('/admin/filter/search', [AdminVendorController::class, 'filterSearch'])->name('admin.vendors.search');

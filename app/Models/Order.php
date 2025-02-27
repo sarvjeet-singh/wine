@@ -45,6 +45,9 @@ class Order extends Model
         'wallet_used',
         'platform_service_fee',
         'cancelled_at',
+        'cancel_reason',
+        'vendor_cancelled',
+        'payment_status',
     ];
 
     // If experiences_selected is stored as JSON, you can cast it to an array

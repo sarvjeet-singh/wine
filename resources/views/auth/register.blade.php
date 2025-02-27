@@ -53,7 +53,7 @@
                         @endif
                         <div class="row mb-3 mt-4">
                             <div class="col-md-6" style="position:relative">
-                                <label for="firstname" class="col-form-label">{{ __('Given Name(s)') }}</label>
+                                <label for="firstname" class="col-form-label">{{ __('Given Name(s)') }}<span style="color:red;padding-left: 1px;">*</span></label>
                                 <input id="firstname" type="text"
                                     class="form-control required @error('firstname') is-invalid @enderror" name="firstname"
                                     value="{{ old('firstname') }}" autocomplete="firstname" autofocus placeholder="">
@@ -65,7 +65,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-6" style="position:relative">
-                                <label for="lastname" class="col-form-label">{{ __('Last/Surname') }}</label>
+                                <label for="lastname" class="col-form-label">{{ __('Last/Surname') }}<span style="color:red;padding-left: 1px;">*</span></label>
                                 <input id="lastname" type="text"
                                     class="form-control required @error('lastname') is-invalid @enderror" name="lastname"
                                     value="{{ old('lastname') }}" autocomplete="lastname" autofocus placeholder="">
@@ -80,7 +80,7 @@
 
                         <div class="row mb-3 mt-4">
                             <div class="col-md-6">
-                                <label for="email" class="col-form-label">{{ __('eMail Address') }}</label>
+                                <label for="email" class="col-form-label">{{ __('eMail Address') }}<span style="color:red;padding-left: 1px;">*</span></label>
                                 <div style="position:relative">
                                     <i class="fa-solid fa-envelope login-custom-icon"></i>
                                     <input id="email" type="email"
@@ -115,7 +115,7 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="password" class="col-form-label">{{ __('Create Password') }}</label>
+                                <label for="password" class="col-form-label">{{ __('Create Password') }}<span style="color:red;padding-left: 1px;">*</span></label>
                                 <div style="position:relative">
                                     <i class="fa-solid fa-lock login-custom-icon"></i>
                                     <input id="password" type="password"
@@ -134,7 +134,7 @@
                                 {{-- @enderror --}}
                             </div>
                             <div class="col-md-6" style="position:relative">
-                                <label for="password-confirm" class="col-form-label">{{ __('Confirm Password') }}</label>
+                                <label for="password-confirm" class="col-form-label">{{ __('Confirm Password') }}<span style="color:red;padding-left: 1px;">*</span></label>
                                 <div style="position:relative">
                                     <i class="fa-solid fa-lock register-custom-icon"></i>
                                     <input id="password-confirm" type="password"

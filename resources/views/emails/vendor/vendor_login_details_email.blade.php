@@ -8,7 +8,7 @@
                 style="color: #118c97;">{{ $vendorData['user']->firstname ?? 'Vendor' }}</strong>,</p>
 
         <p>Welcome to the e-commerce section of our marketplace platform.  The link below will log you into your  <strong
-                style="color: #118c97;">[{{ $vendorData['vendor']->vendor_name ?? 'Vendor' }}]</strong> account and any other vendor account you may become associated with.</p>
+                style="color: #118c97;">{{ $vendorData['vendor']->vendor_name ?? 'Vendor' }}</strong> account and any other vendor account you may become associated with.</p>
 
         <div class="credentials">
             <p>eMail/Username: <span style="color:#28405e;">{{ $vendorData['user']->email ?? '' }}</span></p>

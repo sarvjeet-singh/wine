@@ -40,6 +40,9 @@
                 <div class="property-slider">
                     @if ($vendor->mediaGallery->isNotEmpty() && $vendor->account_status == 1)
                         @foreach ($vendor->mediaGallery as $media)
+                            @if ($media->is_default)
+                                @continue
+                            @endif
                             <div class="item">
                                 <div class="inner-box">
                                     @if ($media->vendor_media_type === 'youtube')

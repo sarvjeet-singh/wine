@@ -67,15 +67,15 @@
             @include('UserDashboard.includes.leftNav')
             <div class="col right-side">
                 <div class="row g-3">
-                    <div class="col-xl-3 col-6">
-                        <div class="top-boxes">
-                            <div class="box-image">
-                                <img src="{{ asset('images/icons/bottle-bucks-box-icon.png') }}">
-                            </div>
-                            <div class="box-points">0 Events</div>
-                            <div class="box-text mt-1">Today</div>
-                        </div>
-                    </div>
+                    <!-- <div class="col-xl-3 col-6">
+                                <div class="top-boxes">
+                                    <div class="box-image">
+                                        <img src="{{ asset('images/icons/bottle-bucks-box-icon.png') }}">
+                                    </div>
+                                    <div class="box-points">0 Events</div>
+                                    <div class="box-text mt-1">Today</div>
+                                </div>
+                            </div> -->
                     <div class="col-xl-3 col-6">
                         <a href="{{ route('wallet-history') }}">
                             <div class="top-boxes">
@@ -87,15 +87,15 @@
                             </div>
                         </a>
                     </div>
-                    <div class="col-xl-3 col-6">
-                        <div class="top-boxes">
-                            <div class="box-image">
-                                <img src="{{ asset('images/icons/messages-box-icon.png') }}">
-                            </div>
-                            <div class="box-points">1 + 0</div>
-                            <div class="box-text">Prize Pools</div>
-                        </div>
-                    </div>
+                    <!-- <div class="col-xl-3 col-6">
+                                <div class="top-boxes">
+                                    <div class="box-image">
+                                        <img src="{{ asset('images/icons/messages-box-icon.png') }}">
+                                    </div>
+                                    <div class="box-points">1 + 0</div>
+                                    <div class="box-text">Prize Pools</div>
+                                </div>
+                            </div> -->
                     <div class="col-xl-3 col-6">
                         <div class="top-boxes">
                             <div class="box-image">
@@ -117,6 +117,12 @@
                 </div>
                 <!-- User Profile Box Start -->
                 <div class="row mt-5">
+                    @if (empty(Auth::user()->profile_image))
+                        <div class="col-12">
+                            <h5 class="fw-bold mb-3 theme-color">Please upload a profile headshot so your testimonials &
+                                reviews can be publicly posted.</h5>
+                        </div>
+                    @endif
                     <div class="col-sm-12">
                         <div class="information-box">
                             <div class="information-box-head grey-head">
@@ -235,6 +241,11 @@
 
                 <!-- User Guest Registry Start -->
                 <div class="row mt-5">
+                    @if (Auth::user()->form_guest_registry_filled == 0)
+                        <div class="col-12">
+                            <h5 class="fw-bold mb-3 theme-color">Please complete the Guest Registry to process transactions and access your Bottle Bucks credits.</h5>
+                        </div>
+                    @endif
                     <div class="col-sm-12">
                         <div class="information-box guest-reg-sec">
                             <div class="information-box-head grey-head">

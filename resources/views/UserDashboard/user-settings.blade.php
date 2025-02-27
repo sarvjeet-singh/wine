@@ -120,7 +120,8 @@
                                             <label class="form-label">Last Name<span class="required-filed">*</span></label>
                                             <input type="text"
                                                 class="form-control @error('lastname') is-invalid @enderror" name="lastname"
-                                                value="{{ old('lastname', Auth::user()->lastname) }}" placeholder="Enter your last name">
+                                                value="{{ old('lastname', Auth::user()->lastname) }}"
+                                                placeholder="Enter your last name">
                                             @error('lastname')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -135,7 +136,8 @@
                                                     class="required-filed">*</span></label>
                                             <input type="text"
                                                 class="form-control @error('display_name') is-invalid @enderror"
-                                                name="display_name" value="{{ old('display_name', Auth::user()->display_name) }}"
+                                                name="display_name"
+                                                value="{{ old('display_name', Auth::user()->display_name) }}"
                                                 placeholder="Enter your Display name">
                                             @error('display_name')
                                                 <span class="invalid-feedback" role="alert">
@@ -471,7 +473,7 @@
                 <!-- User Emergency Contact Detail End -->
 
                 <!-- User Referral section Start -->
-                <div class="row mt-5">
+                <div class="row mt-5" id="referral">
                     <div class="col-sm-12">
                         <div class="information-box">
                             <div class="information-box-head">
@@ -484,14 +486,14 @@
                             </div>
                             <div class="information-box-body">
                                 <!-- @if ($errors->any())
-                                                                        <div class="alert alert-danger">
-                                                                            <ul>
-                                                                                @foreach ($errors->all() as $error)
+                                                                                    <div class="alert alert-danger">
+                                                                                        <ul>
+                                                                                            @foreach ($errors->all() as $error)
     <li>{{ $error }}</li>
     @endforeach
-                                                                            </ul>
-                                                                        </div>
-                                                                    @endif -->
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                @endif -->
 
                                 @if (session('success'))
                                     <div class="alert alert-success">
@@ -1115,5 +1117,44 @@
             // Optionally, set a placeholder or tooltip with the formatted date
             dateInput.placeholder = "MM/DD/YYYY";
         });
+        document.addEventListener("DOMContentLoaded", function() {
+            // Check if URL contains "#referral"
+            if (window.location.hash === "#referral") {
+                const referralSection = document.getElementById("referral");
+                const fixedMenuHeight = document.querySelector(".navbar")?.offsetHeight ||
+                0; // Handle cases where .navbar might not exist
+
+                function smoothScroll(target, duration) {
+                    let targetPosition = target.getBoundingClientRect().top + window.scrollY - fixedMenuHeight -
+                    40;
+                    let startPosition = window.scrollY;
+                    let startTime = null;
+
+                    function animation(currentTime) {
+                        if (startTime === null) startTime = currentTime;
+                        let timeElapsed = currentTime - startTime;
+                        let run = ease(timeElapsed, startPosition, targetPosition - startPosition, duration);
+                        window.scrollTo(0, run);
+                        if (timeElapsed < duration) requestAnimationFrame(animation);
+                    }
+
+                    function ease(t, b, c, d) {
+                        t /= d / 2;
+                        if (t < 1) return (c / 2) * t * t + b;
+                        t--;
+                        return (-c / 2) * (t * (t - 2) - 1) + b;
+                    }
+
+                    requestAnimationFrame(animation);
+                }
+
+                if (referralSection) {
+                    setTimeout(() => {
+                        smoothScroll(referralSection, 1000); // Scroll over 1 second
+                    }, 500); // Small delay for better UX
+                }
+            }
+        });
     </script>
+
 @endsection

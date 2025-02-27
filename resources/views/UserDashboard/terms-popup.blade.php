@@ -157,7 +157,7 @@
 
                                     <input type="text" name="captcha" id="captcha" class="form-control required"
 
-                                        placeholder="Enter skill testing code" required>
+                                        placeholder="Enter Answer" required>
 
                                 </div>
 
@@ -275,13 +275,13 @@
 
                     required: "Please enter the CAPTCHA.",
 
-                    remote: "Invalid CAPTCHA. Please try again."
+                    remote: "Incorrect calculation."
 
                 },
 
                 terms: {
 
-                    required: "You must agree to the terms and conditions."
+                    required: "You enter agree to the terms and conditions."
 
                 }
 
@@ -345,7 +345,7 @@
 
                         });
 
-                        window.location.href = "{{ route('user-dashboard') }}";
+                        window.location.href = "{{ route('user-settings') }}#referral";
 
                     },
 

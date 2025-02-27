@@ -48,18 +48,18 @@
                                         @default
                                             <td class="pending-text">Pending</td>
                                     @endswitch
-                                    <td>
+                                    <td class="text-center">
+                                        <a href="{{ route('user.inquiryDetail', ['id' => $inquiry->id]) }}"
+                                            class="btn btn-primary w-100">
+                                            View
+                                        </a>
                                         @if (!empty($inquiry->apk) && $inquiry->inquiry_status == 1)
                                             <form action="{{ route('checkout.process') }}" method="POST">
                                                 @csrf
                                                 <input type="hidden" name="apk" value="{{ $inquiry->apk }}">
-                                                <button type="submit" class="btn btn-primary">Pay Now</button>
+                                                <button type="submit" class="btn btn-primary w-100 mt-1 pay-now-btn">Pay Now</button>
                                             </form>
                                         @endif
-                                        <a href="{{ route('user.inquiryDetail', ['id' => $inquiry->id]) }}"
-                                            class="btn btn-primary">
-                                            View
-                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

@@ -509,6 +509,12 @@ class VendorController extends Controller
                     'vendor' => $vendor
                 ];
                 $send = Mail::to($to)->send(new VendorMail($vendorData, 'emails.vendor.vendor_login_details_email', $subject));
+                $send = Mail::to(env('ADMIN_EMAIL'))->send(new VendorMail($vendorData, 'emails.vendor.vendor_login_details_email', $subject));
+                $moderatorEmail = env('MODERATOR_EMAIL');
+
+                if (!empty($moderatorEmail)) {
+                    Mail::to($moderatorEmail)->send(new VendorMail($vendorData, 'emails.vendor.vendor_login_details_email', $subject));
+                }
                 if ($send) {
                     $vendor->email_sent_at = \Carbon\Carbon::now();
                     $vendor->save();

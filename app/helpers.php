@@ -552,3 +552,18 @@ if (!function_exists('calculatePlatformProcessingFee')) {
         return round(($totalAmount * $feePercentage) / 100, 2);
     }
 }
+
+if (!function_exists('refundContent')) {
+    /**
+     * Calculate the platform processing fee as 8% of the total.
+     *
+     * @param float $totalAmount
+     * @return float
+     */
+    function refundContent($key = null): string
+    {
+        $key = str_replace('-', '_', $key);
+        $refundContent = App\Models\CmsPage::where('slug', 'refund-policy')->first();
+        return $refundContent->description[$key] ?? '';
+    }
+}

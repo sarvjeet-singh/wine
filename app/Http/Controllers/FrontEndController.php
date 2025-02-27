@@ -237,8 +237,9 @@ class FrontEndController extends Controller
         }
 
         $vendor->load('mediaGallery');
+        $mediaGalleries = VendorMediaGallery::where('vendor_id', $vendor->id)->where('is_default', 0)->get();
         // If the vendor exists, proceed with the logic to show the accommodation details
-        return view('FrontEnd.accommodation-details', compact('vendor', 'socialLinks', 'amenities', 'season'));
+        return view('FrontEnd.accommodation-details', compact('vendor', 'socialLinks', 'amenities', 'season', 'mediaGalleries'));
     }
 
     private function getWineryDetails($short_code)
@@ -306,8 +307,9 @@ class FrontEndController extends Controller
         }
 
         $vendor->load('mediaGallery');
+        $mediaGalleries = VendorMediaGallery::where('vendor_id', $vendor->id)->where('is_default', 0)->get();
         // If the vendor exists, proceed with the logic to show the accommodation details
-        return view('FrontEnd.wineryDetails', compact('vendor', 'socialLinks', 'amenities', 'wines', 'hours', 'cuisineNames', 'user'));
+        return view('FrontEnd.wineryDetails', compact('vendor', 'socialLinks', 'amenities', 'wines', 'hours', 'cuisineNames', 'user', 'mediaGalleries'));
     }
 
     public function getExcursionDetails($short_code)
@@ -483,10 +485,10 @@ class FrontEndController extends Controller
         $checkInOnly = $this->dateCheckerService->getCheckInOnlyDates();
         $checkOutOnly = $this->dateCheckerService->getCheckOutOnlyDates();
         $bookedAndBlockeddates = $this->dateCheckerService->getBlockedDates();
-        $data['dates'] = $dates;
         $data['bookedAndBlockeddates']  = $bookedAndBlockeddates;
         $data['checkOutOnly']           = $checkOutOnly;
         $data['checkInOnly']           = $checkInOnly;
+        $data['dates'] = $dates;
         // $data['booking_minimum']        = isset($VendorBookingSeason->booking_min) ? $VendorBookingSeason->booking_min : '';
         // $data['booking_maximum']        = isset($VendorBookingSeason->booking_max) ? $VendorBookingSeason->booking_max : '';
         // $data['refund_policy']          = isset($VendorBookingSeason->refund_policy) ? $VendorBookingSeason->refund_policy : '';

@@ -56,72 +56,73 @@
                                                 @enderror
                                             </div>
                                         </div>
-
-                                        <div class="col-md-6">
-                                            <div>
-                                                <label for="price" class="form-label fw-bold">Price</label>
-                                                <input type="text"
-                                                    class="form-control @error('price') is-invalid @enderror" name="price"
-                                                    placeholder="Price" value="{{ old('price', $plan->price ?? '') }}"
-                                                    oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                                                @error('price')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
+                                        @if (empty($plan))
+                                            <div class="col-md-6">
+                                                <div>
+                                                    <label for="price" class="form-label fw-bold">Price</label>
+                                                    <input type="text"
+                                                        class="form-control @error('price') is-invalid @enderror"
+                                                        name="price" placeholder="Price"
+                                                        value="{{ old('price', $plan->price ?? '') }}"
+                                                        oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                                                    @error('price')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div class="col-md-6">
-                                            <div>
-                                                <label for="interval" class="form-label fw-bold">Billing Interval</label>
-                                                <select name="interval"
-                                                    class="form-select @error('interval') is-invalid @enderror">
-                                                    <option value="">Select Interval</option>
-                                                    <option value="day"
-                                                        {{ old('interval', $plan->interval ?? '') == 'day' ? 'selected' : '' }}>
-                                                        Daily</option>
-                                                    <option value="week"
-                                                        {{ old('interval', $plan->interval ?? '') == 'week' ? 'selected' : '' }}>
-                                                        Weekly</option>
-                                                    <option value="month"
-                                                        {{ old('interval', $plan->interval ?? '') == 'month' ? 'selected' : '' }}>
-                                                        Monthly</option>
-                                                    <option value="year"
-                                                        {{ old('interval', $plan->interval ?? '') == 'year' ? 'selected' : '' }}>
-                                                        Yearly</option>
-                                                    <option value="3months"
-                                                        {{ old('interval', $plan->interval ?? '') == '3months' ? 'selected' : '' }}>
-                                                        Every 3 months</option>
-                                                    <option value="6months"
-                                                        {{ old('interval', $plan->interval ?? '') == '6months' ? 'selected' : '' }}>
-                                                        Every 6 months</option>
-                                                </select>
-                                                @error('interval')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
+                                            <div class="col-md-6">
+                                                <div>
+                                                    <label for="interval" class="form-label fw-bold">Billing
+                                                        Interval</label>
+                                                    <select name="interval"
+                                                        class="form-select @error('interval') is-invalid @enderror">
+                                                        <option value="">Select Interval</option>
+                                                        <option value="day"
+                                                            {{ old('interval', $plan->interval ?? '') == 'day' ? 'selected' : '' }}>
+                                                            Daily</option>
+                                                        <option value="week"
+                                                            {{ old('interval', $plan->interval ?? '') == 'week' ? 'selected' : '' }}>
+                                                            Weekly</option>
+                                                        <option value="month"
+                                                            {{ old('interval', $plan->interval ?? '') == 'month' ? 'selected' : '' }}>
+                                                            Monthly</option>
+                                                        <option value="year"
+                                                            {{ old('interval', $plan->interval ?? '') == 'year' ? 'selected' : '' }}>
+                                                            Yearly</option>
+                                                        <option value="3months"
+                                                            {{ old('interval', $plan->interval ?? '') == '3months' ? 'selected' : '' }}>
+                                                            Every 3 months</option>
+                                                        <option value="6months"
+                                                            {{ old('interval', $plan->interval ?? '') == '6months' ? 'selected' : '' }}>
+                                                            Every 6 months</option>
+                                                    </select>
+                                                    @error('interval')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div>
-                                                <label for="currency" class="form-label fw-bold">Currency</label>
-                                                <select name="currency"
-                                                    class="form-select @error('currency') is-invalid @enderror">
-                                                    <option value="">Select Currency</option>
-                                                    @if (count($currencies) > 0)
-                                                        @foreach ($currencies as $key => $currency)
-                                                            <option value="{{ $key }}"
-                                                                {{ old('currency', $plan->currency ?? '') == $key ? 'selected' : '' }}>
-                                                                {{ $currency }}
-                                                            </option>
-                                                        @endforeach
-                                                    @endif
-                                                </select>
-                                                @error('currency')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
+                                            <div class="col-md-6">
+                                                <div>
+                                                    <label for="currency" class="form-label fw-bold">Currency</label>
+                                                    <select name="currency"
+                                                        class="form-select @error('currency') is-invalid @enderror">
+                                                        <option value="">Select Currency</option>
+                                                        @if (count($currencies) > 0)
+                                                            @foreach ($currencies as $key => $currency)
+                                                                <option value="{{ $key }}"
+                                                                    {{ old('currency', $plan->currency ?? '') == $key ? 'selected' : '' }}>
+                                                                    {{ $currency }}
+                                                                </option>
+                                                            @endforeach
+                                                        @endif
+                                                    </select>
+                                                    @error('currency')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
                                             </div>
-                                        </div>
-
+                                        @endif
                                         <div class="col-md-12">
                                             <div>
                                                 <label for="description" class="form-label fw-bold">Description</label>
@@ -142,7 +143,7 @@
                                                 @enderror
                                             </div>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <div>
                                                 <label for="features" class="form-label fw-bold">Vendor Type</label>
                                                 <select name="type" class="form-select" id="type">
@@ -160,13 +161,17 @@
                                                 @enderror
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label for="sort_order">Sort Order</label>
-                                            <select name="sort_order" id="sort_order" class="form-control">
-                                                @foreach (range(1, 100) as $i)
-                                                    <option value="{{ $i }}">{{ $i }}</option>
-                                                @endforeach
-                                            </select>
+                                        <div class="col-md-6">
+                                            <div>
+                                                <label for="sort_order" class="form-label fw-bold">Sort Order</label>
+                                                <select name="sort_order" id="sort_order" class="form-select">
+                                                    @foreach (range(1, 100) as $i)
+                                                        <option
+                                                            {{ old('sort_order', $plan->sort_order ?? '') == $i ? 'selected' : '' }}
+                                                            value="{{ $i }}">{{ $i }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -220,7 +225,7 @@
     <script>
         $(document).ready(function() {
             $('select').select2();
-            CKEDITOR.replace( 'features' );
+            CKEDITOR.replace('features');
         });
     </script>
 @endpush

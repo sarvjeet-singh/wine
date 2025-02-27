@@ -114,8 +114,9 @@
 
                 // Function to toggle the main checkbox state and label text
                 function toggleCheckboxState() {
+
                     // Enable "Open/Closed" checkbox if opening time is set and (closing time is set or Late is checked)
-                    if (openingTimeInput.value && (closingTimeInput.value || lateCheckbox.checked)) {
+                    if (openingTimeInput.value &&  (closingTimeInput.value || lateCheckbox.checked)) {
                         checkbox.disabled = false;
                         checkbox.checked = true; // Automatically check when valid inputs are provided
                         statusText.textContent = 'Open';
@@ -139,8 +140,8 @@
                 }
 
                 // Run initially to set the correct state on page load
-                toggleCheckboxState();
-                toggleClosingTimeState();
+                // toggleCheckboxState();
+                // toggleClosingTimeState();
 
                 // Add event listeners to monitor changes in time inputs and checkboxes
                 openingTimeInput.addEventListener('input', toggleCheckboxState);

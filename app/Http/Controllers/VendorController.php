@@ -23,6 +23,7 @@ use App\Models\VendorAmenity;
 use App\Models\VendorRoom;
 use App\Models\Order;
 use App\Models\Inquiry;
+use App\Models\CmsPage;
 use App\Models\InventoryType;
 use App\Models\SubCategory;
 use App\Models\FarmingPractice;
@@ -49,18 +50,21 @@ use App\Mail\InquiryApprovedMail;
 use App\Mail\InquiryRejectedMail;
 use DB;
 use Hash;
+use App\Services\DateCheckerService;
 
 
 class VendorController extends Controller
 {
+	private $dateCheckerService;
 	/**
 	 * Create a new controller instance.
 	 *
 	 * @return void
 	 */
-	public function __construct()
+	public function __construct(DateCheckerService $dateCheckerService)
 	{
 		// $this->middleware('auth');
+		$this->dateCheckerService = $dateCheckerService;
 	}
 
 	/**
@@ -78,7 +82,8 @@ class VendorController extends Controller
 		$booked = DB::table('booking_dates')->where('vendor_id',  $vendor_id)->where('booking_type', '!=', 'packaged')->select('start_date', 'end_date')->get();
 
 		// $booked_dates = DB::table('member_payment')->where('vendor_id',  $vendor_id)->select('check_in','check_out')->get();
-
+		$checkOutOnly = [];
+        $checkInOnly = [];
 		$cojoinDates = array();
 		$dates = array();
 
@@ -168,9 +173,16 @@ class VendorController extends Controller
 
 		// Convert to JSON format if needed
 		// $bookedAndBlockedDatesJson = json_encode($bookedAndBlockedDates);
+		$dates_all = $this->dateCheckerService->processVendorDates($vendor_id);
+        $checkInOnly = $this->dateCheckerService->getCheckInOnlyDates();
+        $checkOutOnly = $this->dateCheckerService->getCheckOutOnlyDates();
+        $bookedAndBlockeddates = $this->dateCheckerService->getBlockedDates();
+        $data['bookedAndBlockeddates']  = $bookedAndBlockeddates;
+        $data['checkOutOnly']           = $checkOutOnly;
+        $data['checkInOnly']           = $checkInOnly;
 		$data['cojoinDates'] = $cojoinDates;
 		$data['dates'] = $dates;
-		$data['bookedAndBlockeddates'] = $bookedAndBlockedDates;
+		// $data['bookedAndBlockeddates'] = $bookedAndBlockedDates;
 		return response()->json(array('success' => true, 'data' => $data), 200);
 
 		// }
@@ -540,15 +552,20 @@ class VendorController extends Controller
 			$vendor->metadata = $vendor->accommodationMetadata;
 			unset($vendor->accommodationMetadata);
 		}
+		$getRefundData = CmsPage::where('slug', 'refund-policy')->first();
+		$getRefundContent = '';
+		if($getRefundData){
+			$getRefundContent = $getRefundData->description;
+		}
 		$stripeDetail = VendorStripeDetail::where('vendor_id', $vendorid)->count();
-		return view('VendorDashboard.vendor-booking-utility', compact('vendor', 'stripeDetail'));
+		return view('VendorDashboard.vendor-booking-utility', compact('vendor', 'stripeDetail', 'getRefundContent'));
 	}
 
 	public function updateVendorPolicy(Request $request)
 	{
 		$request->validate([
 			// other validation rules
-			'policy' => 'required|string|in:open,partial,closed',
+			'policy' => 'required|string|in:no-cancel,one-day,seven-day',
 		]);
 
 		$vendor = Vendor::find($request->vendorid);
@@ -794,15 +811,14 @@ class VendorController extends Controller
 	{
 		// Find the vendor using the vendor ID
 		$vendor = Vendor::find($vendorid);
-		$usersCount = User::where('role', 'member')->count();
-		$mostCommonLocation = User::select('country', 'city', \DB::raw('COUNT(*) as user_count'))
+		$usersCount = Customer::where('guestrewards_vendor_id', $vendorid)->count();
+		$mostCommonLocation = Customer::select('country', 'city', \DB::raw('COUNT(*) as user_count'))
 			->whereNotNull('country') // Exclude NULL countries
 			->where('country', '!=', '') // Exclude empty strings
 			->whereNotNull('city') // Exclude NULL cities
 			->where('city', '!=', '') // Exclude empty strings
 			->groupBy('country', 'city')
 			->orderByDesc('user_count')
-			->where('role', 'member')
 			->first();
 		$reviewData = Review::where('vendor_id', $vendorid)
 			->where('review_status', 'approved')

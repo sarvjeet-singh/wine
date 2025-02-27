@@ -2842,7 +2842,19 @@ button#confirm_booking_btn:hover {
     fill: #c0a144;
 
 }
-
+.summary-content-sec #state-wrapper span.select2-selection {
+    height: 38px;
+    border-color: #dee2e6;
+    border-radius: 0.375rem;
+}
+.summary-content-sec #state-wrapper span#select2-state-container,
+.summary-content-sec #state-wrapper span.select2-selection button.select2-selection__clear,
+.summary-content-sec #state-wrapper span.select2-selection__arrow {
+    height: 100%;
+}
+.summary-content-sec #state-wrapper span#select2-state-container {
+    padding-block: 4px;
+}
 .stripe-payment-sec input[type=number]::-webkit-inner-spin-button, 
 
 .stripe-payment-sec input[type=number]::-webkit-outer-spin-button { 
@@ -2955,11 +2967,11 @@ button#confirm_booking_btn:hover {
 
 }
 
-.forgot-pwd-sec form > div:has(.error) svg {
+/*.forgot-pwd-sec form > div:has(.error) svg {
 
     right: 32px;
 
-}
+}*/
 .forgot-pwd-sec.vendor-forgot-pwd button.theme-btn {
     background-color: #118c97;
 }
@@ -2974,6 +2986,9 @@ button#confirm_booking_btn:hover {
 }
 .forgot-pwd-sec.vendor-forgot-pwd .form-control:focus {
     border-color: #118c97 !important;
+}
+.forgot-pwd-sec form input.form-control:not([type="email"]) {
+    background-position: right calc(.375em + 1.75rem) center;
 }
 /* ================== FORGOT PWD PAGE END ================== */
 
@@ -3221,6 +3236,58 @@ footer.vendor-footer .footer-links li a:hover {
 
 
 
+/* ================== T&C PAGE START ================== */
+.terms-and-condition-content h1 {
+    font-size: 34px;
+    color: #000;
+}
+.terms-and-condition-content  h2 {
+    font-size: 26px;
+    color: #000;
+}
+.terms-and-condition-content a {
+    color: #bba253;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+}
+.terms-and-condition-content input[type=checkbox] {
+    border-color: #bba253;
+    box-shadow: unset;
+}
+.terms-and-condition-content input[type=checkbox]:checked {
+    background-color: #bba253;
+}
+.terms-and-condition-content ul {
+    list-style: decimal;
+}
+.terms-and-condition-content ul ul {
+    list-style: upper-roman;
+}
+.terms-and-condition-content ul li:not(:last-child) {
+    margin-bottom: 10px;
+}
+.terms-and-condition-content ul li::marker {
+    font-weight: 600;
+    color: #000000;
+}
+/* ================== T&C PAGE END ================== */
+
+
+/* ================== THANK YOU PAGE START ================== */
+.order-thankyou-content {
+    min-height: 70vh;
+}
+.order-thankyou-content a.return-btn {
+    background-color: #bba253;
+    border-color: #bba253;
+}
+.order-thankyou-content a.view-order-btn {
+    background-color: #ffffff;
+    color: #b7a35f;
+    border-color: #b7a35f;
+}
+/* ================== THANK YOU PAGE END ================== */
+
 .age-verify-modal .modal-body img {
 
     width: 80px;
@@ -3276,4 +3343,17 @@ footer.vendor-footer .footer-links li a:hover {
 }
 .status-declined {
     color: red;
+}
+table .pay-now-btn {
+    font-size: 14px;
+    padding: 6px 10px;
+    background-color: #3e8b4c;
+    border-color: #3e8b4c;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+table .pay-now-btn:hover {
+    background-color: #3e8b4c;
+    border-color: #3e8b4c;
+    color: #ffffff;
 }

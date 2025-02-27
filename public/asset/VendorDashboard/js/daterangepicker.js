@@ -380,14 +380,17 @@
                             null != this.endDate && i[b][k].format("YYYY-MM-DD") == this.endDate.format("YYYY-MM-DD") && W.push("active", "end-date"),
                             null != this.endDate && i[b][k] > this.startDate && i[b][k] < this.endDate && W.push("in-range");
                         var H = this.isCustomDate(i[b][k]);
+                        var tt = "";
                         // console.log(H);
                         0==cojoin&&"cojoinDates"==H&&(H="cojoinDates FirstDates",cojoin=1);
+                         "checkoutonly"==H&&(tt="CheckOut Only");
+                        "checkinonly"==H&&(tt="CheckIn Only");
                        "bookedAndBlockeddates"==H&&(W.push("off", "disabled"));
                         !1 !== H && ("string" == typeof H ? W.push(H) : Array.prototype.push.apply(W, H));
                         var j = "",
                             N = !1;
                         for (D = 0; D < W.length; D++) (j += W[D] + " "), "disabled" == W[D] && (N = !0);
-                        N || (j += "available"), (Y += '<td class="' + j.replace(/^\s+|\s+$/g, "") + '" data-title="r' + b + "c" + k + '">' + i[b][k].date() + "</td>");
+                        N || (j += "available"), (Y += '<td class="' + j.replace(/^\s+|\s+$/g, "") + '" title="'+ tt +'" data-title="r' + b + "c" + k + '">' + i[b][k].date() + "</td>");
                     }
                     Y += "</tr>";
                 }
@@ -614,7 +617,9 @@
                             var h = this.timePickerSeconds ? parseInt(this.container.find(".left .secondselect").val(), 10) : 0;
                             r = r.clone().hour(o).minute(l).second(h);
                         }
-                        (this.endDate = null), this.setStartDate(r.clone());
+                        if(!e(t.target).hasClass("checkoutonly")){
+                            (this.endDate = null), this.setStartDate(r.clone());
+                        }
                     } else
                         !this.endDate && r.isBefore(this.startDate)
                             ? this.setEndDate(this.startDate.clone())

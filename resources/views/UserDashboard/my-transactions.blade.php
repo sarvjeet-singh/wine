@@ -26,7 +26,7 @@
                                     <td>{{ $order->vendor->vendor_name }}</td>
                                     <td>{{ toLocalTimezone($order->created_at, getUserTimezone()) }}</td>
                                     <td>${{ $order->order_total }}</td>
-                                    <td>{{ toLocalTimezone($order->check_in_at, getUserTimezone()) ?? 'N/A' }}</td>
+                                    <td>{{ toLocalTimezone($order->check_in_at, getUserTimezone()) ?? 'N/A' }} - {{ toLocalTimezone($order->check_out_at, getUserTimezone()) ?? 'N/A' }}</td>
                                     <td><a href="{{ route('user.orderDetail', $order->id) }}" class="btn btn-primary">View
                                     </td>
                                 </tr>

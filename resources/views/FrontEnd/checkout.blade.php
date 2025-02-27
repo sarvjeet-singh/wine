@@ -22,7 +22,7 @@
                         <h5 class="theme-color mb-0 fs-6">
                             {{ !empty($vendor->sub_category->name) ? $vendor->sub_category->name : '' }}</h5>
                         <!-- <div class="rating-star d-flex align-items-center"
-                                                                                                                                                                                                                        data-rating="{{ $vendor->reviews->avg('rating') ?? 0.0 }}"></div> -->
+                                                                                                                                                                                                                                data-rating="{{ $vendor->reviews->avg('rating') ?? 0.0 }}"></div> -->
                     </div>
                     <h3 class="card-title mt-2 mb-2 fw-bold" style="font-size: 15px;">{{ $vendor->vendor_name }}</h3>
                     <div class="info d-flex align-items-baseline gap-2 mb-2">
@@ -137,7 +137,7 @@
                                             @enderror
                                         </div>
 
-                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3" id="state-wrapper"
+                                        <div class="col-sm-6 col-12 mb-sm-0 mb-3 mt-sm-0 mt-3" id="state-wrapper"
                                             style="display: none;">
                                             <label class="form-label">State</label>
                                             <select name="state" id="state" class="form-select">
@@ -171,7 +171,7 @@
                                             @enderror
                                         </div>
                                     </div>
-                                    <div class="row mt-3">
+                                    <div class="row mt-sm-3">
                                         <div class="col-sm-12 col-12">
                                             <label for="email" class="form-label">Postal Code/Zip<span
                                                     class="required-filed">*</span></label>
@@ -192,16 +192,17 @@
                                 <p class="info-label mb-0">Check-In Date/Time:</p>
                                 <p class="mb-0">
                                     {{ Carbon::createFromFormat('Y-m-d', $booking->start_date)->format('Y-F-d') }}
-                                    ({{ !empty($vendor->accommodationMetadata->checkin_start_time) ? $vendor->accommodationMetadata->checkin_start_time : '' }}
-                                    –
-                                    {{ !empty($vendor->accommodationMetadata->checkin_end_time) ? $vendor->accommodationMetadata->checkin_end_time : '' }})
+                                    (After
+                                    {{ !empty($vendor->accommodationMetadata->checkin_start_time) ? $vendor->accommodationMetadata->checkin_start_time : '' }})
+                                    {{-- –
+                                    {{ !empty($vendor->accommodationMetadata->checkin_end_time) ? $vendor->accommodationMetadata->checkin_end_time : '' }}) --}}
                                 </p>
                                 <!-- 2024-May-16  3:00 PM – 12:00 AM-->
                             </div>
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <p class="info-label mb-0">Check-out Date/Time</p>
                                 <p class="mb-0">
-                                    {{ Carbon::createFromFormat('Y-m-d', $booking->end_date)->format('Y-F-d') }} ( Before
+                                    {{ Carbon::createFromFormat('Y-m-d', $booking->end_date)->format('Y-F-d') }} (Before
                                     {{ !empty($vendor->accommodationMetadata->checkout_time) ? $vendor->accommodationMetadata->checkout_time : '' }})
                                 </p>
                             </div>
@@ -426,30 +427,14 @@
                 <div class="col-lg-4">
                     <div class="detail-outer-box border mt-lg-0 mt-4 mb-4">
                         <div class="refund-policies p-sm-4 p-3">
-                            <h4 class="text-dark fw-bold fs-6 mb-3">Refund Policy</h4>
+                            <h4 class="mt-5">Refund Policy</h4>
                             @if ($vendor->policy != '')
-                                <ul class="">
-                                    <li class="mb-2">
-                                        @if ($vendor->policy == 'partial')
-                                            A full refund minus transaction fees will be issued upon request up to 7 days
-                                            prior to the check-in date indicated. No refund will be issued for cancellations
-                                            that fall within that 7-day period prior to the check-in date. A credit or rain
-                                            cheque may be issued to guests at the vendor’s discretion.
-                                        @elseif($vendor->policy == 'open')
-                                            A full refund minus transaction fees will be issued upon request up to 24 hours
-                                            prior to the check-in date indicated.
-                                        @elseif($vendor->policy == 'closed')
-                                            All bookings are final. No portion of your transaction will be refunded. A
-                                            credit or rain cheque may be issued by the subject vendor at the vendor’s
-                                            discretion.
-                                        @endif
-                                    </li>
-                                </ul>
+                                {!! refundContent($vendor->policy) !!}
                             @endif
                         </div>
                     </div>
                     @if ($vendor->accommodationMetadata->process_type == 'one-step' || !empty($booking->apk))
-                        <div class="detail-outer-box border p-4 rounded shadow-sm">
+                        <div class="detail-outer-box border p-4 mb-4">
                             <h4 class="text-dark fw-bold fs-5 text-center mb-3">
                                 Total Bottle Bucks: <span id="wallet_balance">$0.00</span>
                             </h4>
@@ -557,13 +542,13 @@
                         (!empty($vendor->accommodationMetadata->process_type) ? $vendor->accommodationMetadata->process_type : '') ==
                             'one-step' || !empty($booking->apk))
                         <!-- Stripe Payment Sec Start -->
-                        <div id="payment-methods-container">
+                        <div id="payment-methods-container" class="mt-4">
                             <h4 class="fw-bold">Saved Payment Methods</h4>
                             <input type="hidden" id="selectedPaymentMethodId" name="payment_method_id" value="">
                             <!-- Payment Methods List (Will be populated by AJAX) -->
                             <ul id="payment-methods-list" class="list-group"></ul>
                             <!-- "Use a New Card" Option -->
-                            <div class="form-check mb-2">
+                            <div class="form-check my-2">
                                 <input type="radio" name="payment_method_select" value="new" id="use-new-card"
                                     class="form-check-input">
                                 <label for="use-new-card" class="form-check-label fw-bold">Use a New
@@ -1476,49 +1461,49 @@
                         restorePayButton(); // Restore the button on error
                     });
             @else
-            if ($("#checkout-form").valid()) {
-                const $payButton = $(this);
-                // Save the original button text globally
+                if ($("#checkout-form").valid()) {
+                    const $payButton = $(this);
+                    // Save the original button text globally
 
-                // Change button to show spinner
-                $payButton.html(
-                    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'
-                );
-                $payButton.prop('disabled', true); // Disable button to prevent multiple clicks
+                    // Change button to show spinner
+                    $payButton.html(
+                        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'
+                    );
+                    $payButton.prop('disabled', true); // Disable button to prevent multiple clicks
 
-                // Append data from both forms
-                const checkoutFormData = new FormData(document.getElementById("checkout-form"));
-                for (let [key, value] of checkoutFormData.entries()) {
-                    formData.append(key, value);
+                    // Append data from both forms
+                    const checkoutFormData = new FormData(document.getElementById("checkout-form"));
+                    for (let [key, value] of checkoutFormData.entries()) {
+                        formData.append(key, value);
+                    }
+
+                    if ($("#selectedPaymentMethodId").val() != null) {
+                        formData.append("payment_method_id", $("#selectedPaymentMethodId").val());
+                    }
+                    formData.append('selectedExperiences', JSON.stringify(selectedExperiences));
+                    formData.append('wallet_used', $('#wallet_used').val() || 0.00);
+                    fetch('{{ route('orders.authorize-payment') }}', {
+                            method: "POST",
+                            headers: {
+                                "X-CSRF-Token": $('meta[name="csrf-token"]').attr('content'),
+                                "Accept": "application/json"
+                            },
+                            body: formData
+                        })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            // if (data.client_secret && data.order_id) {
+                            handlePayment(data.client_secret, data.order_id, data.intent_type);
+                            // } else {
+                            //     console.error("Missing client_secret or order_id in response:", data);
+                            //     restorePayButton(); // Restore the button if data is missing
+                            // }
+                        })
+                        .catch((error) => {
+                            console.error("Error:", error);
+                            restorePayButton(); // Restore the button on error
+                        });
                 }
-
-                if ($("#selectedPaymentMethodId").val() != null) {
-                    formData.append("payment_method_id", $("#selectedPaymentMethodId").val());
-                }
-                formData.append('selectedExperiences', JSON.stringify(selectedExperiences));
-                formData.append('wallet_used', $('#wallet_used').val() || 0.00);
-                fetch('{{ route('orders.authorize-payment') }}', {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-Token": $('meta[name="csrf-token"]').attr('content'),
-                            "Accept": "application/json"
-                        },
-                        body: formData
-                    })
-                    .then((response) => response.json())
-                    .then((data) => {
-                        // if (data.client_secret && data.order_id) {
-                        handlePayment(data.client_secret, data.order_id, data.intent_type);
-                        // } else {
-                        //     console.error("Missing client_secret or order_id in response:", data);
-                        //     restorePayButton(); // Restore the button if data is missing
-                        // }
-                    })
-                    .catch((error) => {
-                        console.error("Error:", error);
-                        restorePayButton(); // Restore the button on error
-                    });
-            }
             @endif
         });
 

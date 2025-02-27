@@ -258,19 +258,21 @@
 
                                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                                     @if ($order->cancelled_at != null)
-                                                        <p class="info-label mb-0 fw-bold">Cancel Reason</p>
-
-
-                                                        <p class="mb-0">{{ $order->cancel_reason }}</p>
-                                                    @else
-                                                        <div>
-                                                            <button type="button" class="btn btn-danger"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#cancelOrderModal">Cancel
-                                                                Order</button>
+                                                        <div class="d-flex flex-column">
+                                                            <p class="info-label mb-0 fw-bold">Cancel Reason</p>
+                                                            @if (!empty($order->vendor_cancelled))
+                                                                <p class="mb-0"><b>Order Cancelled By You</b></p>
+                                                            @else
+                                                                <p class="mb-0"><b>Order Cancelled By Guest</b></p>
+                                                            @endif
+                                                            <p class="mb-0">{{ $order->cancel_reason }}</p>
                                                         </div>
+                                                    @else
+                                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                            data-bs-target="#cancelOrderModal">
+                                                            Cancel Order
+                                                        </button>
                                                     @endif
-
                                                 </div>
 
                                             </div>
@@ -446,47 +448,7 @@
                                 <div class="px-4 py-3">
 
                                     @if ($vendor->policy != '')
-
-                                        <ul class="">
-
-                                            <li class="mb-0">
-
-                                                @if ($vendor->policy == 'partial')
-                                                    A full refund minus transaction fees will be issued upon request
-
-                                                    up to 7 days
-
-                                                    prior to the check-in date indicated. No refund will be issued
-
-                                                    for cancellations
-
-                                                    that fall within that 7-day period prior to the check-in date. A
-
-                                                    credit or rain
-
-                                                    cheque may be issued to guests at the vendor’s discretion.
-                                                @elseif($vendor->policy == 'open')
-                                                    A full refund minus transaction fees will be issued upon request
-
-                                                    up to 24 hours
-
-                                                    prior to the check-in date indicated.
-                                                @elseif($vendor->policy == 'closed')
-                                                    All bookings are final. No portion of your transaction will be
-
-                                                    refunded. A
-
-                                                    credit or rain cheque may be issued by the subject vendor at the
-
-                                                    vendor’s
-
-                                                    discretion.
-                                                @endif
-
-                                            </li>
-
-                                        </ul>
-
+                                        {!! refundContent($vendor->policy) !!}
                                     @endif
 
                                 </div>
@@ -558,7 +520,7 @@
 
                                         <p class="fw-bold mb-0 fs-6">Payment Status</p>
 
-                                        <p class="fw-bold mb-0 fs-6">Approved</p>
+                                        <p class="fw-bold mb-0 fs-6">{{ ucfirst($order->payment_status) }}</p>
 
                                     </div>
 
@@ -679,7 +641,8 @@
 
                 let orderId = $("#order_id").val();
                 let cancelReason = $("#cancel_reason").val();
-                let url = "{{ route('orders.cancel') }}"; // Ensure this matches your route
+                let url =
+                    "{{ route('orders.vendor-cancel', $vendor->id) }}"; // Ensure this matches your route
 
                 // Clear previous errors
                 $("#cancel_reason_error").text("");
@@ -693,25 +656,52 @@
                         cancel_reason: cancelReason
                     },
                     beforeSend: function() {
-                        $("#cancelOrderForm button[type='submit']").prop("disabled", true).text(
-                            "Cancelling...");
+                        $("#cancelOrderForm button[type='submit']")
+                            .prop("disabled", true)
+                            .text("Cancelling...");
                     },
                     success: function(response) {
                         if (response.success) {
-                            $("#cancelOrderModal").modal("hide");
-                            location.reload(); // Reload to reflect changes
+                            Swal.fire({
+                                icon: "success",
+                                title: "Success",
+                                text: response.message,
+                                confirmButtonText: "OK"
+                            }).then(() => {
+                                $("#cancelOrderModal").modal("hide");
+                                window.location.href = window.location
+                                    .href; // Local reload
+                            });
                         } else {
-                            alert(response.message);
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: response.message,
+                                confirmButtonText: "OK"
+                            });
+                            $("#cancelOrderForm button[type='submit']")
+                                .prop("disabled", false)
+                                .text("Cancel Order");
                         }
                     },
                     error: function(xhr) {
                         let errors = xhr.responseJSON.errors;
-                        if (errors.cancel_reason) {
+                        if (errors && errors.cancel_reason) {
                             $("#cancel_reason_error").text(errors.cancel_reason[0]);
+                            $("#cancelOrderForm button[type='submit']")
+                                .prop("disabled", false)
+                                .text("Cancel Order");
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: errors.cancel_reason[0],
+                                confirmButtonText: "OK"
+                            });
                         }
                     },
                     complete: function() {
-                        $("#cancelOrderForm button[type='submit']").prop("disabled", false)
+                        $("#cancelOrderForm button[type='submit']")
+                            .prop("disabled", false)
                             .text("Cancel Order");
                     }
                 });

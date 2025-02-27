@@ -57,7 +57,64 @@
         </style>
         <div class="container">
             <div class="inner-sec">
-                <h1 class="mb-3">Terms and Conditions</h1>
+                <h1 class="mb-3">General Terms of Participation</h1>
+                <div class="my-4">
+                    <p>The Wine Country Weekends (WCW) marketplace platform and online community was developed to connect
+                        users/guests with listed vendors. Users are provided with a dynamic online environment through which
+                        they can easily source products and/or services to enhance their local travel experience. Catalogued
+                        vendors are afforded a similar opportunity to connect with individuals that may be seeking their
+                        product or service.
+                    </p>
+                </div>
+                <div class="my-4">
+                    <p>Platform users are not required to log into the system in order to access content, nor are they
+                        required to pay any fees. If however, a user does choose to establish a registered account, they
+                        will gain additional or improved access to many system utilities and services.
+                    </p>
+                </div>
+                <div class="my-4">
+                    <p>Registered users are also enrolled in the WCW Guest Rewards program which entitles them to earn cash
+                        back rewards, avoid 3rd-party fees and win prizes (i.e. getaway packages). The Guest Rewards program
+                        and affiliate promotions are administered by the Wine Country Weekends marketing team (hereafter:
+                        WCW Team). Contest participants must be 19 years of age or older and must not reside in the province
+                        of Quebec.
+                    </p>
+                </div>
+                <div class="my-4">
+                    <p>Initiating a registered user account (i.e. becoming a member) will enable participants to facilitate
+                        e-commerce directly with vendor partners. Personally identifying information collected will further
+                        help to facilitate transactions and/or used to enhance the online and in-person experiences.
+                    </p>
+                </div>
+                <div class="my-4">
+                    <p>Registered users agree to the use of their likeness (i.e. still or video images) in various
+                        advertising and promotional content. Participants may also receive periodic email notifications and
+                        are free to opt out of receiving said notifications at any time.
+                    </p>
+                </div>
+                <div class="my-4">
+                    <p>The WCW Team reserves the right to cancel or suspend any program or contest, modify the rules,
+                        particularly if there are factors that interfere with the proper administration of the contest.
+                        Additionally, the WCW Team may substitute all or part of a prize, including for a cash equivalent to
+                        the stated value of the prize, if all or part of the prize becomes unavailable for any reason.
+                    </p>
+                </div>
+                <div class="my-4">
+                    <p>
+                        The WCW Team reserves the right to cancel or suspend any program or contest, modify the rules,
+                        particularly if there are factors that interfere with the proper administration of the contest.
+                        Additionally, the WCW Team may substitute all or part of a prize, including for a cash equivalent to
+                        the stated value of the prize, if all or part of the prize becomes unavailable for any reason. </p>
+                    <ul>
+                        <li style="list-style-type: none"><input type="checkbox" onclick="return false;"> I agree to the above terms and the full Terms &
+                            Conditions detailed in the indicated link.</li>
+                    </ul>
+                    <p>Please correctly answer the following skill testing question to participate in contests and periodic
+                        giveaways.</p>
+
+                    </p>
+                </div>
+
                 <p class="fw-bold fst-italic">Please read our Terms & Conditions carefully, as they form the basis of the
                     agreement between you and the Wine Country Weekends marketing cooperative. Wine Country Weekends is the
                     sole
@@ -113,6 +170,36 @@
                         authorized or deemed part of the service. Modification or use of said content for any other purpose
                         may
                         be deemed as a violation of copyright and other proprietary rights.</p>
+                </div>
+
+                <div class="my-4">
+                    <h2>User Classes</h2>
+                    <p>There are two fundamental registered user classes; <b><i>personal</i></b> and <b><i>vendor</i></b>.
+                        Both
+                        categories have their own sub-sets or user statuses but the two top level categories are detailed
+                        below:
+                    </p>
+                    <div class="ps-3">
+                        <h6 class="fw-bold">Personal</h6>
+                        <p>Personal accounts are representative of individual users. Registrants are also members of the
+                            regional Guest Rewards program. Registered users are able to access their secure user dashboard,
+                            process transactions, submit testimonials & reviews, earn cash back rewards, participate in
+                            contests
+                            and more.</p>
+                    </div>
+                    <div class="ps-3">
+                        <h6 class="fw-bold">Vendor</h6>
+                        <p>Vendor accounts are representative of an organization or enterprise promoted via the platform
+                            and/or
+                            participating in the marketing cooperative. Vendor accounts can only be initiated by system
+                            administrators but potential listings can be submitted by registered users. Vendor accounts also
+                            serve as content that users are able to sort through when sourcing accommodations, excursions or
+                            wineries.</p>
+                    </div>
+                    <p>Any registered user or vendor that supplies or produces content are considered a content oriented
+                        registered entity (CORE) account. CORE users and vendor accounts provide the content that helps to
+                        drive
+                        interactions on the platform.</p>
                 </div>
 
                 <div class="my-4">
@@ -177,36 +264,6 @@
                             </ul>
                         </li>
                     </ul>
-                </div>
-
-                <div class="my-4">
-                    <h2>User Classes</h2>
-                    <p>There are two fundamental registered user classes; <b><i>personal</i></b> and <b><i>vendor</i></b>.
-                        Both
-                        categories have their own sub-sets or user statuses but the two top level categories are detailed
-                        below:
-                    </p>
-                    <div class="ps-3">
-                        <h6 class="fw-bold">Personal</h6>
-                        <p>Personal accounts are representative of individual users. Registrants are also members of the
-                            regional Guest Rewards program. Registered users are able to access their secure user dashboard,
-                            process transactions, submit testimonials & reviews, earn cash back rewards, participate in
-                            contests
-                            and more.</p>
-                    </div>
-                    <div class="ps-3">
-                        <h6 class="fw-bold">Vendor</h6>
-                        <p>Vendor accounts are representative of an organization or enterprise promoted via the platform
-                            and/or
-                            participating in the marketing cooperative. Vendor accounts can only be initiated by system
-                            administrators but potential listings can be submitted by registered users. Vendor accounts also
-                            serve as content that users are able to sort through when sourcing accommodations, excursions or
-                            wineries.</p>
-                    </div>
-                    <p>Any registered user or vendor that supplies or produces content are considered a content oriented
-                        registered entity (CORE) account. CORE users and vendor accounts provide the content that helps to
-                        drive
-                        interactions on the platform.</p>
                 </div>
 
                 <div class="my-4">
@@ -290,13 +347,6 @@
                 </div>
 
                 <div class="my-4">
-                    <h2>Monitoring of Information</h2>
-                    <p>The WCW Team reserves the right to monitor and censor all advertisements, public postings and
-                        messages to
-                        ensure that they conform to the content guidelines which may be applicable.</p>
-                </div>
-
-                <div class="my-4">
                     <h2>Removal of Information</h2>
                     <p>While The WCW Team does not and cannot review every message or material posted or sent by users of
                         the
@@ -311,6 +361,13 @@
                         Users shall remain solely responsible for the content of profiles, public postings, messages and
                         other
                         materials they may post publicly via the platform or provide to other users.</p>
+                </div>
+
+                <div class="my-4">
+                    <h2>Monitoring of Information</h2>
+                    <p>The WCW Team reserves the right to monitor and censor all advertisements, public postings and
+                        messages to
+                        ensure that they conform to the content guidelines which may be applicable.</p>
                 </div>
 
                 <div class="my-4">
@@ -350,6 +407,12 @@
 
                 <div class="my-4">
                     <h2>Security</h2>
+                    <p>
+                        We take your privacy seriously and use industry standard security practices. Your information is
+                        encrypted both when stored and when being transferred. We use firewalls and advanced security
+                        tools to prevent unauthorized access. We backup data securely to prevent loss in the event of
+                        system failure and only authorized individuals can access sensitive information.
+                    </p>
                     <p>User accounts are private and should not be used by anyone else. Users are responsible for all usage
                         or
                         activity on the platform gained through access by their login credentials, including but not limited

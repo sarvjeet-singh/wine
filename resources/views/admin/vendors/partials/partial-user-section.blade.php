@@ -56,13 +56,13 @@
                     @enderror
                 </div>
             </div>
-            <div class="col-md-6">
+            {{-- <div class="col-md-6">
                 <div>
                     <label for="" class="form-label fw-bold">Custom Password</small></label>
                     <input type="password" autocomplete="off" class="form-control" name="custom_password"
                         id="custom_password" placeholder="Enter password">
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 </div>

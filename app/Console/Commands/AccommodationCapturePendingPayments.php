@@ -41,7 +41,9 @@ class AccommodationCapturePendingPayments extends Command
                     // Capture payment on Stripe
                     $paymentIntent = PaymentIntent::retrieve($transaction->transaction_id);
                     $paymentIntent->capture();
-
+                    $order = Order::find($transaction->order_id);
+                    $order->payment_status = 'paid';
+                    $order->save();
                     // Update transaction status
                     $transaction->update(['transaction_status' => 'captured']);
 

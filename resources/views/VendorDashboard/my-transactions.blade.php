@@ -23,7 +23,7 @@
                             <td>{{ $order->guest_name ?? 'N/A' }}</td>
                             <td>{{ $order->created_at->format('m/d/Y') ?? 'N/A' }}</td>
                             <td>${{ $order->order_total ?? 'N/A' }}</td>
-                            <td>{{ \Carbon\Carbon::parse($order->check_in_at)->format('m/d/Y') ?? 'N/A' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($order->check_in_at)->format('m/d/Y') ?? 'N/A' }} - {{ \Carbon\Carbon::parse($order->check_out_at)->format('m/d/Y') ?? 'N/A' }}</td>
                             <td><a href="{{ route('vendor.orderDetail', ['id' => $order->id, 'vendorid' => $order->vendor->id]) }}"
                                     class="btn btn-primary">View</td>
                         </tr>

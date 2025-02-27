@@ -41,12 +41,12 @@ class DateCheckerService
                 $query->where('check_in_at', '>=', $this->currentDate)
                     ->orWhere('check_out_at', '>=', $this->currentDate);
             })
+            ->where("cancelled_at", null)
             ->get();
-
         // Process all date types
-        $this->processBookings($booked)
+        $this
+            ->processBookings($booked)
             ->processOrders($orders);
-
         return $this;
     }
 
@@ -56,24 +56,48 @@ class DateCheckerService
             $startDate = Carbon::parse($booking->start_date);
             $endDate = Carbon::parse($booking->end_date);
 
-            // Add check-in and check-out dates
-            $this->checkOutOnly[] = $startDate->format('Y-m-d');
-            $this->checkInOnly[] = $endDate->format('Y-m-d');
+            $startStr = $startDate->format('Y-m-d');
+            $endStr = $endDate->format('Y-m-d');
 
-            // Only block dates between check-in and check-out (exclusive)
+            // 🚨 If the start date is in checkOutOnly, block it and remove it
+            if (in_array($startStr, $this->checkInOnly)) {
+                $this->bookedAndBlockedDates[] = $startStr;
+                $this->checkInOnly = array_diff($this->checkInOnly, [$startStr]);
+            } else if (in_array($startStr, $this->checkOutOnly)) {
+                $this->bookedAndBlockedDates[] = $startStr;
+                $this->checkOutOnly = array_diff($this->checkOutOnly, [$startStr]);
+            } else {
+                $this->checkOutOnly[] = $startStr;
+            }
+
+            // 🚨 If the end date is in checkInOnly, block it and remove it
+            if (in_array($endStr, $this->checkOutOnly)) {
+                $this->bookedAndBlockedDates[] = $endStr;
+                $this->checkOutOnly = array_diff($this->checkOutOnly, [$endStr]);
+            }
+            else if (in_array($endStr, $this->checkInOnly)) {
+                $this->bookedAndBlockedDates[] = $endStr;
+                $this->checkInOnly = array_diff($this->checkInOnly, [$endStr]);
+            } else {
+                $this->checkInOnly[] = $endStr;
+            }
+
+
+            if (in_array($endStr, $this->checkOutOnly)) {
+                $this->bookedAndBlockedDates[] = $startStr;
+                $this->checkOutOnly = array_diff($this->checkInOnly, [$endStr]);
+            }
+
+            // 🚨 Block all middle dates between start and end (exclusive)
             $currentDate = $startDate->copy()->addDay();
             while ($currentDate->lt($endDate)) {
-                $dateStr = $currentDate->format('Y-m-d');
-                // Only add to blocked dates if it's not a check-in or check-out date
-                if (
-                    !in_array($dateStr, $this->checkInOnly) &&
-                    !in_array($dateStr, $this->checkOutOnly)
-                ) {
-                    $this->bookedAndBlockedDates[] = $dateStr;
-                }
+                $this->bookedAndBlockedDates[] = $currentDate->format('Y-m-d');
                 $currentDate->addDay();
             }
         }
+
+        // 🚨 Remove duplicate blocked dates
+        $this->bookedAndBlockedDates = array_values(array_unique($this->bookedAndBlockedDates));
 
         return $this;
     }
@@ -88,26 +112,47 @@ class DateCheckerService
                 $checkin = $this->currentDate;
             }
 
-            // Add check-in and check-out dates
-            $this->checkOutOnly[] = $checkin->format('Y-m-d');
-            $this->checkInOnly[] = $checkout->format('Y-m-d');
+            $checkinStr = $checkin->format('Y-m-d');
+            $checkoutStr = $checkout->format('Y-m-d');
 
-            // Block dates between check-in and check-out (exclusive)
+            // 🚨 If check-in date is in checkOutOnly, block it and remove it
+            if (in_array($checkinStr, $this->checkInOnly)) {
+                $this->bookedAndBlockedDates[] = $checkinStr;
+                $this->checkInOnly = array_diff($this->checkInOnly, [$checkinStr]);
+            } else if (in_array($checkinStr, $this->checkOutOnly)) {
+                $this->bookedAndBlockedDates[] = $checkinStr;
+                $this->checkOutOnly = array_diff($this->checkOutOnly, [$checkinStr]);
+            } else {
+                $this->checkOutOnly[] = $checkinStr;
+            }
+
+            // 🚨 If the end date is in checkInOnly, block it and remove it
+            if (in_array($checkoutStr, $this->checkOutOnly)) {
+                $this->bookedAndBlockedDates[] = $checkoutStr;
+                $this->checkOutOnly = array_diff($this->checkOutOnly, [$checkoutStr]);
+            }
+            else if (in_array($checkoutStr, $this->checkInOnly)) {
+                $this->bookedAndBlockedDates[] = $checkoutStr;
+                $this->checkInOnly = array_diff($this->checkInOnly, [$checkoutStr]);
+            } else {
+                $this->checkInOnly[] = $checkoutStr;
+            }
+
+
+            // 🚨 Block all middle dates between check-in and check-out (exclusive)
             $currentDate = $checkin->copy()->addDay();
             while ($currentDate->lt($checkout)) {
-                $dateStr = $currentDate->format('Y-m-d');
-                if (
-                    !in_array($dateStr, $this->checkInOnly) &&
-                    !in_array($dateStr, $this->checkOutOnly)
-                ) {
-                    $this->bookedAndBlockedDates[] = $dateStr;
-                }
+                $this->bookedAndBlockedDates[] = $currentDate->format('Y-m-d');
                 $currentDate->addDay();
             }
         }
 
+        // 🚨 Remove duplicate blocked dates
+        $this->bookedAndBlockedDates = array_values(array_unique($this->bookedAndBlockedDates));
+
         return $this;
     }
+
 
     public function isDateAvailable(string $date): bool
     {

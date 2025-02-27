@@ -211,8 +211,8 @@
                                     <div class="left child">
 
                                         <div class="property-gallery-main">
-                                            @if ($vendor->mediaGallery->isNotEmpty())
-                                                @foreach ($vendor->mediaGallery as $media)
+                                            @if (!empty($mediaGalleries))
+                                                @foreach ($mediaGalleries as $media)
                                                     @if ($media->vendor_media_type == 'image')
                                                         <div class="item">
                                                             <img src="{{ asset($media->vendor_media) }}">
@@ -249,8 +249,8 @@
 
                                     <div class="right child">
                                         <div class="property-gallery-thumb">
-                                            @if ($vendor->mediaGallery->isNotEmpty())
-                                                @foreach ($vendor->mediaGallery as $media)
+                                            @if (!empty($mediaGalleries))
+                                                @foreach ($mediaGalleries as $media)
                                                     @if ($media->vendor_media_type == 'image')
                                                         <div class="item">
                                                             <img src="{{ asset($media->vendor_media) }}">
@@ -2139,9 +2139,10 @@
 
             draggable: false,
 
-            useTransform: false,
+            useTransform: true,
 
             mobileFirst: true,
+            adaptiveHeight: true,
 
             responsive: [{
 

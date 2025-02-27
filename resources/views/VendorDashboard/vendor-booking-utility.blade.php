@@ -267,19 +267,19 @@
                             @csrf
                             <div class="row mt-3">
                                 <div class="col-12">
-                                    <input type="radio" class="custom-radio" id="open-policy" name="policy"
-                                        value="open" {{ old('policy', $vendor->policy) == 'open' ? 'checked' : '' }}>
-                                    <label class="form-label" for="open-policy">Open</label>
+                                    <input type="radio" class="custom-radio" id="no-cancel-policy" name="policy"
+                                        value="no-cancel" {{ old('policy', $vendor->policy) == 'no-cancel' ? 'checked' : '' }}>
+                                    <label class="form-label" for="no-cancel-policy">No Cancellation</label>
                                     <p style="font-size: 16px;padding-left: 30px;">A full refund minus transaction fees
                                         will be issued upon request up to 24 hours prior to the check-in date indicated.</p>
                                 </div>
                             </div>
                             <div class="row mt-3">
                                 <div class="col-12">
-                                    <input type="radio" class="custom-radio" id="partial-policy" name="policy"
-                                        value="partial"
-                                        {{ old('policy', $vendor->policy) == 'partial' ? 'checked' : '' }}>
-                                    <label class="form-label" for="partial-policy">Partial</label>
+                                    <input type="radio" class="custom-radio" id="one-day-policy" name="policy"
+                                        value="one-day"
+                                        {{ old('policy', $vendor->policy) == 'one-day' ? 'checked' : '' }}>
+                                    <label class="form-label" for="one-day-policy">24 Hours Cancellation</label>
                                     <p style="font-size: 16px;padding-left: 30px;">A full refund minus transaction fees
                                         will be issued upon request up to 7 days prior to the check-in date indicated. No
                                         refund will be issued for cancellations that fall within that 7-day period prior to
@@ -289,9 +289,9 @@
                             </div>
                             <div class="row mt-3">
                                 <div class="col-12">
-                                    <input type="radio" class="custom-radio" id="closed-policy" name="policy"
-                                        value="closed" {{ old('policy', $vendor->policy) == 'closed' ? 'checked' : '' }}>
-                                    <label class="form-label" for="closed-policy">Closed</label>
+                                    <input type="radio" class="custom-radio" id="seven-day-policy" name="policy"
+                                        value="seven-day" {{ old('policy', $vendor->policy) == 'seven-day' ? 'checked' : '' }}>
+                                    <label class="form-label" for="seven-day-policy">7 Days Cancellation</label>
                                     <p style="font-size: 16px;padding-left: 30px;">All bookings are final. No portion of
                                         your transaction will be refunded. A credit or rain cheque may be issued by the
                                         subject vendor at the vendor’s discretion.</p>
