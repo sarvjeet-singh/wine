@@ -88,5 +88,11 @@
                 <span class="link_name">Configuration Settings </span>
             </a>
         </li>
+        <li class="position-relative">
+            <a href="{{route('admin.error-logs')}}">
+                <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
+                <span class="link_name">Error Logs </span>
+            </a>
+        </li>
     </ul>
 </div>

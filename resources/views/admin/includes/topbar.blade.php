@@ -19,9 +19,9 @@
                 <button class="btn btn-account dropdown-toggle" type="button" id="dropdownMenuButton1"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     <div class="account-user text-white d-flex align-items-center gap-3 text-start">
-                        <img src="images/user-main.png" alt="User Image">
+                        <img src="{{ asset('asset/admin/images/user-main.png') }}" alt="User Image">
                         <div class="user-account-data">
-                            <h6 class="f-16 mb-0 bold"><span>Hello,</span> John Doe</h6>
+                            <h6 class="f-16 mb-0 bold"><span>Hello,</span> Admin</h6>
                             <p class="f-14 mb-0">Super Admin</p>
                         </div>
                         <a href="#"><i class="fa-solid fa-angle-down"></i></a>

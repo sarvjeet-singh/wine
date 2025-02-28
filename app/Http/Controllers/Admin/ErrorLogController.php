@@ -15,7 +15,7 @@ class ErrorLogController extends Controller
         if ($request->has('level') && !empty($request->level)) {
             $query->where('level', $request->level);
         }
-
+        $logs = $query->orderBy('id', 'desc');
         $logs = $query->paginate(20);
         $levels = ErrorLog::distinct()->pluck('level');
 

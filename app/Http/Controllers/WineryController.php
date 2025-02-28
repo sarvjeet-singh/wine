@@ -19,7 +19,7 @@ class WineryController extends Controller
         $subRegionId = request('sub_region');
 
         // Build the query
-        $wineries = Vendor::with('sub_category', 'sub_regions', 'reviews')
+        $wineries = Vendor::with('sub_category', 'sub_regions', 'reviews', 'mediaGallery')
             ->whereRaw('LOWER(vendor_type) = ?', ['winery'])
             ->where(function ($query) {
                 $query->where('account_status', '1')

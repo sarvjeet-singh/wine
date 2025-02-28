@@ -376,9 +376,21 @@
                                                 <a
                                                     href="{{ route('winery-shop.products', ['shopid' => $vendor->id, 'vendorid' => $vendorid]) }}">
                                                     <div class="wine-thumbnail text-center">
-                                                        @if ($vendor->vendor_media_logo)
-                                                            <img src="{{ asset($vendor->vendor_media_logo) }}"
-                                                                class="img-fluid" alt="Property Image">
+                                                        @if ($vendor->mediaGallery->isNotEmpty())
+                                                            @php
+                                                                $defaultMedia = $vendor->mediaGallery->firstWhere(
+                                                                    'is_default',
+                                                                    1,
+                                                                );
+                                                            @endphp
+
+                                                            @if ($defaultMedia && $defaultMedia->vendor_media_type == 'image')
+                                                                <img src="{{ asset($defaultMedia->vendor_media) }}"
+                                                                    class="img-fluid" alt="Property Image">
+                                                            @else
+                                                                <img src="{{ asset('images/vendorbydefault.png') }}"
+                                                                    class="img-fluid" alt="Property Image">
+                                                            @endif
                                                         @else
                                                             <img src="{{ asset('images/vendorbydefault.png') }}"
                                                                 class="img-fluid" alt="Property Image">
@@ -402,7 +414,9 @@
                                                         </h5>
                                                         <div class="info d-flex align-items-center gap-2 mb-2">
                                                             <i class="fa-solid fa-location-dot theme-color"></i>
-                                                            <p class="mb-0">{{ $vendor->street_address }}<br>{{ $vendor->city }}, {{ $vendor->province }}</p>
+                                                            <p class="mb-0">
+                                                                {{ $vendor->street_address }}<br>{{ $vendor->city }},
+                                                                {{ $vendor->province }}</p>
                                                         </div>
                                                     </div>
                                                 </a>

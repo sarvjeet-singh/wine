@@ -26,6 +26,15 @@
                                 {{ session('error') }}
                             </div>
                         @endif
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                     </div>
                     <div class="p-3">
                         <form
@@ -225,7 +234,11 @@
     <script>
         $(document).ready(function() {
             $('select').select2();
-            CKEDITOR.replace('features');
+            CKEDITOR.replace('features', {
+                extraAllowedContent: '*(*);*{*}', // Allows all tags, attributes, and styles
+                allowedContent: true, // Fully allows all HTML content
+                enterMode: CKEDITOR.ENTER_BR, // Prevents extra paragraphs
+            });
         });
     </script>
 @endpush

@@ -451,7 +451,7 @@ Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('adm
 // Admin routes protected by middleware
 Route::middleware(['auth:admin'])->group(function () {
     Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
-        Route::get('/error-logs', [AdminErrorLogController::class, 'index'])->name('admin.error.logs');
+        Route::get('/error-logs', [AdminErrorLogController::class, 'index'])->name('error-logs');
         Route::get('plans/sync', [AdminPlanSyncController::class, 'index'])->name('plans.sync.index');
         Route::post('plans/sync', [AdminPlanSyncController::class, 'sync'])->name('plans.sync');
         Route::get('taxes/sync', [AdminTaxSyncController::class, 'index'])->name('taxes.sync.index');

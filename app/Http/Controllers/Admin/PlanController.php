@@ -136,10 +136,10 @@ class PlanController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
+            // 'price' => 'required|numeric|min:0',
             'type' => 'required|in:accommodation,winery,excursion,licensed,non-licensed',
             'features' => 'nullable|string',
-            'interval' => 'required|in:day,week,month,year,3months,6months',
+            // 'interval' => 'required|in:day,week,month,year,3months,6months',
             'description' => 'nullable|string',
             'tax_ids' => 'array'
         ]);
