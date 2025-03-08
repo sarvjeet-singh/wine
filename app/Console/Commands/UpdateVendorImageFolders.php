@@ -27,11 +27,15 @@ class UpdateVendorImageFolders extends Command
                 rename($oldFolder, $newFolder);
                 $this->info("Renamed folder: {$vendor->vendor_name} -> {$vendor->short_code}");
 
-                // Update vendor_media_galleries URLs
-                VendorMediaGallery::where('vendor_media', 'like', "%images/VendorImages/{$vendor->vendor_name}%")
-                    ->update([
-                        'vendor_media' => \DB::raw("REPLACE(vendor_media, 'images/VendorImages/{$vendor->vendor_name}', 'images/VendorImages/{$vendor->short_code}')")
-                    ]);
+                // Properly escape vendor_name and short_code to avoid syntax errors
+                $oldPath = "images/VendorImages/{$vendor->vendor_name}";
+                $newPath = "images/VendorImages/{$vendor->short_code}";
+
+                // Update vendor_media_galleries URLs safely using parameter binding
+                \DB::update(
+                    "UPDATE vendor_media_galleries SET vendor_media = REPLACE(vendor_media, ?, ?), updated_at = NOW() WHERE vendor_media LIKE ?",
+                    [$oldPath, $newPath, "%$oldPath%"]
+                );
 
                 $this->info("Updated media URLs for vendor: {$vendor->vendor_name}");
             } else {

@@ -77,13 +77,13 @@
                             <input type="hidden" name="type" value="vendor">
                             <div class="row align-items-end mt-3">
                                 <!-- <div class="col-sm-4 col-12">
-                                                                <label class="form-label">Apply Value</label>
-                                                                <select class="form-control" name="booking_date_option">
-                                                                    <option value="booked">Booked Dates</option>
-                                                                    <option value="packaged">Package Dates</option>
-                                                                    <option value="blocked">Blocked Dates</option>
-                                                                </select>
-                                                            </div> -->
+                                                                        <label class="form-label">Apply Value</label>
+                                                                        <select class="form-control" name="booking_date_option">
+                                                                            <option value="booked">Booked Dates</option>
+                                                                            <option value="packaged">Package Dates</option>
+                                                                            <option value="blocked">Blocked Dates</option>
+                                                                        </select>
+                                                                    </div> -->
                                 <div class="col-sm-4 col-12">
                                     <label class="form-label">Select Season</label>
                                     @php
@@ -184,11 +184,11 @@
                             </div>
 
                             <!-- <div class="row mt-5">
-                                                            <div class="col-sm-12 text-center">
-                                                                <button type="submit" class="btn wine-btn" id="dateform_submit"
-                                                                    disabled>Update</button>
-                                                            </div>
-                                                        </div> -->
+                                                                    <div class="col-sm-12 text-center">
+                                                                        <button type="submit" class="btn wine-btn" id="dateform_submit"
+                                                                            disabled>Update</button>
+                                                                    </div>
+                                                                </div> -->
                         </form>
                     </div>
                 </div>
@@ -840,33 +840,46 @@
                             url: "{{ route('publish_dates.update', ['vendorid' => $vendorid]) }}",
                             data: {
                                 season_type: season_type,
-                                vendorID: vendorID
+                                vendorid: vendorID // Match controller expected param
                             },
                             dataType: 'json',
                             headers: {
                                 'X-CSRF-TOKEN': csrfToken
                             },
-                            success: function(data) {
+                            beforeSend: function() {
+                                $(".overlay-loader")
+                            .show(); // Show loader before request
+                            },
+                            success: function(response) {
                                 $(".overlay-loader").hide();
                                 Swal.fire({
                                     title: 'Published!',
+                                    text: response.message,
                                     icon: 'success',
                                     showConfirmButton: true,
                                     timer: 2000
                                 }).then(function() {
-                                    location.reload(); // Reload the page
+                                    location.reload();
                                 });
                             },
                             error: function(xhr) {
                                 $(".overlay-loader").hide();
                                 let errorMessage =
                                     'An error occurred while publishing the season.';
+
                                 if (xhr.responseJSON && xhr.responseJSON.message) {
-                                    errorMessage = xhr.responseJSON.message;
+                                    if (Array.isArray(xhr.responseJSON.message)) {
+                                        // Convert array messages to bullet points with <br>
+                                        errorMessage = xhr.responseJSON.message.map(
+                                            msg => `• ${msg}`).join('<br>');
+                                    } else {
+                                        errorMessage = `• ${xhr.responseJSON.message}`;
+                                    }
                                 }
+
                                 Swal.fire({
                                     title: 'Error!',
-                                    text: errorMessage,
+                                    html: errorMessage, // Use 'html' instead of 'text' to support new lines
                                     icon: 'error',
                                     showConfirmButton: true,
                                 });

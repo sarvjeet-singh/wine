@@ -7,9 +7,52 @@
 
 
 @section('content')
-
     <style type="text/css">
         /******DON'T COPY THIS CSS*****/
+        .upload-container {
+            text-align: center;
+        }
+
+        .dropbox {
+            width: 400px;
+            height: 100px;
+            border: 2px dashed #aaa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            cursor: pointer;
+        }
+
+        .dropbox.drag-over {
+            border-color: green;
+            background: #f0f8ff;
+        }
+
+        .progress-container {
+            width: 300px;
+            height: 20px;
+            background: #ddd;
+            margin: 10px auto;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: green;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-weight: bold;
+            transition: width 0.3s;
+        }
+
+        #fileList {
+            margin-top: 20px;
+        }
 
         .table-custom th {
 
@@ -178,6 +221,19 @@
     </style>
 
     <div class="col right-side">
+        <div class="upload-container">
+            <h3>Upload Your Files</h3>
+            <div class="dropbox" id="dropbox">
+                Drag & Drop files here or click to upload
+            </div>
+            <input type="file" id="fileInput" multiple style="display: none;">
+
+            <div class="progress-container" style="display: none;">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+
+            <div id="status"></div>
+        </div>
 
         <div class="text-end mb-4">
 
@@ -574,6 +630,149 @@
             $('#imagePreview').attr('src', '').hide(); // Hide the image preview
             $(this).hide(); // Hide the remove button
             $('#imageRemoved').val('true');
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let vendorId = "{{ $vendor_id }}"; // Get vendor_id from Blade
+            let uploadUrl = `/vendor/upload/store/${vendorId}`;
+            let dropbox = document.getElementById("dropbox");
+            let fileInput = document.getElementById("fileInput");
+            let progressBar = document.getElementById("progressBar");
+            let progressContainer = document.querySelector(".progress-container");
+            let status = document.getElementById("status");
+
+            let isUploading = false; // Track if an upload is in progress
+            // let uploadedFilesList = new Set(JSON.parse(localStorage.getItem("uploadedFiles")) || []);
+            let uploadedFilesList = new Set();
+
+            // Prevent closing or refreshing the page during upload
+            window.addEventListener("beforeunload", function(event) {
+                if (isUploading) {
+                    event.preventDefault();
+                    return (event.returnValue =
+                        "File upload is in progress. Are you sure you want to leave?");
+                }
+            });
+
+            // Click to open file input
+            dropbox.addEventListener("click", function() {
+                fileInput.click();
+            });
+
+            // Drag & Drop functionality
+            dropbox.addEventListener("dragover", function(event) {
+                event.preventDefault();
+                dropbox.classList.add("drag-over");
+            });
+
+            dropbox.addEventListener("dragleave", function() {
+                dropbox.classList.remove("drag-over");
+            });
+
+            dropbox.addEventListener("drop", function(event) {
+                event.preventDefault();
+                dropbox.classList.remove("drag-over");
+                let files = event.dataTransfer.files;
+                handleFileUpload(files);
+            });
+
+            // Handle file selection
+            fileInput.addEventListener("change", function() {
+                let files = fileInput.files;
+                handleFileUpload(files);
+            });
+
+            async function handleFileUpload(files) {
+                if (!files.length) return;
+
+                progressContainer.style.display = "block";
+                progressBar.style.width = "0%";
+                progressBar.innerText = "0%"; // Show 0% initially
+                status.innerHTML = "";
+                isUploading = true; // Mark as uploading
+
+                let formData = new FormData();
+                let newFiles = [];
+
+                // Filter files that haven't been uploaded yet
+                for (let i = 0; i < files.length; i++) {
+                    if (!uploadedFilesList.has(files[i].name)) {
+                        formData.append("files[]", files[i]);
+                        newFiles.push(files[i].name);
+                    }
+                }
+
+                if (newFiles.length === 0) {
+                    status.innerHTML = `<p style="color: orange;">No new files to upload.</p>`;
+                    isUploading = false;
+                    return;
+                }
+
+                try {
+                    let response = await fetchWithProgress(uploadUrl, formData, updateProgress);
+
+                    if (!response.ok) {
+                        let errorData = await response.json();
+                        if (response.status === 422) {
+                            let errorMessages = Object.values(errorData.errors).flat().join("<br>");
+                            throw new Error(errorMessages);
+                        }
+                        throw new Error(errorData.message || "File upload failed");
+                    }
+
+                    let result = await response.json();
+                    progressBar.style.width = "100%";
+                    progressBar.innerText = "100%";
+
+                    status.innerHTML = `<p style="color: green;">Files uploaded successfully!</p>`;
+
+                    // Store uploaded file names to resume from where it left off
+                    newFiles.forEach((file) => uploadedFilesList.add(file));
+                    // localStorage.setItem("uploadedFiles", JSON.stringify(Array.from(uploadedFilesList)));
+                } catch (error) {
+                    status.innerHTML = `<p style="color: red;">Upload Failed: ${error.message}</p>`;
+                } finally {
+                    isUploading = false; // Mark upload as finished
+                    setTimeout(() => {
+                        progressContainer.style.display = "none";
+                    }, 2000);
+                }
+            }
+
+            function updateProgress(percent) {
+                progressBar.style.width = percent + "%";
+                progressBar.innerText = percent + "%"; // Show percentage number inside bar
+            }
+
+            async function fetchWithProgress(url, formData, progressCallback) {
+                return new Promise((resolve, reject) => {
+                    let xhr = new XMLHttpRequest();
+                    xhr.open("POST", url, true);
+                    xhr.setRequestHeader("X-CSRF-TOKEN", document.querySelector(
+                        'meta[name="csrf-token"]').getAttribute("content"));
+
+                    xhr.upload.onprogress = function(event) {
+                        if (event.lengthComputable) {
+                            let percent = Math.round((event.loaded / event.total) * 100);
+                            progressCallback(percent);
+                        }
+                    };
+
+                    xhr.onload = function() {
+                        resolve(new Response(xhr.responseText, {
+                            status: xhr.status
+                        }));
+                    };
+
+                    xhr.onerror = function() {
+                        reject(new Error("Network error"));
+                    };
+
+                    xhr.send(formData);
+                });
+            }
         });
     </script>
 

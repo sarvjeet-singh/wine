@@ -13,13 +13,22 @@ class Admin extends Authenticatable
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'firstname',
+        'lastname',
         'email',
         'password',
+        'profile_image'
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
+
+    public function setPasswordAttribute($value)
+    {
+        if ($value) {
+            $this->attributes['password'] = bcrypt($value);
+        }
+    }
 }

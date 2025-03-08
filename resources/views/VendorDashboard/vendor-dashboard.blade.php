@@ -8,7 +8,7 @@
             <div class="col-sm-3">
                 <div class="top-boxes">
                     <div class="box-image">
-                        <img src="{{asset('images/icons/total_booking_icon.png')}}">
+                        <img src="{{ asset('images/icons/total_booking_icon.png') }}">
                     </div>
                     <div class="box-points">{{ $usersCount }}</div>
                     <div class="box-text mt-1">Guest Rewards</div>
@@ -17,25 +17,27 @@
             <div class="col-sm-3">
                 <div class="top-boxes">
                     <div class="box-image">
-                        <img src="{{asset('images/icons/Inquiries-box-icon.png')}}">
+                        <img src="{{ asset('images/icons/Inquiries-box-icon.png') }}">
                     </div>
-                    <div class="box-points">{{ $mostCommonLocation->city ?? '' }}, {{ucwords($mostCommonLocation->country ?? '')}}</div>
+                    <div class="box-points">{{ $mostCommonLocation->city ?? '' }},
+                        {{ ucwords($mostCommonLocation->country ?? '') }}</div>
                     <div class="box-text">Guest Origins</div>
                 </div>
             </div>
             <div class="col-sm-3">
                 <div class="top-boxes">
                     <div class="box-image">
-                        <img src="{{asset('images/icons/vendor-reviews-box-icon.png')}}">
+                        <img src="{{ asset('images/icons/vendor-reviews-box-icon.png') }}">
                     </div>
-                    <div class="box-points">{{ $reviewData->review_count }}, {{ round($reviewData->average_rating, 1) }}</div>
+                    <div class="box-points">{{ $reviewData->review_count }}, {{ round($reviewData->average_rating, 1) }}
+                    </div>
                     <div class="box-text">What People Think</div>
                 </div>
             </div>
             <div class="col-sm-3">
                 <div class="top-boxes">
                     <div class="box-image">
-                        <img src="{{asset('images/icons/enhance-points-box.png')}}">
+                        <img src="{{ asset('images/icons/enhance-points-box.png') }}">
                     </div>
                     <div class="box-points">40</div>
                     <div class="box-text">Engagement Points</div>
@@ -53,7 +55,7 @@
                                         <label>Vendor</label>
                                     </div>
                                     <div class="col-sm-7 text-right">
-                                    <span>{{ ucfirst($vendor->vendor_type ?? '') }}</span>
+                                        <span>{{ ucfirst($vendor->vendor_type ?? '') }}</span>
                                     </div>
                                     <div class="col-sm-5">
                                         <label>Sub Type</label>
@@ -65,24 +67,33 @@
                                         <label>Account Status</label>
                                     </div>
                                     <div class="col-sm-7 text-right">
-                                        
+
                                         <span>{{ !empty($vendor->account_status) ? $vendor->accountStatus->name : '' }}</span>
                                     </div>
                                     <div class="col-sm-5">
                                         <label>Current Rate</label>
                                     </div>
                                     <div class="col-sm-7 text-right">
-                                    <span id="current-rate">${{ number_format($vendor->pricing->current_rate ?? 0, 2) }}</span>
+                                        <span
+                                            id="current-rate">${{ number_format($vendor->pricing->current_rate ?? 0, 2) }}</span>
                                     </div>
-                                
+
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        @if ($vendor->account_status != 1)
+                                            <button id="checkActivationBtn" class="btn btn-primary">Make Account
+                                                Active</button>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                        
+
                             <div class="col-sm-4 col-9 text-right">
-                                <img src="{{asset($vendor->qr_code)}}" id="qr-code-img" style="width:120px">
+                                <img src="{{ asset($vendor->qr_code) }}" id="qr-code-img" style="width:120px">
                             </div>
                             <div class="col-sm-2 col-3">
-                                <img id="download-qr" src="{{asset('images/icons/download.png')}}" width="80">
+                                <img id="download-qr" src="{{ asset('images/icons/download.png') }}" width="80">
                             </div>
                         </div>
                     </div>
@@ -97,13 +108,15 @@
                         <div class="box-body-label theme-color">Gallary</div>
                         <div class="row mt-3 d-flex">
                             <div class="box-gallary-images-row">
-                                @if($VendorMediaGallery)
-                                    @foreach($VendorMediaGallery as $media)
+                                @if ($VendorMediaGallery)
+                                    @foreach ($VendorMediaGallery as $media)
                                         <div class="box-gallary-images-column ">
-                                            @if($media->vendor_media_type == 'image')
-                                                <img src="{{asset($media->vendor_media)}}" class="box-gallary-images rounded-4">
+                                            @if ($media->vendor_media_type == 'image')
+                                                <img src="{{ asset($media->vendor_media) }}"
+                                                    class="box-gallary-images rounded-4">
                                             @elseif($media->vendor_media_type == 'youtube')
-                                                <iframe width="135px" src="{{ $media->vendor_media }}" frameborder="0" allowfullscreen></iframe>
+                                                <iframe width="135px" src="{{ $media->vendor_media }}" frameborder="0"
+                                                    allowfullscreen></iframe>
                                             @endif
                                         </div>
                                     @endforeach
@@ -121,20 +134,75 @@
 
 @section('js')
 
-<script>
-    $(document).ready(function() {
-        // Get the initial value and format it
+    <script>
+        $(document).ready(function() {
+            // Get the initial value and format it
 
-        $('#download-qr').on('click', function() {
-            // alert();
-            const qrImage = $('#qr-code-img');
-            const link = $('<a></a>')
-                .attr('href', qrImage.attr('src'))
-                .attr('download', 'qr_code.png');
-            $('body').append(link);
-            link[0].click();
-            link.remove();
+            $('#download-qr').on('click', function() {
+                // alert();
+                const qrImage = $('#qr-code-img');
+                const link = $('<a></a>')
+                    .attr('href', qrImage.attr('src'))
+                    .attr('download', 'qr_code.png');
+                $('body').append(link);
+                link[0].click();
+                link.remove();
+            });
         });
-    });
-</script>
+        $(document).ready(function() {
+            $('#checkActivationBtn').click(function() {
+                let vendorid = "{{ $vendor->id }}"; // Get vendor ID
+
+                // Show confirmation alert
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to check if the subscription can be activated?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, check now!",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Proceed with AJAX request if confirmed
+                        $.ajax({
+                            type: 'POST',
+                            url: "{{ route('vendor.activation.check') }}" + '/' + vendorid,
+                            data: {
+                                vendorid: vendorid, // Sending vendor ID in the body
+                            },
+                            dataType: 'json',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                Swal.fire("Success!", response.message, "success");
+                            },
+                            error: function(xhr) {
+                                let errorMessage = 'Cannot activate subscription.';
+
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    if (Array.isArray(xhr.responseJSON.message)) {
+                                        // Convert array messages to a bulleted list with <br>
+                                        errorMessage = xhr.responseJSON.message.map(
+                                            msg => `• ${msg}`).join('<br>');
+                                    } else {
+                                        errorMessage = `• ${xhr.responseJSON.message}`;
+                                    }
+                                }
+
+                                Swal.fire({
+                                    title: "Error!",
+                                    html: errorMessage, // Use 'html' to render new lines with <br>
+                                    icon: "error",
+                                    showConfirmButton: true
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

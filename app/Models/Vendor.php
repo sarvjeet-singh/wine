@@ -176,4 +176,9 @@ class Vendor extends Model
     {
         return $this->belongsTo(State::class, 'province');
     }
+
+    public function uploadedFiles()
+    {
+        return $this->hasMany(VendorFileUpload::class, 'vendor_id', 'id');
+    }
 }

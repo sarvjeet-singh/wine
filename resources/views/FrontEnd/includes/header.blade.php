@@ -1,3 +1,104 @@
+<script>
+    async function getUserCountry() {
+        try {
+            console.log("Fetching country...");
+            let response = await fetch('https://ipapi.co/json/');
+            let data = await response.json();
+            console.log("Country detected:", data.country_name, "(", data.country_code, ")");
+
+            return data.country_code === "IN"; // Check if country is India
+        } catch (error) {
+            console.error("Failed to fetch location data:", error);
+            return false; // Default to false if the API fails
+        }
+    }
+
+    function handlePermission(status) {
+        if (status === "granted") {
+            console.log("Location access granted.");
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    let latitude = position.coords.latitude;
+                    let longitude = position.coords.longitude;
+                    console.log("Latitude:", latitude, "Longitude:", longitude);
+
+                    sendLocationToServer(latitude, longitude);
+                    document.body.style.display = "block"; // Show the website
+                },
+                function(error) {
+                    console.error("Error getting location:", error);
+                    document.body.remove(); // Remove everything if an error occurs
+                }
+            );
+        } else {
+            console.log("Location permission denied.");
+            document.body.remove(); // If denied, remove everything
+        }
+    }
+
+    function checkLocationPermission() {
+        if (!("geolocation" in navigator)) {
+            console.log("Geolocation is not supported.");
+            document.body.remove();
+            return;
+        }
+
+        console.log("Checking location permissions...");
+        navigator.permissions.query({
+            name: "geolocation"
+        }).then(function(result) {
+            console.log("Permission state:", result.state);
+            if (result.state === "granted") {
+                handlePermission("granted");
+            } else if (result.state === "prompt") {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        handlePermission("granted");
+                    },
+                    function(error) {
+                        console.error("User denied location access:", error);
+                        document.body.remove();
+                    }
+                );
+            } else {
+                document.body.remove();
+            }
+        });
+    }
+
+    async function sendLocationToServer(lat, long) {
+        console.log("Sending location to server...");
+        let response = await fetch('https://ipapi.co/json/');
+        let data = await response.json();
+        fetch('/save-user-location', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    latitude: lat,
+                    longitude: long,
+                    data: data
+                })
+            })
+            .then(response => response.json())
+            .then(data => console.log("Server response:", data))
+            .catch(error => console.error("Location not sent:", error));
+    }
+
+    // First, check if the user is from India
+    getUserCountry().then(isFromIndia => {
+        document.body.style.display = "none";
+        if (isFromIndia) {
+            console.log("User is from India, checking location...");
+            checkLocationPermission(); // Request location only if from India
+        } else {
+            console.log("User is not from India. Hiding website.");
+            document.body.remove(); // Hide everything if not from India
+        }
+    });
+</script>
 <header>
     <nav class="navbar navbar-expand-lg px-sm-4 px-2 py-0">
         <div class="container-fluid">

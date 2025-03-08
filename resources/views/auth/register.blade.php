@@ -127,7 +127,7 @@
                                 </div>
                                 {{-- @error('password') --}}
                                 <span class="theme-color mt-1" role="alert"
-                                    style="display: inline-block;line-height: normal;font-size: 14px;">
+                                    style="display: inline-block;line-height: normal;font-size: 13px;">
                                     <strong>Password must contain uppercase, lowercase, number, and special
                                         character</strong>
                                 </span>

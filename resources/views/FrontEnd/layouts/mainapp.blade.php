@@ -19,8 +19,6 @@
             --theme-secondary-color: #fcf8e4;
         }
     </style>
-
-
     <meta name="title" content="Book Accommodations, Wineries, and Excursions - Wine Country Weekends">
     <meta name="description"
         content="Discover and book unique accommodations, exclusive winery tours, and exciting excursions. Plan your perfect getaway with us!">

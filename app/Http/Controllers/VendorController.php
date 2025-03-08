@@ -51,6 +51,7 @@ use App\Mail\InquiryRejectedMail;
 use DB;
 use Hash;
 use App\Services\DateCheckerService;
+use App\Helpers\VendorHelper;
 
 
 class VendorController extends Controller
@@ -83,7 +84,7 @@ class VendorController extends Controller
 
 		// $booked_dates = DB::table('member_payment')->where('vendor_id',  $vendor_id)->select('check_in','check_out')->get();
 		$checkOutOnly = [];
-        $checkInOnly = [];
+		$checkInOnly = [];
 		$cojoinDates = array();
 		$dates = array();
 
@@ -174,12 +175,12 @@ class VendorController extends Controller
 		// Convert to JSON format if needed
 		// $bookedAndBlockedDatesJson = json_encode($bookedAndBlockedDates);
 		$dates_all = $this->dateCheckerService->processVendorDates($vendor_id);
-        $checkInOnly = $this->dateCheckerService->getCheckInOnlyDates();
-        $checkOutOnly = $this->dateCheckerService->getCheckOutOnlyDates();
-        $bookedAndBlockeddates = $this->dateCheckerService->getBlockedDates();
-        $data['bookedAndBlockeddates']  = $bookedAndBlockeddates;
-        $data['checkOutOnly']           = $checkOutOnly;
-        $data['checkInOnly']           = $checkInOnly;
+		$checkInOnly = $this->dateCheckerService->getCheckInOnlyDates();
+		$checkOutOnly = $this->dateCheckerService->getCheckOutOnlyDates();
+		$bookedAndBlockeddates = $this->dateCheckerService->getBlockedDates();
+		$data['bookedAndBlockeddates']  = $bookedAndBlockeddates;
+		$data['checkOutOnly']           = $checkOutOnly;
+		$data['checkInOnly']           = $checkInOnly;
 		$data['cojoinDates'] = $cojoinDates;
 		$data['dates'] = $dates;
 		// $data['bookedAndBlockeddates'] = $bookedAndBlockedDates;
@@ -205,14 +206,26 @@ class VendorController extends Controller
 
 	public function publishDatesUpdate(Request $request)
 	{
-		if (!$request->vendorid) {
-			return redirect()->back();
+		$vendorID = $request->vendorid; // Ensure it matches AJAX param
+
+		if (!$vendorID) {
+			return response()->json([
+				'success' => false,
+				'message' => ['Vendor ID is required.'], // Return as an array
+			], 400);
 		}
 
-		$vendorID = $request->vendorid;
+		$response = VendorHelper::canActivateBooking($vendorID);
+		if (!$response['status']) {
+			return response()->json([
+				'success' => false,
+				'message' => is_array($response['messages']) ? $response['messages'] : [$response['messages']],
+			], 400);
+		}
+
 		$seasonType = $request->season_type;
 
-		// Check if pricing exists for the specified season
+		// Check if pricing exists
 		$seasonPricingExists = VendorPricing::where('vendor_id', $vendorID)
 			->whereNotNull($seasonType)
 			->exists();
@@ -220,21 +233,16 @@ class VendorController extends Controller
 		if (!$seasonPricingExists) {
 			return response()->json([
 				'success' => false,
-				'message' => 'Pricing does not exist for the selected season.',
+				'message' => ['Pricing does not exist for the selected season.'], // Return as an array
 			], 400);
 		}
 
 		// Find or create PublishSeason record
-		$PublishSeason = PublishSeason::where('vendor_id', $vendorID)
-			->where('season_type', $seasonType)
-			->first();
+		$PublishSeason = PublishSeason::firstOrNew([
+			'vendor_id' => $vendorID,
+			'season_type' => $seasonType
+		]);
 
-		if (!$PublishSeason) {
-			$PublishSeason = new PublishSeason();
-		}
-
-		$PublishSeason->vendor_id = $vendorID;
-		$PublishSeason->season_type = $seasonType;
 		$PublishSeason->publish = 1;
 		$PublishSeason->save();
 
@@ -554,7 +562,7 @@ class VendorController extends Controller
 		}
 		$getRefundData = CmsPage::where('slug', 'refund-policy')->first();
 		$getRefundContent = '';
-		if($getRefundData){
+		if ($getRefundData) {
 			$getRefundContent = $getRefundData->description;
 		}
 		$stripeDetail = VendorStripeDetail::where('vendor_id', $vendorid)->count();
@@ -676,7 +684,7 @@ class VendorController extends Controller
 			$filename = Str::random(10) . '.png';
 
 			// Create the vendor-specific directory if it doesn't exist
-			$vendorDir = public_path('images/VendorImages/' . $vendor->vendor_name);
+			$vendorDir = public_path('images/VendorImages/' . $vendor->short_code);
 			if (!File::exists($vendorDir)) {
 				File::makeDirectory($vendorDir, 0777, true, true);
 			}
@@ -687,7 +695,7 @@ class VendorController extends Controller
 
 			// Save the media information to the database
 			$VendorMediaGallery = new VendorMediaGallery;
-			$VendorMediaGallery->vendor_media = 'images/VendorImages/' . $vendor->vendor_name . '/' . $filename;
+			$VendorMediaGallery->vendor_media = 'images/VendorImages/' . $vendor->short_code . '/' . $filename;
 			$VendorMediaGallery->vendor_media_type = 'image';
 			$VendorMediaGallery->vendor_id = $vendor->id;
 
@@ -795,6 +803,10 @@ class VendorController extends Controller
 		// Ensure the media belongs to the vendor
 		if ($media->vendor_id != $vendorId) {
 			return response()->json(['status' => 'error', 'message' => 'Unauthorized action.'], 403);
+		}
+
+		if ($media->vendor_media_type == 'youtube') {
+			return response()->json(['status' => 'error', 'message' => 'Video cannot be set as logo.'], 422);
 		}
 
 		// Reset all media is_default to 0 for this vendor
@@ -1037,9 +1049,9 @@ class VendorController extends Controller
 	public function inquiries(Request $request)
 	{
 		$inquiries = Inquiry::with('vendor')
-		->where('vendor_id', $request->vendorid)
-		->orderBy('created_at', 'desc')
-		->get();
+			->where('vendor_id', $request->vendorid)
+			->orderBy('created_at', 'desc')
+			->get();
 		return view('VendorDashboard.my-inquiries', compact('inquiries'));
 	}
 
@@ -1063,7 +1075,7 @@ class VendorController extends Controller
 		// Fetch customer details
 		$customer = Customer::find($inquiry->customer_id);
 		$vendor = Vendor::find($inquiry->vendor_id);
-    
+
 		if (!$customer || empty($customer->email)) {
 			return response()->json(['error' => 'Customer email not found.'], 404);
 		}
@@ -1089,7 +1101,7 @@ class VendorController extends Controller
 
 		$customer = Customer::find($inquiry->customer_id);
 		$vendor = Vendor::find($inquiry->vendor_id);
-    
+
 		if (!$customer || empty($customer->email)) {
 			return response()->json(['error' => 'Customer email not found.'], 404);
 		}
@@ -1414,5 +1426,32 @@ class VendorController extends Controller
 	{
 		$vendor = Vendor::find($vendorid);
 		return view('VendorDashboard.access-credentials', compact('vendor'));
+	}
+
+	public function checkActivation(Request $request)
+	{
+		$vendorid = $request->vendorid; // ✅ Get vendor ID from request
+
+		if (!$vendorid) {
+			return response()->json([
+				'success' => false,
+				'message' => ['Vendor ID is required.'], // Return as an array
+			], 400);
+		}
+
+		$vendor = Vendor::find($vendorid);
+		$response = VendorHelper::canActivateSubscription($vendorid);
+
+		if ($response['status'] == true) {
+			return response()->json([
+				'success' => true,
+				'message' => 'Subscription Activated'
+			]);
+		}
+
+		return response()->json([
+			'success' => false,
+			'message' => is_array($response['messages']) ? $response['messages'] : [$response['messages']],
+		], 400);
 	}
 }

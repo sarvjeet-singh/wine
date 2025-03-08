@@ -19,16 +19,16 @@
                 <button class="btn btn-account dropdown-toggle" type="button" id="dropdownMenuButton1"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     <div class="account-user text-white d-flex align-items-center gap-3 text-start">
-                        <img src="{{ asset('asset/admin/images/user-main.png') }}" alt="User Image">
+                        <img src="{{ isset(Auth::guard('admin')->user()->profile_image) ? Storage::url(Auth::guard('admin')->user()->profile_image) : asset('asset/admin/images/user-main.png') }}" alt="User Image">
                         <div class="user-account-data">
-                            <h6 class="f-16 mb-0 bold"><span>Hello,</span> Admin</h6>
-                            <p class="f-14 mb-0">Super Admin</p>
+                            <h6 class="f-16 mb-0 bold"><span>Hello,</span> {{ Auth::guard('admin')->user()->firstname }} </h6>
+                            <p class="f-14 mb-0">Admin</p>
                         </div>
                         <a href="#"><i class="fa-solid fa-angle-down"></i></a>
                     </div>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.admins.edit', Auth::guard('admin')->user()->id) }}">Profile</a></li>
                     <li>
                         <a class="dropdown-item" href="{{ route('logout') }}"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>

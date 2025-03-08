@@ -23,6 +23,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CustomerPaymentController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\VendorFileUploadController;
 use App\Http\Controllers\TimezoneController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\Admin\WalletController as AdminWalletController;
@@ -57,8 +58,10 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\FrontendInquiryController;
 use App\Http\Controllers\CommandController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\Vendor\UserController as AdminVendorUserController;
 use Mews\Captcha\CaptchaController;
+use App\Http\Controllers\LocationController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -79,6 +82,8 @@ use Illuminate\Support\Facades\Artisan;
 */
 
 Auth::routes(['verify' => true, 'login' => false]);
+Route::post('/save-user-location', [LocationController::class, 'store']);
+
 Route::get('captcha/{config?}', [CaptchaController::class, 'getCaptcha'])->name('captcha');
 Route::post('/set-timezone', [TimezoneController::class, 'setTimezone']);
 Route::get('login', [LoginController::class, 'login'])->name('login');
@@ -377,7 +382,7 @@ Route::group(['middleware' => ['auth:vendor', 'checkPasswordUpdated', 'check.ven
     Route::post('/vendor/subscription/cancel-subscription/{vendorid?}', [SubscriptionController::class, 'cancelSubscription'])->name('subscription.cancel');
     Route::get('/vendor/subscription/get-subscription/{vendorid?}', [SubscriptionController::class, 'showSubscriptionDetail'])->name('subscription.detail');
     Route::get('/vendor/stripe-details/{vendorid?}', [VendorStripeDetailController::class, 'show'])->name('stripe.details.show');
-
+    Route::post('/vendor/check-activation/{vendorid?}', [VendorController::class, 'checkActivation'])->name('vendor.activation.check');
     // Route::post('/vendor/update-stripe-details/{vendorid?}', [VendorStripeDetailController::class, 'update'])->name('stripe.details.update');
 
     // Route::post('/subscribe', [SubscriptionController::class, 'createSubscription'])->name('create.subscription');
@@ -417,6 +422,7 @@ Route::group(['middleware' => ['auth:vendor', 'checkPasswordUpdated', 'check.ven
     Route::post('/vendor/create-payment-intent/{vendorid?}', [PaymentController::class, 'createPaymentIntent'])->name('create-payment-intent');
     Route::post('/vendor/confirm-payment/{vendorid?}', [PaymentController::class, 'confirmPayment'])->name('confirm-payment');
     Route::post('/vendor/winery-shop/store-winery-shop-transaction-details/{vendorid?}', [WineryCheckoutController::class, 'storeTransactionDetails'])->name('store-winery-shop-transaction-details');
+    Route::post('/vendor/upload/store/{vendorid?}', [VendorFileUploadController::class, 'store'])->name('upload.store');
 });
 // ================= ADMIN ============== //
 
@@ -451,6 +457,7 @@ Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('adm
 // Admin routes protected by middleware
 Route::middleware(['auth:admin'])->group(function () {
     Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
+        Route::resource('admins', AdminController::class)->names('admins');
         Route::get('/error-logs', [AdminErrorLogController::class, 'index'])->name('error-logs');
         Route::get('plans/sync', [AdminPlanSyncController::class, 'index'])->name('plans.sync.index');
         Route::post('plans/sync', [AdminPlanSyncController::class, 'sync'])->name('plans.sync');
@@ -467,10 +474,11 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::get('/vendor/users/search', [AdminVendorUserController::class, 'search'])->name('vendors.users.search');
         Route::get('/vendor/users/activate/{id}', [AdminVendorUserController::class, 'activate'])->name('vendor.users.activate');
         Route::resource('/vendor/users', AdminVendorUserController::class)->names('vendors.users');
+        Route::get('/vendors/uploaded-files/{id}', [AdminVendorController::class, 'getUploadedFiles'])->name('vendors.uploaded-files');
     });
     Route::post('/check-vendor-combination', [AdminVendorController::class, 'checkVendorCombination'])->name('check.vendor.combination');
     Route::get('/admin/filter/search', [AdminVendorController::class, 'filterSearch'])->name('admin.vendors.search');
-    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/vendors/show/{id}', [AdminVendorController::class, 'show'])->name('admin.vendors.show');
     Route::get('/admin/wine-catalogues', [AdminWineCatalogueController::class, 'index'])->name('admin.dashboard');
 

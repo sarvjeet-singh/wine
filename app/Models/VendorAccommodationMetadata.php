@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class VendorAccommodationMetadata extends Model
 {
+
+    protected $table = 'vendor_accommodation_metadata';
     use HasFactory;
 
     protected $fillable = [

@@ -9,6 +9,12 @@
         </a>
     </div>
     <ul class="nav-links list-unstyled">
+        <li class="position-relative">
+            <a href="{{route('admin.admins.index')}}">
+                <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
+                <span class="link_name">Admin Management</span>
+            </a>
+        </li>
         <li class="position-relative parent-menu">
             <a href="#">
                 <img src="{{ asset('asset/admin/images/icons/user-icon.png') }}">

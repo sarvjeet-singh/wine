@@ -9,6 +9,7 @@ use Stripe\Exception\SignatureVerificationException;
 use App\Models\WinerySubscription;
 use App\Models\Vendor;
 use Log;
+use App\Helpers\VendorHelper;
 
 class StripeWebhookController extends Controller
 {
@@ -57,9 +58,10 @@ class StripeWebhookController extends Controller
 
             // Update the Vendors table with the vendor_id
             if ($vendorId) {
-                Vendor::where('id', $vendorId)->update([
-                    'account_status' => 1, // Replace with your desired status
-                ]);
+                // Vendor::where('id', $vendorId)->update([
+                //     'account_status' => 1, // Replace with your desired status
+                // ]);
+                VendorHelper::canActivateSubscription($vendorId);
             }
         } elseif ($event->type === 'customer.subscription.updated') {
             $subscriptionId = $event->data->object->id;
@@ -81,9 +83,10 @@ class StripeWebhookController extends Controller
 
             // Update the Vendors table with the vendor_id
             if ($vendorId) {
-                Vendor::where('id', $vendorId)->update([
-                    'account_status' => 1, // Replace with your desired status
-                ]);
+                // Vendor::where('id', $vendorId)->update([
+                //     'account_status' => 1, // Replace with your desired status
+                // ]);
+                VendorHelper::canActivateSubscription($vendorId);
             }
         } elseif ($event->type === 'customer.subscription.deleted') {
             $subscriptionId = $event->data->object->id;

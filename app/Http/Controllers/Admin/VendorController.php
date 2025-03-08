@@ -45,6 +45,7 @@ use Validator;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\User;
+use App\Models\VendorFileUpload;
 use App\Models\VendorSocialMedia;
 use App\Models\VendorStripeDetail;
 use Illuminate\Support\Facades\Crypt;
@@ -630,6 +631,15 @@ class VendorController extends Controller
     public function destroy()
     {
         return view('admin.vendor.destroy');
+    }
+
+    public function getUploadedFiles($vendor_id)
+    {
+        $vendor = Vendor::find($vendor_id);
+        $files = VendorFileUpload::where('vendor_id', $vendor_id)
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+        return view('admin.vendors.uploaded-files', compact('vendor', 'files'));
     }
 
     public function getUserByEmail(Request $request)

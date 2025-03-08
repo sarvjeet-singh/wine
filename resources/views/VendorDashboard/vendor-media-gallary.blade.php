@@ -254,10 +254,12 @@
                                                             Default Logo
                                                         </a>
                                                     @else
-                                                        <a href="javascript:void(0)" data-id="{{ $media->id }}"
-                                                            class="default-media-logo vendor-media-set-default">
-                                                            Set as Logo
-                                                        </a>
+                                                        @if ($media->vendor_media_type == 'image')
+                                                            <a href="javascript:void(0)" data-id="{{ $media->id }}"
+                                                                class="default-media-logo vendor-media-set-default">
+                                                                Set as Logo
+                                                            </a>
+                                                        @endif
                                                     @endif
                                                 </div>
                                             </div>
@@ -596,10 +598,10 @@
                             // Handle any errors
                             Swal.fire(
                                 'Error!',
-                                'An error occurred while setting the default media. Please try again.',
+                                xhr.responseText.message ||'An error occurred while setting the default media. Please try again.',
                                 'error'
                             );
-                            console.error(xhr.responseText);
+                            // console.error(xhr.responseText);
                         }
                     });
                 }

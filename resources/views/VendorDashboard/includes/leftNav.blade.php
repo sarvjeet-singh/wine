@@ -120,7 +120,7 @@
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('winery.shop.orders') ? 'active' : '' }}"
                                     href="{{ route('winery.shop.orders', ['vendorid' => $id]) }}">
-                                    <i class="fas fa-wrench menu-icon"></i> Sales Order History
+                                    <i class="fas fa-wrench menu-icon"></i> Sales History
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -219,7 +219,7 @@
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('business-hours*') ? 'active' : '' }}"
                                     href="{{ route('business-hours.index', ['vendorid' => $id]) }}">
-                                    <i class="fas fa-wrench menu-icon"></i> Business Hours
+                                    <i class="fas fa-wrench menu-icon"></i> Box Office
                                 </a>
                             </li>
                         @endif

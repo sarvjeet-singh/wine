@@ -18,7 +18,7 @@
 
                     <div class="box-head-heading d-flex">
 
-                        <span class="box-head-label theme-color">Business Hours</span>
+                        <span class="box-head-label theme-color">Box Office</span>
 
                     </div>
 

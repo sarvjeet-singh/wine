@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class PublishSeason extends Model
 {
     use HasFactory;
+
+    protected $table = 'publish_seasons';
+
+    protected $fillable = [
+        'vendor_id',
+        'season_type',
+        'publish',
+    ];
 }

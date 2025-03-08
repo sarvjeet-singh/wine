@@ -71,6 +71,10 @@
                                                     <a href="{{ route('admin.vendor.details', $vendor->id) }}">
                                                         <i class="fa-solid fa-eye"></i>
                                                     </a>
+                                                    {{-- uploded files --}}
+                                                    <a href="{{ route('admin.vendors.uploaded-files', $vendor->id) }}">
+                                                        <i class="fa-solid fa-upload"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                         @endforeach
