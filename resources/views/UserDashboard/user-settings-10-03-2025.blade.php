@@ -59,12 +59,8 @@
             color: #dc3545;
         }
 
-       .update-pwd-sec form div:has(.invalid-feedback) svg {
-            right: 35px !important;
-            top: 20px!important;
-        }
-        .update-pwd-sec form div:has(.invalid-feedback) input {
-            padding-right: 60px;
+        .update-pwd-sec form div:has(.invalid-feedback) svg {
+            display: none;
         }
     </style>
     <div class="container main-container">

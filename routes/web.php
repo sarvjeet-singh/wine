@@ -99,7 +99,9 @@ Route::get('/terms', function () {
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
-
+Route::get('/events', function () {
+    return view('FrontEnd.events');
+})->name('events');
 Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
     // Retrieve the user by ID
     $user = App\Models\User::findOrFail($id);
@@ -295,6 +297,9 @@ Route::get('/user/wallet-history', [WalletController::class, 'walletHistory'])->
 // ================= VENDOR ============== //
 Route::get('/vendor/handle-stripe-callback/', [VendorStripeDetailController::class, 'handleStripeCallback'])->name('handle-stripe-callback');
 Route::group(['middleware' => ['auth:vendor', 'checkPasswordUpdated', 'check.vendorid']], function () {
+    Route::get('/vendor/create-curative-experience/{vendorid}', function () {
+        return view('VendorDashboard.create-curative-experience');
+    })->name('vendor.create-curative-experience');
     Route::post('/vendor/setup-intent/{vendorid}', [PaymentController::class, 'createSetupIntent'])->name('vendor.setup-intent');
     Route::post('/vendor/save-payment-method/{vendorid}', [PaymentController::class, 'savePaymentMethod'])->name('vendor.save-payment-method');
     Route::post('/vendor/create-payment-intent/{shopid}/{vendorid}', [PaymentController::class, 'createPaymentIntent'])->name('vendor.create-payment-intent');

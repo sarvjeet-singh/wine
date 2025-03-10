@@ -273,7 +273,7 @@
 
                 captcha: {
 
-                    required: "Please enter skill testing Question.",
+                    required: "Please enter the CAPTCHA.",
 
                     remote: "Incorrect calculation."
 
@@ -281,7 +281,7 @@
 
                 terms: {
 
-                    required: "Please select Terms and participant."
+                    required: "You enter agree to the terms and conditions."
 
                 }
 

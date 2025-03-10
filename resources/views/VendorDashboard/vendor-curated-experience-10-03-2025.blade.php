@@ -3,78 +3,18 @@
 @section('title', 'Wine Country Weekends - Vendor Dashboard')
 
 @section('content')
-
-<style>
-.curated-exp-listing tbody td {
-    padding: 20px 8px;
-    color: #757575;
-}
-.curated-exp-listing tbody td svg {
-    width: 20px;
-    height: 20px;
-    margin-inline: 4px;
-}
-</style>
-
     <div class="col right-side">
         <div class="row">
             <div class="col-sm-12">
                 <div class="information-box">
                     <div class="information-box-head">
-                        <div class="box-head-heading d-flex align-items-center justify-content-between gap-2">
+                        <div class="box-head-heading d-flex">
                             <span class="box-head-label theme-color">Curated Experience</span>
-                            <a href="#" class="btn wine-btn px-4">Create</a>
                         </div>
                     </div>
-                    <div class="information-box-body py-4">
-                        <table id="" class="table curated-exp-listing table-custom text-center" style="width:100%">
-                            <thead>
-                                <tr>
-                                    <th>Sr. No.</th>
-                                    <th>Experience Type</th>
-                                    <th>Upgrade Fee</th>
-                                    <th>Extension</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Concert</td>
-                                    <td>$999</td>
-                                    <td>Lorem Lpsum</td>
-                                    <td>
-                                        <a href="#"><i class="fa-regular fa-pen-to-square"></i></a>
-                                        <a href="#"><i class="fa-regular fa-trash-can"></i></a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Concert</td>
-                                    <td>$999</td>
-                                    <td>Lorem Lpsum</td>
-                                    <td>
-                                        <a href="#"><i class="fa-regular fa-pen-to-square"></i></a>
-                                        <a href="#"><i class="fa-regular fa-trash-can"></i></a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Concert</td>
-                                    <td>$999</td>
-                                    <td>Lorem Lpsum</td>
-                                    <td>
-                                        <a href="#"><i class="fa-regular fa-pen-to-square"></i></a>
-                                        <a href="#"><i class="fa-regular fa-trash-can"></i></a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-
-
+                    <div class="information-box-body">
                         <!-- Success Message -->
-                        <!-- @if(session('success'))
+                        @if(session('success'))
                             <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-message">
                                 {{ session('success') }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -142,7 +82,7 @@
                                     <button type="submit" class="btn wine-btn">Update</button>
                                 </div>
                             </div>
-                        </form> -->
+                        </form>
 
                     </div>
                 </div>
@@ -153,3 +93,18 @@
 @endsection
 
 @section('js')
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var currencyFields = document.querySelectorAll('.currency-field');
+            currencyFields.forEach(function (currencyField) {
+                currencyField.addEventListener('input', function (e) {
+                    var value = e.target.value;
+                    var regex = /^\d+(\.\d{0,2})?$/;
+                    if (!regex.test(value)) {
+                        e.target.value = value.slice(0, -1);
+                    }
+                });
+            });
+        });
+
+</script>

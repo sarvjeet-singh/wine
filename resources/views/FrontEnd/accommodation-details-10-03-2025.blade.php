@@ -347,14 +347,14 @@
                                         style="opacity: 0; font-size: 0;" readonly />
                                 </div>
                                 <div style="clear: both;"></div>
-                                <!-- <div class="form-check m-3 mt-sm-3 mt-5">
+                                <div class="form-check m-3 mt-sm-3 mt-5">
                                     <input class="form-check-input" type="checkbox" value="" id="guest-registry">
                                     <label class="form-check-label" for="guest-registry"
                                         style="font-size: 15px; font-weight: 400; cursor: pointer;">
                                         My Guest Registry section is completed
                                     </label>
-                                </div> -->
-                                <div class="text-end mt-sm-4 mt-5">
+                                </div>
+                                <div class="text-end">
                                     {{-- && !empty(Auth::guard('customer')->user()->phone_verified_at) --}}
                                     @if (!Auth::guard('vendor')->check())
                                         @if (Auth::check())

@@ -79,26 +79,26 @@
                                 <form id="checkout-form" method="post" action="">
                                     <div class="row mt-3">
                                         <div class="col-sm-6 col-12 mb-sm-0 mb-3">
-                                            <label class="form-label">Name<span class="required-filed">*</span></label>
+                                            <label class="form-label">Name</label>
                                             <input type="text" class="form-control" name="name"
                                                 value="{{ Auth::user()->firstname }} {{ Auth::user()->lastname }}"
                                                 placeholder="Enter Your Name">
                                         </div>
                                         <div class="col-sm-6 col-12">
-                                            <label class="form-label">eMail<span class="required-filed">*</span></label>
+                                            <label class="form-label">eMail</label>
                                             <input type="email" class="form-control" name="email_address"
                                                 value="{{ Auth::user()->email }}" placeholder="Enter Your eMail">
                                         </div>
                                     </div>
                                     <div class="row mt-3">
                                         <div class="col-sm-6 col-12 mb-sm-0 mb-3">
-                                            <label class="form-label">Contact Ph#<span class="required-filed">*</span></label>
+                                            <label class="form-label">Contact Ph#</label>
                                             <input type="text" class="form-control  phone-number" name="contact_number"
                                                 value="{{ Auth::user()->contact_number }}"
                                                 placeholder="Enter Contact Phone">
                                         </div>
                                         <div class="col-sm-6 col-12">
-                                            <label class="form-label">Street Address<span class="required-filed">*</span></label>
+                                            <label class="form-label">Street Address:</label>
                                             <input type="text" class="form-control" name="street_address"
                                                 value="{{ Auth::user()->street_address }}"
                                                 placeholder="Enter Street Address:">
@@ -118,7 +118,7 @@
                                     </div>
                                     <div class="row mt-3">
                                         <div class="col-sm-6 col-12">
-                                            <label class="form-label">Country<span class="required-filed">*</span></label>
+                                            <label class="form-label">Country</label>
                                             <select name="country" id="country" class="form-select">
                                                 <option value="">Select Country</option>
                                                 @foreach (getCountries() as $country)
@@ -139,7 +139,7 @@
 
                                         <div class="col-sm-6 col-12 mb-sm-0 mb-3 mt-sm-0 mt-3" id="state-wrapper"
                                             style="display: none;">
-                                            <label class="form-label">State<span class="required-filed">*</span></label>
+                                            <label class="form-label">State</label>
                                             <select name="state" id="state" class="form-select">
                                                 <option value="">Select State</option>
                                                 {{-- States will be dynamically loaded via JS --}}
