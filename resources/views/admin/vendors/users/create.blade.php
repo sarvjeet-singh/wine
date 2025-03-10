@@ -147,12 +147,14 @@
                                                     multiple>
                                                     @foreach ($vendors as $vendor)
                                                         <option value="{{ $vendor->id }}"
-                                                            {{ isset($user) && $user->vendors->contains($vendor->id) ? 'selected' : '' }}>
+                                                            @if (old('vendor_id') && in_array($vendor->id, old('vendor_id'))) selected 
+                                                            @elseif(isset($user) && $user->vendors->contains($vendor->id)) 
+                                                                selected @endif>
                                                             {{ $vendor->vendor_name }}
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                                @error('vendors')
+                                                @error('vendor_id')
                                                     <div class="error">{{ $message }}</div>
                                                 @enderror
                                             </div>

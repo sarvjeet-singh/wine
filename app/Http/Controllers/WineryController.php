@@ -21,10 +21,11 @@ class WineryController extends Controller
         // Build the query
         $wineries = Vendor::with('sub_category', 'sub_regions', 'reviews', 'mediaGallery')
             ->whereRaw('LOWER(vendor_type) = ?', ['winery'])
-            ->where(function ($query) {
-                $query->where('account_status', '1')
-                    ->orWhere('account_status', '2');
-            })
+            // ->where(function ($query) {
+            //     $query->where('account_status', '1')
+            //         ->orWhere('account_status', '2');
+            // })
+            ->where('account_status', '1')
             ->where('id', '!=', $vendorid);
 
         // Apply filters if input values are provided
@@ -50,10 +51,12 @@ class WineryController extends Controller
     public function products($shopid, $vendorid)
     {
         $shopActive = Vendor::where('id', $shopid)
-            ->where(function ($query) {
-                $query->where('account_status', '1')
-                    ->orWhere('account_status', '2');
-            })->first();
+            // ->where(function ($query) {
+            //     $query->where('account_status', '1')
+            //         ->orWhere('account_status', '2');
+            // })
+            ->where('account_status', '1')
+            ->first();
         if(!$shopActive) {
             return redirect()->route('winery-shop.index', ['vendorid' => $vendorid]);
         }
@@ -94,8 +97,15 @@ class WineryController extends Controller
 
     public function detail($wineid, $shopid, $vendorid)
     {
+        $vendor = Vendor::where('id', $shopid)
+        ->where('account_status', '1')
+        ->first();
+        if(!$vendor) {
+            return redirect()->route('winery-shop.index', ['vendorid' => $vendorid]);
+        }
         $wine = VendorWine::where('id', $wineid)
             ->where('inventory', '>', 0)
+            ->where('delisted', 0)
             ->where('vendor_id', '!=', $vendorid)
             ->where('price', '>', 0.00)
             ->first();
@@ -104,7 +114,6 @@ class WineryController extends Controller
         }
         $sliders = VendorWine::where('vendor_id', $shopid)
             ->where('id', '!=', $wineid)->limit(5)->get();
-        $vendor = Vendor::where('id', $shopid)->first();
         return view('VendorDashboard.winery.product-detail', compact('wine', 'vendor', 'vendorid', 'shopid', 'sliders'));
     }
 

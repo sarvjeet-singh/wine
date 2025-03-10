@@ -95,11 +95,37 @@
         <div class="col-12">
 
             <div class="row g-3">
-                <div class="col-md-4">
+                <div class="col-md-6">
+                    <label for="" class="form-label">Label Name</label>
+
+                    <input type="text" name="winery_name" value="{{ old('winery_name', $wine->winery_name) }}"
+                        class="form-control" id="Label">
+                </div>
+                <div class="col-md-6">
                     <label for="" class="form-label">Series Name</label>
 
                     <input type="text" name="series" value="{{ old('series', $wine->series) }}"
                         class="form-control" id="Series">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-12">
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="vintage_date" class="form-label">Vintage Date</label>
+
+                    <select class="form-select" id="vintage_date" name="vintage_date">
+                        <option value="">Select Year</option>
+                        @foreach (range(date('Y'), 1900) as $year)
+                            <option value="{{ $year }}"
+                                {{ isset($wine->vintage_date) && $wine->vintage_date == $year ? 'selected' : '' }}>
+                                {{ $year }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="col-md-8">
@@ -194,17 +220,13 @@
 
         <div class="col-md-6">
 
-            <label for="vintage_date" class="form-label">Vintage Date</label>
+            <label for="abv" class="form-label">Alcohol By Volume</label>
+            <div class="input-group">
+                <input type="text" class="form-control" name="abv" id="abv"
+                    value="{{ old('abv', $wine->abv) }}">
+                <span class="input-group-text">%</span>
+            </div>
 
-            <select class="form-select" id="vintage_date" name="vintage_date">
-                <option value="">Select Year</option>
-                @foreach (range(date('Y'), 1900) as $year)
-                    <option value="{{ $year }}"
-                        {{ isset($wine->vintage_date) && $wine->vintage_date == $year ? 'selected' : '' }}>
-                        {{ $year }}
-                    </option>
-                @endforeach
-            </select>
         </div>
         <div class="col-md-6">
             <label for="bottle_size" class="form-label">Bottle Size</label>
@@ -228,17 +250,6 @@
                 </option>
             </select>
         </div>
-        <div class="col-md-6">
-
-            <label for="abv" class="form-label">Alcohol By Volume</label>
-            <div class="input-group">
-                <input type="text" class="form-control" name="abv" id="abv"
-                    value="{{ old('abv', $wine->abv) }}">
-                <span class="input-group-text">%</span>
-            </div>
-
-        </div>
-
         <div class="col-12">
 
             <label for="" class="form-label">Residual Sugars</label>
@@ -298,8 +309,8 @@
             <div class="d-flex align-items-center gap-2">
                 <div>
                     <label for="totalInventory" class="form-label">Inventory</label>
-                    <input type="number" class="form-control w-100" id="totalInventory" readonly value="{{ old('inventory', $wine->inventory) }}"
-                        style="width: 50%;">
+                    <input type="number" class="form-control w-100" id="totalInventory" readonly
+                        value="{{ old('inventory', $wine->inventory) }}" style="width: 50%;">
                 </div>
                 <div>
                     <label for="sku" class="form-label">SKU</label>

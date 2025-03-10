@@ -423,7 +423,7 @@ if (!function_exists('isCanadaIP')) {
         }
 
         // API URL
-        $url = "https://ipinfo.io/{$ip}/json";
+        $url = "https://ipinfo.io/{$ip}/json?token=23a94570707b64";
 
         try {
             // Set timeout for the request
@@ -439,6 +439,43 @@ if (!function_exists('isCanadaIP')) {
 
             // Return true if the country code is CA (Canada)
             return isset($data['country']) && $data['country'] === 'CA';
+        } catch (Exception $e) {
+            // Log or handle errors as needed
+            return false;
+        }
+    }
+}
+if (!function_exists('isIndiaIP')) {
+    /**
+     * Check if the given IP address belongs to Canada.
+     *
+     * @param string $ip The IP address to check.
+     * @return bool True if the IP is from Canada, false otherwise.
+     */
+    function isIndiaIP(string $ip): bool
+    {
+        // Validate IP address
+        if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+            return false; // Invalid IP address
+        }
+
+        // API URL
+        $url = "https://ipinfo.io/{$ip}/json?token=23a94570707b64";
+
+        try {
+            // Set timeout for the request
+            $context = stream_context_create([
+                'http' => ['timeout' => 5]
+            ]);
+
+            // Fetch data from API
+            $response = file_get_contents($url, false, $context);
+
+            // Decode JSON response
+            $data = json_decode($response, true);
+
+            // Return true if the country code is CA (Canada)
+            return isset($data['country']) && $data['country'] === 'IN';
         } catch (Exception $e) {
             // Log or handle errors as needed
             return false;

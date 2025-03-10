@@ -54,7 +54,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'contact_number' => 'required|string|max:20',
             'password' => 'required|string|min:8',
-            'vendor_id' => 'nullable|array',  // Allow it to be null
+            'vendor_id' => 'required|array|min:1',  // Allow it to be null
             'vendor_id.*' => 'exists:vendors,id', // Check each vendor ID exists
         ]);
 
@@ -113,7 +113,7 @@ class UserController extends Controller
             'lastname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'contact_number' => 'required|string|max:20',
-            'vendor_id' => 'nullable|array', // Allow null values
+            'vendor_id' => 'required|array|min:1',
             'vendor_id.*' => 'exists:vendors,id', // Validate vendor existence
         ]);
 

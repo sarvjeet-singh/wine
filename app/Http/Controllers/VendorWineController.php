@@ -65,7 +65,7 @@ class VendorWineController extends Controller
     public function store(Request $request, $vendor_id)
     {
         $request->validate([
-            // 'winery_name' => 'required|string|min:2',
+            'winery_name' => 'required|string|min:2',
             'region' => 'nullable|string',
             'sub_region' => 'nullable|string',
             'varietal_blend.*' => 'nullable|string',
@@ -119,7 +119,7 @@ class VendorWineController extends Controller
         // Create new VendorWine entry
         $data = [
             'vendor_id' => $vendor_id,
-            // 'winery_name' => $request->input('winery_name'),
+            'winery_name' => $request->input('winery_name'),
             'region' => $request->input('region') ?? null,
             'sub_region' => $request->input('sub_region') ?? null,
             'varietal_blend' => json_encode($varietalData) ?? null, // Store JSON data
@@ -157,7 +157,7 @@ class VendorWineController extends Controller
         $wine = VendorWine::findOrFail($id);
 
         $request->validate([
-            // 'winery_name' => 'required|string|min:2',
+            'winery_name' => 'required|string|min:2',
             'region' => 'nullable|string',
             'sub_region' => 'nullable|string',
             'varietal_blend.*' => 'nullable|string',
@@ -229,7 +229,7 @@ class VendorWineController extends Controller
 
         // Create new VendorWine entry
         $data = [
-            // 'winery_name' => $request->input('winery_name'),
+            'winery_name' => $request->input('winery_name'),
             'region' => $request->input('region'),
             'sub_region' => $request->input('sub_region'),
             'varietal_blend' => json_encode($varietalData),

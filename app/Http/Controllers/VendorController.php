@@ -1440,7 +1440,17 @@ class VendorController extends Controller
 		}
 
 		$vendor = Vendor::find($vendorid);
-		$response = VendorHelper::canActivateSubscription($vendorid);
+		if (strtolower($vendor->vendor_type) == 'accommodation') {
+			$response = VendorHelper::canActivateSubscription($vendorid);
+		} else if (strtolower($vendor->vendor_type) == 'winery') {
+			$response = VendorHelper::canActivateWinerySubscription($vendorid);
+		} else if (strtolower($vendor->vendor_type) == 'excursion') {
+		$response = VendorHelper::canActivateExcursionSubscription($vendorid);
+		} else {
+			$response = ['status' => true];
+			$vendor->account_status = 1;
+			$vendor->save();
+		}
 
 		if ($response['status'] == true) {
 			return response()->json([

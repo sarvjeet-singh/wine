@@ -64,10 +64,32 @@
         <div class="col-12">
 
             <div class="row g-3">
-                <div class="col-md-4">
+                <div class="col-md-6">
+                    <label for="" class="form-label">Label Name</label>
+
+                    <input type="text" name="winery_name" class="form-control" id="Label">
+                </div>
+                <div class="col-md-6">
                     <label for="" class="form-label">Series Name</label>
 
                     <input type="text" name="series" class="form-control" id="Series">
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-12">
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="" class="form-label">Vintage Date</label>
+
+                    <select class="form-select" id="vintage_date" name="vintage_date">
+                        @foreach (range(date('Y'), 1900) as $year)
+                            <option value="{{ $year }}">{{ $year }}</option>';
+                        @endforeach
+                    </select>
                 </div>
                 <div class="col-md-8">
 
@@ -115,13 +137,16 @@
 
         <div class="col-md-6">
 
-            <label for="" class="form-label">Vintage Date</label>
+            <label for="abv" class="form-label">Alcohol By Volume</label>
 
-            <select class="form-select" id="vintage_date" name="vintage_date">
-                @foreach (range(date('Y'), 1900) as $year)
-                    <option value="{{ $year }}">{{ $year }}</option>';
-                @endforeach
-            </select>
+            <!-- <input type="number" class="form-control" step="0.01" min="0" max="100" name="abv_rs"
+
+                id="abv_rs"> -->
+
+            <div class="input-group">
+                <input type="number" class="form-control" name="abv" id="abv">
+                <span class="input-group-text">%</span>
+            </div>
 
         </div>
 
@@ -142,21 +167,6 @@
                 <option value="3 L">3 L (Dbl Magnum)</option>
 
             </select>
-
-        </div>
-
-        <div class="col-md-6">
-
-            <label for="abv" class="form-label">Alcohol By Volume</label>
-
-            <!-- <input type="number" class="form-control" step="0.01" min="0" max="100" name="abv_rs"
-
-                id="abv_rs"> -->
-
-            <div class="input-group">
-                <input type="number" class="form-control" name="abv" id="abv">
-                <span class="input-group-text">%</span>
-            </div>
 
         </div>
 
@@ -217,11 +227,12 @@
                 <div>
                     <label for="" class="form-label">Inventory</label>
                     <input type="number" class="form-control w-100 readonly" id="totalInventory" readonly
-                     style="width: 50%;">
+                        style="width: 50%;">
                 </div>
                 <div>
                     <label for="" class="form-label">SKU</label>
-                    <input type="text" class="form-control w-100" style="width: 50%;" name="sku" id="sku">
+                    <input type="text" class="form-control w-100" style="width: 50%;" name="sku"
+                        id="sku">
 
                 </div>
             </div>
@@ -381,6 +392,10 @@
         $('#vendorWineFormAdd').validate({
 
             rules: {
+
+                winery_name: {
+                    required: true
+                },
 
                 series: {
 

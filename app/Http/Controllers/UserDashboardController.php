@@ -433,6 +433,7 @@ class UserDashboardController extends Controller
         $query = $request->input('q');
         $options = Vendor::where('vendor_name', 'LIKE', '%' . $query . '%')
             ->whereNotIn('vendor_type', ['licensed', 'non-licensed'])
+            ->where('account_status', 1)
             ->get() // Get both columns
             ->map(function ($vendor) {
                 return [
@@ -448,6 +449,7 @@ class UserDashboardController extends Controller
 
         $options = Vendor::where('vendor_name', 'LIKE', '%' . $query . '%')
             ->whereNotIn('vendor_type', ['winery', 'accommodation', 'excursion']) // Exclude specific vendor types
+            ->where('account_status', 1)
             ->get()
             ->map(function ($vendor) {
                 return [

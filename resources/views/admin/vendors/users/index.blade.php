@@ -62,7 +62,10 @@
                                                 <td>{{ ucfirst($user->lastname) ?? '-' }}</td>
                                                 <td>{{ $user->email ?? '-' }}</td>
                                                 <td>{{ $user->contact_number ?? '-' }}</td>
-                                                <td>{{ $user->vendors->pluck('vendor_name')->implode(', ') ?? '-' }}</td>
+                                                <td><span
+                                                        title="{{ $user->vendors->pluck('vendor_name')->implode(', ') ?? '-' }}">
+                                                        {{ Str::limit($user->vendors->pluck('vendor_name')->implode(', ') ?? '-', 50, '...') }}
+                                                    </span></td>
                                                 <td>{{ $user->created_at->format('m/d/Y') }}</td>
                                                 <td>
                                                     <a href="{{ route('admin.vendors.users.edit', $user->id) }}">
@@ -195,6 +198,12 @@
                         });
                     }
                 });
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
             });
         });
     </script>

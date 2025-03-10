@@ -68,7 +68,7 @@
 
     async function sendLocationToServer(lat, long) {
         console.log("Sending location to server...");
-        let response = await fetch('https://ipapi.co/json/');
+        let response = await fetch(route("get-user-location", { lat, long }));
         let data = await response.json();
         fetch('/save-user-location', {
                 method: "POST",
@@ -88,16 +88,16 @@
     }
 
     // First, check if the user is from India
-    getUserCountry().then(isFromIndia => {
-        document.body.style.display = "none";
-        if (isFromIndia) {
-            console.log("User is from India, checking location...");
-            checkLocationPermission(); // Request location only if from India
-        } else {
-            console.log("User is not from India. Hiding website.");
-            document.body.remove(); // Hide everything if not from India
-        }
-    });
+    // getUserCountry().then(isFromIndia => {
+    //     document.body.style.display = "none";
+    //     if (isFromIndia) {
+    //         console.log("User is from India, checking location...");
+    //         checkLocationPermission(); // Request location only if from India
+    //     } else {
+    //         // console.log("User is not from India. Hiding website.");
+    //         // document.body.remove(); // Hide everything if not from India
+    //     }
+    // });
 </script>
 <header>
     <nav class="navbar navbar-expand-lg px-sm-4 px-2 py-0">
