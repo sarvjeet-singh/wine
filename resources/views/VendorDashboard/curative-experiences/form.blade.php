@@ -26,10 +26,10 @@
                             <a href="#" class="btn wine-btn px-4">Create</a>
                         </div>
                     </div>
-                    
+
                     <form
                         action="{{ isset($experience) ? route('curative-experiences.update', [$experience->id, $vendor->id]) : route('curative-experiences.store', $vendor->id) }}"
-                        method="POST" enctype="multipart/form-data">
+                        method="POST" id="experienceForm" enctype="multipart/form-data">
                         @csrf
                         @if (isset($experience))
                             @method('PUT')
@@ -40,7 +40,8 @@
                                 <!-- Experience Type -->
                                 <div class="col-lg-4 col-12">
                                     <div class="form-floating">
-                                        <select name="category_id" class="form-control form-select" id="seasonSelect">
+                                        <select name="category_id" class="form-control form-select" id="experienceType">
+                                            <option value="">Select type</option>
                                             @if ($categories->isEmpty())
                                                 <option value="">No Category Found</option>
                                             @else
@@ -82,9 +83,9 @@
                                         </div>
                                         <div class="col-3 d-flex align-items-center">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="free"
+                                                <input class="form-check-input" type="checkbox" name="is_free"
                                                     value="1" id="flexCheckDefault"
-                                                    {{ old('free', isset($experience) ? $experience->free : 0) ? 'checked' : '' }}>
+                                                    {{ old('is_free', isset($experience) ? $experience->is_free : 0) ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="flexCheckDefault">
                                                     Free
                                                 </label>
@@ -121,8 +122,8 @@
                                 <!-- URL (Booking Platform) -->
                                 <div class="col-lg-4 col-12">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" name="url"
-                                            value="{{ old('url', isset($experience) ? $experience->url : '') }}"
+                                        <input type="text" class="form-control" name="booking_url"
+                                            value="{{ old('booking_url', isset($experience) ? $experience->booking_url : '') }}"
                                             placeholder="URL (Booking Platform)">
                                         <label>URL (Booking Platform)</label>
                                     </div>
@@ -139,7 +140,7 @@
                                 </div>
 
                                 <!-- Start Date -->
-                                <div class="col-lg-4 col-12">
+                                <div class="col-lg-3 col-12">
                                     <div class="form-floating">
                                         <input type="date" class="form-control" name="start_date"
                                             value="{{ old('start_date', isset($experience) ? $experience->start_date : '') }}">
@@ -148,7 +149,7 @@
                                 </div>
 
                                 <!-- End Date -->
-                                <div class="col-lg-4 col-12">
+                                <div class="col-lg-3 col-12">
                                     <div class="form-floating">
                                         <input type="date" class="form-control" name="end_date"
                                             value="{{ old('end_date', isset($experience) ? $experience->end_date : '') }}">
@@ -157,16 +158,16 @@
                                 </div>
 
                                 <!-- Start Time -->
-                                <div class="col-lg-4 col-12">
+                                <div class="col-lg-3 col-12">
                                     <div class="form-floating">
-                                        <input type="time" class="form-control" name="start_time"
+                                        <input type="time" class="form-control" id="start_time" name="start_time"
                                             value="{{ old('start_time', isset($experience) ? $experience->start_time : '') }}">
                                         <label>Start Time</label>
                                     </div>
                                 </div>
 
                                 <!-- End Time -->
-                                <div class="col-lg-4 col-12">
+                                <div class="col-lg-3 col-12">
                                     <div class="form-floating">
                                         <input type="time" class="form-control" name="end_time"
                                             value="{{ old('end_time', isset($experience) ? $experience->end_time : '') }}">
@@ -215,4 +216,64 @@
         </div>
     </div>
 
+@endsection
+@section('js')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js"
+        integrity="sha512-KFHXdr2oObHKI9w4Hv1XPKc898mE4kgYx58oqsc/JqqdLMDI4YjOLzom+EMlW8HFUd0QfjfAvxSL6sEq/a42fQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        $(document).ready(function() {
+            let $startDate = $("input[name='start_date']");
+            let $endDate = $("input[name='end_date']");
+            let $startTime = $("input[name='start_time']");
+            let $endTime = $("input[name='end_time']");
+
+            // Restrict End Date to be same or after Start Date
+            $startDate.on("change", function() {
+                $endDate.attr("min", $(this).val());
+                if ($endDate.val() < $(this).val()) {
+                    $endDate.val($(this).val());
+                }
+            });
+
+            // Restrict End Time if Start Date and End Date are the same
+            $startTime.on("change", function() {
+                console.log($(this).val());
+                $endTime.attr("min", $(this).val());
+                $endTime.attr("max", "23:59");
+                if ($endTime.val() < $(this).val()) {
+                    $endTime.val($(this).val());
+                }
+            });
+
+            // Reset End Time restriction if End Date is changed
+            $endDate.on("change", function() {
+                if ($startDate.val() !== $(this).val()) {
+                    $endTime.removeAttr("min");
+                } else {
+                    $endTime.attr("min", $startTime.val());
+                }
+            });
+        });
+        $.validator.addMethod("timeGreater", function(value, element, param) {
+            return this.optional(element) || value > $(param).val();
+        }, "End time must be greater than start time");
+
+        $("#experienceForm").validate({
+            rules: {
+                start_time: {
+                    required: true
+                },
+                end_time: {
+                    required: true,
+                    timeGreater: "#start_time" // Custom rule
+                }
+            },
+            errorElement: "div",
+            errorPlacement: function(error, element) {
+                error.addClass("text-danger mt-1");
+                error.insertAfter(element);
+            }
+        });
+    </script>
 @endsection

@@ -12,8 +12,8 @@ class AdminLoginController extends Controller
     // Show the admin login form
     public function showLoginForm()
     {
-        if(Auth::guard('admin')->check()) {
-        return redirect('/admin/dashboard');
+        if (Auth::guard('admin')->check()) {
+            return redirect('/admin/dashboard');
         }
         return view('auth.admin-login'); // Create a custom admin login view
     }
@@ -38,9 +38,17 @@ class AdminLoginController extends Controller
     }
 
     // Logout admin
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/admin/login')->withHeaders([
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT'
+        ]);
         return redirect('/admin/login');
     }
 }

@@ -56,6 +56,8 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
             'vendor_id' => 'required|array|min:1',  // Allow it to be null
             'vendor_id.*' => 'exists:vendors,id', // Check each vendor ID exists
+        ], [
+            'vendor_id.required' => 'Please select at least one vendor.',
         ]);
 
         // Check if any of the selected vendors are already assigned to another user

@@ -31,10 +31,16 @@ class CurativeExperienceController extends Controller
         $request->validate([
             'category_id' => 'required|exists:curative_experience_categories,id',
             'name' => 'required|string|max:255',
+            'admittance' => 'required',
+            'free'  => 'required|boolean',
+            'extension'  => 'required|string',
             'start_date' => 'required|date',
+            'booking_url' => 'nullable|url',
+            'inventory' => 'nullable|integer',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'start_time' => 'required',
-            'end_time' => 'required',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i',
+            'description' => 'nullable|string',
             'medias.*' => 'nullable|file|mimes:jpg,png,jpeg,gif,mp4|max:2048'
         ]);
 
@@ -58,6 +64,7 @@ class CurativeExperienceController extends Controller
         $categories = CurativeExperienceCategory::orderBy('position', 'asc')->pluck('name', 'id');
         $vendor = Vendor::find($vendor_id);
         $experience = CurativeExperience::findOrFail($id);
+        // print_r($experience); die;
         return view('VendorDashboard.curative-experiences.form', compact('experience', 'categories', 'vendor'));
     }
 
