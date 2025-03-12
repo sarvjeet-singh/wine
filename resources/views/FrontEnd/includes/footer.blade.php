@@ -16,7 +16,7 @@
                     <li class=""><a href="{{ route('contact-us') }}"
                             class="text-decoration-none text-dark">Contact Us</a></li>
                 </ul>
-                <div class="social text-md-start text-center">
+                {{-- <div class="social text-md-start text-center">
                     <ul class="list-unstyled px-0 d-flex align-items-center justify-content-center gap-xl-3 gap-2 mb-0">
                         <li><a href="#"><i class="fa-brands fa-facebook"></i></a></li>
                         <li><a href="#"><i class="fa-brands fa-twitter"></i></a></li>
@@ -25,7 +25,7 @@
                         <li><a href="#"><i class="fa-brands fa-youtube"></i></a></li>
                         <li><a href="#"><i class="fa-brands fa-tiktok"></i></a></li>
                     </ul>
-                </div>
+                </div> --}}
 
                 <div class="sec-btn mt-4">
                     @guest

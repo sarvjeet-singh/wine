@@ -62,6 +62,8 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\Vendor\UserController as AdminVendorUserController;
 use Mews\Captcha\CaptchaController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\Admin\CurativeExperienceCategoryController as AdminCurativeExperienceCategoryController;
+use App\Http\Controllers\CurativeExperienceController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -428,6 +430,14 @@ Route::group(['middleware' => ['auth:vendor', 'checkPasswordUpdated', 'check.ven
     Route::post('/vendor/confirm-payment/{vendorid?}', [PaymentController::class, 'confirmPayment'])->name('confirm-payment');
     Route::post('/vendor/winery-shop/store-winery-shop-transaction-details/{vendorid?}', [WineryCheckoutController::class, 'storeTransactionDetails'])->name('store-winery-shop-transaction-details');
     Route::post('/vendor/upload/store/{vendorid?}', [VendorFileUploadController::class, 'store'])->name('upload.store');
+
+    // Curative Experiences
+    Route::get('/vendor/curative-experiences/{vendorid?}', [CurativeExperienceController::class, 'index'])->name('curative-experiences.index');
+    Route::get('/vendor/curative-experiences/create/{vendorid?}', [CurativeExperienceController::class, 'create'])->name('curative-experiences.create');
+    Route::post('/vendor/curative-experiences/store/{vendorid?}', [CurativeExperienceController::class, 'store'])->name('curative-experiences.store');
+    Route::get('/vendor/curative-experiences/edit/{curativeExperienceId}/{vendorid?}', [CurativeExperienceController::class, 'edit'])->name('curative-experiences.edit');
+    Route::put('/vendor/curative-experiences/update/{curativeExperienceId}/{vendorid?}', [CurativeExperienceController::class, 'update'])->name('curative-experiences.update');
+    Route::get('/vendor/curative-experiences/delete/{curativeExperienceId}/{vendorid?}', [CurativeExperienceController::class, 'destroy'])->name('curative-experiences.destroy');
 });
 // ================= ADMIN ============== //
 
@@ -466,10 +476,10 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::get('/error-logs', [AdminErrorLogController::class, 'index'])->name('error-logs');
         Route::get('plans/sync', [AdminPlanSyncController::class, 'index'])->name('plans.sync.index');
         Route::post('plans/sync', [AdminPlanSyncController::class, 'sync'])->name('plans.sync');
-        Route::get('taxes/sync', [AdminTaxSyncController::class, 'index'])->name('taxes.sync.index');
-        Route::post('taxes/sync', [AdminTaxSyncController::class, 'sync'])->name('taxes.sync');
         Route::resource('plans', AdminPlanController::class)->names('plans');
-        Route::resource('taxes', AdminTaxController::class)->names('taxes');
+        // Route::get('taxes/sync', [AdminTaxSyncController::class, 'index'])->name('taxes.sync.index');
+        // Route::post('taxes/sync', [AdminTaxSyncController::class, 'sync'])->name('taxes.sync');
+        // Route::resource('taxes', AdminTaxController::class)->names('taxes');
 
         // refund policy routes
         Route::get('refund-policy', [AdminCmsPageController::class, 'refundPolicy'])->name('cms.refund-policy');
@@ -480,6 +490,8 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::get('/vendor/users/activate/{id}', [AdminVendorUserController::class, 'activate'])->name('vendor.users.activate');
         Route::resource('/vendor/users', AdminVendorUserController::class)->names('vendors.users');
         Route::get('/vendors/uploaded-files/{id}', [AdminVendorController::class, 'getUploadedFiles'])->name('vendors.uploaded-files');
+        Route::post('curative-experience-categories/update-order', [AdminCurativeExperienceCategoryController::class, 'updateOrder'])->name('curative-experience-categories.updateOrder');
+        Route::resource('curative-experience-categories', AdminCurativeExperienceCategoryController::class)->names('curative-experience-categories');
     });
     Route::post('/check-vendor-combination', [AdminVendorController::class, 'checkVendorCombination'])->name('check.vendor.combination');
     Route::get('/admin/filter/search', [AdminVendorController::class, 'filterSearch'])->name('admin.vendors.search');

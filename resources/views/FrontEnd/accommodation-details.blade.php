@@ -259,9 +259,9 @@
                         @if (
                             !empty($vendor->accommodationMetadata->process_type) &&
                                 $vendor->accommodationMetadata->process_type != 'redirect-url')
-                            <div class="pt-3">
+                            {{-- <div class="pt-3">
                                 <button class="btn wine-btn"><a href="#datepicker-container">Check Availability</a></button>
-                            </div>
+                            </div> --}}
                         @else
                             <div class="text-start pt-3">
                                 <button type="button" class="btn btn-success"><a target="_blank" class="link-light"
@@ -413,12 +413,12 @@
                         <div class="d-flex justify-content-between">
                             <span class="fa-lg">Check-In After:</span>
                             <strong
-                                class="fa-lg text-muted text-uppercase">{{ !empty($vendor->accommodationMetadata->checkin_start_time) ? \Carbon\Carbon::createFromFormat('H:i:s', $vendor->accommodationMetadata->checkin_start_time)->format('h:i A') : 'N/A' }}</strong>
+                                class="fa-lg text-muted text-uppercase">{{ !empty($vendor->accommodationMetadata->checkin_start_time) ? \Carbon\Carbon::createFromFormat('H:i:s', $vendor->accommodationMetadata->checkin_start_time)->format('g:i A') : 'N/A' }}</strong>
                         </div>
                         <div class="d-flex  justify-content-between">
                             <span class="fa-lg">Check-Out Before:</span>
                             <strong
-                                class="fa-lg text-muted text-uppercase">{{ !empty($vendor->accommodationMetadata->checkout_time) ? \Carbon\Carbon::createFromFormat('H:i:s', $vendor->accommodationMetadata->checkout_time)->format('h:i A') : 'N/A' }}</strong>
+                                class="fa-lg text-muted text-uppercase">{{ !empty($vendor->accommodationMetadata->checkout_time) ? \Carbon\Carbon::createFromFormat('H:i:s', $vendor->accommodationMetadata->checkout_time)->format('g:i A') : 'N/A' }}</strong>
                         </div>
                         <div class="d-flex justify-content-between">
                             <p>Special request may be accommodated</p>

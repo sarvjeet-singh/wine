@@ -157,11 +157,11 @@
                                                 <div class="box-body-information">{{ Auth::user()->firstname }}</div>
                                             </div>
                                             <div class="col-sm-3 mb-sm-0 mb-2">
-                                                <div class="box-body-label">Last/Surname:</div>
+                                                <div class="box-body-label">Last Name:</div>
                                                 <div class="box-body-information">{{ Auth::user()->lastname }}</div>
                                             </div>
                                             <div class="col-sm-5 mb-sm-0 mb-2">
-                                                <div class="box-body-label">Email: @if (!empty(Auth::user()->email_verified_at))
+                                                <div class="box-body-label">Email / Username: @if (!empty(Auth::user()->email_verified_at))
                                                         <i class="fas fa-check-circle text-success"
                                                             title="Email Verified"></i>
                                                     @endif

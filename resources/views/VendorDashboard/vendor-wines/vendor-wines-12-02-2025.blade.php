@@ -221,7 +221,7 @@
     </style>
 
     <div class="col right-side">
-        <!-- <div class="upload-container">
+        <div class="upload-container">
             <h3>Upload Your Files</h3>
             <div class="dropbox" id="dropbox">
                 Drag & Drop files here or click to upload
@@ -233,9 +233,9 @@
             </div>
 
             <div id="status"></div>
-        </div> -->
+        </div>
 
-        <div class="mb-4 d-flex justify-content-end align-items-center gap-2">
+        <div class="text-end mb-4">
 
             <button type="button" class="btn wine-btn rounded px-4 open-modal-btn" data-url=
 
@@ -245,8 +245,6 @@
                 Add Wine
 
             </button>
-
-            <button type="button" class="btn wine-btn rounded px-4">Upload</button>
 
         </div>
 

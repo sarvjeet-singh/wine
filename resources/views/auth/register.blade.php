@@ -126,11 +126,11 @@
                                         style="position:relative; top:100%; left:0; font-size:0.8em; color:red;"></span> --}}
                                 </div>
                                 {{-- @error('password') --}}
-                                <span class="theme-color mt-1" role="alert"
+                                {{-- <span class="theme-color mt-1" role="alert"
                                     style="display: inline-block;line-height: normal;font-size: 13px;">
                                     <strong>Password must contain uppercase, lowercase, number, and special
                                         character</strong>
-                                </span>
+                                </span> --}}
                                 {{-- @enderror --}}
                             </div>
                             <div class="col-md-6" style="position:relative">
@@ -385,12 +385,13 @@
                     }
                 },
                 errorPlacement: function(error, element) {
-                    if (element.attr("name") === "password") {
-                        // highlight the password field
-                        $("#password").addClass("password-error");
-                    } else {
-                        error.insertAfter(element); // Default error message positioning
-                    }
+                    error.insertAfter(element);
+                    // if (element.attr("name") === "password") {
+                    //     // highlight the password field
+                    //     $("#password").addClass("password-error");
+                    // } else {
+                    //     error.insertAfter(element); // Default error message positioning
+                    // }
                 },
                 // Remove error on keyup
                 onkeyup: function(element) {

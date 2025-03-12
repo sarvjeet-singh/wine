@@ -3,25 +3,6 @@
 @section('title', 'Wine Country Weekends - Guest Registry')
 
 @section('content')
-
-<style>
-.select2-container {
-    width: 100% !important;
-}
-.select2-container--default .select2-selection--single {
-    border: 1px solid #dee2e6;
-}
-.select2-container .select2-selection--single {
-    height: 37.6px;
-}
-.select2-container--default .select2-selection--single .select2-selection__rendered {
-    padding-block: 4px;
-}
-.select2-container--default .select2-selection--single .select2-selection__arrow {
-    top: 6px;
-}
-</style>
-
     <div class="container main-container">
         <div class="row flex-lg-nowrap flex-wrap g-4">
             @include('UserDashboard.includes.leftNav')

@@ -5,6 +5,8 @@ namespace App\Helpers;
 use App\Models\PublishSeason;
 use App\Models\Vendor;
 use App\Models\VendorAccommodationMetadata;
+use App\Models\VendorWineryMetadata;
+use App\Models\VendorExcursionMetadata;
 use App\Models\VendorMediaGallery;
 use App\Models\WinerySubscription;
 use App\Models\VendorPricing;
@@ -43,8 +45,6 @@ class VendorHelper
             'short_code',
             'qr_code',
             'inventory_type',
-            'price_point',
-            'host'
         ];
         $missingVendorFields = [];
         foreach ($requiredVendorFields as $field) {
@@ -228,8 +228,6 @@ class VendorHelper
             'short_code',
             'qr_code',
             'inventory_type',
-            'price_point',
-            'host'
         ];
         $missingVendorFields = [];
         foreach ($requiredVendorFields as $field) {
@@ -328,8 +326,6 @@ class VendorHelper
             'short_code',
             'qr_code',
             'inventory_type',
-            'price_point',
-            'host'
         ];
         $missingVendorFields = [];
         foreach ($requiredVendorFields as $field) {

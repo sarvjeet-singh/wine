@@ -421,9 +421,11 @@
         $(document).ready(function() {
 
             $('#vendorWineFormEdit').validate({
-                rrules: {
+                rules: {
+                    winery_name: {
+                        required: true
+                    },
                     series: {
-
                         required: true
                     },
                 },

@@ -107,7 +107,7 @@
 
                                     <div class="row mt-3">
                                         <div class="col-sm-6 col-12 mb-sm-0 mb-3">
-                                            <label class="form-label">Given Name(s)<span
+                                            <label class="form-label">First Name<span
                                                     class="required-filed">*</span></label>
                                             <input type="text"
                                                 class="form-control @error('firstname') is-invalid @enderror"
@@ -121,7 +121,7 @@
                                         </div>
 
                                         <div class="col-sm-6 col-12">
-                                            <label class="form-label">Last/Surname<span class="required-filed">*</span></label>
+                                            <label class="form-label">Last Name<span class="required-filed">*</span></label>
                                             <input type="text"
                                                 class="form-control @error('lastname') is-invalid @enderror" name="lastname"
                                                 value="{{ old('lastname', Auth::user()->lastname) }}"
