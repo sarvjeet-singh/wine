@@ -74,7 +74,7 @@
                     <i
                         class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-amenities', 'vendor-curated-experience') ? 'rotate' : '' }}"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('vendor-amenities', 'vendor-curated-experience') ? 'show' : '' }}"
+                <div class="collapse {{ request()->routeIs('vendor-amenities', 'curative-experiences.index') ? 'show' : '' }}"
                     id="menu5">
                     <ul class="nav flex-column sub-menu mt-2">
                         <li class="nav-item">
@@ -84,8 +84,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('vendor-curated-experience') ? 'active' : '' }}"
-                                href="{{ route('vendor-curated-experience', ['vendorid' => $id]) }}">
+                            <a class="nav-link {{ request()->routeIs('curative-experiences.index') ? 'active' : '' }}"
+                                href="{{ route('curative-experiences.index', ['vendorid' => $id]) }}">
                                 <i class="fas fa-wrench menu-icon"></i> Curated Experiences
                             </a>
                         </li>

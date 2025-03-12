@@ -26,7 +26,32 @@
                             <a href="#" class="btn wine-btn px-4">Create</a>
                         </div>
                     </div>
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
 
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <form
                         action="{{ isset($experience) ? route('curative-experiences.update', [$experience->id, $vendor->id]) : route('curative-experiences.store', $vendor->id) }}"
                         method="POST" id="experienceForm" enctype="multipart/form-data">
@@ -104,11 +129,12 @@
                                                     isset($experience) ? $experience->extension : '',
                                                 );
                                             @endphp
-                                            <option value="+" {{ $selectedExtension == '+' ? 'selected' : '' }}>+
+                                            <option value="">+
                                             </option>
                                             <option value="/Hr" {{ $selectedExtension == '/Hr' ? 'selected' : '' }}>/Hr
                                             </option>
-                                            <option value="/Person" {{ $selectedExtension == '/Person' ? 'selected' : '' }}>
+                                            <option value="/Person"
+                                                {{ $selectedExtension == '/Person' ? 'selected' : '' }}>
                                                 /Person</option>
                                             <option value="/Night" {{ $selectedExtension == '/Night' ? 'selected' : '' }}>
                                                 /Night</option>
@@ -160,8 +186,9 @@
                                 <!-- Start Time -->
                                 <div class="col-lg-3 col-12">
                                     <div class="form-floating">
-                                        <input type="time" class="form-control" id="start_time" name="start_time"
-                                            value="{{ old('start_time', isset($experience) ? $experience->start_time : '') }}">
+                                        <input type="time" id="start_time" name="start_time" class="form-control"
+                                            value="{{ old('start_time', !empty($experience) && !empty($experience->start_time) ? \Carbon\Carbon::parse($experience->start_time)->format('H:i') : '') }}">
+
                                         <label>Start Time</label>
                                     </div>
                                 </div>
@@ -169,8 +196,8 @@
                                 <!-- End Time -->
                                 <div class="col-lg-3 col-12">
                                     <div class="form-floating">
-                                        <input type="time" class="form-control" name="end_time"
-                                            value="{{ old('end_time', isset($experience) ? $experience->end_time : '') }}">
+                                        <input type="time" id="end_time" name="end_time" class="form-control"
+                                            value="{{ old('end_time', !empty($experience) && !empty($experience->end_time) ? \Carbon\Carbon::parse($experience->end_time)->format('H:i') : '') }}">
                                         <label>End Time</label>
                                     </div>
                                 </div>
@@ -185,19 +212,21 @@
 
                                 <!-- Media Upload -->
                                 <div class="col-12">
-                                    <div class="profile-img-sec">
-                                        <label for="profileImage" class="position-relative">
-                                            <img id="profilePreview"
-                                                src="{{ isset($experience) && $experience->media ? asset($experience->media->url) : asset('/images/placeholder.png') }}"
-                                                class="profile-img rounded-3"
-                                                style="width: 200px; height: 130px; object-fit: cover; border: 1px solid #408a95;">
-                                            <p class="text-center"
-                                                style="font-size: 14px; margin-top: 10px; color: #408a95; cursor: pointer;">
-                                                <i class="fa-solid fa-arrow-up-from-bracket"></i> Upload Media
-                                            </p>
-                                        </label>
-                                        <input type="file" id="profileImage" name="media" class="file-input"
-                                            accept="image/*" style="display: none;">
+                                    <div id="profilePreviewWrapper" class="d-flex flex-wrap gap-2">
+                                        @if (isset($experience) && count($experience->medias) > 0)
+                                            @foreach ($experience->medias as $media)
+                                                <img src="{{ Storage::url($media->file_path) }}"
+                                                    class="profile-img rounded-3"
+                                                    style="width: 200px; height: 130px; object-fit: cover; border: 1px solid #408a95;">
+                                            @endforeach
+                                        @endif
+                                        <div class="d-flex justify-content-center align-items-center rounded-3"
+                                            style="width: 200px; height: 130px; border: 1px solid #408a95; background-color: #f8f9fa;">
+                                            <i class="fa-solid fa-camera fa-2x text-muted"></i>
+                                            <!-- Camera Icon -->
+                                            <input type="file" id="profileImage" name="medias[]" class="file-input"
+                                                accept="image/*" multiple style="display: none;">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -254,26 +283,107 @@
                     $endTime.attr("min", $startTime.val());
                 }
             });
-        });
-        $.validator.addMethod("timeGreater", function(value, element, param) {
-            return this.optional(element) || value > $(param).val();
-        }, "End time must be greater than start time");
 
-        $("#experienceForm").validate({
-            rules: {
-                start_time: {
-                    required: true
+            $.validator.addMethod("timeGreater", function(value, element, param) {
+                return this.optional(element) || value > $(param).val();
+            }, "End time must be greater than start time");
+
+
+            $("#experienceForm").validate({
+                rules: {
+                    category_id: {
+                        required: true
+                    },
+                    name: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    admittance: {
+                        required: true
+                    },
+                    is_free: {
+                        required: false, // Nullable
+                    },
+                    extension: {
+                        required: true
+                    },
+                    booking_url: {
+                        url: true
+                    },
+                    inventory: {
+                        required: true,
+                        number: true,
+                        min: 1
+                    },
+                    start_date: {
+                        required: true,
+                        date: true
+                    },
+                    end_date: {
+                        required: true,
+                        date: true
+                    },
+                    start_time: {
+                        required: true
+                    },
+                    end_time: {
+                        required: true,
+                        timeGreater: "#start_time" // Custom rule
+                    },
+                    "medias[]": {
+                        extension: "jpg|jpeg|png|gif|mp4",
+                        filesize: 2048 * 1024 // 2MB limit
+                    }
                 },
-                end_time: {
-                    required: true,
-                    timeGreater: "#start_time" // Custom rule
+                messages: {
+                    category_id: {
+                        required: "The category field is required."
+                    },
+                    inventory: {
+                        required: "Inventory is required.",
+                        number: "Please enter a valid number.",
+                        min: "Inventory must be at least 1."
+                    },
+                    end_time: {
+                        required: "End time is required.",
+                        timeGreater: "End time must be greater than Start time."
+                    },
+                    "medias[]": {
+                        extension: "Only JPG, JPEG, PNG, GIF, and MP4 files are allowed.",
+                        filesize: "File size must not exceed 2MB."
+                    }
+                },
+                errorElement: "div",
+                errorPlacement: function(error, element) {
+                    error.addClass("text-danger mt-1");
+                    error.insertAfter(element);
                 }
-            },
-            errorElement: "div",
-            errorPlacement: function(error, element) {
-                error.addClass("text-danger mt-1");
-                error.insertAfter(element);
-            }
+            });
+        });
+        $(document).ready(function() {
+            $("#profileImage").change(function(event) {
+                let input = event.target;
+                let reader = new FileReader();
+
+                reader.onload = function() {
+                    let previewWrapper = $("#profilePreviewWrapper");
+                    let imagePreview = $("#profilePreview");
+
+                    if (!imagePreview.length) {
+                        // If img tag doesn't exist, create it
+                        previewWrapper.html(`<img id="profilePreview" class="profile-img rounded-3" 
+                    style="width: 100%; height: 100%; object-fit: cover;">`);
+                        imagePreview = $("#profilePreview");
+                    }
+
+                    // Set new image source
+                    imagePreview.attr("src", reader.result);
+                };
+
+                if (input.files && input.files[0]) {
+                    reader.readAsDataURL(input.files[0]); // Read file as Data URL
+                }
+            });
         });
     </script>
 @endsection

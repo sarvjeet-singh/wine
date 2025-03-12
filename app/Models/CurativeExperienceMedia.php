@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CurativeExperienceMedia extends Model
 {
     use HasFactory;
-
+    protected $table = 'curative_experience_medias';
     protected $fillable = ['experience_id', 'file_path'];
 
     public function experience()

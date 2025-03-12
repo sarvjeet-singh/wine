@@ -24,9 +24,27 @@
                     <div class="information-box-head">
                         <div class="box-head-heading d-flex align-items-center justify-content-between gap-2">
                             <span class="box-head-label theme-color">Curated Experience</span>
-                            <a href="{{ route('curative-experiences.create', $vendor->id) }}" class="btn wine-btn px-4">Create</a>
+                            <a href="{{ route('curative-experiences.create', $vendor->id) }}"
+                                class="btn wine-btn px-4">Create</a>
                         </div>
                     </div>
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
                     <div class="information-box-body py-4">
                         <table id="" class="table curated-exp-listing table-custom text-center" style="width:100%">
                             <thead>
@@ -47,10 +65,12 @@
                                             <td>{{ $experience->admittance ?? 'N/A' }}</td>
                                             <td>{{ $experience->extension ?? 'N/A' }}</td>
                                             <td>
-                                                <a href="{{ route('curative-experiences.edit', [$experience->id, $vendor->id]) }}">
+                                                <a
+                                                    href="{{ route('curative-experiences.edit', [$experience->id, $vendor->id]) }}">
                                                     <i class="fa-regular fa-pen-to-square"></i>
                                                 </a>
-                                                <form action="{{ route('curative-experiences.destroy', [$experience->id, $vendor->id]) }}"
+                                                <form
+                                                    action="{{ route('curative-experiences.destroy', [$experience->id, $vendor->id]) }}"
                                                     method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
@@ -62,6 +82,10 @@
                                             </td>
                                         </tr>
                                     @endforeach
+                                @else
+                                    <tr>
+                                        <td colspan="5" class="text-center">No experiences found.</td>
+                                    </tr>
                                 @endif
                             </tbody>
                         </table>

@@ -437,7 +437,7 @@ Route::group(['middleware' => ['auth:vendor', 'checkPasswordUpdated', 'check.ven
     Route::post('/vendor/curative-experiences/store/{vendorid?}', [CurativeExperienceController::class, 'store'])->name('curative-experiences.store');
     Route::get('/vendor/curative-experiences/edit/{curativeExperienceId}/{vendorid?}', [CurativeExperienceController::class, 'edit'])->name('curative-experiences.edit');
     Route::put('/vendor/curative-experiences/update/{curativeExperienceId}/{vendorid?}', [CurativeExperienceController::class, 'update'])->name('curative-experiences.update');
-    Route::get('/vendor/curative-experiences/delete/{curativeExperienceId}/{vendorid?}', [CurativeExperienceController::class, 'destroy'])->name('curative-experiences.destroy');
+    Route::delete('/vendor/curative-experiences/delete/{curativeExperienceId}/{vendorid?}', [CurativeExperienceController::class, 'destroy'])->name('curative-experiences.destroy');
 });
 // ================= ADMIN ============== //
 

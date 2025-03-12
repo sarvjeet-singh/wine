@@ -53,7 +53,8 @@
                         @endif
                         <div class="row mb-3 mt-4">
                             <div class="col-md-6" style="position:relative">
-                                <label for="firstname" class="col-form-label">{{ __('Given Name(s)') }}<span style="color:red;padding-left: 1px;">*</span></label>
+                                <label for="firstname" class="col-form-label">{{ __('Given Name(s)') }}<span
+                                        style="color:red;padding-left: 1px;">*</span></label>
                                 <input id="firstname" type="text"
                                     class="form-control required @error('firstname') is-invalid @enderror" name="firstname"
                                     value="{{ old('firstname') }}" autocomplete="firstname" autofocus placeholder="">
@@ -65,7 +66,8 @@
                                 @enderror
                             </div>
                             <div class="col-md-6" style="position:relative">
-                                <label for="lastname" class="col-form-label">{{ __('Last/Surname') }}<span style="color:red;padding-left: 1px;">*</span></label>
+                                <label for="lastname" class="col-form-label">{{ __('Last/Surname') }}<span
+                                        style="color:red;padding-left: 1px;">*</span></label>
                                 <input id="lastname" type="text"
                                     class="form-control required @error('lastname') is-invalid @enderror" name="lastname"
                                     value="{{ old('lastname') }}" autocomplete="lastname" autofocus placeholder="">
@@ -80,7 +82,8 @@
 
                         <div class="row mb-3 mt-4">
                             <div class="col-md-6">
-                                <label for="email" class="col-form-label">{{ __('eMail Address') }}<span style="color:red;padding-left: 1px;">*</span></label>
+                                <label for="email" class="col-form-label">{{ __('eMail Address') }}<span
+                                        style="color:red;padding-left: 1px;">*</span></label>
                                 <div style="position:relative">
                                     <i class="fa-solid fa-envelope login-custom-icon"></i>
                                     <input id="email" type="email"
@@ -115,7 +118,8 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="password" class="col-form-label">{{ __('Create Password') }}<span style="color:red;padding-left: 1px;">*</span></label>
+                                <label for="password" class="col-form-label">{{ __('Create Password') }}<span
+                                        style="color:red;padding-left: 1px;">*</span></label>
                                 <div style="position:relative">
                                     <i class="fa-solid fa-lock login-custom-icon"></i>
                                     <input id="password" type="password"
@@ -134,7 +138,8 @@
                                 {{-- @enderror --}}
                             </div>
                             <div class="col-md-6" style="position:relative">
-                                <label for="password-confirm" class="col-form-label">{{ __('Confirm Password') }}<span style="color:red;padding-left: 1px;">*</span></label>
+                                <label for="password-confirm" class="col-form-label">{{ __('Confirm Password') }}<span
+                                        style="color:red;padding-left: 1px;">*</span></label>
                                 <div style="position:relative">
                                     <i class="fa-solid fa-lock register-custom-icon"></i>
                                     <input id="password-confirm" type="password"
@@ -169,10 +174,10 @@
                             </div>
                         </div>
                         <!-- <div class="row mb-5">
-                                        <div class="col-md-12 text-center">
-                                            Already Have an account? <a href="{{ route('login') }}" class="fw-bold">Sign In</a>
-                                        </div>
-                                    </div> -->
+                                            <div class="col-md-12 text-center">
+                                                Already Have an account? <a href="{{ route('login') }}" class="fw-bold">Sign In</a>
+                                            </div>
+                                        </div> -->
                     </form>
                     <hr>
                     <div class="current-benifits mb-5">
@@ -303,9 +308,21 @@
                 $input[0].setSelectionRange(adjustedPosition, adjustedPosition);
             });
             // Add custom password validation method
-            $.validator.addMethod("strongPassword", function(value) {
-                return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
-            }, "Password must contain uppercase, lowercase, number, and special character");
+            $.validator.addMethod("strongPassword", function(value, element) {
+                if (value.length > 12) {
+                    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+={}\[\]:;<>,.?~\\/-]{12,}$/
+                        .test(value);
+                } else {
+                    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;<>,.?~\\/-])[A-Za-z\d!@#$%^&*()_+={}\[\]:;<>,.?~\\/-]{8,}$/
+                        .test(value);
+                }
+            }, function(value, element) {
+                if (value.length > 12) {
+                    return "Password must contain at least one uppercase letter, one lowercase letter, and one number.";
+                } else {
+                    return "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.";
+                }
+            });
             $.validator.addMethod(
                 "phoneNumberFormat",
                 function(value, element) {

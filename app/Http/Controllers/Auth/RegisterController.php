@@ -73,10 +73,16 @@ class RegisterController extends Controller
                 'string',
                 'min:8',
                 'confirmed',
-                'regex:/[A-Z]/',       // must contain at least one uppercase letter
-                'regex:/[a-z]/',       // must contain at least one lowercase letter
-                'regex:/[0-9]/',       // must contain at least one number
-                'regex:/[@$!%*#?&]/',  // must contain a special character
+                'regex:/[A-Z]/',  // At least one uppercase letter
+                'regex:/[a-z]/',  // At least one lowercase letter
+                'regex:/[0-9]/',  // At least one number
+                function ($attribute, $value, $fail) {
+                    if (strlen($value) < 8) {
+                        $fail('Password must be at least 8 characters long.');
+                    } elseif (strlen($value) <= 12 && !preg_match('/[@$!%*#?&]/', $value)) {
+                        $fail('Password must contain at least one special character if it is 8-12 characters long.');
+                    }
+                },
             ],
             'phone' => [
                 'nullable',
@@ -165,9 +171,9 @@ class RegisterController extends Controller
         if (!$isCanada) {
             return back()->withErrors(['location' => 'Our services are currently only available to residents of Canada.  We apologize for any inconvenience.']);
         }
-        
+
         $user = $this->create($request->all());
-        
+
         $user->sendEmailVerificationNotification();
         if (config('site.phone_verification') == 1) {
             Session::put('unverified_phone', $user->contact_number);

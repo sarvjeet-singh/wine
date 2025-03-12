@@ -9,6 +9,7 @@ class CurativeExperience extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'vendor_id',
         'category_id',
         'name',
         'admittance',
