@@ -41,6 +41,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\BusinessHour;
 use App\Models\TastingOption;
 use App\Helpers\SeasonHelper;
+use App\Models\CurativeExperience;
 use App\Services\DateCheckerService;
 
 class FrontEndController extends Controller
@@ -1762,5 +1763,10 @@ class FrontEndController extends Controller
         } else if (strtolower($vendor->vendor_type) == 'excursion') {
             return $this->getExcursionDetails($short_code);
         }
+    }
+
+    public function events() {
+        $events = CurativeExperience::with('category')->paginate(10);
+        return view('FrontEnd.events', compact('events'));
     }
 }

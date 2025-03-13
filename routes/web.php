@@ -101,9 +101,7 @@ Route::get('/terms', function () {
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
-Route::get('/events', function () {
-    return view('FrontEnd.events');
-})->name('events');
+Route::get('/events', [FrontEndController::class, 'events'])->name('events');
 Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
     // Retrieve the user by ID
     $user = App\Models\User::findOrFail($id);
