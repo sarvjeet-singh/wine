@@ -242,7 +242,7 @@
 
         <div class="col-md-4">
 
-            <label for="" class="form-label">Cost</label>
+            <label for="" class="form-label">Listed Price</label>
 
             <div class="input-group mb-3">
 
@@ -266,7 +266,7 @@
 
         <div class="col-md-4">
 
-            <label for="" class="form-label">Price</label>
+            <label for="" class="form-label">Reseller Price</label>
 
             <div class="input-group mb-3">
 

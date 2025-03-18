@@ -76,6 +76,19 @@
     top: -8px;
     right: 5px;
 }
+.curated-event-sec .event-thumbnail img {
+    height: 180px;
+}
+.curated-event-sec .event-info h5 {
+    font-size: 18px;
+}
+.curated-event-sec .event-info p.event-price {
+    font-size: 15px;
+}
+.curated-event-sec p.event-desc,
+.curated-event-sec p.event-sub-head {
+    font-size: 14px;
+}
 }
 
 @media screen and (max-width: 1023px) {
@@ -362,6 +375,9 @@ header .navbar-collapse .navbar-nav {
 }
 .amenities-data ul {
     grid-template-columns: 1fr;
+}
+.curated-event-sec .event-thumbnail img {
+    border-radius: 15px;
 }
 footer .footer-logo img {
     width: 50%;

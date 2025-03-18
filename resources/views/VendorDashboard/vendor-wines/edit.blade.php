@@ -325,7 +325,7 @@
 
         <div class="col-md-4">
 
-            <label for="cost" class="form-label">Cost</label>
+            <label for="cost" class="form-label">Listed Price</label>
 
             <div class="input-group mb-3">
 
@@ -350,7 +350,7 @@
 
         <div class="col-md-4">
 
-            <label for="price" class="form-label">Price</label>
+            <label for="price" class="form-label">Reseller Price</label>
 
             <div class="input-group mb-3">
 

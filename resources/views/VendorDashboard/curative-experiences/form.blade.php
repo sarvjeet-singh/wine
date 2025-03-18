@@ -20,41 +20,43 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="information-box">
-                    <div class="information-box-head">
-                        <div class="box-head-heading d-flex align-items-center justify-content-between gap-2">
-                            <span class="box-head-label theme-color">Curated Experience</span>
-                            <a href="#" class="btn wine-btn px-4">Create</a>
-                        </div>
-                    </div>
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    @endif
-
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session('error') }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    @endif
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
                     <form
                         action="{{ isset($experience) ? route('curative-experiences.update', [$experience->id, $vendor->id]) : route('curative-experiences.store', $vendor->id) }}"
                         method="POST" id="experienceForm" enctype="multipart/form-data">
+                        <div class="information-box-head">
+                            <div class="box-head-heading d-flex align-items-center justify-content-between gap-2">
+                                <span class="box-head-label theme-color">Curated Experience</span>
+                                <button type="submit"
+                                    class="btn wine-btn px-4">{{ isset($experience) ? 'Update' : 'Create' }}</button>
+                            </div>
+                        </div>
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
+
+                        @if (session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         @csrf
                         @if (isset($experience))
                             @method('PUT')
@@ -62,28 +64,8 @@
 
                         <div class="information-box-body py-4">
                             <div class="row g-3">
-                                <!-- Experience Type -->
-                                <div class="col-lg-4 col-12">
-                                    <div class="form-floating">
-                                        <select name="category_id" class="form-control form-select" id="experienceType">
-                                            <option value="">Select type</option>
-                                            @if ($categories->isEmpty())
-                                                <option value="">No Category Found</option>
-                                            @else
-                                                @foreach ($categories as $key => $category)
-                                                    <option value="{{ $key }}"
-                                                        {{ old('category_id', isset($experience) ? $experience->category_id : '') == $key ? 'selected' : '' }}>
-                                                        {{ $category }}
-                                                    </option>
-                                                @endforeach
-                                            @endif
-                                        </select>
-                                        <label class="form-label">Experience Type</label>
-                                    </div>
-                                </div>
-
                                 <!-- Experience Name -->
-                                <div class="col-lg-4 col-12">
+                                <div class="col-lg-3 col-12">
                                     <div class="form-floating">
                                         <input type="text" class="form-control" name="name"
                                             value="{{ old('name', isset($experience) ? $experience->name : '') }}"
@@ -91,9 +73,18 @@
                                         <label>Experience Name</label>
                                     </div>
                                 </div>
+                                <!-- URL (Booking Platform) -->
+                                <div class="col-lg-3 col-12">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" name="booking_url"
+                                            value="{{ old('booking_url', isset($experience) ? $experience->booking_url : '') }}"
+                                            placeholder="URL (Booking Platform)">
+                                        <label>URL (Booking Platform)</label>
+                                    </div>
+                                </div>
 
                                 <!-- Admittance + Free -->
-                                <div class="col-lg-4 col-12">
+                                <div class="col-lg-3 col-12">
                                     <div class="row">
                                         <div class="col-9">
                                             <div class="input-group">
@@ -118,9 +109,8 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <!-- Extension -->
-                                <div class="col-lg-4 col-12">
+                                <div class="col-lg-3 col-12">
                                     <div class="form-floating">
                                         <select name="extension" class="form-control">
                                             @php
@@ -145,16 +135,25 @@
                                     </div>
                                 </div>
 
-                                <!-- URL (Booking Platform) -->
+                                <!-- Experience Type -->
                                 <div class="col-lg-4 col-12">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" name="booking_url"
-                                            value="{{ old('booking_url', isset($experience) ? $experience->booking_url : '') }}"
-                                            placeholder="URL (Booking Platform)">
-                                        <label>URL (Booking Platform)</label>
+                                        <select name="category_id" class="form-control form-select" id="experienceType">
+                                            <option value="">Select type</option>
+                                            @if ($categories->isEmpty())
+                                                <option value="">No Category Found</option>
+                                            @else
+                                                @foreach ($categories as $key => $category)
+                                                    <option value="{{ $key }}"
+                                                        {{ old('category_id', isset($experience) ? $experience->category_id : '') == $key ? 'selected' : '' }}>
+                                                        {{ $category }}
+                                                    </option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                        <label class="form-label">Experience Type</label>
                                     </div>
                                 </div>
-
                                 <!-- Inventory -->
                                 <div class="col-lg-4 col-12">
                                     <div class="form-floating">
@@ -162,6 +161,32 @@
                                             value="{{ old('inventory', isset($experience) ? $experience->inventory : '') }}"
                                             placeholder="Quantity">
                                         <label>Inventory</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-12">
+                                    <div class="form-floating">
+                                        <select class="form-select" name="duration">
+                                            @for ($i = 15; $i <= 1440; $i += 15)
+                                                @php
+                                                    $hours = floor($i / 60);
+                                                    $minutes = $i % 60;
+                                                    if ($hours == 1) {
+                                                        $displayValue =
+                                                            '1 hour' . ($minutes ? " $minutes minutes" : '');
+                                                    } elseif ($hours > 1) {
+                                                        $displayValue =
+                                                            "$hours hours" . ($minutes ? " $minutes minutes" : '');
+                                                    } else {
+                                                        $displayValue = "$minutes minutes";
+                                                    }
+                                                @endphp
+                                                <option value="{{ $i }}"
+                                                    {{ old('duration', isset($experience) && $experience->duration == $i ? 'selected' : '') }}>
+                                                    {{ $displayValue }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                        <label>Duration</label>
                                     </div>
                                 </div>
 
@@ -212,31 +237,61 @@
 
                                 <!-- Media Upload -->
                                 <div class="col-12">
-                                    <div id="profilePreviewWrapper" class="d-flex flex-wrap gap-2">
-                                        @if (isset($experience) && count($experience->medias) > 0)
-                                            @foreach ($experience->medias as $media)
-                                                <img src="{{ Storage::url($media->file_path) }}"
-                                                    class="profile-img rounded-3"
-                                                    style="width: 200px; height: 130px; object-fit: cover; border: 1px solid #408a95;">
-                                            @endforeach
+                                    <!-- Radio Buttons to Select Media Type -->
+                                    <div class="mb-2">
+                                        <label class="fw-bold">Choose Media Type:</label>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="media_type"
+                                                id="imageOption" value="image"
+                                                {{ empty($experience) || (!empty($experience->image) && empty($experience->youtube_url)) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="imageOption">Image</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="media_type"
+                                                id="youtubeOption" value="youtube"
+                                                {{ !empty($experience->youtube_url) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="youtubeOption">YouTube Video</label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Image Upload Preview -->
+                                    <div id="imageUploadWrapper" class="d-flex flex-wrap gap-2"
+                                        style="{{ !empty($experience->youtube_url) ? 'display: none;' : '' }}">
+                                        @if (!empty($experience) && !empty($experience->image))
+                                            <img src="{{ Storage::url($experience->image) }}"
+                                                class="profile-img rounded-3"
+                                                style="width: 200px; height: 130px; object-fit: cover; border: 1px solid #408a95;">
                                         @endif
                                         <div class="d-flex justify-content-center align-items-center rounded-3"
-                                            style="width: 200px; height: 130px; border: 1px solid #408a95; background-color: #f8f9fa;">
+                                            style="width: 200px; height: 130px; border: 1px solid #408a95; background-color: #f8f9fa; cursor: pointer;">
                                             <i class="fa-solid fa-camera fa-2x text-muted"></i>
-                                            <!-- Camera Icon -->
-                                            <input type="file" id="profileImage" name="medias[]" class="file-input"
-                                                accept="image/*" multiple style="display: none;">
+                                            <input type="file" id="profileImage" name="image" class="file-input"
+                                                accept="image/*" style="display: none;">
+                                        </div>
+                                    </div>
+
+                                    <!-- YouTube URL Input -->
+                                    <div id="youtubeWrapper" class="mt-2 d-none">
+                                        <label for="youtubeUrl" class="fw-bold">YouTube Video Link</label>
+                                        <input type="text" id="youtubeUrl" name="youtube_url" class="form-control"
+                                            value="{{ old('youtube_url', $experience->youtube_url ?? '') }}"
+                                            placeholder="Enter YouTube Video URL">
+
+                                        <!-- YouTube Preview -->
+                                        <div id="youtubePreview" class="mt-2">
+                                            <iframe width="200" height="130" frameborder="0"
+                                                allowfullscreen></iframe>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="row mt-5">
+                            {{-- <div class="row mt-5">
                                 <div class="col-sm-12 text-center">
                                     <button type="submit"
                                         class="btn wine-btn">{{ isset($experience) ? 'Update' : 'Create' }}</button>
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
                     </form>
 
@@ -323,14 +378,14 @@
                         required: true,
                         date: true
                     },
-                    start_time: {
-                        required: true
-                    },
+                    start_time: {},
                     end_time: {
-                        required: true,
                         timeGreater: "#start_time" // Custom rule
                     },
-                    "medias[]": {
+                    duration: {
+                        required: true
+                    },
+                    image: {
                         extension: "jpg|jpeg|png|gif|mp4",
                         filesize: 2048 * 1024 // 2MB limit
                     }
@@ -348,7 +403,7 @@
                         required: "End time is required.",
                         timeGreater: "End time must be greater than Start time."
                     },
-                    "medias[]": {
+                    image: {
                         extension: "Only JPG, JPEG, PNG, GIF, and MP4 files are allowed.",
                         filesize: "File size must not exceed 2MB."
                     }
@@ -361,29 +416,88 @@
             });
         });
         $(document).ready(function() {
-            $("#profileImage").change(function(event) {
-                let input = event.target;
-                let reader = new FileReader();
+            const profileInput = $("#profileImage");
+            const previewWrapper = $("#imageUploadWrapper");
 
-                reader.onload = function() {
-                    let previewWrapper = $("#profilePreviewWrapper");
-                    let imagePreview = $("#profilePreview");
+            // Handle image selection and preview
+            profileInput.on("change", function(event) {
+                const file = event.target.files[0];
 
-                    if (!imagePreview.length) {
-                        // If img tag doesn't exist, create it
-                        previewWrapper.html(`<img id="profilePreview" class="profile-img rounded-3" 
-                    style="width: 100%; height: 100%; object-fit: cover;">`);
-                        imagePreview = $("#profilePreview");
-                    }
+                if (file) {
+                    const reader = new FileReader();
 
-                    // Set new image source
-                    imagePreview.attr("src", reader.result);
-                };
+                    reader.onload = function(e) {
+                        // Replace existing preview or append new one
+                        previewWrapper.find(".profile-img").remove();
+                        previewWrapper.prepend(`
+                    <img src="${e.target.result}" class="profile-img rounded-3"
+                        style="width: 200px; height: 130px; object-fit: cover; border: 1px solid #408a95;">
+                `);
+                    };
 
-                if (input.files && input.files[0]) {
-                    reader.readAsDataURL(input.files[0]); // Read file as Data URL
+                    reader.readAsDataURL(file);
                 }
             });
+
+            // Trigger file input on wrapper click (prevent infinite loop)
+            previewWrapper.on("click", function(event) {
+                if (!$(event.target).is("#profileImage")) {
+                    profileInput.trigger("click");
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            const $imageOption = $("#imageOption");
+            const $youtubeOption = $("#youtubeOption");
+            const $imageUploadWrapper = $("#imageUploadWrapper");
+            const $youtubeWrapper = $("#youtubeWrapper");
+            const $youtubeUrlInput = $("#youtubeUrl");
+            const $youtubePreview = $("#youtubePreview");
+            const $youtubeIframe = $("#youtubePreview iframe");
+
+            function toggleFields() {
+                if ($imageOption.is(":checked")) {
+                    $imageUploadWrapper.removeClass("d-none").addClass("d-flex");
+                    $youtubeWrapper.addClass("d-none");
+                } else if ($youtubeOption.is(":checked")) {
+                    $imageUploadWrapper.addClass("d-none").removeClass("d-flex");
+                    $youtubeWrapper.removeClass("d-none");
+                } else {
+                    $imageUploadWrapper.addClass("d-none");
+                    $youtubeWrapper.addClass("d-none");
+                }
+            }
+
+            function showYouTubePreview() {
+                const url = $youtubeUrlInput.val().trim();
+                const videoId = extractYouTubeID(url);
+
+                if (videoId) {
+                    $youtubeIframe.attr("src", `https://www.youtube.com/embed/${videoId}`);
+                    $youtubePreview.removeClass("d-none");
+                } else {
+                    $youtubeIframe.attr("src", "");
+                    $youtubePreview.addClass("d-none");
+                }
+            }
+
+            function extractYouTubeID(url) {
+                const regex =
+                    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+                const match = url.match(regex);
+                return match ? match[1] : null;
+            }
+
+            // Event Listeners
+            $imageOption.on("change", toggleFields);
+            $youtubeOption.on("change", toggleFields);
+            $youtubeUrlInput.on("blur", showYouTubePreview);
+
+            // Initial State
+            toggleFields();
+            showYouTubePreview();
         });
     </script>
 @endsection

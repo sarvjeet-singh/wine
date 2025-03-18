@@ -1005,6 +1005,13 @@ html .ui-button.ui-state-disabled:active {
 .cart-sec .input-group input {
     border-color: #408a95 !important;
 }
+.cart-sec .update-quantity {
+    background-color: transparent;
+    border: none;
+    padding: 4px;
+    color: #408a95;
+    font-size: 20px;
+}
 .wine-club-listing-sec .wine-title {
     font-size: 15px;
     color: #408a95;
@@ -1310,7 +1317,22 @@ html .ui-button.ui-state-disabled:active {
 }
 /* ================== Winary Shop CSS End ================== */
 
-
+.upload-container {
+    margin-bottom: 20px;
+}
+.upload-container .dropbox {
+    border-radius: 10px;
+    border-color: #118c97;
+    padding: 50px 20px;
+    text-align: center;
+    color: #118c97;
+}
+.upload-container .dropbox:hover {
+    background: inherit;
+}
+.upload-container .progress-bar {
+    background: #118c97;
+}
 
 @media screen and (min-width: 769px) {
     .daterangepicker .drp-calendar {

@@ -21,7 +21,13 @@ class CurativeExperience extends Model
         'end_date',
         'start_time',
         'end_time',
-        'description'
+        'description',
+        'status',
+        'duration',
+        'image',
+        'thumbnail_small',
+        'thumbnail_medium',
+        'thumbnail_large'
     ];
 
     public function category()
@@ -29,8 +35,8 @@ class CurativeExperience extends Model
         return $this->belongsTo(CurativeExperienceCategory::class);
     }
 
-    public function medias()
+    public function vendor()
     {
-        return $this->hasMany(CurativeExperienceMedia::class, 'experience_id');
+        return $this->belongsTo(Vendor::class);
     }
 }

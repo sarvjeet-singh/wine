@@ -142,7 +142,7 @@ class VendorWineController extends Controller
         ];
 
         if (!empty($data['cost'])) {
-            $calculations = $this->calculateStockingFeeAndPrice($data['cost']);
+            $calculations = calculateStockingFeeAndPrice($data['cost']);
             $data['commission_delivery_fee'] = $calculations['stocking_fee'];
             $data['price'] = $calculations['final_price'];
         }
@@ -252,7 +252,7 @@ class VendorWineController extends Controller
 
         // Use the private method to calculate stocking fee and final price
         if (!empty($data['cost'])) {
-            $calculations = $this->calculateStockingFeeAndPrice($data['cost']);
+            $calculations = calculateStockingFeeAndPrice($data['cost']);
             $data['commission_delivery_fee'] = $calculations['stocking_fee'];
             $data['price'] = $calculations['final_price'];
         }
@@ -297,38 +297,5 @@ class VendorWineController extends Controller
             // Return a JSON response for errors
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
-    }
-
-    /**
-     * Calculate stocking fee and final price based on the cost and price.
-     *
-     * @param float $cost
-     * @param float $price
-     * @return array
-     */
-    private function calculateStockingFeeAndPrice(float $cost)
-    {
-        // Calculate stocking fee
-        $stockingFee = 0;
-
-        if ($cost <= 20) {
-            $stockingFee = 3;
-        } elseif ($cost <= 40) {
-            $stockingFee = 4;
-        } elseif ($cost <= 60) {
-            $stockingFee = 6;
-        } elseif ($cost <= 80) {
-            $stockingFee = 8;
-        } else {
-            $stockingFee = 10;
-        }
-
-        // Calculate final price
-        $finalPrice = $cost + $stockingFee;
-
-        return [
-            'stocking_fee' => $stockingFee,
-            'final_price' => $finalPrice,
-        ];
     }
 }

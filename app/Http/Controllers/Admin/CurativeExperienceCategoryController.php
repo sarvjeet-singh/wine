@@ -25,11 +25,12 @@ class CurativeExperienceCategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:curative_experience_categories,name',
-            'status' => 'required|in:active,inactive',
+            'status' => 'nullable|in:active,inactive',
             'image' => 'nullable|image|max:2048',
         ]);
-
-        $category = new CurativeExperienceCategory($request->all());
+        $data = $request->all();
+        $data['status'] = $request->status ?? 'inactive';
+        $category = new CurativeExperienceCategory($data);
         if ($request->hasFile('image')) {
             $category->image = $request->file('image')->store('categories', 'public');
         }
@@ -48,11 +49,12 @@ class CurativeExperienceCategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:curative_experience_categories,name,' . $curative_experience_category->id,
-            'status' => 'required|in:active,inactive',
+            'status' => 'nullable|in:active,inactive',
             'image' => 'nullable|image|max:2048',
         ]);
-
-        $curative_experience_category->update($request->all());
+        $data = $request->all();
+        $data['status'] = $request->status ?? 'inactive';
+        $curative_experience_category->update($data);
 
         if ($request->hasFile('image')) {
             $curative_experience_category->image = $request->file('image')->store('categories', 'public');
@@ -64,8 +66,16 @@ class CurativeExperienceCategoryController extends Controller
 
     public function destroy(CurativeExperienceCategory $curative_experience_category)
     {
+        // Check if any curative experiences exist under this category
+        if ($curative_experience_category->curativeExperiences()->exists()) {
+            return redirect()->route('admin.curative-experience-categories.index')
+                ->with('error', 'Category cannot be deleted because it has associated experiences.');
+        }
+
         $curative_experience_category->delete();
-        return redirect()->route('admin.curative-experience-categories.index')->with('success', 'Category deleted successfully.');
+
+        return redirect()->route('admin.curative-experience-categories.index')
+            ->with('success', 'Category deleted successfully.');
     }
 
     public function updateOrder(Request $request)

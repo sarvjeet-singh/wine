@@ -1734,7 +1734,10 @@ button#confirm_booking_btn:before {
     color:#fff;
 
 }
-
+.daterangepicker th.prev.available:hover,
+.daterangepicker th.next.available:hover {
+    background-color: transparent; !important;
+}
 .detail-page .daterangepicker .calendar-table th,
 
 .detail-page .daterangepicker .calendar-table td {
@@ -1842,7 +1845,28 @@ button#confirm_booking_btn:before {
     height: 30px;
 
 }
-
+.detail-page td.off.disabled.bookedAndBlockeddates {
+    background: #c3c3c3;
+}
+.detail-page td.active.checkoutonly.available:before,
+.detail-page td.active.checkinonly.available:before {
+    background: #f7f7f7 !important;
+    border: 1px solid #ddd;
+    width: 34px;
+    height: 34px;
+}
+.detail-page td.active.checkoutonly.available,
+.detail-page td.active.checkinonly.available {
+    color: #262626;
+}
+.detail-page td.active.checkoutonly.available:hover,
+.detail-page td.active.checkinonly.available:hover {
+    background-color: transparent;
+}
+.detail-page td.checkinonly,
+.detail-page td.checkoutonly {
+    background: lightgray;
+}
 button#confirm_booking_btn:hover {
 
     color: #fff;
@@ -1965,7 +1989,7 @@ button#confirm_booking_btn:hover {
 
 .single-main-slider .synch-carousels .property-gallery-main .slick-list {
 
-  height: auto !important;
+  height: 400px !important;
 
   margin: 0 -20px;
 
@@ -3287,6 +3311,48 @@ footer.vendor-footer .footer-links li a:hover {
     border-color: #b7a35f;
 }
 /* ================== THANK YOU PAGE END ================== */
+
+
+/* ================== CURATED EVENT PAGE START ================== */
+.curated-event-sec .search-bar input {
+    padding-left: 32px;
+}
+.curated-event-sec .search-bar button svg path {
+    fill: #666666;
+}
+.curated-event-sec .search-bar button {
+    position: absolute;
+    top: 9px;
+    left: 10px;
+}
+.curated-event-sec .filter-bar svg {
+    width: 30px;
+    height: 30px;
+}
+.curated-event-sec .event-thumbnail img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 20px;
+}
+.curated-event-sec p.event-desc {
+    font-size: 15px;
+    line-height: normal;
+}
+.curated-event-sec .event-info a.btn {
+    font-size: 15px;
+}
+.curated-event-sec p.event-date {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #bba253;
+    color: #fff;
+    padding: 4px 12px;
+    font-size: 15px;
+    border-radius: 4px 0 15px 0;
+}
+/* ================== CURATED EVENT PAGE END ================== */
 
 .age-verify-modal .modal-body img {
 

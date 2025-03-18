@@ -63,6 +63,7 @@ use App\Http\Controllers\Admin\Vendor\UserController as AdminVendorUserControlle
 use Mews\Captcha\CaptchaController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Admin\CurativeExperienceCategoryController as AdminCurativeExperienceCategoryController;
+use App\Http\Controllers\Admin\CurativeExperienceController as AdminCurativeExperienceController;
 use App\Http\Controllers\CurativeExperienceController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -85,7 +86,7 @@ use Illuminate\Support\Facades\Artisan;
 
 Auth::routes(['verify' => true, 'login' => false]);
 Route::post('/save-user-location', [LocationController::class, 'store']);
-
+Route::get('/events/search', [FrontEndController::class, 'searchEvents'])->name('events.search');
 Route::get('captcha/{config?}', [CaptchaController::class, 'getCaptcha'])->name('captcha');
 Route::post('/set-timezone', [TimezoneController::class, 'setTimezone']);
 Route::get('login', [LoginController::class, 'login'])->name('login');
@@ -490,6 +491,10 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::get('/vendors/uploaded-files/{id}', [AdminVendorController::class, 'getUploadedFiles'])->name('vendors.uploaded-files');
         Route::post('curative-experience-categories/update-order', [AdminCurativeExperienceCategoryController::class, 'updateOrder'])->name('curative-experience-categories.updateOrder');
         Route::resource('curative-experience-categories', AdminCurativeExperienceCategoryController::class)->names('curative-experience-categories');
+        Route::get('curative-experiences/search', [AdminCurativeExperienceController::class, 'search'])->name('curative-experiences.search');
+        Route::post('curative-experiences/toggle-status', [AdminCurativeExperienceController::class, 'toggleStatus'])->name('curative-experiences.toggleStatus');
+        Route::post('curative-experiences/bulk-status-update', [AdminCurativeExperienceController::class, 'bulkStatusUpdate'])->name('curative-experiences.bulkStatusUpdate');
+        Route::resource('curative-experiences', AdminCurativeExperienceController::class)->names('curative-experiences');
     });
     Route::post('/check-vendor-combination', [AdminVendorController::class, 'checkVendorCombination'])->name('check.vendor.combination');
     Route::get('/admin/filter/search', [AdminVendorController::class, 'filterSearch'])->name('admin.vendors.search');

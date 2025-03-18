@@ -18,4 +18,9 @@ class CurativeExperienceCategory extends Model
             $category->slug = Str::slug($category->name);
         });
     }
+
+    public function curativeExperiences()
+    {
+        return $this->hasMany(CurativeExperience::class, 'category_id'); // Adjust foreign key if needed
+    }
 }

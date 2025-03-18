@@ -82,11 +82,16 @@
                 <span class="link_name">Manage Stripe Taxes</span>
             </a>
         </li> --}}
-        <li class="position-relative">
-            <a href="{{route('admin.curative-experience-categories.index')}}">
+    <li class="position-relative parent-menu">
+            <a href="#">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
-                <span class="link_name">Manage Curative Categories</span>
+                <span class="link_name">Manage Curative Experiences</span>
             </a>
+            <i class="fa-solid fa-angle-right"></i>
+            <ul class="sub-menu list-unstyled mt-2">
+                <li class="mb-2"><a href="{{route('admin.curative-experience-categories.index')}}">Manage Categories</a></li>
+                <li class="mb-2"><a href="{{route('admin.curative-experiences.index')}}">Manage Experiences</a></li>
+            </ul>
         </li>
         <li class="position-relative">
             <a href="{{route('admin.wallet.index')}}">

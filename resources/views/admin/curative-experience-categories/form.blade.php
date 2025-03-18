@@ -25,9 +25,13 @@
                         <div class="mb-3">
                             <label class="fw-bold">Status</label>
                             <div class="form-check form-switch">
+                                <input type="hidden" name="status" value="inactive"> <!-- Ensures "inactive" is sent when unchecked -->
+                                
                                 <input type="checkbox" class="form-check-input" id="statusToggle" name="status"
                                     value="active" {{ isset($category) && $category->status == 'active' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-bold text-success" for="statusToggle">Active</label>
+                                <label class="form-check-label fw-bold" id="statusLabel" for="statusToggle">
+                                    {{ isset($category) && $category->status == 'active' ? 'Active' : 'Inactive' }}
+                                </label>
                             </div>
                         </div>
 
@@ -68,6 +72,24 @@
                 preview.src = reader.result;
             }
             reader.readAsDataURL(event.target.files[0]);
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let statusToggle = document.getElementById("statusToggle");
+            let statusLabel = document.getElementById("statusLabel");
+    
+            statusToggle.addEventListener("change", function () {
+                if (this.checked) {
+                    statusLabel.textContent = "Active";
+                    statusLabel.classList.add("text-success");
+                    statusLabel.classList.remove("text-danger");
+                } else {
+                    statusLabel.textContent = "Inactive";
+                    statusLabel.classList.add("text-danger");
+                    statusLabel.classList.remove("text-success");
+                }
+            });
         });
     </script>
 @endpush

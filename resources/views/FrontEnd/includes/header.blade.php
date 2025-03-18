@@ -68,7 +68,10 @@
 
     async function sendLocationToServer(lat, long) {
         console.log("Sending location to server...");
-        let response = await fetch(route("get-user-location", { lat, long }));
+        let response = await fetch(route("get-user-location", {
+            lat,
+            long
+        }));
         let data = await response.json();
         fetch('/save-user-location', {
                 method: "POST",
@@ -110,7 +113,10 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-end position-relative" id="navbarNavDropdown">
-                <ul class="navbar-nav gap-lg-4 gap-2">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('events') }}">Events</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
@@ -134,7 +140,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link"
-                            @if(!authCheck()['is_logged_in']) href="{{ route('register') }}" @else href="{{ route('guest-rewards') }}" @endif>Guests
+                            @if (!authCheck()['is_logged_in']) href="{{ route('register') }}" @else href="{{ route('guest-rewards') }}" @endif>Guests
                             Rewards</a>
                     </li>
 
@@ -145,7 +151,8 @@
                                     id="loginOption" data-bs-toggle="dropdown" aria-expanded="false">Login</a>
                                 <ul class="dropdown-menu" aria-labelledby="loginOption">
                                     <li><a class="dropdown-item rounded-top" href="{{ route('customer.login') }}">User Account</a></li>
-                                    <li><a class="dropdown-item rounded-bottom" href="{{ route('vendor.login') }}">Vendor Account</a></li>
+                                    <li><a class="dropdown-item rounded-bottom"
+                                            href="{{ route('vendor.login') }}">Vendor Account</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -161,7 +168,8 @@
                                     Vendor Dashboard
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    <a class="dropdown-item" href="/vendor/dashboard/{{Auth::guard('vendor')->user()->id}}">Dashboard</a>
+                                    <a class="dropdown-item"
+                                        href="/vendor/dashboard/{{ Auth::guard('vendor')->user()->id }}">Dashboard</a>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST"

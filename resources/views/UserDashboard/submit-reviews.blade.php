@@ -20,6 +20,17 @@
 .select2-container--default .select2-selection--single .select2-selection__arrow {
     top: 6px;
 }
+.profile-img-sec svg {
+    width: 34px;
+    height: 34px;
+    padding: 6px;
+    border-radius: 50%;
+    color: #343434;
+    position: absolute;
+    top: 33%;
+    right: 30%;
+    cursor: pointer;
+}
 </style>
 
     <div class="container main-container">
@@ -47,6 +58,15 @@
                                     @csrf
                                     <input type="hidden" name="rating" value="0" id="rating">
                                     <div class="row mt-3">
+                                        <div class="col-12">
+                                            <div class="profile-img-sec text-center">
+                                                <label for="profileImage" class="position-relative">
+                                                    <img id="profilePreview" src="" class="profile-img rounded-circle" style="width: 120px; height: 120px; min-height: 120px; object-fit: cover; border: 2px solid #b7a35f;cursor: pointer;">
+                                                    <i class="fa-solid fa-camera"></i>
+                                                </label>
+                                                <input type="file" id="profileImage" class="file-input" accept="image/*" style="display: none;">
+                                            </div>
+                                        </div>
                                         <div class="col-12">
                                             <label class="form-label">Business/Vendor Name<span class="required-filed">*</span></label>
                                             <select id="buisness_vendor_name" class="form-control @error('vendor_id') is-invalid @enderror" name="vendor_id" >
@@ -147,6 +167,19 @@
         });
     });
 
+
+    // Upload Profile Image
+    $('#profileImage').on('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#profilePreview').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 </script>
+
 
 @endsection

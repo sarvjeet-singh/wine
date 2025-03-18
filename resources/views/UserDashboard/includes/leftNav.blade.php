@@ -1,3 +1,36 @@
+<style>
+li.nav-item ul.sub-menu-list {
+    display: none;
+    padding-inline: 10px;
+}
+li.nav-item:has(.enable-sub-menu) ul.sub-menu-list {
+    display: block;
+}
+.left-navbar li.nav-item ul.sub-menu-list a {
+    color: #757575;
+    background-color: unset;
+    display: block;
+    padding: 4px 30px;
+    border-radius: 4px;
+}
+.left-navbar .nav-item ul.sub-menu-list li:hover a {
+    background-color: #bba253;
+    color: #fff;
+}
+li.nav-item svg {
+    position: absolute;
+    top: 15px;
+    right: 10px;
+}
+li.nav-item.active {
+    background-color: unset !important;
+}
+li.nav-item.active a.nav-link {
+    background-color: #bba253;
+    color: #fff;
+}
+</style>
+
 <div class="left-navbar-mobile d-lg-none d-flex align-items-center justify-content-between py-2">
     <h6 class="mb-0 fw-bold text-dark">User Dashboard</h6>
     <nav class="navbar w-25 border-0">
@@ -90,12 +123,24 @@
                   <span class="ms-1 d-none d-sm-inline">Referral</span>
               </a>
           </li> -->
-            <li class="nav-item {{ request()->is('user-settings*') ? 'active' : '' }}">
+          <!-- <li class="nav-item {{ request()->is('user-settings*') ? 'active' : '' }}">
                 <a href="{{ route('user-settings') }}" class="nav-link px-sm-2 px-3 align-middle">
                     <img src="{{ asset('images/icons/settings_icon_grey.png') }}"
                         data-image="{{ asset('images/icons/settings_icon') }}">
                     <span class="ms-1 d-none d-sm-inline">Settings</span>
                 </a>
+            </li> -->
+            <li class="nav-item position-relative {{ request()->is('user-settings*') ? 'active' : '' }}" id="settingsDropdown">
+                <a href="#" class="nav-link head-link px-sm-2 px-3 align-middle">
+                    <img src="{{ asset('images/icons/settings_icon_grey.png') }}"
+                        data-image="{{ asset('images/icons/settings_icon') }}">
+                    <span class="ms-1 d-none d-sm-inline">Settings</span>
+                    <i class="fas fa-angle-right expand-icon"></i>
+                </a>
+                <ul class="sub-menu-list">
+                    <li class="dropdown-item my-2"><a href="/user-settings">User Settings</a></li>
+                    <li class="dropdown-item my-2"><a href="#">Another Action</a></li>
+                </ul>
             </li>
             <li class="nav-item">
                 <a href="javascripr:void(0)" class="nav-link px-sm-2 px-3 align-middle" data-bs-toggle="modal"
@@ -115,4 +160,29 @@
             $('.left-navbar').removeClass('show');
         });
     });
+</script>
+
+<script>
+    $(document).ready(function() {
+    // Toggle the 'enable-sub-menu' class only on the a.nav-link when clicked
+    $('a.head-link').click(function(event) {
+        event.preventDefault(); // Prevent default anchor link behavior
+
+        // Toggle the 'enable-sub-menu' class on the clicked a.head-link only
+        $(this).toggleClass('enable-sub-menu');
+
+        // No longer toggle on the sub-menu-list here
+    });
+
+    // Close the dropdown when clicking anywhere outside the a.head-link
+    $(document).click(function(event) {
+        // If the click is outside the a.head-link, remove the enable-sub-menu class
+        if (!$(event.target).closest('a.head-link').length) {
+            // Remove 'enable-sub-menu' class from all a.head-link elements
+            $('a.head-link').removeClass('enable-sub-menu');
+        }
+    });
+});
+
+
 </script>

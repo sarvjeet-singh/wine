@@ -481,7 +481,7 @@ class FrontEndController extends Controller
             // Sort dates (optional)
             sort($bookedAndBlockeddates);
         }
-        
+
         $dates_all = $this->dateCheckerService->processVendorDates($vendor_id);
         $checkInOnly = $this->dateCheckerService->getCheckInOnlyDates();
         $checkOutOnly = $this->dateCheckerService->getCheckOutOnlyDates();
@@ -1765,8 +1765,28 @@ class FrontEndController extends Controller
         }
     }
 
-    public function events() {
-        $events = CurativeExperience::with('category')->paginate(10);
+    public function events(Request $request)
+    {
+        $query = CurativeExperience::with('category');
+
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where('name', 'LIKE', "%{$searchTerm}%");
+        }
+
+        $events = $query->paginate(10);
+
         return view('FrontEnd.events', compact('events'));
+    }
+
+    function searchEvents(Request $request)
+    {
+        $searchTerm = $request->query('term');
+
+        $results = CurativeExperience::where('name', 'LIKE', "%{$searchTerm}%")
+            ->limit(5)
+            ->pluck('name', 'id'); // Only return titles
+
+        return response()->json($results);
     }
 }
