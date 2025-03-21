@@ -556,4 +556,24 @@ class UserDashboardController extends Controller
     {
         return view('emails.accommodation_inquiry');
     }
+
+    public function changePassword()
+    {
+        return view('UserDashboard.change-password');
+    }
+
+    public function referrals()
+    {
+        return view('UserDashboard.referral');
+    }
+
+    public function emergencyContact()
+    {
+        return view('UserDashboard.emergency-contact-details');
+    }
+
+    public function socialMedia()
+    {
+        return view('UserDashboard.social-media');
+    }
 }

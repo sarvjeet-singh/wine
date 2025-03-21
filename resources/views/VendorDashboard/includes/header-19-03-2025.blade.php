@@ -63,7 +63,9 @@
                                     @foreach ($vendors as $vendor)
                                         <li>
                                             <a class="dropdown-item fs-7 vendor-item"
-                                                href="{{ route('vendor-dashboard', $vendor->id) }}">{{ $vendor->vendor_name }}</a>
+                                                href="{{ route('vendor-dashboard', $vendor->id) }}">
+                                                {{ $vendor->vendor_name }}
+                                            </a>
                                         </li>
                                     @endforeach
                                 </div>
@@ -71,7 +73,9 @@
                                 <!-- Logout Option -->
                                 <li>
                                     <a class="dropdown-item fs-7" href="{{ route('vendor.logout') }}"
-                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        Logout
+                                    </a>
                                     <form id="logout-form" action="{{ route('vendor.logout') }}" method="POST"
                                         style="display: none;">
                                         @csrf

@@ -166,6 +166,7 @@
                                 <div class="col-lg-4 col-12">
                                     <div class="form-floating">
                                         <select class="form-select" name="duration">
+                                            <option value="">Select Duration</option>
                                             @for ($i = 15; $i <= 1440; $i += 15)
                                                 @php
                                                     $hours = floor($i / 60);
@@ -354,10 +355,12 @@
                         maxlength: 255
                     },
                     admittance: {
-                        required: true
+                        required: function() {
+                            return !$('#flexCheckDefault').is(':checked');
+                        }
                     },
                     is_free: {
-                        required: false, // Nullable
+                        required: false
                     },
                     extension: {
                         required: true
@@ -380,14 +383,11 @@
                     },
                     start_time: {},
                     end_time: {
-                        timeGreater: "#start_time" // Custom rule
-                    },
-                    duration: {
-                        required: true
+                        timeGreater: "#start_time"
                     },
                     image: {
                         extension: "jpg|jpeg|png|gif|mp4",
-                        filesize: 2048 * 1024 // 2MB limit
+                        filesize: 2048 * 1024
                     }
                 },
                 messages: {
@@ -498,6 +498,25 @@
             // Initial State
             toggleFields();
             showYouTubePreview();
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            function toggleAdmittance() {
+                if ($('#flexCheckDefault').is(':checked')) {
+                    $('input[name="admittance"]').prop('readonly', true).val(''); // Make readonly and clear value
+                } else {
+                    $('input[name="admittance"]').prop('readonly', false);
+                }
+            }
+
+            // Check on page load (edit case)
+            toggleAdmittance();
+
+            // Handle checkbox change event
+            $('#flexCheckDefault').change(function() {
+                toggleAdmittance();
+            });
         });
     </script>
 @endsection

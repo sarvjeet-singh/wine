@@ -81,9 +81,10 @@
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col-12">
-                                        @if ($vendor->account_status != 1)
-                                            <button id="checkActivationBtn" class="btn btn-primary">Make Account
-                                                Active</button>
+                                        @if ($vendor->account_status != 1 && $hasActiveSubscription)
+                                            <button id="checkActivationBtn" class="btn btn-primary">
+                                                Complete Your Profile
+                                            </button>
                                         @endif
                                     </div>
                                 </div>
@@ -128,7 +129,31 @@
             </div>
         </div>
     </div>
-
+    <!-- Error Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="errorModalLabel">Your profile is incomplete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="errorIntro">
+                        Your profile is incomplete. Please complete the following required sections to get Vendor Partner
+                        status:
+                    </p>
+                    <ul id="errorMessage" class="mb-0 list-unstyled"></ul>
+                </div>
+                <div class="modal-footer">
+                    <p id="completionNote">
+                        "Once all sections are completed, your profile will be upgraded to Vendor Partner status
+                        automatically."
+                    </p>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection
 
@@ -149,59 +174,118 @@
                 link.remove();
             });
         });
+        // $(document).ready(function() {
+        //     $('#checkActivationBtn').click(function() {
+        //         let vendorid = "{{ $vendor->id }}"; // Get vendor ID
+
+        //         // Show confirmation alert
+        //         Swal.fire({
+        //             title: "Are you sure?",
+        //             text: "Do you want to check if the subscription can be activated?",
+        //             icon: "warning",
+        //             showCancelButton: true,
+        //             confirmButtonColor: "#3085d6",
+        //             cancelButtonColor: "#d33",
+        //             confirmButtonText: "Yes, check now!",
+        //             cancelButtonText: "Cancel"
+        //         }).then((result) => {
+        //             if (result.isConfirmed) {
+        //                 // Proceed with AJAX request if confirmed
+        //                 $.ajax({
+        //                     type: 'POST',
+        //                     url: "{{ route('vendor.activation.check') }}" + '/' + vendorid,
+        //                     data: {
+        //                         vendorid: vendorid, // Sending vendor ID in the body
+        //                     },
+        //                     dataType: 'json',
+        //                     headers: {
+        //                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        //                     },
+        //                     success: function(response) {
+        //                         Swal.fire("Success!", response.message, "success");
+        //                     },
+        //                     error: function(xhr) {
+        //                         let errorMessage = 'Cannot activate subscription.';
+
+        //                         if (xhr.responseJSON && xhr.responseJSON.message) {
+        //                             if (Array.isArray(xhr.responseJSON.message)) {
+        //                                 // Convert array messages to a bulleted list with <br>
+        //                                 errorMessage = xhr.responseJSON.message.map(
+        //                                     msg => `• ${msg}`).join('<br>');
+        //                             } else {
+        //                                 errorMessage = `• ${xhr.responseJSON.message}`;
+        //                             }
+        //                         }
+
+        //                         Swal.fire({
+        //                             title: "Error!",
+        //                             html: errorMessage, // Use 'html' to render new lines with <br>
+        //                             icon: "error",
+        //                             showConfirmButton: true
+        //                         });
+        //                     }
+        //                 });
+        //             }
+        //         });
+        //     });
+        // });
         $(document).ready(function() {
             $('#checkActivationBtn').click(function() {
                 let vendorid = "{{ $vendor->id }}"; // Get vendor ID
 
-                // Show confirmation alert
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: "Do you want to check if the subscription can be activated?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, check now!",
-                    cancelButtonText: "Cancel"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Proceed with AJAX request if confirmed
-                        $.ajax({
-                            type: 'POST',
-                            url: "{{ route('vendor.activation.check') }}" + '/' + vendorid,
-                            data: {
-                                vendorid: vendorid, // Sending vendor ID in the body
-                            },
-                            dataType: 'json',
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(response) {
-                                Swal.fire("Success!", response.message, "success");
-                            },
-                            error: function(xhr) {
-                                let errorMessage = 'Cannot activate subscription.';
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ route('vendor.activation.check') }}" + '/' + vendorid,
+                    data: {
+                        vendorid: vendorid
+                    },
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        let messages = '';
 
-                                if (xhr.responseJSON && xhr.responseJSON.message) {
-                                    if (Array.isArray(xhr.responseJSON.message)) {
-                                        // Convert array messages to a bulleted list with <br>
-                                        errorMessage = xhr.responseJSON.message.map(
-                                            msg => `• ${msg}`).join('<br>');
-                                    } else {
-                                        errorMessage = `• ${xhr.responseJSON.message}`;
-                                    }
-                                }
+                        if (response.message && Array.isArray(response.message)) {
+                            messages = response.message.map(item =>
+                                `<li style="color: ${item.completed ? 'green' : 'red'};">
+                        ${item.completed ? '✅' : '❌'} ${item.message}
+                    </li>`
+                            ).join('');
+                        } else {
+                            messages =
+                                `<li style="color: green;">✅ Vendor is eligible for activation</li>`;
+                        }
 
-                                Swal.fire({
-                                    title: "Error!",
-                                    html: errorMessage, // Use 'html' to render new lines with <br>
-                                    icon: "error",
-                                    showConfirmButton: true
-                                });
-                            }
-                        });
+                        $('#errorMessage').html(messages);
+
+                        if (response.success) {
+                            $('#errorModalLabel').text('Your profile is complete ✅');
+                            $("#errorIntro").text('Your profile is complete now!');
+                            $("#completionNote").text(
+                                'All sections are completed, your profile will be upgraded to Vendor Partner status.'
+                            );
+                            $('#checkActivationBtn').remove();
+                            $(".modal-header").removeClass("bg-danger").addClass("bg-success");
+                        } else {
+                            $('#errorModalLabel').text('Your profile is incomplete ❌');
+                        }
+
+                        $('#errorModal').modal('show');
+                    },
+                    error: function() {
+                        $('#errorMessage').html(
+                            "<li style='color: red;'>❌ Something went wrong. Please try again.</li>"
+                        );
+                        $('#errorModalLabel').text('Error ❌');
+                        $('#errorModal').modal('show');
                     }
                 });
+            });
+        });
+        $(document).ready(function() {
+            $('#errorModal').on('hidden.bs.modal', function() {
+                location.reload();
             });
         });
     </script>

@@ -22,7 +22,7 @@ class CurativeExperienceController extends Controller
     public function create(Request $request, $vendor_id)
     {
         $vendor = Vendor::find($vendor_id);
-        $categories = CurativeExperienceCategory::orderBy('position', 'asc')->pluck('name', 'id');
+        $categories = CurativeExperienceCategory::where('status', 'active')->orderBy('position', 'asc')->pluck('name', 'id');
         return view('VendorDashboard.curative-experiences.form', compact('categories', 'vendor'));
     }
 
@@ -31,7 +31,7 @@ class CurativeExperienceController extends Controller
         $request->validate([
             'category_id' => 'required|exists:curative_experience_categories,id',
             'name' => 'required|string|max:255',
-            'admittance' => 'required',
+            'admittance' => 'required_if:is_free,0',
             'media_type' => 'nullable|string|in:image,youtube',
             'youtube_url' => 'nullable|url',
             'is_free'  => 'nullable|boolean',
@@ -43,7 +43,7 @@ class CurativeExperienceController extends Controller
             'start_time' => 'nullable|date_format:H:i',
             'end_time' => 'nullable|date_format:H:i',
             'description' => 'nullable|string',
-            'duration' => 'required|integer|min:1|max:1440',
+            'duration' => 'nullable|integer|min:1|max:1440',
             'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,webp|max:5120'
         ], [
             'category_id.required' => 'The category field is required.',
@@ -66,9 +66,9 @@ class CurativeExperienceController extends Controller
             if ($path) {
                 // Create thumbnails with aspect ratio
                 $sizes = [
-                    'small'  => [100, 50],   // 2:1 Aspect Ratio
-                    'medium' => [400, 200],  // 2:1 Aspect Ratio (Main)
-                    'large'  => [800, 400],  // 2:1 Aspect Ratio
+                    'small'  => [100, 63],   // 2:1 Aspect Ratio
+                    'medium' => [600, 375],  // 2:1 Aspect Ratio (Main)
+                    'large'  => [1000, 625],  // 2:1 Aspect Ratio
                 ];
 
                 foreach ($sizes as $sizeName => [$width, $height]) {
@@ -94,6 +94,10 @@ class CurativeExperienceController extends Controller
         $data['thumbnail_small'] = $thumbnails['small'] ?? null;
         $data['thumbnail_medium'] = $thumbnails['medium'] ?? null;
         $data['thumbnail_large'] = $thumbnails['large'] ?? null;
+
+        if (!isset($request->is_free)) {
+            $data['is_free'] = 0;
+        }
         // Create experience
         $experience = CurativeExperience::create($data);
 
@@ -102,7 +106,7 @@ class CurativeExperienceController extends Controller
 
     public function edit(Request $request, $id, $vendor_id)
     {
-        $categories = CurativeExperienceCategory::orderBy('position', 'asc')->pluck('name', 'id');
+        $categories = CurativeExperienceCategory::where('status', 'active')->orderBy('position', 'asc')->pluck('name', 'id');
         $vendor = Vendor::find($vendor_id);
         $experience = CurativeExperience::findOrFail($id);
         if (isset($experience->image) && (str_contains($experience->image, 'youtube') || str_contains($experience->image, 'youtu.be'))) {
@@ -119,7 +123,7 @@ class CurativeExperienceController extends Controller
         $request->validate([
             'category_id' => 'required|exists:curative_experience_categories,id',
             'name' => 'required|string|max:255',
-            'admittance' => 'required',
+            'admittance' => 'required_if:is_free,0',
             'media_type' => 'nullable|string|in:image,youtube',
             'youtube_url' => 'nullable|url',
             'is_free'  => 'nullable|boolean',
@@ -131,7 +135,7 @@ class CurativeExperienceController extends Controller
             'start_time' => 'nullable|date_format:H:i',
             'end_time' => 'nullable|date_format:H:i',
             'description' => 'nullable|string',
-            'duration' => 'required|integer|min:1|max:1440',
+            'duration' => 'nullable|integer|min:1|max:1440',
             'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,webp|max:5120'
         ], [
             'category_id.required' => 'The category field is required.',
@@ -204,9 +208,9 @@ class CurativeExperienceController extends Controller
 
                 // Create thumbnails
                 $sizes = [
-                    'small'  => [100, 50],   // 2:1 Aspect Ratio
-                    'medium' => [400, 200],  // 2:1 Aspect Ratio (Main)
-                    'large'  => [800, 400],  // 2:1 Aspect Ratio
+                    'small'  => [100, 63],   // 2:1 Aspect Ratio
+                    'medium' => [600, 375],  // 2:1 Aspect Ratio (Main)
+                    'large'  => [1000, 625],  // 2:1 Aspect Ratio
                 ];
 
                 foreach ($sizes as $sizeName => [$width, $height]) {
@@ -235,6 +239,10 @@ class CurativeExperienceController extends Controller
             $data['thumbnail_small'] = $thumbnails['small'] ?? null;
             $data['thumbnail_medium'] = $thumbnails['medium'] ?? null;
             $data['thumbnail_large'] = $thumbnails['large'] ?? null;
+        }
+
+        if (!isset($request->is_free)) {
+            $data['is_free'] = 0;
         }
 
         // If not found, return an error

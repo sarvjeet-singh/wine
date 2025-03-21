@@ -42,6 +42,7 @@ use App\Models\VendorWineryMetadata;
 use App\Models\VendorExcursionMetadata;
 use App\Models\VendorLicenseMetadata;
 use App\Models\VendorNonLicenseMetadata;
+use App\Models\WinerySubscription;
 use \illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -836,8 +837,12 @@ class VendorController extends Controller
 			->where('review_status', 'approved')
 			->selectRaw('COUNT(*) as review_count, AVG(rating) as average_rating')
 			->first();
+		$hasActiveSubscription = WinerySubscription::where('vendor_id', $vendorid)
+			->where('status', 'active')
+			->where('end_date', '>', Carbon::now())
+			->exists();
 		$VendorMediaGallery = VendorMediaGallery::where('vendor_id', $vendorid)->get();
-		return view('VendorDashboard.vendor-dashboard', compact('vendor', 'VendorMediaGallery', 'usersCount', 'mostCommonLocation', 'reviewData'));
+		return view('VendorDashboard.vendor-dashboard', compact('vendor', 'VendorMediaGallery', 'usersCount', 'mostCommonLocation', 'reviewData','hasActiveSubscription'));
 
 		// Check if vendor is not found
 		if (!$vendor) {
@@ -1445,23 +1450,23 @@ class VendorController extends Controller
 		} else if (strtolower($vendor->vendor_type) == 'winery') {
 			$response = VendorHelper::canActivateWinerySubscription($vendorid);
 		} else if (strtolower($vendor->vendor_type) == 'excursion') {
-		$response = VendorHelper::canActivateExcursionSubscription($vendorid);
+			$response = VendorHelper::canActivateExcursionSubscription($vendorid);
 		} else {
 			$response = ['status' => true];
 			$vendor->account_status = 1;
 			$vendor->save();
 		}
 
-		if ($response['status'] == true) {
+		if (is_array($response['messages'])) {
 			return response()->json([
-				'success' => true,
-				'message' => 'Subscription Activated'
+				'success' => $response['status'],
+				'message' => is_array($response['messages']) ? $response['messages'] : [$response['messages']],
 			]);
 		}
 
-		return response()->json([
-			'success' => false,
-			'message' => is_array($response['messages']) ? $response['messages'] : [$response['messages']],
-		], 400);
+		// return response()->json([
+		// 	'success' => false,
+		// 	'message' => is_array($response['messages']) ? $response['messages'] : [$response['messages']],
+		// ], 400);
 	}
 }

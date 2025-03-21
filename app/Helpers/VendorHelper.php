@@ -10,26 +10,31 @@ use App\Models\VendorExcursionMetadata;
 use App\Models\VendorMediaGallery;
 use App\Models\WinerySubscription;
 use App\Models\VendorPricing;
+use App\Models\BusinessHour;
 use Carbon\Carbon;
 
 class VendorHelper
 {
     public static function canActivateSubscription($vendorId)
     {
-        $errors = [];
+        $messages = [];
 
         // Fetch the vendor
         $vendor = Vendor::find($vendorId);
         if (!$vendor) {
-            return ['status' => false, 'messages' => ['Vendor not found']];
+            return ['status' => false, 'messages' => [['message' => 'Vendor not found', 'completed' => false]]];
         }
 
-        // Helper function to format field names
-        $formatFieldName = function ($field) {
-            return ucfirst(str_replace('_', ' ', $field));
-        };
+        // Check subscription status
+        $subscription = WinerySubscription::where('vendor_id', $vendorId)
+            ->where('status', 'active')
+            ->where('end_date', '>', Carbon::now())
+            ->exists();
+        if (!$subscription) {
+            return ['status' => false, 'messages' => [['message' => 'No active subscription on your account. Please activate your subscription.', 'completed' => false]]];
+        }
 
-        // Required fields in `vendors` table
+        // Check vendor details completeness
         $requiredVendorFields = [
             'vendor_name',
             'vendor_email',
@@ -44,106 +49,70 @@ class VendorHelper
             'sub_region',
             'short_code',
             'qr_code',
-            'inventory_type',
+            'inventory_type'
         ];
-        $missingVendorFields = [];
+        $isVendorComplete = true;
         foreach ($requiredVendorFields as $field) {
             if (empty($vendor->$field)) {
-                $missingVendorFields[] = $formatFieldName($field);
+                $isVendorComplete = false;
+                break;
             }
         }
-        if (!empty($missingVendorFields)) {
-            $errors[] = "Missing vendor fields: " . implode(', ', $missingVendorFields);
-        }
+        $messages[] = [
+            'message' => '<b>Accommodation Details</b> (Complete information about your accommodation)',
+            'completed' => $isVendorComplete
+        ];
 
-        // Check vendor accommodation metadata completeness
+        // Check vendor accommodation metadata
         $metadata = VendorAccommodationMetadata::where('vendor_id', $vendorId)->first();
-        if (!$metadata) {
-            $errors[] = "Vendor accommodation details not complete";
-        } else {
-            $requiredVendorMetaFields = [
-                'checkin_start_time',
-                'checkout_time',
-                'square_footage',
-                'bedrooms',
-                'washrooms',
-                'sleeps',
-                'booking_minimum',
-                'booking_maximum',
-                'applicable_taxes_amount',
-                'beds'
-            ];
-            $missingMetadataFields = [];
-            foreach ($requiredVendorMetaFields as $field) {
-                if (empty($metadata->$field)) {
-                    $missingMetadataFields[] = $formatFieldName($field);
-                }
+        $isMetadataComplete = $metadata && !empty($metadata->applicable_taxes_amount);
+        $messages[] = [
+            'message' => '<b>Accommodation Details</b> (Complete information about your accommodation)',
+            'completed' => $isMetadataComplete
+        ];
+
+        // Check refund policy
+        $messages[] = [
+            'message' => '<b>Refund Policy</b> (Refund policy set)',
+            'completed' => !empty($vendor->policy)
+        ];
+
+        // Check payment integration
+        $isStripeConnected = !empty($vendor->stripe_account_id) && $vendor->stripe_onboarding_account_status === 'active';
+        $messages[] = [
+            'message' => '<b>Stripe Account</b> Integration (Connect your Stripe account for seamless payments)',
+            'completed' => $isStripeConnected
+        ];
+
+        // Check media gallery
+        $mediaCount = VendorMediaGallery::where('vendor_id', $vendorId)->count();
+        $messages[] = [
+            'message' => '<b>Media Gallery</b> (Images uploaded)',
+            'completed' => $mediaCount > 0
+        ];
+
+        // Remove duplicate messages while keeping order
+        $seenMessages = [];
+        $filteredMessages = [];
+
+        foreach ($messages as $item) {
+            if (!in_array($item['message'], $seenMessages)) {
+                $seenMessages[] = $item['message'];
+                $filteredMessages[] = $item;
             }
-            if (!empty($missingMetadataFields)) {
-                $errors[] = "Missing vendor accommodation fields: " . implode(', ', $missingMetadataFields);
-            }
         }
 
-        // Check vendor refund policy completeness
-        if (empty($vendor->policy)) {
-            $errors[] = "Missing Vendor Refund Policy";
+        // Determine status
+        $hasErrors = in_array(false, array_column($filteredMessages, 'completed'));
+        if (!$hasErrors) {
+            $vendor->account_status = 1;
+            $vendor->save();
         }
 
-        // Check if pricing details are provided and complete
-        // $pricing = VendorPricing::where('vendor_id', $vendorId)->first();
-        // $missingPricingFields = [];
-        // if (!$pricing) {
-        //     $errors[] = "Pricing details are missing";
-        // } else {
-        //     if (empty($pricing->spring)) $missingPricingFields[] = 'Spring';
-        //     if (empty($pricing->summer)) $missingPricingFields[] = 'Summer';
-        //     if (empty($pricing->fall)) $missingPricingFields[] = 'Fall';
-        //     if (empty($pricing->winter)) $missingPricingFields[] = 'Winter';
-        //     if ($pricing->special_price == 1 && empty($pricing->special_price_value)) {
-        //         $missingPricingFields[] = 'Special Price Value';
-        //     }
-        //     if (!empty($missingPricingFields)) {
-        //         $errors[] = "Missing pricing details: " . implode(', ', $missingPricingFields);
-        //     }
-        // }
-
-        // Check if the vendor has integrated a payment gateway
-        if (empty($vendor->stripe_account_id) || $vendor->stripe_onboarding_account_status != 'active') {
-            $errors[] = "Payment gateway integration is incomplete";
-        }
-
-        // Check if published seasons are present
-        // $seasons = PublishSeason::where('vendor_id', $vendorId)->count();
-        // if ($seasons == 0) {
-        //     $errors[] = "Publish season is missing";
-        // }
-
-        // Check for vendor media gallery completeness
-        $media = VendorMediaGallery::where('vendor_id', $vendorId)->count();
-        if ($media == 0) {
-            $errors[] = "Vendor media gallery is missing";
-        }
-
-        $subscription = WinerySubscription::where('vendor_id', $vendorId)
-        ->where('status', 'active')
-        ->where('end_date', '>', Carbon::now())
-        ->first();
-
-        if (!$subscription) {
-            $errors[] = "Vendor has no active subscription";
-        }
-        
-
-        // Return result
-        if (!empty($errors)) {
-            return ['status' => false, 'messages' => $errors];
-        }
-
-        if(empty($errors)) {
-            $vendor->update('account_status', 1);
-        }
-
-        return ['status' => true, 'messages' => ['Vendor is eligible for activation']];
+        return [
+            'status' => !$hasErrors,
+            'messages' => $filteredMessages
+        ];
     }
 
 
@@ -199,20 +168,24 @@ class VendorHelper
 
     public static function canActivateWinerySubscription($vendorId)
     {
-        $errors = [];
+        $messages = [];
 
         // Fetch the vendor
         $vendor = Vendor::find($vendorId);
         if (!$vendor) {
-            return ['status' => false, 'messages' => ['Vendor not found']];
+            return ['status' => false, 'messages' => [['message' => 'Vendor not found', 'completed' => false]]];
         }
 
-        // Helper function to format field names
-        $formatFieldName = function ($field) {
-            return ucfirst(str_replace('_', ' ', $field));
-        };
+        // Check subscription status
+        $subscription = WinerySubscription::where('vendor_id', $vendorId)
+            ->where('status', 'active')
+            ->where('end_date', '>', Carbon::now())
+            ->exists();
+        if (!$subscription) {
+            return ['status' => false, 'messages' => [['message' => 'No active subscription on your account. Please activate your subscription.', 'completed' => false]]];
+        }
 
-        // Required fields in `vendors` table
+        // Check winery details
         $requiredVendorFields = [
             'vendor_name',
             'vendor_email',
@@ -227,90 +200,96 @@ class VendorHelper
             'sub_region',
             'short_code',
             'qr_code',
-            'inventory_type',
         ];
-        $missingVendorFields = [];
+        $isVendorComplete = true;
         foreach ($requiredVendorFields as $field) {
             if (empty($vendor->$field)) {
-                $missingVendorFields[] = $formatFieldName($field);
+                $isVendorComplete = false;
+                break;
             }
         }
-        if (!empty($missingVendorFields)) {
-            $errors[] = "Missing vendor fields: " . implode(', ', $missingVendorFields);
-        }
+        $messages[] = [
+            'message' => "<b>Winery Details</b> (All details provided)",
+            'completed' => $isVendorComplete
+        ];
 
-        // Check vendor winery metadata completeness
-        $metadata = VendorWineryMetadata::where('vendor_id', $vendorId)->first();
-        if (!$metadata) {
-            $errors[] = "Vendor winery details not complete";
-        } else {
-            $requiredVendorMetaFields = [
-                'applicable_taxes_amount',
-            ];
-            $missingMetadataFields = [];
-            foreach ($requiredVendorMetaFields as $field) {
-                if (empty($metadata->$field)) {
-                    $missingMetadataFields[] = $formatFieldName($field);
-                }
+        // // Check vendor winery metadata
+        // $metadata = VendorWineryMetadata::where('vendor_id', $vendorId)->first();
+        // $isMetadataComplete = $metadata && !empty($metadata->applicable_taxes_amount);
+        // $messages[] = [
+        //     'message' => "<b>Winery Details</b> (All details provided)",
+        //     'completed' => $isMetadataComplete
+        // ];
+
+        // Check refund policy
+        $messages[] = [
+            'message' => "<b>Refund Policy</b> (Refund policy set)",
+            'completed' => !empty($vendor->policy)
+        ];
+
+        // Check payment integration
+        $isStripeConnected = !empty($vendor->stripe_account_id) && $vendor->stripe_onboarding_account_status === 'active';
+        $messages[] = [
+            'message' => "<b>Stripe Account</b> Integration (Connect your Stripe account for seamless payments)",
+            'completed' => $isStripeConnected
+        ];
+
+        // Check media gallery
+        $mediaCount = VendorMediaGallery::where('vendor_id', $vendorId)->count();
+        $messages[] = [
+            'message' => "<b>Media Gallery</b> (Images uploaded)",
+            'completed' => $mediaCount > 4
+        ];
+
+        $businessHours = BusinessHour::where('vendor_id', $vendorId)->exists();
+        $messages[] = [
+            'message' => "<b>Business Hours</b> (Business hours set)",
+            'completed' => $businessHours
+        ];
+
+        // Remove duplicates while keeping the exact order
+        $seenMessages = [];
+        $filteredMessages = [];
+
+        foreach ($messages as $item) {
+            if (!in_array($item['message'], $seenMessages)) {
+                $seenMessages[] = $item['message'];
+                $filteredMessages[] = $item;
             }
-            if (!empty($missingMetadataFields)) {
-                $errors[] = "Missing vendor winery fields: " . implode(', ', $missingMetadataFields);
-            }
         }
 
-        // Check vendor refund policy completeness
-        if (empty($vendor->policy)) {
-            $errors[] = "Missing Vendor Refund Policy";
+        // Determine status
+        $hasErrors = in_array(false, array_column($filteredMessages, 'completed'));
+        if ($hasErrors === false) {
+            $vendor->account_status = 1;
+            $vendor->save();
         }
-
-        // Check if the vendor has integrated a payment gateway
-        if (empty($vendor->stripe_account_id) || $vendor->stripe_onboarding_account_status != 'active') {
-            $errors[] = "Payment gateway integration is incomplete";
-        }
-
-        // Check for vendor media gallery completeness
-        $media = VendorMediaGallery::where('vendor_id', $vendorId)->count();
-        if ($media == 0) {
-            $errors[] = "Vendor media gallery is missing";
-        }
-
-        $subscription = WinerySubscription::where('vendor_id', $vendorId)
-        ->where('status', 'active')
-        ->where('end_date', '>', Carbon::now())
-        ->first();
-
-        if (!$subscription) {
-            $errors[] = "Vendor has no active subscription";
-        }
-        
-
-        // Return result
-        if (!empty($errors)) {
-            return ['status' => false, 'messages' => $errors];
-        }
-
-        if(empty($errors)) {
-            $vendor->update('account_status', 1);
-        }
-
-        return ['status' => true, 'messages' => ['Vendor is eligible for activation']];
+        return [
+            'status' => !$hasErrors,
+            'messages' => $filteredMessages
+        ];
     }
+
     public static function canActivateExcursionSubscription($vendorId)
     {
-        $errors = [];
+        $messages = [];
 
         // Fetch the vendor
         $vendor = Vendor::find($vendorId);
         if (!$vendor) {
-            return ['status' => false, 'messages' => ['Vendor not found']];
+            return ['status' => false, 'messages' => [['message' => 'Vendor not found', 'completed' => false]]];
         }
 
-        // Helper function to format field names
-        $formatFieldName = function ($field) {
-            return ucfirst(str_replace('_', ' ', $field));
-        };
+        // Check subscription status
+        $subscription = WinerySubscription::where('vendor_id', $vendorId)
+            ->where('status', 'active')
+            ->where('end_date', '>', Carbon::now())
+            ->exists();
+        if (!$subscription) {
+            return ['status' => false, 'messages' => [['message' => 'No active subscription on your account. Please activate your subscription.', 'completed' => false]]];
+        }
 
-        // Required fields in `vendors` table
+        // Check vendor details
         $requiredVendorFields = [
             'vendor_name',
             'vendor_email',
@@ -324,73 +303,75 @@ class VendorHelper
             'region',
             'sub_region',
             'short_code',
-            'qr_code',
-            'inventory_type',
+            'qr_code'
         ];
-        $missingVendorFields = [];
+        $isVendorComplete = true;
         foreach ($requiredVendorFields as $field) {
             if (empty($vendor->$field)) {
-                $missingVendorFields[] = $formatFieldName($field);
+                $isVendorComplete = false;
+                break;
             }
         }
-        if (!empty($missingVendorFields)) {
-            $errors[] = "Missing vendor fields: " . implode(', ', $missingVendorFields);
-        }
+        $messages[] = [
+            'message' => '<b>Excursion Details</b> (All details provided)',
+            'completed' => $isVendorComplete
+        ];
 
-        // Check vendor excursion metadata completeness
+        // Check vendor excursion metadata
         $metadata = VendorExcursionMetadata::where('vendor_id', $vendorId)->first();
-        if (!$metadata) {
-            $errors[] = "Vendor excursion details not complete";
-        } else {
-            $requiredVendorMetaFields = [
-                'applicable_taxes_amount',
-            ];
-            $missingMetadataFields = [];
-            foreach ($requiredVendorMetaFields as $field) {
-                if (empty($metadata->$field)) {
-                    $missingMetadataFields[] = $formatFieldName($field);
-                }
+        $isMetadataComplete = $metadata && !empty($metadata->applicable_taxes_amount);
+        $messages[] = [
+            'message' => '<b>Excursion Details</b> (All details provided)',
+            'completed' => $isMetadataComplete
+        ];
+
+        // Check refund policy
+        $messages[] = [
+            'message' => '<b>Refund Policy</b> (Refund policy set)',
+            'completed' => !empty($vendor->policy)
+        ];
+
+        // Check payment integration
+        $isStripeConnected = !empty($vendor->stripe_account_id) && $vendor->stripe_onboarding_account_status === 'active';
+        $messages[] = [
+            'message' => '<b>Stripe Account</b> Integration (Connect your Stripe account for seamless payments)',
+            'completed' => $isStripeConnected
+        ];
+
+        // Check media gallery
+        $mediaCount = VendorMediaGallery::where('vendor_id', $vendorId)->count();
+        $messages[] = [
+            'message' => '<b>Media Gallery</b> (Images uploaded)',
+            'completed' => $mediaCount > 0
+        ];
+
+        // Check business hours
+        $businessHours = BusinessHour::where('vendor_id', $vendorId)->exists();
+        $messages[] = [
+            'message' => '<b>Business Hours</b> (Business hours set)',
+            'completed' => $businessHours
+        ];
+
+        // Remove duplicates while keeping the exact order
+        $seenMessages = [];
+        $filteredMessages = [];
+        foreach ($messages as $item) {
+            if (!in_array($item['message'], $seenMessages)) {
+                $seenMessages[] = $item['message'];
+                $filteredMessages[] = $item;
             }
-            if (!empty($missingMetadataFields)) {
-                $errors[] = "Missing vendor excursion fields: " . implode(', ', $missingMetadataFields);
-            }
         }
 
-        // Check vendor refund policy completeness
-        if (empty($vendor->policy)) {
-            $errors[] = "Missing Vendor Refund Policy";
+        // Determine status
+        $hasErrors = in_array(false, array_column($filteredMessages, 'completed'));
+        if (!$hasErrors) {
+            $vendor->account_status = 1;
+            $vendor->save();
         }
 
-        // Check if the vendor has integrated a payment gateway
-        if (empty($vendor->stripe_account_id) || $vendor->stripe_onboarding_account_status != 'active') {
-            $errors[] = "Payment gateway integration is incomplete";
-        }
-
-        // Check for vendor media gallery completeness
-        $media = VendorMediaGallery::where('vendor_id', $vendorId)->count();
-        if ($media == 0) {
-            $errors[] = "Vendor media gallery is missing";
-        }
-
-        $subscription = WinerySubscription::where('vendor_id', $vendorId)
-        ->where('status', 'active')
-        ->where('end_date', '>', Carbon::now())
-        ->first();
-
-        if (!$subscription) {
-            $errors[] = "Vendor has no active subscription";
-        }
-        
-
-        // Return result
-        if (!empty($errors)) {
-            return ['status' => false, 'messages' => $errors];
-        }
-
-        if(empty($errors)) {
-            $vendor->update('account_status', 1);
-        }
-
-        return ['status' => true, 'messages' => ['Vendor is eligible for activation']];
+        return [
+            'status' => !$hasErrors,
+            'messages' => $filteredMessages
+        ];
     }
 }

@@ -256,6 +256,10 @@ Route::get('/guest-registry', [UserDashboardController::class, 'userGuestRegistr
 Route::post('/user-update-address', [UserDashboardController::class, 'userAddressUpdate'])->name('user.update.address');
 Route::post('/user-update-goverment-proof', [UserDashboardController::class, 'userGovermentUpdate'])->name('user.goverment.update');
 Route::get('/user-settings', [UserDashboardController::class, 'userSettings'])->name('user-settings');
+Route::get('/user/change-password', [UserDashboardController::class, 'changePassword'])->name('user.change-password');
+Route::get('/user/referrals', [UserDashboardController::class, 'referrals'])->name('user.referrals');
+Route::get('/user/social-media', [UserDashboardController::class, 'socialMedia'])->name('user.social-media');
+Route::get('/user/emergency-contact', [UserDashboardController::class, 'emergencyContact'])->name('user.emergency-contact');
 Route::post('/user-settings-update', [UserDashboardController::class, 'userSettingsAccountUpdate'])->name('user-settings-account-update');
 Route::post('/user-settings-emergency-update', [UserDashboardController::class, 'userSettingsEmergencyUpdate'])->name('user-settings-emergency-update');
 Route::post('/user-settings-refferral-update', [UserDashboardController::class, 'userSettingsRefferralUpdate'])->name('user.settings.refferral.update');

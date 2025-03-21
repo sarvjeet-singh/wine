@@ -345,7 +345,7 @@
 
                         });
 
-                        window.location.href = "{{ route('user-settings') }}#referral";
+                        window.location.href = "{{ route('user.referrals') }}";
 
                     },
 

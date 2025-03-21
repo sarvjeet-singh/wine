@@ -39,7 +39,7 @@
             position: relative;
         }
 
-        /*.progress-bar {
+        .progress-bar {
             width: 0%;
             height: 100%;
             background: green;
@@ -48,17 +48,6 @@
             color: white;
             font-weight: bold;
             transition: width 0.3s;
-        }*/
-        .progress {
-            width: 80%;
-            height: 12px;
-            font-size: 10px;
-        }
-        .progress-btns {
-            width: 20%;
-        }
-        .progress-bar {
-            background-color: #408a95;
         }
 
         #fileList {
@@ -162,6 +151,18 @@
 
 
 
+        .wine-vintage-table tbody td {
+
+            padding: 20px 8px;
+
+            color: #757575;
+
+            text-align: left !important;
+
+        }
+
+
+
         #addWine-modal .form-label {
 
             font-weight: bold;
@@ -234,17 +235,19 @@
             <div id="status"></div>
         </div> -->
 
-        <div class="mb-4 d-flex justify-content-between align-items-center gap-2">
-            <!-- Progress Bar -->
-            <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
-              <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 75%">75%</div>
-            </div>
-            <!-- /Progress Bar -->
+        <div class="mb-4 d-flex justify-content-end align-items-center gap-2">
 
-            <div class="progress-btns text-end">
-                <button type="button" class="btn wine-btn rounded px-4 open-modal-btn" data-url="add" data-id="{{ $vendor_id }}"> Add Wine</button>
-                <button type="button" class="btn wine-btn rounded px-4">Upload</button>
-            </div>
+            <button type="button" class="btn wine-btn rounded px-4 open-modal-btn" data-url=
+
+            "add"
+                data-id="{{ $vendor_id }}">
+
+                Add Wine
+
+            </button>
+
+            <button type="button" class="btn wine-btn rounded px-4">Upload</button>
+
         </div>
 
         <div class="table-responsive">
