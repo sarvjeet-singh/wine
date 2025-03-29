@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -10,6 +9,9 @@ use App\Models\WinerySubscription;
 use App\Models\Vendor;
 use Log;
 use App\Helpers\VendorHelper;
+use App\Mail\SubscriptionMail;
+use App\Models\Plan;
+use Illuminate\Support\Facades\Mail;
 
 class StripeWebhookController extends Controller
 {
@@ -63,6 +65,11 @@ class StripeWebhookController extends Controller
                 // ]);
                 VendorHelper::canActivateSubscription($vendorId);
             }
+            $vendor = Vendor::where('id', $vendorId)->first();
+            $subscription = WinerySubscription::where('stripe_subscription_id', $subscriptionId)->first();
+            $plan = Plan::where('stripe_plan_id', $subscription->stripe_plan_id)->first();
+            Mail::to($vendor->vendor_email)->send(new SubscriptionMail($vendor, $plan, $subscription));
+            Mail::to(env('ADMIN_EMAIL'))->send(new SubscriptionMail($vendor, $plan, $subscription));
         } elseif ($event->type === 'customer.subscription.updated') {
             $subscriptionId = $event->data->object->id;
             $status = $event->data->object->status;
@@ -88,6 +95,13 @@ class StripeWebhookController extends Controller
                 // ]);
                 VendorHelper::canActivateSubscription($vendorId);
             }
+            $vendor = Vendor::where('id', $vendorId)->first();
+            $subscription = WinerySubscription::where('stripe_subscription_id', $subscriptionId)->first();
+            // print_r($subscription);
+            $plan = Plan::where('stripe_plan_id', $subscription->stripe_plan_id)->first();
+            // print_r($plan);
+            Mail::to($vendor->vendor_email)->send(new SubscriptionMail($vendor, $plan, $subscription));
+            Mail::to(env('ADMIN_EMAIL'))->send(new SubscriptionMail($vendor, $plan, $subscription));
         } elseif ($event->type === 'customer.subscription.deleted') {
             $subscriptionId = $event->data->object->id;
             $status = 'canceled'; // Set status to canceled

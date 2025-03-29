@@ -42,7 +42,8 @@
 }
 
 @media screen and (min-width: 1900px){
-.listing-outer {
+.listing-outer,
+.curated-event-sec {
     max-width: 1600px;
     margin: 0 auto;
 }
@@ -76,7 +77,8 @@
     top: -8px;
     right: 5px;
 }
-.curated-event-sec .event-thumbnail img {
+.curated-event-sec .event-thumbnail img,
+.curated-event-sec .event-thumbnail iframe {
     height: 180px;
 }
 .curated-event-sec .event-info h5 {
@@ -188,6 +190,12 @@ footer .footer-logo img {
 @media screen and (max-width: 768px) {
 .single-main-slider .right .item img {
     height: 350px;
+}
+.register-top-bar.tab-content-sec ul a span {
+    display: none;
+}
+.register-top-bar.tab-content-sec ul {
+    padding: 12px 20px !important;
 }
 }
 
@@ -442,6 +450,16 @@ nav.navbar ul li.nav-item {
     font-size: 18px;
     line-height: normal;
 }
+.curated-event-sec .event-info {
+    min-height: unset;
+}
+.register-top-bar ul a svg {
+    width: 24px !important;
+    height: 24px !important;
+}
+.register-top-bar ul a svg.fa-people-group {
+    width: 30px !important;
+}
 }
 
 @media screen and (max-width: 360px){
@@ -460,5 +478,11 @@ header .navbar-brand img {
 }
 .detail-form-sec .check-label {
     font-size: 12px;    
+}
+.curated-event-sec .event-head a.view-btn {
+    font-size: 14px;
+}
+.curated-event-sec .event-head h3 {
+    font-size: 18px !important;
 }
 }

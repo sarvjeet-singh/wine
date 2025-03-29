@@ -65,7 +65,8 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Admin\CurativeExperienceCategoryController as AdminCurativeExperienceCategoryController;
 use App\Http\Controllers\Admin\CurativeExperienceController as AdminCurativeExperienceController;
 use App\Http\Controllers\CurativeExperienceController;
-
+use App\Http\Controllers\Admin\VendorSubscriptionController as AdminVendorSubscriptionController;
+use App\Http\Controllers\EventController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
@@ -86,7 +87,11 @@ use Illuminate\Support\Facades\Artisan;
 
 Auth::routes(['verify' => true, 'login' => false]);
 Route::post('/save-user-location', [LocationController::class, 'store']);
-Route::get('/events/search', [FrontEndController::class, 'searchEvents'])->name('events.search');
+Route::get('/events', [EventController::class, 'events'])->name('events');
+Route::get('/get-events', [EventController::class, 'getEvents'])->name('get-events');
+Route::get('/events/search', [EventController::class, 'searchEvents'])->name('events.search');
+Route::get('/events/detail/{id?}', [EventController::class, 'eventDetails'])->name('events.detail');
+Route::post('/events/checkout', [EventController::class, 'eventCheckout'])->name('events.checkout');
 Route::get('captcha/{config?}', [CaptchaController::class, 'getCaptcha'])->name('captcha');
 Route::post('/set-timezone', [TimezoneController::class, 'setTimezone']);
 Route::get('login', [LoginController::class, 'login'])->name('login');
@@ -102,7 +107,6 @@ Route::get('/terms', function () {
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
-Route::get('/events', [FrontEndController::class, 'events'])->name('events');
 Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
     // Retrieve the user by ID
     $user = App\Models\User::findOrFail($id);
@@ -499,6 +503,7 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::post('curative-experiences/toggle-status', [AdminCurativeExperienceController::class, 'toggleStatus'])->name('curative-experiences.toggleStatus');
         Route::post('curative-experiences/bulk-status-update', [AdminCurativeExperienceController::class, 'bulkStatusUpdate'])->name('curative-experiences.bulkStatusUpdate');
         Route::resource('curative-experiences', AdminCurativeExperienceController::class)->names('curative-experiences');
+        Route::resource('vendor/subscriptions', AdminVendorSubscriptionController::class)->names('vendor.subscriptions');
     });
     Route::post('/check-vendor-combination', [AdminVendorController::class, 'checkVendorCombination'])->name('check.vendor.combination');
     Route::get('/admin/filter/search', [AdminVendorController::class, 'filterSearch'])->name('admin.vendors.search');

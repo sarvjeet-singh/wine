@@ -136,7 +136,7 @@
                                 </div>
 
                                 <!-- Experience Type -->
-                                <div class="col-lg-4 col-12">
+                                <div class="col-lg-6 col-12">
                                     <div class="form-floating">
                                         <select name="category_id" class="form-control form-select" id="experienceType">
                                             <option value="">Select type</option>
@@ -155,15 +155,34 @@
                                     </div>
                                 </div>
                                 <!-- Inventory -->
-                                <div class="col-lg-4 col-12">
+                                <div class="col-lg-6 col-12">
                                     <div class="form-floating">
                                         <input type="text" class="form-control" name="inventory"
                                             value="{{ old('inventory', isset($experience) ? $experience->inventory : '') }}"
                                             placeholder="Quantity">
-                                        <label>Inventory</label>
+                                        <label>Inventory (in days)</label>
                                     </div>
                                 </div>
-                                <div class="col-lg-4 col-12">
+
+                                <!-- Start Date -->
+                                <div class="col-lg-3 col-12">
+                                    <div class="form-floating">
+                                        <input type="date" class="form-control" name="start_date"
+                                            value="{{ old('start_date', isset($experience) ? $experience->start_date : '') }}">
+                                        <label>Start Date</label>
+                                    </div>
+                                </div>
+
+                                <!-- End Date -->
+                                <div class="col-lg-3 col-12">
+                                    <div class="form-floating">
+                                        <input type="date" class="form-control" name="end_date"
+                                            value="{{ old('end_date', isset($experience) ? $experience->end_date : '') }}">
+                                        <label>End Date</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-12">
                                     <div class="form-floating">
                                         <select class="form-select" name="duration">
                                             <option value="">Select Duration</option>
@@ -191,40 +210,67 @@
                                     </div>
                                 </div>
 
-                                <!-- Start Date -->
-                                <div class="col-lg-3 col-12">
-                                    <div class="form-floating">
-                                        <input type="date" class="form-control" name="start_date"
-                                            value="{{ old('start_date', isset($experience) ? $experience->start_date : '') }}">
-                                        <label>Start Date</label>
+                                @php
+                                    // Retrieve booking times from old input or from the $experience (assumed to be an array)
+                                    $bookingTimes = old(
+                                        'booking_time',
+                                        isset($experience) ? $experience->booking_time : [],
+                                    );
+                                    // Ensure $bookingTimes is an array. If it's stored as JSON in the DB, decode it.
+                                    if (!is_array($bookingTimes)) {
+                                        $bookingTimes = json_decode($bookingTimes, true) ?? [];
+                                    }
+                                @endphp
+                                @if (count($bookingTimes) > 0)
+                                    @foreach ($bookingTimes as $index => $time)
+                                        <!-- Container for additional time inputs -->
+                                        <div class="col-lg-3 col-12">
+                                            <div class="form-floating d-flex">
+                                                <input type="time" name="booking_time[]"
+                                                    class="form-control"
+                                                    value="{{ $time }}">
+                                                <label>Select Time</label>
+                                                <button type="button" class="btn btn-danger ms-2 remove-time-btn">−</button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
+                                <div class="col-lg-3 col-12" id="extra-times">
+                                    <div class="form-floating d-flex">
+                                        <input type="time" id="booking_time" name="booking_time[]"
+                                            class="form-control"
+                                            value="">
+                                        <label>Select Time</label>
+                                        <button type="button"
+                                            class="btn btn-primary ms-2 add-time-btn">+</button>
                                     </div>
                                 </div>
-
-                                <!-- End Date -->
                                 <div class="col-lg-3 col-12">
                                     <div class="form-floating">
-                                        <input type="date" class="form-control" name="end_date"
-                                            value="{{ old('end_date', isset($experience) ? $experience->end_date : '') }}">
-                                        <label>End Date</label>
+                                        <input type="text" id="address" name="address" class="form-control"
+                                            value="{{ old('address', !empty($experience) && !empty($experience->address) ? $experience->address : $vendor->street_address) }}">
+                                        <label>Address</label>
                                     </div>
                                 </div>
-
-                                <!-- Start Time -->
                                 <div class="col-lg-3 col-12">
                                     <div class="form-floating">
-                                        <input type="time" id="start_time" name="start_time" class="form-control"
-                                            value="{{ old('start_time', !empty($experience) && !empty($experience->start_time) ? \Carbon\Carbon::parse($experience->start_time)->format('H:i') : '') }}">
-
-                                        <label>Start Time</label>
+                                        <input type="text" id="city" name="city" class="form-control"
+                                            value="{{ old('city', !empty($experience) && !empty($experience->city) ? $experience->city : $vendor->city) }}">
+                                        <label>City</label>
                                     </div>
                                 </div>
-
-                                <!-- End Time -->
                                 <div class="col-lg-3 col-12">
                                     <div class="form-floating">
-                                        <input type="time" id="end_time" name="end_time" class="form-control"
-                                            value="{{ old('end_time', !empty($experience) && !empty($experience->end_time) ? \Carbon\Carbon::parse($experience->end_time)->format('H:i') : '') }}">
-                                        <label>End Time</label>
+                                        <input type="text" id="state" name="state" class="form-control"
+                                            value="{{ old('state', !empty($experience) && !empty($experience->state) ? $experience->state : ($vendor->state->name ?? '')) }}">
+                                        <label>State</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-12">
+                                    <div class="form-floating">
+                                        <input type="text" id="zipcode" name="zipcode" class="form-control"
+                                            value="{{ old('zipcode', !empty($experience) && !empty($experience->zipcode) ? $experience->zipcode : $vendor->postalCode) }}">
+                                        <label>Zipcode</label>
                                     </div>
                                 </div>
 
@@ -237,7 +283,79 @@
                                 </div>
 
                                 <!-- Media Upload -->
+
                                 <div class="col-12">
+
+                                    <!-- Radio Buttons to Select Media Type -->
+
+                                    <div class="mb-2 d-flex align-items-center gap-2">
+
+                                        <label class="fw-bold">Choose Media Type:</label>
+
+                                        <div class="form-check form-check-inline mb-0">
+
+                                            <input class="form-check-input" type="radio" name="media_type"
+                                                id="imageOption" value="image"
+                                                {{ empty($experience) || (!empty($experience->image) && empty($experience->youtube_url)) ? 'checked' : '' }}>
+
+                                            <label class="form-check-label" for="imageOption">Image</label>
+
+                                        </div>
+
+                                        <div class="form-check form-check-inline m-0">
+
+                                            <input class="form-check-input" type="radio" name="media_type"
+                                                id="youtubeOption" value="youtube"
+                                                {{ !empty($experience->youtube_url) ? 'checked' : '' }}>
+
+                                            <label class="form-check-label" for="youtubeOption">YouTube Link</label>
+
+                                        </div>
+
+                                        <!-- YouTube URL Input -->
+                                        <div id="youtubeWrapper" class="d-none d-flex align-items-center gap-2">
+                                            <input type="text" id="youtubeUrl" name="youtube_url"
+                                                class="form-control"
+                                                value="{{ old('youtube_url', $experience->youtube_url ?? '') }}"
+                                                placeholder="Enter YouTube Video URL">
+                                            <!-- YouTube Preview -->
+                                            <div id="youtubePreview" class="mt-2">
+                                                <iframe width="140" height="100" frameborder="0"
+                                                    allowfullscreen></iframe>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+
+                                    <!-- Image Upload Preview -->
+
+                                    <div id="imageUploadWrapper" class="d-flex flex-wrap gap-2"
+                                        style="{{ !empty($experience->youtube_url) ? 'display: none;' : '' }}">
+
+                                        @if (!empty($experience) && !empty($experience->image))
+                                            <img src="{{ Storage::url($experience->image) }}"
+                                                class="profile-img rounded-3"
+                                                style="width: 200px; height: 130px; object-fit: cover; border: 1px solid #408a95;">
+                                        @endif
+
+                                        <div class="d-flex justify-content-center align-items-center rounded-3"
+                                            style="width: 200px; height: 130px; border: 1px solid #408a95; background-color: #f8f9fa; cursor: pointer;">
+
+                                            <i class="fa-solid fa-camera fa-2x text-muted"></i>
+
+                                            <input type="file" id="profileImage" name="image" class="file-input"
+                                                accept="image/*" style="display: none;">
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Media Upload -->
+                                {{-- <div class="col-12">
                                     <!-- Radio Buttons to Select Media Type -->
                                     <div class="mb-2">
                                         <label class="fw-bold">Choose Media Type:</label>
@@ -284,7 +402,7 @@
                                                 allowfullscreen></iframe>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
 
                             {{-- <div class="row mt-5">
@@ -380,10 +498,6 @@
                     end_date: {
                         required: true,
                         date: true
-                    },
-                    start_time: {},
-                    end_time: {
-                        timeGreater: "#start_time"
                     },
                     image: {
                         extension: "jpg|jpeg|png|gif|mp4",
@@ -518,5 +632,28 @@
                 toggleAdmittance();
             });
         });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelector(".add-time-btn").addEventListener("click", function() {
+                let newInput = `
+                    <div class="col-lg-3 col-12">
+                        <div class="form-floating d-flex">
+                            <input type="time" name="booking_time[]"
+                                class="form-control"
+                                value="">
+                            <label>Select Time</label>
+                            <button type="button" class="btn btn-danger ms-2 remove-time-btn">−</button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById("extra-times").insertAdjacentHTML("beforebegin", newInput);
+            });
+        });
+        $(document).ready(function() {
+            $(document).on("click", ".remove-time-btn", function() {
+                $(this).closest(".col-lg-3").remove();
+            });
+        })
     </script>
 @endsection

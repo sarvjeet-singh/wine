@@ -3314,6 +3314,15 @@ footer.vendor-footer .footer-links li a:hover {
 
 
 /* ================== CURATED EVENT PAGE START ================== */
+.curated-event-sec .event-head {
+    background-color: #b7a35f;
+}
+.curated-event-sec .event-head h3 {
+    color: #fff;
+}
+.curated-event-sec .event-head a.view-btn {
+    background-color: #fff;
+}
 .curated-event-sec .search-bar input {
     padding-left: 32px;
 }
@@ -3335,22 +3344,62 @@ footer.vendor-footer .footer-links li a:hover {
     object-fit: cover;
     border-radius: 20px;
 }
+.curated-event-sec .event-thumbnail iframe {
+    height: 250px;
+}
 .curated-event-sec p.event-desc {
     font-size: 15px;
     line-height: normal;
 }
+.curated-event-sec .event-info {
+    min-height: 183px;
+}
+.curated-event-sec .event-info h5 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 .curated-event-sec .event-info a.btn {
     font-size: 15px;
-}
-.curated-event-sec p.event-date {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    background-color: #bba253;
+    background-color: #3b8343;
     color: #fff;
-    padding: 4px 12px;
+}
+.curated-event-sec p.event-date,
+.curated-event-sec .event-price {
     font-size: 15px;
-    border-radius: 4px 0 15px 0;
+}
+.curated-event-sec .event-filters {
+    position: sticky;
+    top: 100px;
+}
+.curated-event-sec .accordion-item {
+    border: 1px solid #dedede !important;
+    border-radius: 6px;
+}
+.curated-event-sec .accordion .accordion-button {
+    background-color: #bba253;
+    font-size: 16px;
+    color: #fff;
+    font-weight: 400;
+    padding: 12px 15px;
+    border-radius: 6px !important;
+}
+.curated-event-sec .accordion .accordion-button:after {
+    background-size: 18px;
+    filter: brightness(0) invert(1);
+}
+.curated-event-sec .clear-btn {
+    font-size: 15px;
+}
+.curated-event-sec input[type="range"]::-webkit-slider-thumb {
+    background-color: #b7a35f;
+    width: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.curated-event-sec .accordion-body label {
+    font-size: 15px;
 }
 /* ================== CURATED EVENT PAGE END ================== */
 

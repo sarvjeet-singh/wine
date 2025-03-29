@@ -34,7 +34,7 @@
                         <div class="cart-sec px-xl-2 py-xl-4 py-2">
 
                             {{-- ({{ ($cart && $cart->items->count()) ? $cart->items->count() : 0 }}) --}}
-                            
+
                             <h3 class="fs-5 fw-bold mb-3">Your Cart </h3>
 
                             @if ($cart && $cart->items->count() > 0)
@@ -147,8 +147,7 @@
                                                                             <input type="text"
                                                                                 id="quantity_{{ $item->product->id }}"
                                                                                 class="form-control input-number quantity"
-                                                                                value="{{ $item->quantity }}"
-                                                                                min="1"
+                                                                                value="{{ $item->quantity }}" min="1"
                                                                                 max="{{ $item->product->inventory }}">
                                                                             <span class="input-group-btn">
                                                                                 <button type="button"
@@ -467,7 +466,8 @@
 
                                 title: 'Error',
 
-                                text: 'Failed to update cart.',
+                                text: xhr.responseJSON.message ||
+                                    'Failed to update cart.',
 
                                 icon: 'error',
 
@@ -497,24 +497,44 @@
             $('.quantity-right-plus').click(function(e) {
                 e.preventDefault();
 
-                // Find the closest input field to the clicked button
+                // Find the closest input field
                 var quantityInput = $(this).closest('.input-group').find('.quantity');
                 var quantity = parseInt(quantityInput.val());
+                var maxQuantity = parseInt(quantityInput.attr('max')) || 1; // Default max if not set
 
-                // Increment the value
-                quantityInput.val(quantity + 1);
+                // Increase only if within max limit
+                if (quantity < maxQuantity) {
+                    quantityInput.val(quantity + 1);
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Limit Reached',
+                        text: 'Maximum quantity limit reached!',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    });
+                }
             });
 
             $('.quantity-left-minus').click(function(e) {
                 e.preventDefault();
 
-                // Find the closest input field to the clicked button
+                // Find the closest input field
                 var quantityInput = $(this).closest('.input-group').find('.quantity');
                 var quantity = parseInt(quantityInput.val());
+                var minQuantity = parseInt(quantityInput.attr('min')) || 1; // Default min if not set
 
-                // Decrement the value if greater than 0
-                if (quantity > 1) {
+                // Decrease only if above min limit
+                if (quantity > minQuantity) {
                     quantityInput.val(quantity - 1);
+                } else {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Limit Reached',
+                        text: 'Minimum quantity limit reached!',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    });
                 }
             });
         });

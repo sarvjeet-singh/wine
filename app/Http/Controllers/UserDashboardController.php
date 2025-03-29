@@ -276,6 +276,8 @@ class UserDashboardController extends Controller
     {
         // Custom validation messages
         $messages = [
+            'image.image' => 'Please upload a valid image file.',
+            'image.max' => 'Image size should not exceed 8MB.',
             'vendor_id.required' => 'Please select any vendor.',
             'rating.not_in' => 'Please select at least one star.',
             'date_of_visit.required' => 'The date of visit is required.',
@@ -285,6 +287,7 @@ class UserDashboardController extends Controller
 
         // Validation rules
         $rules = [
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:8192',
             'vendor_id' => 'required',
             'date_of_visit' => 'required|date',
             'rating' => 'not_in:0',
@@ -296,6 +299,14 @@ class UserDashboardController extends Controller
 
         // Check if the validation fails
 
+        // Handle Image Upload
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('uploads/reviews', 'public');
+        } else {
+            $imagePath = null;
+        }
+
+
 
         // Proceed with storing the review
         // Assuming you have a Review model
@@ -306,6 +317,7 @@ class UserDashboardController extends Controller
         $review->date_of_visit = $request->date_of_visit;
         $review->receipt = $request->receipt;
         $review->review_description = $request->review_description;
+        $review->image = $imagePath;
         $review->save();
 
         // Redirect back with a success message
@@ -532,9 +544,9 @@ class UserDashboardController extends Controller
     public function inquiries()
     {
         $inquiries = Inquiry::with('vendor')
-        ->where('customer_id', Auth::user()->id)
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->where('customer_id', Auth::user()->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
         return view('UserDashboard.my-inquiries', compact('inquiries'));
     }
 

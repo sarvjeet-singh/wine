@@ -11,6 +11,7 @@ use App\Models\WineryOrderTransaction;
 use App\Models\Vendor;
 use App\Models\VendorWine;
 use App\Models\VendorStripeDetail;
+use App\Models\VendorWineryMetadata;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use DB;
@@ -30,7 +31,7 @@ class WineryCheckoutController extends Controller
     public function index($shopid, $vendorid)
     {
         $shop = Vendor::find($shopid);
-        if($shop->stripe_onboarding_account_status != 'active') {
+        if ($shop->stripe_onboarding_account_status != 'active') {
             return redirect()->back()->with('error', 'We\'re sorry, but this vendor is not accepting new orders or payments at the moment due to an inactive payment account. Please try again later or choose a different vendor.');
         }
         $cart = WineryCart::with('items.product')
@@ -63,11 +64,17 @@ class WineryCheckoutController extends Controller
             $deliveryFee = 0.00;
         }
 
+        $tax = VendorWineryMetadata::where('vendor_id', $shopid)->first();
+        $taxPercentage = 0.00;
+        if (!empty($tax) && $tax->applicable_taxes_amount > 0) {
+            $taxPercentage = $tax->applicable_taxes_amount;
+        }
+
         $vendor = Vendor::find($shopid);
         // if(!isset($vendor->stripeDetails->stripe_publishable_key) && !isset($vendor->stripeDetails->stripe_secret_key)) {
         //     return redirect()->route('cart.index', ['shopid' => $shopid, 'vendorid' => $vendorid])->with('error', 'Payment server error.');
         // }
-        return view('VendorDashboard.winery.checkout', compact('shopid', 'vendorid', 'vendor', 'cartTotal', 'deliveryFee'));
+        return view('VendorDashboard.winery.checkout', compact('shopid', 'vendorid', 'vendor', 'cartTotal', 'deliveryFee', 'taxPercentage'));
     }
 
     public function checkout(Request $request, $shopid, $vendorid)
@@ -139,6 +146,14 @@ class WineryCheckoutController extends Controller
             $deliveryFee = 0.00;
         }
 
+        $tax = VendorWineryMetadata::where('vendor_id', $shopid)->first();
+        $tax_amount = 0.00;
+        if (!empty($tax) && $tax->applicable_taxes_amount > 0) {
+            $tax_percentage = $tax->applicable_taxes_amount;
+            $tax_amount = ($cartTotal + $deliveryFee)  * ($tax_percentage / 100);
+            $tax_amount += $tax_amount;
+        }
+
         DB::beginTransaction();
         $data = [
             'user_id' => Auth::id(),
@@ -147,8 +162,10 @@ class WineryCheckoutController extends Controller
             'subtotal_price' => $cartTotal, // Total cart amount
             'delivery_charges' => $deliveryFee, // Total cart amount
             'stocking_fee' => $stockingFee,
-            'total_price' => $cartTotal + $deliveryFee, // Total cart amount
+            'total_price' => $cartTotal + $deliveryFee + $tax_amount, // Total cart amount
             'status' => 'pending',
+            'tax' => $tax->applicable_taxes_amount,
+            'tax_amount' => $tax_amount,
             // Billing Details
             'billing_first_name' => $request->input('billing_first_name'),
             'billing_last_name' => $request->input('billing_last_name'),
@@ -198,7 +215,7 @@ class WineryCheckoutController extends Controller
 
             DB::commit();
 
-            
+
             Stripe::setApiKey(env('STRIPE_SECRET'));
             $vendor = Vendor::find($vendorid);
             if (empty($request->input('payment_method_id'))) {

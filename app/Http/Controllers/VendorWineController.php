@@ -117,38 +117,36 @@ class VendorWineController extends Controller
             $imagePath = $image->store('images', 'public'); // Store image in public storage
         }
         // Create new VendorWine entry
-        $data = [
-            'vendor_id' => $vendor_id,
-            'winery_name' => $request->input('winery_name'),
-            'region' => $request->input('region') ?? null,
-            'sub_region' => $request->input('sub_region') ?? null,
-            'varietal_blend' => json_encode($varietalData) ?? null, // Store JSON data
-            // 'vintage_brand_name' => $request->input('vintage_brand_name'),
-            'grape_varietals' => $grapeVarietals ?? null,
-            'vintage_date' => $request->input('vintage_date') ?? null,
-            'description' => $request->input('description') ?? null,
-            'abv' => $request->input('abv') ?? null,
-            'rs' => $request->input('rs') ?? null,
-            'rs_value' => $rs_value ?? null,
-            'series' => $request->input('series') ?? null,
-            'bottle_size' => $request->input('bottle_size') ?? null,
-            'sku' => $request->input('sku') ?? null,
-            'cost' => $request->input('cost') ?? 0.00,
-            'cellar' => $request->input('cellar') ?? null,
-            'commission_delivery_fee' => $request->input('commission') ?? 0.00,
-            'price' => $request->input('price') ?? 0.00,
-            'inventory' => $request->input('inventory') ?? 0,
-            'image' => $imagePath,
-        ];
+        $vendorWine = new VendorWine();
+        $vendorWine->vendor_id = $vendor_id;
+        $vendorWine->winery_name = $request->input('winery_name');
+        $vendorWine->region = $request->input('region') ?? null;
+        $vendorWine->sub_region = $request->input('sub_region') ?? null;
+        $vendorWine->varietal_blend = json_encode($varietalData) ?? null; // Store JSON data
+        $vendorWine->grape_varietals = $grapeVarietals ?? null;
+        $vendorWine->vintage_date = $request->input('vintage_date') ?? null;
+        $vendorWine->description = $request->input('description') ?? null;
+        $vendorWine->abv = $request->input('abv') ?? null;
+        $vendorWine->rs = $request->input('rs') ?? null;
+        $vendorWine->rs_value = $rs_value ?? null;
+        $vendorWine->series = $request->input('series') ?? null;
+        $vendorWine->bottle_size = $request->input('bottle_size') ?? null;
+        $vendorWine->sku = $request->input('sku') ?? null;
+        $vendorWine->cost = $request->input('cost') ?? 0.00;
+        $vendorWine->cellar = $request->input('cellar') ?? null;
+        $vendorWine->commission_delivery_fee = $request->input('commission') ?? 0.00;
+        $vendorWine->price = $request->input('price') ?? 0.00;
+        $vendorWine->inventory = $request->input('inventory') ?? 0;
+        $vendorWine->image = $imagePath;
 
-        if (!empty($data['cost'])) {
-            $calculations = calculateStockingFeeAndPrice($data['cost']);
-            $data['commission_delivery_fee'] = $calculations['stocking_fee'];
-            $data['price'] = $calculations['final_price'];
+        if (!empty($vendorWine->cost)) {
+            $calculations = calculateStockingFeeAndPrice($vendorWine->cost);
+            $vendorWine->commission_delivery_fee = $calculations['stocking_fee'];
+            $vendorWine->price = $calculations['final_price'];
         }
 
-        VendorWine::create($data);
-
+        // Save the model
+        $vendorWine->save();
         return response()->json(['success' => true, 'message' => 'Wine added successfully']);
     }
 

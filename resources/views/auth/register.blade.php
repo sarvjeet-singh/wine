@@ -24,6 +24,18 @@
             border: 1px solid red !important;
         }
     </style>
+    <section class="register-top-bar tab-content-sec">
+        <div class="container">
+            <div class="inner-content">
+                <ul class="list-unstyled d-flex justify-content-between align-items-center mb-0">
+                    <li><a href="/accommodations" class="text-decoration-none"><i class="fa-solid fa-building"></i><span>Accommodations</span></a></li>
+                    <li><a href="/excursion" class="text-decoration-none"><i class="fa-solid fa-people-group"></i><span>Excursions</span></a></li>
+                    <li><a href="/wineries" class="text-decoration-none"><i class="fa-solid fa-wine-glass"></i><span>Wineries</span></a></li>
+                    <li><a href="/events" class="text-decoration-none"><i class="fa-solid fa-calendar-days"></i><span>Events</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
     <div class="container-fluid over-flow-register">
         <div class="row justify-content-center">
             <div class="col-sm-6 padding-left-0 register-left-section">

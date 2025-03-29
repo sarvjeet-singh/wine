@@ -33,11 +33,13 @@
     right: 0;
     bottom: 0;
     width: 90%;
+    height: calc(100% - 16%);
     margin: 0 auto;
     background-color: #f9f9f9;
     border-radius: 0;
-}
-body.fixed-postion .left-navbar .nav {
+    flex-direction: row !important;
+    overflow-y: auto;
+}body.fixed-postion .left-navbar .nav {
     top: 13%;
 }
 div#leftNavbarMobile {
@@ -111,7 +113,8 @@ body:has(.left-navbar.collapse.show) {
 }
 @media screen and (max-width: 360px){
 .left-navbar .nav {    
-    top: 12%;    
+    top: 12%;
+    height: calc(100% - 12%);    
 }
 .information-box-body button.wine-btn {
     padding: 10px 30px;

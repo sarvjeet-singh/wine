@@ -16,6 +16,7 @@
                                 <th>Vendor Name</th>
                                 <th>Street Address</th>
                                 <th>Date of Visits</th>
+                                <th>Image</th>
                                 <th>Comment</th>
                                 <th>Ratings</th>
                             </tr>
@@ -32,6 +33,14 @@
                                         <td>{{ $review->vendor->vendor_name }}</td>
                                         <td>{{ $review->vendor->street_address }}</td>
                                         <td>{{ $review->date_of_visit }}</td>
+                                        <td>
+                                            @if ($review->image)
+                                                <img src="{{ Storage::url($review->image) }}" width="100px"
+                                                    alt="Review Image">
+                                            @else
+                                                No Image
+                                            @endif
+                                        </td>
                                         <td>
                                             {!! truncateReviewDescription($review->review_description) !!}
                                         </td>

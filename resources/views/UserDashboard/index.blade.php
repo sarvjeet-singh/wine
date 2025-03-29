@@ -61,6 +61,10 @@
         #proof-images {
             display: none;
         }
+        svg.fa-circle-info {
+            width: 18px;
+            height: 18px;
+        }
     </style>
     <div class="container main-container">
         <div class="row flex-lg-nowrap flex-wrap g-4">
@@ -79,8 +83,11 @@
                     <div class="col-xl-3 col-6">
                         <a href="{{ route('wallet-history') }}">
                             <div class="top-boxes">
-                                <div class="box-image">
+                                <div class="box-image d-flex align-items-start justify-content-between">
                                     <img src="{{ asset('images/icons/amount-box-icon.png') }}">
+                                    <a class="border-0 p-0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Bottle Bucks have a 1:1 CAD cash value. Earn an additional 7% cash-back credits on all transactions.">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                    </a>
                                 </div>
                                 <div class="box-points">${{ $balance }}</div>
                                 <div class="box-text">Bottle Bucks</div>
@@ -442,4 +449,13 @@
             }
         }, 1000);
     </script>
+
+    <script>
+      // Initialize all tooltips on the page
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+      })
+    </script>
+
 @endsection

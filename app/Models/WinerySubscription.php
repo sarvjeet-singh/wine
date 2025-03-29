@@ -16,6 +16,14 @@ class WinerySubscription extends Model
         'price',
         'status',
         'start_date',
-        'end_date'
+        'end_date',
+        'subscription_notes',
+        'price_type',
+        'charge_amount',
     ];
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
 }

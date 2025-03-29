@@ -17,6 +17,7 @@ class Review extends Model
         'receipt',
         'review_description',
         'review_status',
+        'image',
     ];
 
     public function customer()

@@ -32,10 +32,21 @@
         background-color: unset !important;
     }
 
-    li.nav-item.active a.nav-link {
+    li.nav-item.active a.nav-link,
+    .left-navbar .nav-item a.enable-sub-menu {
         background-color: #bba253;
         color: #fff;
     }
+li#settingsDropdown a.nav-link.active {
+    background-color: #b7a35f;
+}
+li#settingsDropdown a.nav-link.active > img,
+.left-navbar .nav-item a.enable-sub-menu img {
+    filter: brightness(0) invert(1);
+}
+.left-navbar .nav-item a.enable-sub-menu svg {
+    rotate: 90deg;
+}
 </style>
 
 <div class="left-navbar-mobile d-lg-none d-flex align-items-center justify-content-between py-2">
@@ -147,12 +158,36 @@
                 ];
                 $isSubMenuActive = request()->routeIs($subMenuRoutes);
             @endphp
-            <li class="nav-item position-relative {{ request()->is('user-settings*') ? 'active' : '' }}"
+            <!-- <li class="nav-item position-relative {{ request()->is('user-settings*') ? 'active' : '' }}"
                 id="settingsDropdown">
                 <a href="#"
                     class="nav-link head-link px-sm-2 px-3 align-middle {{ $isSubMenuActive ? 'active enable-sub-menu' : '' }}">
                     <img src="{{ asset('images/icons/settings_icon_grey.png') }}"
                         data-image="{{ asset('images/icons/settings_icon') }}">
+                    <span class="ms-1 d-none d-sm-inline">Settings</span>
+                    <i class="fas fa-angle-right expand-icon"></i>
+                </a>
+                <ul class="sub-menu-list">
+                    <li class="dropdown-item my-2 {{ request()->is('user-settings') ? 'active' : '' }}">
+                        <a href="/user-settings">User Settings</a>
+                    </li>
+                    <li class="dropdown-item my-2 {{ request()->routeIs('user.change-password') ? 'active' : '' }}">
+                        <a href="{{ route('user.change-password') }}">Change Password</a>
+                    </li>
+                    <li class="dropdown-item my-2 {{ request()->routeIs('user.emergency-contact') ? 'active' : '' }}">
+                        <a href="{{ route('user.emergency-contact') }}">Emergency Contact</a>
+                    </li>
+                    <li class="dropdown-item my-2 {{ request()->routeIs('user.referrals') ? 'active' : '' }}">
+                        <a href="{{ route('user.referrals') }}">Referral</a>
+                    </li>
+                    <li class="dropdown-item my-2 {{ request()->routeIs('user.social-media') ? 'active' : '' }}">
+                        <a href="{{ route('user.social-media') }}">Social Media</a>
+                    </li>
+                </ul>
+            </li> -->
+            <li class="nav-item position-relative {{ request()->is('user-settings*') ? 'active' : '' }}" id="settingsDropdown">
+                <a href="#" class="nav-link head-link px-sm-2 px-3 align-middle {{ $isSubMenuActive ? 'active enable-sub-menu' : '' }}">
+                    <img src="{{ asset('images/icons/settings_icon_grey.png') }}" data-image="{{ asset('images/icons/settings_icon') }}">
                     <span class="ms-1 d-none d-sm-inline">Settings</span>
                     <i class="fas fa-angle-right expand-icon"></i>
                 </a>
@@ -202,8 +237,11 @@
 
             // Toggle the 'enable-sub-menu' class on the clicked a.head-link only
             $(this).toggleClass('enable-sub-menu');
+        });
 
-            // No longer toggle on the sub-menu-list here
+        // Prevent the submenu from closing when clicking on links within the sub-menu
+        $('.sub-menu-list a').click(function(event) {
+            event.stopPropagation(); // Prevent event from propagating and closing the menu
         });
 
         // Close the dropdown when clicking anywhere outside the a.head-link

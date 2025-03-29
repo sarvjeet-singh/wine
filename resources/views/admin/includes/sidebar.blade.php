@@ -10,7 +10,7 @@
     </div>
     <ul class="nav-links list-unstyled">
         <li class="position-relative">
-            <a href="{{route('admin.admins.index')}}">
+            <a href="{{ route('admin.admins.index') }}">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
                 <span class="link_name">Admin Management</span>
             </a>
@@ -33,9 +33,9 @@
             </a>
             <i class="fa-solid fa-angle-right"></i>
             <ul class="sub-menu list-unstyled mt-2">
-                <li class="mb-2"><a href="{{route('admin.vendors')}}">Manage Vendor</a></li>
-                <li class="mb-2"><a href="{{route('admin.vendors.users.index')}}">Manage Vendor Contact</a></li>
-                <li class="mb-2"><a href="{{route('admin.vendors.create')}}">Create vendor</a></li>
+                <li class="mb-2"><a href="{{ route('admin.vendors') }}">Manage Vendor</a></li>
+                <li class="mb-2"><a href="{{ route('admin.vendors.users.index') }}">Manage Vendor Contact</a></li>
+                <li class="mb-2"><a href="{{ route('admin.vendors.create') }}">Create vendor</a></li>
             </ul>
         </li>
         <li class="position-relative parent-menu">
@@ -45,10 +45,10 @@
             </a>
             <i class="fa-solid fa-angle-right"></i>
             <ul class="sub-menu list-unstyled mt-2">
-                <li class="mb-2"><a href="{{route('admin.faqs.index')}}">Manage FAQs</a></li>
+                <li class="mb-2"><a href="{{ route('admin.faqs.index') }}">Manage FAQs</a></li>
                 <li class="mb-2"><a href="">Manage Terms & Condition</a></li>
                 <li class="mb-2"><a href="">Manage Questionnaire</a></li>
-                <li class="mb-2"><a href="{{route('admin.cms.refund-policy')}}">Manage Refund Policy</a></li>
+                <li class="mb-2"><a href="{{ route('admin.cms.refund-policy') }}">Manage Refund Policy</a></li>
             </ul>
         </li>
         <li class="position-relative parent-menu">
@@ -65,13 +65,13 @@
             </ul>
         </li>
         <li class="position-relative">
-            <a href="{{route('admin.reviews')}}">
+            <a href="{{ route('admin.reviews') }}">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
                 <span class="link_name">Manage Review & Testimonial</span>
             </a>
         </li>
         <li class="position-relative">
-            <a href="{{route('admin.plans.index')}}">
+            <a href="{{ route('admin.plans.index') }}">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
                 <span class="link_name">Manage Stripe Plans</span>
             </a>
@@ -82,31 +82,44 @@
                 <span class="link_name">Manage Stripe Taxes</span>
             </a>
         </li> --}}
-    <li class="position-relative parent-menu">
+        <li class="position-relative parent-menu">
             <a href="#">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
                 <span class="link_name">Manage Curative Experiences</span>
             </a>
             <i class="fa-solid fa-angle-right"></i>
             <ul class="sub-menu list-unstyled mt-2">
-                <li class="mb-2"><a href="{{route('admin.curative-experience-categories.index')}}">Manage Categories</a></li>
-                <li class="mb-2"><a href="{{route('admin.curative-experiences.index')}}">Manage Experiences</a></li>
+                <li class="mb-2"><a href="{{ route('admin.curative-experience-categories.index') }}">Manage
+                        Categories</a></li>
+                <li class="mb-2"><a href="{{ route('admin.curative-experiences.index') }}">Manage Experiences</a>
+                </li>
+            </ul>
+        </li>
+        <li class="position-relative parent-menu">
+            <a href="#">
+                <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
+                <span class="link_name">Manage Subscriptions</span>
+            </a>
+            <i class="fa-solid fa-angle-right"></i>
+            <ul class="sub-menu list-unstyled mt-2">
+                <li class="mb-2"><a href="{{ route('admin.vendor.subscriptions.index') }}">Vendor Subscriptions</a></li>
+                </li>
             </ul>
         </li>
         <li class="position-relative">
-            <a href="{{route('admin.wallet.index')}}">
+            <a href="{{ route('admin.wallet.index') }}">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
                 <span class="link_name">Manage Bottle Bucks</span>
             </a>
         </li>
         <li class="position-relative">
-            <a href="{{route('admin.configuration-settings')}}">
+            <a href="{{ route('admin.configuration-settings') }}">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
                 <span class="link_name">Configuration Settings </span>
             </a>
         </li>
         <li class="position-relative">
-            <a href="{{route('admin.error-logs')}}">
+            <a href="{{ route('admin.error-logs') }}">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
                 <span class="link_name">Error Logs </span>
             </a>

@@ -583,7 +583,7 @@ if (!function_exists('calculatePlatformProcessingFee')) {
     function calculatePlatformProcessingFee(float $totalAmount, float $feePercentage): float
     {
         $feePercentage = $feePercentage ?? 0.00;
-        if($feePercentage < 0) {
+        if ($feePercentage < 0) {
             return 0.00;
         }
         return round(($totalAmount * $feePercentage) / 100, 2);
@@ -602,5 +602,37 @@ if (!function_exists('refundContent')) {
         $key = str_replace('-', '_', $key);
         $refundContent = App\Models\CmsPage::where('slug', 'refund-policy')->first();
         return $refundContent->description[$key] ?? '';
+    }
+}
+
+if (!function_exists('getCurativeExperienceCategories')) {
+    function getExperienceCurativeCategories()
+    {
+        return App\Models\CurativeExperienceCategory::where('status', 'active')->get();
+    }
+}
+
+if (!function_exists('getEventMinMaxPrice')) {
+    function getEventMinMaxPrice()
+    {
+        // Get today's date
+        $today = Carbon\Carbon::today();
+
+        // Get the latest event date
+        $maxDate = App\Models\CurativeExperience::max('end_date');
+
+        // Fetch the min and max price (admittance) for events that are active between start_date and end_date
+        $prices = App\Models\CurativeExperience::whereDate('start_date', '<=', $maxDate) // Event must have started or will start soon
+            ->whereDate('end_date', '>=', $today) // Event must still be ongoing or upcoming
+            ->whereNotNull('admittance') // Ensure price exists
+            ->where('status', 'active')
+            ->where('is_free', 0)
+            ->selectRaw('MIN(admittance) as min_price, MAX(admittance) as max_price')
+            ->first();
+
+        return [
+            'min_price' => round($prices->min_price) ?? 0,
+            'max_price' => round($prices->max_price) ?? 0,
+        ];
     }
 }

@@ -19,15 +19,18 @@ class CurativeExperience extends Model
         'inventory',
         'start_date',
         'end_date',
-        'start_time',
-        'end_time',
+        'booking_time',
         'description',
         'status',
         'duration',
         'image',
         'thumbnail_small',
         'thumbnail_medium',
-        'thumbnail_large'
+        'thumbnail_large',
+        'city',
+        'state',
+        'address',
+        'zipcode',
     ];
 
     public function category()

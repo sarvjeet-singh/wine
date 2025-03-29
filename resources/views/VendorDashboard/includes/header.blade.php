@@ -41,7 +41,7 @@
             <!-- Collapsible Navbar Items -->
             <div class="collapse navbar-collapse justify-content-end position-relative flex-grow-0"
                 id="navbarNavDropdown">
-                <ul class="navbar-nav gap-lg-4 gap-2">
+                <ul class="navbar-nav gap-lg-4 gap-2 vendor-dropdown-menu">
                     <!-- Vendor Dropdown Menu -->
                     <li class="nav-item dropdown">
                         @if (isset($vendor))
@@ -51,7 +51,7 @@
                             </a>
                         @endif
                         <div class="dropdown">
-                            <ul class="dropdown-menu p-0" style="max-height: 300px; overflow: auto; width: 250px;">
+                            <ul class="dropdown-menu p-0" style="max-height: 300px; overflow: auto; width: 180px;">
                                 <!-- Search Input -->
                                 <li class="p-2">
                                     <input type="text" id="vendorSearch" class="form-control"

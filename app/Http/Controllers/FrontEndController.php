@@ -1764,29 +1764,4 @@ class FrontEndController extends Controller
             return $this->getExcursionDetails($short_code);
         }
     }
-
-    public function events(Request $request)
-    {
-        $query = CurativeExperience::with('category');
-
-        if ($request->has('search') && !empty($request->search)) {
-            $searchTerm = $request->search;
-            $query->where('name', 'LIKE', "%{$searchTerm}%");
-        }
-
-        $events = $query->paginate(10);
-
-        return view('FrontEnd.events', compact('events'));
-    }
-
-    function searchEvents(Request $request)
-    {
-        $searchTerm = $request->query('term');
-
-        $results = CurativeExperience::where('name', 'LIKE', "%{$searchTerm}%")
-            ->limit(5)
-            ->pluck('name', 'id'); // Only return titles
-
-        return response()->json($results);
-    }
 }

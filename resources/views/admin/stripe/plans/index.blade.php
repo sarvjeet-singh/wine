@@ -74,7 +74,6 @@
                                         <th>Plan Name</th>
                                         <th>Price</th>
                                         <th>Interval</th>
-                                        <th>Tax Rates</th>
                                         <th>Status</th>
                                         <th>Date Created</th>
                                         <th>Action</th>
@@ -102,13 +101,6 @@
                                                     {{ $plan->interval_count > 1
                                                         ? 'Every ' . $plan->interval_count . ' ' . Str::plural($plan->interval, $plan->interval_count)
                                                         : $interval }}
-                                                </td>
-                                                <td>
-                                                    @foreach ($plan->taxes as $tax)
-                                                        <span class="badge bg-info">{{ $tax->name }}
-                                                            ({{ $tax->percentage }}%)
-                                                        </span>
-                                                    @endforeach
                                                 </td>
                                                 <td> <span
                                                         class="badge {{ $plan->status ? 'bg-success' : 'bg-danger' }}">{{ $plan->status ? 'Active' : 'Inactive' }}

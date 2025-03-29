@@ -89,6 +89,37 @@ class WineryCartController extends Controller
     public function update(Request $request, $productId, $shopid, $vendorid)
     {
         $cart = $this->cartRepository->getCart(Auth::id(), $shopid, $vendorid);
+        // Get the quantity of the same wine already in the cart
+        $cartWineQuantity = $this->cartRepository->getItemQuantityInCart($cart, $request->id);
+
+        // Calculate the total quantity in the cart after adding the requested quantity
+        $totalQuantityInCart = $cartWineQuantity + $request->quantity;
+
+        $wine = VendorWine::where('vendor_id', $shopid)
+            ->where('id', $productId)
+            ->first();
+
+        if (!$wine) {
+            return response()->json(
+                [
+                    'message' => 'Wine item not found in inventory.',
+                    'status' => 'error'
+                ],
+                404
+            );
+        }
+
+        // Check if requested quantity exceeds available inventory
+        if ($totalQuantityInCart > $wine->inventory) {
+            return response()->json(
+                [
+                    'message' => 'Requested quantity exceeds available stock.',
+                    'status' => 'error',
+                    'available_quantity' => $wine->inventory
+                ],
+                400
+            );
+        }
         $this->cartRepository->updateItemQuantity($cart, $productId, $request->quantity, $vendorid);
 
         return response()->json(['message' => 'Cart updated!', 'status' => 'success']);

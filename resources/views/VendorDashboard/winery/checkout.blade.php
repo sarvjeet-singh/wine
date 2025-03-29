@@ -475,6 +475,16 @@
                                                     </div>
                                                 @endif
 
+                                                @if ($taxPercentage > 0)
+                                                    <div class="d-flex align-items-center justify-content-between mb-2">
+
+                                                        <span>Tax</span>
+
+                                                        <span id="tax_amount">$0.00</span>
+
+                                                    </div>
+                                                @endif
+
                                                 <div class="d-flex align-items-center justify-content-between mb-2">
 
                                                     <span>Total</span>
@@ -1340,26 +1350,50 @@
 
         $('input[name="delivery_type"]').on('change', function() {
             let selectedOption = $(this).val();
+            let cartTotal = parseFloat('{{ $cartTotal }}'); // Get cart total from Blade
+            let deliveryFee = parseFloat('{{ $deliveryFee }}'); // Get delivery fee from Blade
+            let taxPercentage = parseFloat('{{ $taxPercentage }}'); // Get tax percentage from Blade
+
+            let totalAmount = cartTotal;
 
             if (selectedOption === 'pickup') {
                 $("#same_as_shipping_container").hide();
                 $(".shipping-address").hide();
                 $("#deliveryCharges").hide();
-                $("#total_amount").text('${{ $cartTotal }}');
-                // Additional code for handling "Pick Up" option can go here
             } else if (selectedOption === 'delivery') {
                 $(".shipping-address").show();
                 $("#same_as_shipping_container").show();
                 $("#deliveryCharges").show();
-                $("#total_amount").text('${{ number_format($cartTotal + $deliveryFee, 2) }}');
-                // Additional code for handling "Delivery" option can go here
+                totalAmount += deliveryFee;
             }
+
+            // Calculate tax based on the total amount
+            let taxAmount = (totalAmount * taxPercentage) / 100;
+            totalAmount += taxAmount;
+
+            // Update the total amount displayed
+            $("#total_amount").text(`$${totalAmount.toFixed(2)}`);
+            $("#tax_amount").text(`$${taxAmount.toFixed(2)}`); // Display tax separately
         });
         $(document).ready(function() {
+            let cartTotal = parseFloat('{{ $cartTotal }}'); // Get cart total from Blade
+            let deliveryFee = parseFloat('{{ $deliveryFee }}'); // Get delivery fee from Blade
+            let taxPercentage = parseFloat('{{ $taxPercentage }}'); // Get tax percentage from Blade
+
+            let totalAmount = cartTotal + deliveryFee;
+
+            // Calculate tax based on the total amount
+            let taxAmount = (totalAmount * taxPercentage) / 100;
+            totalAmount += taxAmount;
+
+            // Show the required elements
             $(".shipping-address").show();
             $("#same_as_shipping_container").show();
             $("#deliveryCharges").show();
-            $("#total_amount").text('${{ number_format($cartTotal + $deliveryFee, 2) }}');
+
+            // Update the total amount and tax amount displayed
+            $("#total_amount").text(`$${totalAmount.toFixed(2)}`);
+            $("#tax_amount").text(`$${taxAmount.toFixed(2)}`); // Display tax separately
         });
 
         function formatPostalCode(input) {

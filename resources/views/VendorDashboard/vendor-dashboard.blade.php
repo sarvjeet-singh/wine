@@ -70,19 +70,20 @@
 
                                         <span>{{ !empty($vendor->account_status) ? $vendor->accountStatus->name : '' }}</span>
                                     </div>
-                                    <div class="col-sm-5">
-                                        <label>Current Rate</label>
-                                    </div>
-                                    <div class="col-sm-7 text-right">
-                                        <span
-                                            id="current-rate">${{ number_format($vendor->pricing->current_rate ?? 0, 2) }}</span>
-                                    </div>
-
+                                    @if (strtolower($vendor->vendor_type) == 'accommodation')
+                                        <div class="col-sm-5">
+                                            <label>Current Rate</label>
+                                        </div>
+                                        <div class="col-sm-7 text-right">
+                                            <span
+                                                id="current-rate">${{ number_format($vendor->pricing->current_rate ?? 0, 2) }}</span>
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col-12">
                                         @if ($vendor->account_status != 1 && $hasActiveSubscription)
-                                            <button id="checkActivationBtn" class="btn btn-primary">
+                                            <button id="checkActivationBtn" class="btn btn-primary wine-btn rounded-2 px-3">
                                                 Complete Your Profile
                                             </button>
                                         @endif
@@ -247,11 +248,16 @@
                         let messages = '';
 
                         if (response.message && Array.isArray(response.message)) {
-                            messages = response.message.map(item =>
-                                `<li style="color: ${item.completed ? 'green' : 'red'};">
-                        ${item.completed ? '✅' : '❌'} ${item.message}
-                    </li>`
-                            ).join('');
+                            messages = response.message.map(item => {
+                                let color = item.completed ? 'green' : item
+                                    .is_optional ? 'orange' : 'red';
+                                let icon = item.completed ? '✅' : item.is_optional ?
+                                    '⚠️' : '❌';
+
+                                return `<li style="color: ${color};">
+            ${icon} ${item.message}
+        </li>`;
+                            }).join('');
                         } else {
                             messages =
                                 `<li style="color: green;">✅ Vendor is eligible for activation</li>`;

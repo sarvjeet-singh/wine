@@ -11,6 +11,8 @@ use App\Models\VendorMediaGallery;
 use App\Models\WinerySubscription;
 use App\Models\VendorPricing;
 use App\Models\BusinessHour;
+use App\Models\VendorAmenity;
+use App\Models\VendorWine;
 use Carbon\Carbon;
 
 class VendorHelper
@@ -173,7 +175,7 @@ class VendorHelper
         // Fetch the vendor
         $vendor = Vendor::find($vendorId);
         if (!$vendor) {
-            return ['status' => false, 'messages' => [['message' => 'Vendor not found', 'completed' => false]]];
+            return ['status' => false, 'messages' => [['message' => 'Vendor not found', 'completed' => false, 'is_optional' => false]]];
         }
 
         // Check subscription status
@@ -182,10 +184,10 @@ class VendorHelper
             ->where('end_date', '>', Carbon::now())
             ->exists();
         if (!$subscription) {
-            return ['status' => false, 'messages' => [['message' => 'No active subscription on your account. Please activate your subscription.', 'completed' => false]]];
+            return ['status' => false, 'messages' => [['message' => 'No active subscription on your account. Please activate your subscription.', 'completed' => false, 'is_optional' => false]]];
         }
 
-        // Check winery details
+        // Required Fields
         $requiredVendorFields = [
             'vendor_name',
             'vendor_email',
@@ -209,48 +211,61 @@ class VendorHelper
             }
         }
         $messages[] = [
-            'message' => "<b>Winery Details</b> (All details provided)",
-            'completed' => $isVendorComplete
+            'message' => "<b>Vendor Account Details</b> (Please ensure basic contact details are correct or updated)",
+            'completed' => $isVendorComplete,
+            'is_optional' => false
         ];
 
-        // // Check vendor winery metadata
-        // $metadata = VendorWineryMetadata::where('vendor_id', $vendorId)->first();
-        // $isMetadataComplete = $metadata && !empty($metadata->applicable_taxes_amount);
-        // $messages[] = [
-        //     'message' => "<b>Winery Details</b> (All details provided)",
-        //     'completed' => $isMetadataComplete
-        // ];
-
-        // Check refund policy
+        // Wine Catalogue
+        $wines = VendorWine::where('vendor_id', $vendorId)->exists();
         $messages[] = [
-            'message' => "<b>Refund Policy</b> (Refund policy set)",
-            'completed' => !empty($vendor->policy)
+            'message' => "<b>Wine Catalogue</b> (Please input as many wines as you would like to make available to resellers)",
+            'completed' => $wines,
+            'is_optional' => false
         ];
 
-        // Check payment integration
-        $isStripeConnected = !empty($vendor->stripe_account_id) && $vendor->stripe_onboarding_account_status === 'active';
-        $messages[] = [
-            'message' => "<b>Stripe Account</b> Integration (Connect your Stripe account for seamless payments)",
-            'completed' => $isStripeConnected
-        ];
-
-        // Check media gallery
+        // Media Gallery
         $mediaCount = VendorMediaGallery::where('vendor_id', $vendorId)->count();
         $messages[] = [
-            'message' => "<b>Media Gallery</b> (Images uploaded)",
-            'completed' => $mediaCount > 4
+            'message' => "<b>Media Gallery</b> (Please upload images or links to YouTube videos to help promote experiences)",
+            'completed' => $mediaCount > 4,
+            'is_optional' => false
         ];
 
+        // Refund Policy
+        $messages[] = [
+            'message' => "<b>Refund Policy</b> (Please set the policy most applicable to your transactions)",
+            'completed' => !empty($vendor->policy),
+            'is_optional' => false
+        ];
+
+        // Stripe Account
+        $isStripeConnected = !empty($vendor->stripe_account_id) && $vendor->stripe_onboarding_account_status === 'active';
+        $messages[] = [
+            'message' => "<b>Stripe Account</b> (Please integrate a Stripe payment gateway account for seamless payments)",
+            'completed' => $isStripeConnected,
+            'is_optional' => false
+        ];
+
+        // Business Hours (Optional)
         $businessHours = BusinessHour::where('vendor_id', $vendorId)->exists();
         $messages[] = [
-            'message' => "<b>Business Hours</b> (Business hours set)",
-            'completed' => $businessHours
+            'message' => "<b>Business Hours</b> (Please update applicable business hours so users know when you are open)",
+            'completed' => $businessHours,
+            'is_optional' => true
+        ];
+
+        // Amenities (Optional)
+        $vendorAmenities = VendorAmenity::where('vendor_id', $vendorId)->exists();
+        $messages[] = [
+            'message' => "<b>Amenities</b> (Please indicate any amenities applicable to your establishment)",
+            'completed' => $vendorAmenities,
+            'is_optional' => true
         ];
 
         // Remove duplicates while keeping the exact order
         $seenMessages = [];
         $filteredMessages = [];
-
         foreach ($messages as $item) {
             if (!in_array($item['message'], $seenMessages)) {
                 $seenMessages[] = $item['message'];
@@ -258,18 +273,27 @@ class VendorHelper
             }
         }
 
-        // Determine status
-        $hasErrors = in_array(false, array_column($filteredMessages, 'completed'));
-        if ($hasErrors === false) {
+        // Determine status (IGNORE "optional" fields when checking errors)
+        $hasErrors = false;
+        foreach ($filteredMessages as $msg) {
+            if (!$msg['completed'] && !$msg['is_optional']) {
+                $hasErrors = true;
+                break;
+            }
+        }
+
+        // Activate vendor if all required fields are complete
+        if (!$hasErrors) {
             $vendor->account_status = 1;
             $vendor->save();
         }
+
         return [
             'status' => !$hasErrors,
             'messages' => $filteredMessages
         ];
     }
-
+    
     public static function canActivateExcursionSubscription($vendorId)
     {
         $messages = [];

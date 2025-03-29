@@ -188,13 +188,13 @@
             <!-- Parent Menu 8 -->
             <li class="nav-item my-1">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menu8" role="button"
-                    aria-expanded="{{ request()->routeIs('vendor-booking-utility', 'vendor-settings', 'business-hours.index', 'stripe.details.show', 'vendor-social-media', 'vendor-change-password','vendor-access-credentials', 'vendor-questionnaire') ? 'true' : 'false' }}"
+                    aria-expanded="{{ request()->routeIs('vendor-booking-utility', 'vendor-settings', 'business-hours.index', 'stripe.details.show', 'vendor-social-media', 'vendor-change-password', 'vendor-access-credentials', 'vendor-questionnaire') ? 'true' : 'false' }}"
                     aria-controls="menu8">
                     <div><i class="fas fa-cogs menu-icon"></i> Operational Settings</div>
                     <i
-                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-booking-utility', 'vendor-settings', 'business-hours.index', 'stripe.details.show', 'vendor-social-media', 'vendor-change-password','vendor-access-credentials', 'vendor-questionnaire') ? 'rotate' : '' }}"></i>
+                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-booking-utility', 'vendor-settings', 'business-hours.index', 'stripe.details.show', 'vendor-social-media', 'vendor-change-password', 'vendor-access-credentials', 'vendor-questionnaire') ? 'rotate' : '' }}"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('vendor-booking-utility', 'vendor-settings', 'business-hours.index', 'stripe.details.show', 'vendor-social-media', 'vendor-change-password','vendor-access-credentials', 'vendor-questionnaire') ? 'show' : '' }}"
+                <div class="collapse {{ request()->routeIs('vendor-booking-utility', 'vendor-settings', 'business-hours.index', 'stripe.details.show', 'vendor-social-media', 'vendor-change-password', 'vendor-access-credentials', 'vendor-questionnaire') ? 'show' : '' }}"
                     id="menu8">
                     <ul class="nav flex-column sub-menu mt-2">
                         <li class="nav-item">
@@ -219,22 +219,32 @@
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('business-hours*') ? 'active' : '' }}"
                                     href="{{ route('business-hours.index', ['vendorid' => $id]) }}">
-                                    <i class="fas fa-wrench menu-icon"></i> Box Office
+                                    <i class="fas fa-wrench menu-icon"></i>
+                                    @if (strtolower($vendor->vendor_type) == 'winery')
+                                        Business Hours
+                                    @elseif(strtolower($vendor->vendor_type) == 'excursion')
+                                        Box Office
+                                    @else
+                                        Business Hours
+                                    @endif
                                 </a>
                             </li>
                         @endif
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('vendor-access-credentials') ? 'active' : '' }}" href="{{ route('vendor-access-credentials', ['vendorid' => $id]) }}">
+                            <a class="nav-link {{ request()->routeIs('vendor-access-credentials') ? 'active' : '' }}"
+                                href="{{ route('vendor-access-credentials', ['vendorid' => $id]) }}">
                                 <i class="fas fa-wrench menu-icon"></i> Vendor Contacts
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('vendor-questionnaire') ? 'active' : '' }}" href="{{ route('vendor-questionnaire', ['vendorid' => $id]) }}">
+                            <a class="nav-link {{ request()->routeIs('vendor-questionnaire') ? 'active' : '' }}"
+                                href="{{ route('vendor-questionnaire', ['vendorid' => $id]) }}">
                                 <i class="fas fa-wrench menu-icon"></i> Questionnaire
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('vendor-change-password') ? 'active' : '' }}" href="{{ route('vendor-change-password', ['vendorid' => $id]) }}">
+                            <a class="nav-link {{ request()->routeIs('vendor-change-password') ? 'active' : '' }}"
+                                href="{{ route('vendor-change-password', ['vendorid' => $id]) }}">
                                 <i class="fas fa-wrench menu-icon"></i> Change Password
                             </a>
                         </li>
