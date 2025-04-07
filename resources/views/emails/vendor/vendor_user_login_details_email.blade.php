@@ -27,10 +27,10 @@
         font-size: 14px; font-family: 'Inter Tight', Arial, sans-serif;">Log
                 in to Your Account</a>
         </div>
-
+        <br />
         <p>We look forward to your input and feedback.</p>
 
-        <h4 style="color: #118c97; margin-bottom: 16px;">Cheers!</h4>
+        <p>Cheers!</p>
 
         <h4 style="color: #118c97;">The WCW Marketing Team</h4>
     </div>

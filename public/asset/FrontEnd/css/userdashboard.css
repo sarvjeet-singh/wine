@@ -361,3 +361,30 @@
     --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
     font-size: 10px;
 }
+
+/* ================= Incomplete Profile Popup Start ================= */
+.error-modal-wrapper .modal-header {
+    background-color: #c0a144;
+}
+.error-modal-wrapper p#errorIntro {
+    max-width: 70%;
+    margin-inline: auto;
+}
+.error-modal-wrapper li:not(:last-child) {
+    margin-bottom: 6px;
+}
+.error-modal-wrapper button.btn-close {
+    --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+    filter: brightness(0) invert(1);
+    width: 12px;
+    height: 12px;
+    font-size: 12px;
+}
+.error-modal-wrapper .modal-footer p {
+    font-size: 15px;
+    font-style: italic;
+}
+.error-modal-wrapper li a {
+    color: #212529;
+}
+/* ================= Incomplete Profile Popup End ================= */

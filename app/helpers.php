@@ -8,11 +8,11 @@ use App\Helpers\TimezoneHelper;
 // use Auth;
 
 if (! function_exists('truncateReviewDescription')) {
-    function truncateReviewDescription($text, $limit = 41)
+    function truncateReviewDescription($text, $image, $limit = 41)
     {
         if (strlen($text) > $limit) {
             $truncated = ''; //substr($text, 0, $limit) . '...';
-            return $truncated . ' <a href="javascript:void(0)" class="read-more theme-color" data-full-text="' . htmlspecialchars($text, ENT_QUOTES, 'UTF-8') . '">View Comment</a>';
+            return $truncated . ' <a href="javascript:void(0)" class="read-more theme-color" data-image="' . $image . '" data-full-text="' . htmlspecialchars($text, ENT_QUOTES, 'UTF-8') . '">View Comment</a>';
         }
 
         return $text;
@@ -634,5 +634,29 @@ if (!function_exists('getEventMinMaxPrice')) {
             'min_price' => round($prices->min_price) ?? 0,
             'max_price' => round($prices->max_price) ?? 0,
         ];
+    }
+}
+
+if (!function_exists('getEventOrderTicketsUsedPerDay')) {
+    function getEventOrderTicketsUsedPerDay($eventId, $eventDate)
+    {
+        $totalTickets = App\Models\EventOrderDetail::where('event_id', $eventId)
+            ->whereDate('created_at', $eventDate)
+            ->sum('no_of_tickets');
+        return $totalTickets;
+    }
+}
+
+if(!function_exists('platformFeeCalculator')) {
+    function platformFeeCalculator($event) {
+        $platform_fee = $event->vendor->platform_fee ?? (config('site.platform_fee') ?? '0.00');
+        return number_format($event->admittance * ($platform_fee / 100), 2, '.', '');
+    }
+}
+
+if(!function_exists('platformFeeCalculator')) {
+    function platformFeeCalculator($event) {
+        $platform_fee = $event->vendor->platform_fee ?? (config('site.platform_fee') ?? '0.00');
+        return $platform_fee;
     }
 }

@@ -149,7 +149,7 @@
                 <!-- User Driving License Information Start -->
                 <div class="row mt-5">
                     <div class="col-sm-12">
-                        <div class="information-box">
+                        <div class="information-box" id="government-information">
                             <div class="information-box-head">
                                 <div class="box-head-heading d-flex">
                                     <span class="box-head-label theme-color">Government Issue Photo ID</span>

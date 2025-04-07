@@ -243,7 +243,7 @@ class OrderController extends Controller
             // Create order
             $order = Order::create($order);
             if ($wallet_used > 0) {
-                app(WalletController::class)->useWallet($customer, $wallet_used, $order->id);
+                app(WalletController::class)->useWallet($customer, $wallet_used, $order->id, 'accommodation');
             }
             $customer = Auth::guard('customer')->user();
             // Create a Stripe Customer if needed
@@ -408,7 +408,7 @@ class OrderController extends Controller
 
         if (!empty($transaction)) {
             $customer = Auth::guard('customer')->user();
-            app(WalletController::class)->addCashback($customer, $transaction->transaction_amount, $order_id);
+            app(WalletController::class)->addCashback($customer, $transaction->transaction_amount, $order_id, 'accommodation');
             return response()->json([
                 'success' => true,
                 'message' => 'Transaction details stored successfully.',
@@ -422,12 +422,13 @@ class OrderController extends Controller
         ], 500);
     }
 
-    public function thankYou(Request $request, $order_id)
+    public function thankYou(Request $request, $order_id, $orderType = 'accommodation')
     {
         if (Session::has('orderCompleted')) {
             Session::forget('orderCompleted');
         }
-        return view('FrontEnd.thank-you', compact('order_id'));
+
+        return view('FrontEnd.thank-you', compact('order_id', 'orderType'));
     }
 
     public function cancel(Request $request)

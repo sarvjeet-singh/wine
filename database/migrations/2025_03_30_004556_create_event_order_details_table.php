@@ -1,0 +1,47 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('event_order_details', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('customer_order_id');
+            $table->unsignedBigInteger('event_id');
+            $table->unsignedBigInteger('category_id');
+            $table->string('name');
+            $table->decimal('price', 10, 2);
+            $table->string('extension');
+            $table->integer('no_of_tickets');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->time('booking_time');
+            $table->integer('duration');
+            $table->string('full_name');
+            $table->string('email');
+            $table->string('contact_number');
+            $table->string('street_address');
+            $table->string('unit_suite');
+            $table->string('city');
+            $table->string('state');
+            $table->string('country');
+            $table->string('postal_code');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('event_order_details');
+    }
+};

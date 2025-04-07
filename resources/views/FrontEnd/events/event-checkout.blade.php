@@ -158,46 +158,22 @@
                     </div>
                 </div>
             </div>
-            <form action="">
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            <form action="{{ route('events.checkout.process') }}" method="post">
+                @csrf
+                <input type="hidden" name="event_id" value="{{ $event->id }}">
+                <input type="hidden" id="wallet_amount" name="wallet_amount" value="">
                 <div class="row">
                     <div class="col-lg-8">
                         <div class="event-detail-fields pt-3">
-                            <div class="joinee-details mb-4">
-                                <div class="sec-head d-flex align-items-center justify-content-between mb-2">
-                                    <h3 class="theme-color mb-0">Joinee Details</h3>
-                                    <a href="#" class="btn add-btn px-3">Add +</a>
-                                </div>
-                                <div class="row-container">
-                                    <div class="row mb-sm-3">
-                                        <div class="col-sm mb-sm-0 mb-3">
-                                            <div class="form-floating">
-                                                <input type="email" class="form-control" id="floatingInput"
-                                                    placeholder="Email">
-                                                <label for="floatingInput">Email</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm mb-sm-0 mb-3">
-                                            <div class="form-floating">
-                                                <input type="text" class="form-control" id="floatingInput"
-                                                    placeholder="First Name">
-                                                <label for="floatingInput">First Name</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm mb-sm-0 mb-3">
-                                            <div class="form-floating">
-                                                <input type="text" class="form-control" id="floatingInput"
-                                                    placeholder="Last Name">
-                                                <label for="floatingInput">Last Name</label>
-                                            </div>
-                                        </div>
-                                        <!-- <div class="col-1 d-flex align-items-center justify-content-center" style="width: 5%;">
-                                               <a href="#" class="dlt-btn">
-                                                <i class="fa-solid fa-trash-can"></i>
-                                               </a>
-                                              </div> -->
-                                    </div>
-                                </div>
-                            </div>
                             <div class="guest-details">
                                 <div class="sec-head">
                                     <h3 class="theme-color">Guest Details</h3>
@@ -313,6 +289,14 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="joinee-details mb-4">
+                                <div class="sec-head d-flex align-items-center justify-content-between mb-2">
+                                    <h3 class="theme-color mb-0">Joinee Details</h3>
+                                    <a href="#" class="btn add-btn px-3">Add +</a>
+                                </div>
+                                <div class="row-container">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -334,7 +318,7 @@
                                         id="decrease_wallet" disabled>−</button>
 
                                     <input type="number" id="wallet_used" class="form-control text-center fw-bold mx-3"
-                                        value="0" min="0" max="{{ $wallet_balance ?? 0 }}" readonly
+                                        value="0" min="0" max="{{ $wallet->balance ?? 0 }}" readonly
                                         style="width: 130px; font-size: 1.4rem;" disabled>
 
                                     <button type="button" class="btn btn-outline-success fw-bold px-4 py-2"
@@ -342,24 +326,29 @@
                                 </div>
                             </div>
                             <div class="event-total-cost border rounded-4 p-4 shadow-sm">
-                                <h6 class="theme-color text-center fs-5 mb-1">Lorem Lpsum</h6>
-                                <h6 class="text-center mb-0">2 Tickets</h6>
+                                <h6 class="theme-color text-center fs-5 mb-1">{{ $event->name }}</h6>
+                                <h6 class="text-center mb-0"><span id="ticket_count">1</span> Ticket's</h6>
                                 <div class="subtotal-count py-3 my-3 border-top border-bottom">
                                     <div class="d-flex align-items-center justify-content-between mb-2">
                                         <span>Sub-Total</span>
-                                        <span>$400</span>
+                                        <span id="subtotal">$0.00</span>
                                     </div>
-                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                    {{-- <div class="d-flex align-items-center justify-content-between mb-2">
                                         <span>Applicable Tax</span>
-                                        <span>13%</span>
+                                        <span id="applicable_tax">13%</span>
+                                    </div> --}}
+                                    <div class="d-flex align-items-center justify-content-between mb-2 d-none"
+                                        id="bottle_bucks_container">
+                                        <span>Bottle Bucks Used</span>
+                                        <span id="walletused">$0.00</span>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between mb-2">
                                         <span>Total Charges</span>
-                                        <span>$452</span>
+                                        <span id="total">$0.00</span>
                                     </div>
                                 </div>
-                                <button id="submit-button" type="button"
-                                    class="btn book-btn wine-btn w-100 text-uppercase mt-2">Pay Now</button>
+                                <button id="submit-button" type="submit"
+                                    class="btn book-btn wine-btn w-100 text-uppercase mt-2">Click to pay</button>
                             </div>
                         </div>
                     </div>
@@ -371,6 +360,7 @@
     <!-- Event Checkout HTML End -->
 @endsection
 @section('js')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script>
         function capitalizeFirstLetter(string) {
             if (!string) return ''; // Handle empty or null strings
@@ -498,76 +488,90 @@
 
     <!-- Add and Remove Joinee Details Row -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const addBtn = document.querySelector('.add-btn');
+        function addNewRow(e) {
             const rowContainer = document.querySelector('.row-container');
+            const maxRows = Math.max({{ $event->quantity }} - 2, 0);
+            console.log(rowContainer.querySelectorAll('.row').length);
+            console.log(maxRows);
+            if (rowContainer.querySelectorAll('.row').length > maxRows) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'You have reached the maximum number of joinees for this event.',
+                });
+                return;
+            }
+            const rowCount = rowContainer.querySelectorAll('.row').length + 1;
 
-            let rowCount = 1; // This will keep track of the row ID
+            // Create a new row element
+            const newRow = document.createElement('div');
+            newRow.classList.add('row', 'mb-sm-3');
+            newRow.id = 'row_' + rowCount;
 
-            addBtn.addEventListener('click', function(e) {
+            newRow.innerHTML = `
+        <div class="col-sm mb-sm-0 mb-3">
+            <div class="form-floating">
+                <input type="email" class="form-control search-email" id="joinee_email_${rowCount}" name="joinee[${rowCount - 1}][email]" data-msg-required="Please enter your email" data-msg-email="Please enter a valid email address" required placeholder="Email">
+                <label for="joinee_email_${rowCount}">Email</label>
+            </div>
+        </div>
+        <div class="col-sm mb-sm-0 mb-3">
+            <div class="form-floating">
+                <input type="text" class="form-control" id="joinee_first_name_${rowCount}" name="joinee[${rowCount - 1}][first_name]" data-msg-required="Please enter your first name" required placeholder="First Name">
+                <label for="joinee_first_name_${rowCount}">First Name</label>
+            </div>
+        </div>
+        <div class="col-sm mb-sm-0 mb-3">
+            <div class="form-floating">
+                <input type="text" class="form-control" id="joinee_last_name_${rowCount}" required name="joinee[${rowCount - 1}][last_name]" data-msg-required="Please enter your last name" placeholder="Last Name">
+                <label for="joinee_last_name_${rowCount}">Last Name</label>
+            </div>
+        </div>
+        <div class="col-1 d-flex align-items-center justify-content-center">
+            <a href="#" class="dlt-btn"><i class="fa-solid fa-trash-can"></i></a>
+        </div>
+    `;
+
+            // Append the new row to the container
+            rowContainer.appendChild(newRow);
+            e.preventDefault();
+            tickets += 1;
+            $("#ticket_count").text(tickets);
+            priceCalculation();
+
+            // Add event listener to delete button
+            newRow.querySelector('.dlt-btn').addEventListener('click', function(e) {
                 e.preventDefault();
-
-                rowCount++; // Increment the row ID count
-
-                // Clone the first row to create a new row
-                const newRow = rowContainer.querySelector('.row').cloneNode(true);
-
-                // Assign a unique ID to the new row
-                newRow.id = 'row-' + rowCount;
-
-                // Reset the input fields in the new row
-                const inputs = newRow.querySelectorAll('input');
-                inputs.forEach(input => input.value = '');
-
-                // Add the delete button only to the newly added rows, not the first row
-                if (rowCount > 1) {
-                    const deleteBtnContainer = document.createElement('div');
-                    deleteBtnContainer.classList.add('col-1', 'd-flex', 'align-items-center',
-                        'justify-content-center');
-                    deleteBtnContainer.style.width = '5%';
-
-                    const deleteBtn = document.createElement('a');
-                    deleteBtn.href = '#';
-                    deleteBtn.classList.add('dlt-btn');
-                    deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-
-                    deleteBtnContainer.appendChild(deleteBtn);
-                    newRow.appendChild(deleteBtnContainer);
-
-                    // Add event listener for the delete button in the new row
-                    deleteBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        newRow.remove(); // Remove the clicked row
-                    });
-                }
-
-                // Append the new row to the container
-                rowContainer.appendChild(newRow);
+                newRow.remove();
             });
-
-            // Delete row functionality for existing rows
-            rowContainer.addEventListener('click', function(e) {
-                if (e.target && e.target.closest('.dlt-btn')) {
-                    const row = e.target.closest('.row');
-                    row.remove();
-                }
-            });
+        }
+        document.querySelector('.add-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            addNewRow(e);
         });
     </script>
     <script>
         var walletBalance = {{ $wallet->balance ?? 0.0 }};
+        var tickets = 1;
+        var price = parseFloat(
+            "{{ number_format($event->admittance + ($event->admittance * ($event->vendor->platform_fee ?? (config('site.platform_fee') ?? 1.0))) / 100, 2, '.', '') }}"
+        );
+        var tax = 0.00;
+        var total = 0.00;
+        var subtotal = 0.00;
+        var walletUsed = 0;
+        var extension = "{{ strtolower(str_replace('/', '', $event->extension)) }}";
+        var duration = 1;
         $("#wallet_balance").text('$' + walletBalance.toFixed(2));
         $(document).ready(function() {
-            var walletUsed = 0;
-
             $('#use_wallet').change(function() {
                 let isChecked = $(this).is(':checked');
 
                 $('#wallet_used, #increase_wallet, #decrease_wallet').prop('disabled', !isChecked);
                 if (isChecked) {
-                    $("#bottle_bucks_container").addClass('d-flex').show();
+                    $("#bottle_bucks_container").removeClass('d-none');
                 } else {
-                    $("#bottle_bucks_container").removeClass('d-flex').hide();
+                    $("#bottle_bucks_container").addClass('d-none');
                 }
                 if (!isChecked) {
                     walletUsed = 0;
@@ -577,8 +581,6 @@
             });
 
             $('#increase_wallet').click(function() {
-                let total = parseFloat($("#fulltotal").text().replace('$', '')) || 0;
-
                 if (walletUsed < walletBalance && total > 2) {
                     walletUsed += 1;
                     $("#wallet_used").val(walletUsed);
@@ -591,6 +593,196 @@
                     walletUsed -= 1;
                     $("#wallet_used").val(walletUsed);
                     priceCalculation();
+                }
+            });
+        });
+        $(document).ready(function() {
+            // $(".add-btn").on("click", function(e) {
+            //     e.preventDefault();
+            //     tickets += 1;
+            //     $("#ticket_count").text(tickets);
+            //     priceCalculation();
+            // });
+            $(document).on("click", ".dlt-btn", function(e) {
+                e.preventDefault();
+                tickets -= 1;
+                $("#ticket_count").text(tickets);
+                priceCalculation();
+            });
+        });
+
+        function priceCalculation() {
+            if (extension == 'hr') {
+                subtotal = tickets * (price * duration);
+            } else {
+                subtotal = tickets * price;
+            }
+            if ($("#use_wallet").is(":checked")) {
+                $("#walletused").text("$" + walletUsed.toFixed(2));
+                $("#wallet_amount").val(walletUsed);
+                total = parseFloat(subtotal) - parseFloat(walletUsed);
+            } else {
+                $("#walletused").text("$" + "0.00");
+                $("#wallet_amount").val(0);
+                total = parseFloat(subtotal);
+            }
+            $("#subtotal").text('$' + subtotal.toFixed(2));
+            $("#total").text('$' + total.toFixed(2));
+        }
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Initialize validation on the form
+            $("form").validate({
+                rules: {
+                    "joinee_email[]": {
+                        required: true,
+                        email: true
+                    },
+                    "joinee_first_name[]": {
+                        required: true
+                    },
+                    "joinee_last_name[]": {
+                        required: true
+                    },
+                    fullname: {
+                        required: true,
+                        minlength: 3
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    contact_number: {
+                        required: true,
+                        minlength: 12,
+                        maxlength: 15
+                    },
+                    street_address: {
+                        required: true
+                    },
+                    unit_suite: {
+                        required: false
+                    },
+                    city: {
+                        required: true
+                    },
+                    country: {
+                        required: true
+                    },
+                    state: {
+                        required: function() {
+                            return $("#state-wrapper").is(":visible");
+                        }
+                    },
+                    other_country: {
+                        required: function() {
+                            return $("#other-country-wrapper").is(":visible");
+                        }
+                    },
+                    other_state: {
+                        required: function() {
+                            return $("#other-state-wrapper").is(":visible");
+                        }
+                    },
+                    postal_code: {
+                        required: true,
+                        minlength: 5,
+                        maxlength: 7
+                    }
+                },
+                messages: {
+                    "joinee_email[]": {
+                        required: "Please enter an email",
+                        email: "Please enter a valid email"
+                    },
+                    "joinee_first_name[]": {
+                        required: "Please enter first name"
+                    },
+                    "joinee_last_name[]": {
+                        required: "Please enter last name"
+                    },
+                    fullname: {
+                        required: "Please enter your full name",
+                        minlength: "Name must be at least 3 characters"
+                    },
+                    email: {
+                        required: "Please enter your email",
+                        email: "Please enter a valid email"
+                    },
+                    contact_number: {
+                        required: "Please enter your contact number",
+                        minlength: "Contact number should be at least 10 digits",
+                        maxlength: "Contact number should not exceed 15 digits"
+                    },
+                    street_address: {
+                        required: "Please enter your street address"
+                    },
+                    city: {
+                        required: "Please enter your city"
+                    },
+                    country: {
+                        required: "Please select your country"
+                    },
+                    state: {
+                        required: "Please select your state"
+                    },
+                    other_country: {
+                        required: "Please enter the other country name"
+                    },
+                    other_state: {
+                        required: "Please enter the other state name"
+                    },
+                    postal_code: {
+                        required: "Please enter your postal code",
+                        minlength: "Postal code should be at least 5 characters",
+                        maxlength: "Postal code should not exceed 7 characters"
+                    }
+                },
+                errorElement: "div",
+                errorPlacement: function(error, element) {
+                    error.addClass("text-danger");
+                    element.closest(".form-floating").append(error);
+                },
+                highlight: function(element) {
+                    $(element).addClass("is-invalid");
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass("is-invalid");
+                }
+            });
+
+            // Prevent form submission if validation fails
+            $("#submit-button").on("click", function() {
+                $("form").submit();
+            });
+            priceCalculation();
+        });
+    </script>
+    <script>
+        $(document).on('blur', '.search-email', function() {
+            let emailInput = $(this);
+            let email = emailInput.val().trim();
+            if (!email) return;
+
+            let row = emailInput.closest('.row');
+            let firstNameInput = row.find('input[name*="[first_name]"]');
+            let lastNameInput = row.find('input[name*="[last_name]"]');
+
+            $.ajax({
+                url: "{{ route('check.email.details') }}",
+                method: "GET",
+                data: {
+                    email: email
+                },
+                success: function(response) {
+                    if (response.exists) {
+                        firstNameInput.val(response.first_name);
+                        lastNameInput.val(response.last_name);
+                    }
+                },
+                error: function() {
+                    console.warn("Error checking email.");
                 }
             });
         });

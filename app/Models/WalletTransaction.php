@@ -16,6 +16,7 @@ class WalletTransaction extends Model
         'status',
         'description',
         'order_id',
+        'order_type',
     ];
 
     public function wallet()

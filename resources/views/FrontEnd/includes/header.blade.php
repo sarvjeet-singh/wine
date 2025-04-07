@@ -114,9 +114,6 @@
             </button>
             <div class="collapse navbar-collapse justify-content-end position-relative" id="navbarNavDropdown">
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('events') }}">Events</a>
-                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
@@ -127,6 +124,9 @@
                             <li><a class="dropdown-item" href="{{ route('excursion-listing') }}">Excursions</a></li>
                             <li><a class="dropdown-item" href="{{ route('wineries-listing') }}">Wineries</a></li>
                         </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('events') }}">Events</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
@@ -188,4 +188,22 @@
             </div>
         </div>
     </nav>
+
+    <!-- ========== Tab Sec Start ========== -->
+    <section class="tab-content-sec px-sm-4 px-2">
+        <div class="container-fluid">
+            <div class="inner-content">
+                <ul class="list-unstyled d-flex justify-content-between align-items-center mb-0 gap-3">
+                    <li><a href="{{ route('accommodations') }}" class="text-decoration-none">Directories</a></li>
+                    <li><a href="{{ route('accommodations') }}" class="text-decoration-none">Accommodations</a></li>
+                    <li><a href="{{ route('excursion-listing') }}" class="text-decoration-none">Excursions</a></li>
+                    <li><a href="{{ route('wineries-listing') }}" class="text-decoration-none">Wineries</a></li>
+                    <li><a href="/licensed" class="text-decoration-none">Licensed</a></li>
+                    <li><a href="/non-licensed" class="text-decoration-none">Non-Licensed</a></li>
+                    <li><a href="/events" class="text-decoration-none">Events</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    <!-- ========== Tab Sec End ========== -->
 </header>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CustomerHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -165,14 +166,14 @@ class UserDashboardController extends Controller
     public function userSettingsEmergencyUpdate(Request $request)
     {
         $rules = [
+            'medical_physical_concerns' => 'required|string',
             'emergency_contact_name' => 'required|string|regex:/^[a-zA-Z\s]*$/|max:255',
             'emergency_contact_relation' => 'required|string|regex:/^[a-zA-Z\s]*$/|max:255',
             'emergency_contact_phone_number' => 'required|string|max:20',
-            'emergency_contact_number' => 'required|string|max:20',
-            'medical_physical_concerns' => 'required|string',
             'alternate_contact_full_name' => 'required|string|max:255|regex:/^[a-zA-Z\s]*$/|max:255',
             'alternate_contact_relation' => 'required|string|max:255|regex:/^[a-zA-Z\s]*$/|max:255',
-            'alternate_contact_relation' => 'required|string|max:255'
+            'emergency_contact_number' => 'required|string|max:20',
+            // 'alternate_contact_relation' => 'required|string|max:255'
 
         ];
 
@@ -588,4 +589,30 @@ class UserDashboardController extends Controller
     {
         return view('UserDashboard.social-media');
     }
+
+    public function checkActivation(Request $request)
+	{
+		$customerid = $request->customerid; // ✅ Get vendor ID from request
+
+		if (!$customerid) {
+			return response()->json([
+				'success' => false,
+				'message' => ['Customer ID is required.'], // Return as an array
+			], 400);
+		}
+
+		$response = CustomerHelper::getCustomerProfileCompletionStatus($customerid);
+
+		if (is_array($response['messages'])) {
+			return response()->json([
+				'success' => $response['status'],
+				'message' => is_array($response['messages']) ? $response['messages'] : [$response['messages']],
+			]);
+		}
+
+		// return response()->json([
+		// 	'success' => false,
+		// 	'message' => is_array($response['messages']) ? $response['messages'] : [$response['messages']],
+		// ], 400);
+	}
 }

@@ -85,6 +85,7 @@ class VendorWineController extends Controller
             'cellar' => 'nullable|string',
             'inventory' => 'nullable|integer',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust image validation as needed
+            'pdf' => 'nullable|mimes:pdf|max:5120',
         ]);
         $rs_value = null;
 
@@ -116,6 +117,10 @@ class VendorWineController extends Controller
             $image = $request->file('image');
             $imagePath = $image->store('images', 'public'); // Store image in public storage
         }
+        $pdfPath = null;
+        if ($request->hasFile('pdf')) {
+            $pdfPath = $request->file('pdf')->store('pdfs', 'public'); // Store in storage/app/public/pdfs
+        }
         // Create new VendorWine entry
         $vendorWine = new VendorWine();
         $vendorWine->vendor_id = $vendor_id;
@@ -138,6 +143,7 @@ class VendorWineController extends Controller
         $vendorWine->price = $request->input('price') ?? 0.00;
         $vendorWine->inventory = $request->input('inventory') ?? 0;
         $vendorWine->image = $imagePath;
+        $vendorWine->pdf = $pdfPath;
 
         if (!empty($vendorWine->cost)) {
             $calculations = calculateStockingFeeAndPrice($vendorWine->cost);
@@ -175,6 +181,8 @@ class VendorWineController extends Controller
             'price' => 'nullable|numeric',
             'inventory' => 'nullable|integer',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust image validation as needed
+            'pdf' => 'nullable|mimes:pdf|max:5120',
+            'remove_pdf' => 'nullable|boolean',
         ]);
 
         // Process varietal_blend and varietal_type
@@ -215,6 +223,20 @@ class VendorWineController extends Controller
             $imagePath = $image->store('images', 'public'); // Store image in public storage
         }
 
+        // Handle PDF upload
+        $pdfPath = $wine->pdf; // Get the current PDF path from the database
+        if ($request->input('remove_pdf')) {
+            // Delete the old PDF if it exists
+            if ($pdfPath && Storage::disk('public')->exists($pdfPath)) {
+                Storage::disk('public')->delete($pdfPath);
+                $pdfPath = null; // Set PDF path to null if the PDF is removed
+            }
+        }
+
+        if ($request->hasFile('pdf')) {
+            $pdfPath = $request->file('pdf')->store('pdfs', 'public'); // Store in storage/app/public/pdfs
+        }
+
         // Update other fields in your model
         $wine->image = $imagePath;
         $rs_value = null;
@@ -246,6 +268,8 @@ class VendorWineController extends Controller
             'price' => $request->input('price') ?? 0.00,
             'inventory' => $request->input('inventory') ?? 0,
             'image' => $imagePath,
+            'pdf' => $pdfPath,
+
         ];
 
         // Use the private method to calculate stocking fee and final price

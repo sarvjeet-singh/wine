@@ -255,7 +255,7 @@ class StripeService
             'setup_future_usage' => 'off_session',
             'customer' => $customerId,
             'capture_method' => 'manual', // Delayed capture
-            'return_url' => route('payment.return', $order->vendor_buyer_id),
+            'return_url' => route('payment.return', $order->vendor_id),
             'shipping' => [
                 'name' => $customerName,
                 'address' => $customerAddress,

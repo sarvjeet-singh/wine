@@ -18,6 +18,9 @@
             </thead>
             <tbody>
                 @foreach ($reviews as $key => $review)
+                    @php
+                        $review_image = !empty($review->image) ? url(Storage::url($review->image)) : null;
+                    @endphp
                     <tr>
                         <td>
                             <img class="userprofile-image-icon"
@@ -27,7 +30,7 @@
                         <td>{{ $review->date_of_visit }}</td>
                         <td>{{ $review->receipt }}</td>
                         <td>{{ $review->customer->firstname ?? '' }} {{ $review->customer->lastname ?? '' }}</td>
-                        <td>{!! truncateReviewDescription($review->review_description) !!}</td>
+                        <td>{!! truncateReviewDescription($review->review_description, $review_image) !!}</td>
                         <td>
                             <div class="star-rating" data-rating="{{ $review->rating }}" id="rating_{{ $key }}"></div>
                         </td>
@@ -49,6 +52,15 @@
                 </div>
                 <div class="modal-body px-4">
                     <p id="modal-full-text"></p>
+
+                    <div class="border-top pt-2 d-none" id="review-image-modal">
+                        <h6 class="mb-2">Reviews images</h6>
+                        <!-- Image Thumbnail -->
+                        <a href="" target="_blank">
+                            <img id="review-image" alt="Thumbnail Image" class="img-thumbnail" data-bs-toggle="modal"
+                                data-bs-target="#imageModal" style="height: 100px;cursor: pointer;">
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -74,6 +86,12 @@
             event.preventDefault();
             var fullText = $(this).attr('data-full-text');
             $('#modal-full-text').text(fullText);
+            $("#review-image").attr("src", $(this).attr('data-image'));
+            if ($(this).attr('data-image') != null && $(this).attr('data-image') != '') {
+                $('#review-image-modal').removeClass('d-none');
+            } else {
+                $('#review-image-modal').addClass('d-none');
+            }
             $('#readMoreModal').modal('show');
         });
     </script>

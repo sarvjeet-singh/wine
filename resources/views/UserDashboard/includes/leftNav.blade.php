@@ -1,50 +1,44 @@
 <style>
-    li.nav-item ul.sub-menu-list {
-        display: none;
-        padding-inline: 10px;
-    }
+.left-navbar li.nav-item ul.sub-menu-list a {
+    color: #757575;
+    background-color: unset;
+    display: block;
+    padding: 6px 30px;
+    border-radius: 4px;
+}
+.left-navbar .nav-item ul.sub-menu-list li:hover a,
+.left-navbar .nav-item ul.sub-menu-list li.active a {
+    background-color: #bba253;
+    color: #fff;
+}
 
-    li.nav-item:has(.enable-sub-menu) ul.sub-menu-list {
-        display: block;
-    }
+li.nav-item svg {
+    position: absolute;
+    top: 15px;
+    right: 10px;
+    transition: .2s ease-in-out;
+    rotate: 0deg;
+}
+li.nav-item.active {
+    background-color: unset !important;
+}
 
-    .left-navbar li.nav-item ul.sub-menu-list a {
-        color: #757575;
-        background-color: unset;
-        display: block;
-        padding: 4px 30px;
-        border-radius: 4px;
-    }
-
-    .left-navbar .nav-item ul.sub-menu-list li:hover a,
-    .left-navbar .nav-item ul.sub-menu-list li.active a {
-        background-color: #bba253;
-        color: #fff;
-    }
-
-    li.nav-item svg {
-        position: absolute;
-        top: 15px;
-        right: 10px;
-    }
-
-    li.nav-item.active {
-        background-color: unset !important;
-    }
-
-    li.nav-item.active a.nav-link,
-    .left-navbar .nav-item a.enable-sub-menu {
-        background-color: #bba253;
-        color: #fff;
-    }
+li.nav-item.active a.nav-link,
+li#settingsDropdown:has(ul li.active, ul.show) a.nav-link {
+    background-color: #bba253;
+    color: #fff;
+}
 li#settingsDropdown a.nav-link.active {
     background-color: #b7a35f;
 }
 li#settingsDropdown a.nav-link.active > img,
-.left-navbar .nav-item a.enable-sub-menu img {
+li#settingsDropdown:has(ul li.active, ul.show) a.nav-link img {
     filter: brightness(0) invert(1);
 }
-.left-navbar .nav-item a.enable-sub-menu svg {
+li#settingsDropdown ul.sub-menu-list {
+    padding-inline: 10px;
+}
+li#settingsDropdown:has(ul.show) a.nav-link svg {
     rotate: 90deg;
 }
 </style>
@@ -128,6 +122,13 @@ li#settingsDropdown a.nav-link.active > img,
                     <span class="ms-1 d-none d-sm-inline">My Transactions</span>
                 </a>
             </li>
+            <li class="nav-item {{ request()->is('user/event-transactions*') ? 'active' : '' }}">
+                <a href="{{ route('user.event-transactions') }}" class="nav-link px-sm-2 px-3 align-middle">
+                    <img src="{{ asset('images/icons/tranctions_icon_grey.png') }}"
+                        data-image="{{ asset('images/icons/tranctions_icon') }}">
+                    <span class="ms-1 d-none d-sm-inline">Event Transactions</span>
+                </a>
+            </li>
             <li class="nav-item {{ request()->is('user-faq*') ? 'active' : '' }}">
                 <a href="{{ route('user-faq') }}" class="nav-link px-sm-2 px-3 align-middle">
                     <img src="{{ asset('images/icons/faq_icon_grey.png') }}"
@@ -186,29 +187,30 @@ li#settingsDropdown a.nav-link.active > img,
                 </ul>
             </li> -->
             <li class="nav-item position-relative {{ request()->is('user-settings*') ? 'active' : '' }}" id="settingsDropdown">
-                <a href="#" class="nav-link head-link px-sm-2 px-3 align-middle {{ $isSubMenuActive ? 'active enable-sub-menu' : '' }}">
+                <a href="#" class="nav-link px-sm-2 px-3 align-middle" data-bs-toggle="collapse" data-bs-target="#settingsMenu" aria-expanded="false" aria-controls="settingsMenu">
                     <img src="{{ asset('images/icons/settings_icon_grey.png') }}" data-image="{{ asset('images/icons/settings_icon') }}">
                     <span class="ms-1 d-none d-sm-inline">Settings</span>
                     <i class="fas fa-angle-right expand-icon"></i>
                 </a>
-                <ul class="sub-menu-list">
-                    <li class="dropdown-item my-2 {{ request()->is('user-settings') ? 'active' : '' }}">
+                <ul class="sub-menu-list mt-2 collapse" id="settingsMenu">
+                    <li class="submenu-item dropdown-item my-1 {{ request()->is('user-settings') ? 'active' : '' }}">
                         <a href="/user-settings">User Settings</a>
                     </li>
-                    <li class="dropdown-item my-2 {{ request()->routeIs('user.change-password') ? 'active' : '' }}">
+                    <li class="submenu-item dropdown-item my-1 {{ request()->routeIs('user.change-password') ? 'active' : '' }}">
                         <a href="{{ route('user.change-password') }}">Change Password</a>
                     </li>
-                    <li class="dropdown-item my-2 {{ request()->routeIs('user.emergency-contact') ? 'active' : '' }}">
+                    <li class="submenu-item dropdown-item my-1 {{ request()->routeIs('user.emergency-contact') ? 'active' : '' }}">
                         <a href="{{ route('user.emergency-contact') }}">Emergency Contact</a>
                     </li>
-                    <li class="dropdown-item my-2 {{ request()->routeIs('user.referrals') ? 'active' : '' }}">
+                    <li class="submenu-item dropdown-item my-1 {{ request()->routeIs('user.referrals') ? 'active' : '' }}">
                         <a href="{{ route('user.referrals') }}">Referral</a>
                     </li>
-                    <li class="dropdown-item my-2 {{ request()->routeIs('user.social-media') ? 'active' : '' }}">
+                    <li class="submenu-item dropdown-item my-1 {{ request()->routeIs('user.social-media') ? 'active' : '' }}">
                         <a href="{{ route('user.social-media') }}">Social Media</a>
                     </li>
                 </ul>
             </li>
+
             <li class="nav-item">
                 <a href="javascripr:void(0)" class="nav-link px-sm-2 px-3 align-middle" data-bs-toggle="modal"
                     data-bs-target="#logoutModal">
@@ -230,27 +232,28 @@ li#settingsDropdown a.nav-link.active > img,
 </script>
 
 <script>
-    $(document).ready(function() {
-        // Toggle the 'enable-sub-menu' class only on the a.nav-link when clicked
-        $('a.head-link').click(function(event) {
-            event.preventDefault(); // Prevent default anchor link behavior
-
-            // Toggle the 'enable-sub-menu' class on the clicked a.head-link only
-            $(this).toggleClass('enable-sub-menu');
-        });
-
-        // Prevent the submenu from closing when clicking on links within the sub-menu
-        $('.sub-menu-list a').click(function(event) {
-            event.stopPropagation(); // Prevent event from propagating and closing the menu
-        });
-
-        // Close the dropdown when clicking anywhere outside the a.head-link
-        $(document).click(function(event) {
-            // If the click is outside the a.head-link, remove the enable-sub-menu class
-            if (!$(event.target).closest('a.head-link').length) {
-                // Remove 'enable-sub-menu' class from all a.head-link elements
-                $('a.head-link').removeClass('enable-sub-menu');
-            }
-        });
+// Add event listener to submenu items to toggle the active class
+document.querySelectorAll('.submenu-item').forEach(item => {
+    item.addEventListener('click', function() {
+        // Add active class to the clicked submenu item
+        document.querySelectorAll('.submenu-item').forEach(sub => sub.classList.remove('active'));
+        item.classList.add('active');
+        
+        // Keep the settings menu open if any submenu item is active
+        let settingsMenu = document.getElementById('settingsMenu');
+        if (!settingsMenu.classList.contains('show')) {
+            settingsMenu.classList.add('show'); // Ensure the settings menu is open
+        }
     });
+});
+
+// Optional: Add logic to ensure the submenu stays open if there's a page loaded or a menu item active by default
+document.addEventListener('DOMContentLoaded', function() {
+    let activeItem = document.querySelector('.submenu-item.active');
+    if (activeItem) {
+        let settingsMenu = document.getElementById('settingsMenu');
+        settingsMenu.classList.add('show'); // Keep the submenu open if there's an active item
+    }
+});
+
 </script>

@@ -15,17 +15,32 @@
         @csrf
 
         @method('POST')
-
         <div class="col-12">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-6">
+                    <label for="pdf" class="form-label">Upload PDF</label>
+                    <input class="form-control" type="file" name="pdf" id="pdf" accept="application/pdf">
+                </div>
+                <div class="col-6">
                     <label for="image" class="form-label">Image</label>
                     <input class="form-control" type="file" name="image" id="image" accept="image/*">
                 </div>
-                <div class="col-md-6 img-box d-flex flex-column align-items-center">
+                
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-6 d-flex flex-column align-items-center position-relative">
+                    <iframe id="pdfPreview" src=""
+                        style="display:none; width:90%; height:200px; border:1px solid #ccc;margin-right: auto;"></iframe>
+                    <button type="button" id="removePdf" style="display:none; position:absolute;right:0;top:0;padding: 2px 8px;" class="btn btn-danger mt-2">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="col-6 img-box d-flex flex-column align-items-center position-relative">
                     <img id="imagePreview" src="" alt="Image Preview"
                         style="display:none; max-width:100%;height:auto;max-height:200px;" />
-                    <button type="button" id="removeImage" style="display:none;" class="btn btn-danger mt-2"><i
+                    <button type="button" id="removeImage" style="display:none; top: 0;padding: 2px 8px;" class="btn btn-danger mt-2"><i
                             class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
@@ -397,10 +412,10 @@
                     required: true
                 },
 
-                series: {
+                // series: {
 
-                    required: true
-                },
+                //     required: true
+                // },
 
                 abv: {
 
@@ -604,4 +619,27 @@
             }
         });
     }
+</script>
+<script>
+    document.getElementById('pdf').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const pdfPreview = document.getElementById('pdfPreview');
+        const removePdf = document.getElementById('removePdf');
+
+        if (file && file.type === "application/pdf") {
+            const objectURL = URL.createObjectURL(file);
+            pdfPreview.src = objectURL;
+            pdfPreview.style.display = "block";
+            removePdf.style.display = "block";
+        } else {
+            Swal.fire("Error!", "Please select a valid PDF file.", "error");
+            event.target.value = ''; // Reset input
+        }
+    });
+
+    document.getElementById('removePdf').addEventListener('click', function() {
+        document.getElementById('pdf').value = "";
+        document.getElementById('pdfPreview').style.display = "none";
+        this.style.display = "none";
+    });
 </script>

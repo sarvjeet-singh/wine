@@ -46,9 +46,11 @@
                     <div class="row g-4 mb-3">
                         <div class="col-12">
                             <div
-                                class="event-head d-flex align-items-center justify-content-between gap-1 border rounded-3 px-3 py-2">
-                                <h3 class="mb-0 fs-4">Today Events</h3>
-                                <a href="{{ route('events') }}?date_filter[]=today" class="btn view-btn">View All</a>
+                                class="event-head position-relative d-flex align-items-center justify-content-between gap-1 py-2">
+                                <h3 class="mb-0 fw-bold">Today Events</h3>
+                                <div class="head-btn">
+                                    <a href="{{ route('events') }}?date_filter[]=today" class="btn view-btn">View All</a>
+                                </div>
                             </div>
                         </div>
                         @if (!empty($todayEvents) && count($todayEvents) > 0)
@@ -105,7 +107,12 @@
                                                         </p>
                                                     @else
                                                         <p class="event-price fw-bold mb-0">
-                                                            ${{ $todayEvent->admittance }}{{ $todayEvent->extension }}
+                                                            @php
+                                                                $platform_fee =
+                                                                    $todayEvent->vendor->platform_fee ??
+                                                                    (config('site.platform_fee') ?? '1.00');
+                                                            @endphp
+                                                            ${{ number_format($todayEvent->admittance + ($todayEvent->admittance * $platform_fee) / 100, 2, '.', '') }}{{ $todayEvent->extension }}
                                                         </p>
                                                     @endif
                                                 </div>
@@ -124,7 +131,8 @@
                                             @if (!empty($todayEvent->booking_url))
                                                 <a href="{{ $todayEvent->booking_url }}" class="btn px-3">Buy Now</a>
                                             @else
-                                                <a href="{{ route('events.detail', $todayEvent->id) }}" class="btn px-3">Buy Now</a>
+                                                <a href="{{ route('events.detail', $todayEvent->id) }}"
+                                                    class="btn px-3">Buy Now</a>
                                             @endif
                                         </div>
                                     </div>
@@ -137,9 +145,12 @@
                     <div class="row g-4 mb-3">
                         <div class="col-12">
                             <div
-                                class="event-head d-flex align-items-center justify-content-between gap-1 border rounded-3 px-3 py-2">
-                                <h3 class="mb-0 fs-4">Tomorrow Events</h3>
-                                <a href="{{ route('events') }}?date_filter[]=tomorrow" class="btn view-btn">View All</a>
+                                class="event-head position-relative d-flex align-items-center justify-content-between gap-1 py-2">
+                                <h3 class="mb-0 fw-bold">Tomorrow Events</h3>
+                                <div class="head-btn">
+                                    <a href="{{ route('events') }}?date_filter[]=tomorrow" class="btn view-btn">View
+                                        All</a>
+                                </div>
                             </div>
                         </div>
                         @if (!empty($tomorrowEvents) && count($tomorrowEvents) > 0)
@@ -195,7 +206,12 @@
                                                         </p>
                                                     @else
                                                         <p class="event-price fw-bold mb-0">
-                                                            ${{ $tomorrowEvent->admittance }}{{ $tomorrowEvent->extension }}
+                                                            @php
+                                                                $platform_fee =
+                                                                    $tomorrowEvent->vendor->platform_fee ??
+                                                                    (config('site.platform_fee') ?? '1.00');
+                                                            @endphp
+                                                            ${{ number_format($tomorrowEvent->admittance + ($tomorrowEvent->admittance * $platform_fee) / 100, 2, '.', '') }}{{ $tomorrowEvent->extension }}
                                                         </p>
                                                     @endif
                                                 </div>
@@ -214,7 +230,8 @@
                                             @if (!empty($tomorrowEvent->booking_url))
                                                 <a href="{{ $tomorrowEvent->booking_url }}" class="btn px-3">Buy Now</a>
                                             @else
-                                                <a href="{{ route('events.detail', $tomorrowEvent->id) }}" class="btn px-3">Buy Now</a>
+                                                <a href="{{ route('events.detail', $tomorrowEvent->id) }}"
+                                                    class="btn px-3">Buy Now</a>
                                             @endif
                                         </div>
                                     </div>
@@ -227,9 +244,12 @@
                     <div class="row g-4 mb-3">
                         <div class="col-12">
                             <div
-                                class="event-head d-flex align-items-center justify-content-between gap-1 border rounded-3 px-3 py-2">
-                                <h3 class="mb-0 fs-4">Upcoming Events</h3>
-                                <a href="{{ route('events') }}?date_filter[]=upcoming" class="btn view-btn">View All</a>
+                                class="event-head position-relative d-flex align-items-center justify-content-between gap-1 py-2">
+                                <h3 class="mb-0 fw-bold">Upcoming Events</h3>
+                                <div class="head-btn">
+                                    <a href="{{ route('events') }}?date_filter[]=upcoming" class="btn view-btn">View
+                                        All</a>
+                                </div>
                             </div>
                         </div>
                         @if (!empty($upcomingEvents) && count($upcomingEvents) > 0)
@@ -285,7 +305,12 @@
                                                         </p>
                                                     @else
                                                         <p class="event-price fw-bold mb-0">
-                                                            ${{ $upcomingEvent->admittance }}{{ $upcomingEvent->extension }}
+                                                            @php
+                                                                $platform_fee =
+                                                                    $upcomingEvent->vendor->platform_fee ??
+                                                                    (config('site.platform_fee') ?? '1.00');
+                                                            @endphp
+                                                            ${{ number_format($upcomingEvent->admittance + ($upcomingEvent->admittance * $platform_fee) / 100, 2, '.', '') }}{{ $upcomingEvent->extension }}
                                                         </p>
                                                     @endif
                                                 </div>
@@ -304,7 +329,8 @@
                                             @if (!empty($upcomingEvent->booking_url))
                                                 <a href="{{ $upcomingEvent->booking_url }}" class="btn px-3">Buy Now</a>
                                             @else
-                                                <a href="{{ route('events.detail', $upcomingEvent->id) }}" class="btn px-3">Buy Now</a>
+                                                <a href="{{ route('events.detail', $upcomingEvent->id) }}"
+                                                    class="btn px-3">Buy Now</a>
                                             @endif
                                         </div>
                                     </div>
@@ -364,6 +390,7 @@
                             $('.search-item').click(function() {
                                 $('#searchInput').val($(this).text());
                                 dropdown.hide();
+                                triggerFilter();
                             });
                         }
                     }
@@ -380,7 +407,6 @@
     <script>
         $(document).ready(function() {
             $('.date-filter').on('change', function() {
-                console.log('Checkbox changed');
                 if ($(this).is(':checked') && $(this).val() == 'date_range') {
                     $('.date-filter').not(this).prop('checked', false);
                 }
@@ -392,6 +418,9 @@
                     $('#dateRangePickerContainer').show();
                 } else {
                     $('#dateRangePickerContainer').hide();
+                    $('#dateRangePicker').val('');
+                    startDate = null;
+                    endDate = null;
                     triggerFilter();
                 }
             });
@@ -402,6 +431,11 @@
                 $('.date-filter').prop('checked', false);
                 $('#dateRangePicker').val('');
                 $('#dateRangePickerContainer').hide();
+                triggerFilter();
+            });
+            $('#clearSearchFilters').on('click', function(e) {
+                e.preventDefault();
+                $('#searchInput').val('');
                 triggerFilter();
             });
             $('#clearCategories').on('click', function(e) {
@@ -424,14 +458,23 @@
                 maxDate: new Date().fp_incr(30), // Limit to 1 month
                 onChange: function(selectedDates, dateStr) {
                     if (selectedDates.length === 2) {
-                        startDate = selectedDates[0].toISOString().split('T')[0];
-                        endDate = selectedDates[1].toISOString().split('T')[0];
+                        startDate = formatDate(selectedDates[0]);
+                        endDate = formatDate(selectedDates[1]);
+
+                        console.log("Start Date:", startDate, "End Date:", endDate); // Debugging
+
                         triggerFilter();
                     }
                 }
             });
-
         });
+
+        function formatDate(date) {
+            let year = date.getFullYear();
+            let month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure two digits
+            let day = String(date.getDate()).padStart(2, '0'); // Ensure two digits
+            return `${year}-${month}-${day}`;
+        }
     </script>
     <script>
         function triggerFilter() {
@@ -448,14 +491,15 @@
             let isFree = $('#free-event').prop('checked') ? 1 : null; // Check if free event checkbox is checked
             let minPrice = $('#priceRange').attr('min');
             let maxPrice = $('#priceRange').val();
+            let search = $('#searchInput').val();
 
             if (isFree || pricePicker === false || maxPrice == minPrice) {
                 minPrice = null;
                 maxPrice = null;
             }
-            console.log(minPrice);
+
             fetchFilteredEvents(selectedCategories, selectedDateFilter, selectedDateRange, isFree, minPrice,
-                maxPrice);
+                maxPrice, startDate, endDate, search);
         }
         $(document).ready(function() {
             // Function to trigger filtering on any change
@@ -502,17 +546,21 @@
             });
         });
 
-        function fetchFilteredEvents(categories, dateFilter, dateRange, isFree, minPrice, maxPrice) {
+        function fetchFilteredEvents(categories, dateFilter, dateRange, isFree, minPrice, maxPrice, startDate, endDate,
+            searchTerm) {
             $.ajax({
                 url: "{{ route('get-events') }}", // Replace with your actual route
                 type: "GET",
                 data: {
                     categories: categories,
                     date_filter: dateFilter,
-                    date_range: dateRange,
+                    // date_range: dateRange,
                     is_free: isFree,
                     min_price: minPrice,
-                    max_price: maxPrice
+                    max_price: maxPrice,
+                    start_date: startDate,
+                    end_date: endDate,
+                    q: searchTerm
                 },
                 success: function(response) {
                     $('#eventList').html(response.html); // Dynamically update event list
@@ -530,6 +578,13 @@
                     if (isFree) params.set("is_free", 1);
                     if (minPrice) params.set("min_price", minPrice);
                     if (maxPrice) params.set("max_price", maxPrice);
+
+                    if (startDate && endDate) {
+                        params.set("start_date", startDate);
+                        params.set("end_date", endDate);
+                    }
+
+                    if (searchTerm) params.set("q", searchTerm);
 
                     let newUrl = `${window.location.pathname}?${params.toString()}`;
                     history.pushState(null, "", newUrl);
@@ -549,6 +604,7 @@
             let isFree = params.get("is_free") ? 1 : null;
             let minPrice = params.get("min_price") || "";
             let maxPrice = params.get("max_price") || "";
+            let searchTerm = params.get("q") || "";
 
             let dateRange = {
                 start: startDate,
@@ -566,10 +622,11 @@
             if (isFree) $("#free-event").prop("checked", true);
             if (minPrice) $("#minValue").text(`$${minPrice}`);
             if (maxPrice) $("#maxValue").text(`$${maxPrice}`);
-            if(params.size == 0) return false;
+            if (params.size == 0) return false;
             // ✅ Fetch events with preloaded filters
-            fetchFilteredEvents(categories, dateFilter, dateRange, isFree, minPrice, maxPrice);
+            fetchFilteredEvents(categories, dateFilter, dateRange, isFree, minPrice, maxPrice, startDate, endDate);
         });
+
         // Load filters from URL on page refresh
         function loadFiltersFromURL() {
             let params = new URLSearchParams(window.location.search);
@@ -599,6 +656,10 @@
                 $('#dateRangePicker').val(`${params.get("start_date")} - ${params.get("end_date")}`);
                 $('#dateRangePickerContainer').show();
                 $('#date_range').prop("checked", true);
+            }
+
+            if (params.has("q")) {
+                $('#searchInput').val(params.get("q"));
             }
         }
         loadFiltersFromURL();

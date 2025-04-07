@@ -13,7 +13,7 @@
     <nav class="navbar navbar-expand-lg px-sm-4 px-2 py-0">
         <div class="container-fluid">
             <!-- Logo -->
-            <a class="navbar-brand" href="javascript:void(0)">
+            <a class="navbar-brand" href="{{ route('home') }}">
                 <img src="{{ asset('images/logo.png') }}" class="img-fluid" alt="Logo">
             </a>
             @if (!empty($shopId) && is_numeric($shopId))

@@ -189,6 +189,17 @@
                     @enderror
                 </div>
             </div>
+            <div class="col-md-6">
+                <div>
+                    <label for="" class="form-label fw-bold">Platform Fee (%)</label>
+                    <input type="text" class="form-control percent @error('platform_fee') is-invalid @enderror"
+                        name="platform_fee" placeholder="Platform Fee"
+                        value="{{ !empty($vendor) ? $vendor->platform_fee : old('platform_fee') }}">
+                    @error('platform_fee')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
             <div class="col-12">
                 <div>
                     <label for="" class="form-label fw-bold">Description</label>
@@ -390,6 +401,46 @@
         }
         $(document).ready(function() {
             $("#vendorName").text("{{ !empty($vendor) ? $vendor->vendor_name : '' }}");
-        })
+        });
+        $(document).on('input', '.percent', function() {
+            var $this = $(this);
+            var value = $(this).val();
+            // Remove all non-numeric characters except the decimal point
+            value = value.replace(/[^0-9.]/g, '');
+
+            // Ensure the value does not start with a decimal point
+            if (value.startsWith('.')) {
+                value = '0' + value;
+            }
+
+            // Split the value into whole and decimal parts
+            var parts = value.split('.');
+
+            // Limit decimal places to two
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+
+            // If there is a decimal point, limit the number of decimal places to two
+            if (parts.length === 2) {
+                parts[1] = parts[1].slice(0, 2);
+                value = parts.join('.');
+            }
+
+            // Convert value to number and ensure it's within the range 0 to 100
+            var numericValue = parseFloat(value);
+            // if (isNaN(numericValue)) {
+            //     value = '';
+            // } else 
+
+            if (numericValue > 100) {
+                value = '100';
+            } else if (numericValue < 0) {
+                value = '0';
+            }
+
+            // Set the formatted value back to the input
+            $this.val(value);
+        });
     </script>
 @endpush

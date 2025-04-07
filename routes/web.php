@@ -91,7 +91,11 @@ Route::get('/events', [EventController::class, 'events'])->name('events');
 Route::get('/get-events', [EventController::class, 'getEvents'])->name('get-events');
 Route::get('/events/search', [EventController::class, 'searchEvents'])->name('events.search');
 Route::get('/events/detail/{id?}', [EventController::class, 'eventDetails'])->name('events.detail');
-Route::post('/events/checkout', [EventController::class, 'eventCheckout'])->name('events.checkout');
+Route::get('/events/checkout/{id}', [EventController::class, 'eventCheckout'])->name('events.checkout');
+Route::get('/check-email-details', [EventController::class, 'checkEmailDetails'])->name('check.email.details');
+Route::post('/events/checkout-process', [EventController::class, 'eventCheckoutProcess'])->name('events.checkout.process');
+Route::get('/events/payment/{id}', [EventController::class, 'payment'])->name('events.payment');
+Route::post('/events/store-order-transaction-details', [EventController::class, 'storeTransactionDetails'])->name('events.store-order-transaction-details');
 Route::get('captcha/{config?}', [CaptchaController::class, 'getCaptcha'])->name('captcha');
 Route::post('/set-timezone', [TimezoneController::class, 'setTimezone']);
 Route::get('login', [LoginController::class, 'login'])->name('login');
@@ -251,6 +255,7 @@ Route::get('/guest-rewards', function () {
 //  QR Code
 Route::get('qr/{short_code}', [FrontEndController::class, 'showQCode'])->name('vendorQCode.show');
 Route::get('vendor-QCode-generate/{short_code}', [FrontEndController::class, 'generateQCode'])->name('vendorQCode.generate');
+Route::post('/user/check-activation', [UserDashboardController::class, 'checkActivation'])->name('customer.activation.check');
 
 Route::get('/user-dashboard', [UserDashboardController::class, 'userDashboard'])->name('user-dashboard');
 Route::get('/user-review-submit', [UserDashboardController::class, 'userReviews'])->name('user-review-submit');
@@ -281,13 +286,16 @@ Route::get('/faq', [UserDashboardController::class, 'userFaqs'])->name('user-faq
 // Route::get('user/orders', [UserDashboardController::class, 'orders'])->name('user.orders');
 Route::get('/user/transactions', [UserDashboardController::class, 'orders'])->name('user-transactions');
 Route::get('user/transactions/{id}', [UserDashboardController::class, 'orderDetail'])->name('user.orderDetail');
+Route::get('/user/event-transactions', [EventController::class, 'orders'])->name('user.event-transactions');
+Route::get('user/event-transactions/orders/{orderid}', [EventController::class, 'eventOrderDetails'])->name('user.event-orderDetails');
+Route::get('user/event-transactions/order-detail/{order_id}', [EventController::class, 'eventOrderDetail'])->name('user.event-orderDetail');
 Route::get('/user/inquiries', [UserDashboardController::class, 'inquiries'])->name('user-inquiries');
 Route::get('user/inquiries/{id}', [UserDashboardController::class, 'inquiryDetail'])->name('user.inquiryDetail');
 
 Route::post('orders/authorize-payment', [OrderController::class, 'authorizePayment'])->name('orders.authorize-payment');
 Route::post('orders/reauthorize-payment/{orderId}', [OrderController::class, 'reauthorizePayment'])->name('orders.reauthorize-payment');
 Route::post('orders/send-inquiry', [OrderController::class, 'sendInquiry'])->name('orders.send-inquiry');
-Route::get('/orders/thankyou/{id}', [OrderController::class, 'thankYou'])->name('order.thankyou');
+Route::get('/orders/thankyou/{id}/{orderType?}', [OrderController::class, 'thankYou'])->name('order.thankyou');
 Route::post('/orders/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 // ================= CUSTOMER ============== //
 // Stripe Routes for customer
@@ -365,6 +373,8 @@ Route::group(['middleware' => ['auth:vendor', 'checkPasswordUpdated', 'check.ven
 
     Route::put('/vendor/inquiries/{id}/approve/{vendorid?}', [VendorController::class, 'inquiryApprove'])->name('inquiry.approve');
     Route::put('/vendor/inquiries/{id}/reject/{vendorid?}', [VendorController::class, 'inquiryReject'])->name('inquiry.reject');
+    Route::get('/vendor/event-transactions/{vendorid?}', [EventController::class, 'vendorOrders'])->name('vendor.events-transactions');
+    Route::get('vendor/event-transactions/{order_id}/{vendorid?}', [EventController::class, 'vendorEventOrderDetail'])->name('vendor.event.orderDetail');
     Route::get('/vendor/transactions/{vendorid?}', [VendorController::class, 'orders'])->name('vendor-transactions');
     Route::get('vendor/transactions/{id}/{vendorid?}', [VendorController::class, 'orderDetail'])->name('vendor.orderDetail');
     Route::post('/vendor/orders/vendor-cancel/{vendorid?}', [OrderController::class, 'vendorCancel'])->name('orders.vendor-cancel');

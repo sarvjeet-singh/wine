@@ -187,7 +187,7 @@ class RegisterController extends Controller
             return redirect()->route('verify-phone-otp')->with('success', 'We’ve sent an OTP to your phone. Enter it to verify your account!');
         }
         // Instead of logging in, redirect to the login page
-        return redirect()->route('customer.login')->with('success', 'We’ve sent a verification link to your inbox. Click it to activate your account!');
+        return redirect()->route('customer.login')->with('success', 'We sent a verification link to your inbox. Remember to check "Spam" and then click to verify.');
     }
 
     public function verifyOtpForm(Request $request)

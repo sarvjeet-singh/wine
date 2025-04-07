@@ -27,7 +27,7 @@ class WalletController extends Controller
     }
 
     // Add cashback after a booking (7%)
-    public function addCashback(Customer $customer, $bookingAmount, $orderId)
+    public function addCashback(Customer $customer, $bookingAmount, $orderId, $orderType)
     {
         $cashbackAmount = $bookingAmount * 0.07;
         $wallet = Wallet::firstOrCreate(['customer_id' => $customer->id]);
@@ -37,6 +37,7 @@ class WalletController extends Controller
             'amount' => $cashbackAmount,
             'type' => 'credit',
             'order_id' => $orderId,
+            'order_type' => $orderType,
             'status' => 'qualified', // Initially qualified
             'description' => 'Cashback from booking',
         ]);
@@ -58,7 +59,7 @@ class WalletController extends Controller
     }
 
     // Deduct wallet balance when making a purchase
-    public function useWallet(Customer $customer, $amount, $orderId)
+    public function useWallet(Customer $customer, $amount, $orderId, $orderType)
     {
         $wallet = Wallet::where('customer_id', $customer->id)->first();
 
@@ -72,6 +73,7 @@ class WalletController extends Controller
             'amount' => $amount,
             'type' => 'debit',
             'order_id' => $orderId,
+            'order_type' => $orderType,
             'status' => 'approved',
             'description' => 'Purchase using wallet balance',
         ]);

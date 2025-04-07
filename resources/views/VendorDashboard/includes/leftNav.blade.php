@@ -72,9 +72,9 @@
                     aria-controls="menu5">
                     <div><i class="fas fa-cogs menu-icon"></i> Guest Services</div>
                     <i
-                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-amenities', 'vendor-curated-experience') ? 'rotate' : '' }}"></i>
+                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-amenities', 'vendor-curated-experience', 'vendor.events-transactions') ? 'rotate' : '' }}"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('vendor-amenities', 'curative-experiences.index') ? 'show' : '' }}"
+                <div class="collapse {{ request()->routeIs('vendor-amenities', 'curative-experiences.index', 'vendor.events-transactions') ? 'show' : '' }}"
                     id="menu5">
                     <ul class="nav flex-column sub-menu mt-2">
                         <li class="nav-item">
@@ -87,6 +87,12 @@
                             <a class="nav-link {{ request()->routeIs('curative-experiences.index') ? 'active' : '' }}"
                                 href="{{ route('curative-experiences.index', ['vendorid' => $id]) }}">
                                 <i class="fas fa-wrench menu-icon"></i> Curated Experiences
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('vendor.events-transactions') ? 'active' : '' }}"
+                                href="{{ route('vendor.events-transactions', ['vendorid' => $id]) }}">
+                                <i class="fas fa-wrench menu-icon"></i> Events History
                             </a>
                         </li>
                     </ul>

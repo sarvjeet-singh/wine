@@ -40,8 +40,7 @@ class CurativeExperienceController extends Controller
             'inventory' => 'required|integer',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'booking_time'   => 'nullable|array',
-            'booking_time.*' => 'nullable|date_format:H:i',
+            'booking_time' => 'nullable|date_format:H:i',
             'description' => 'nullable|string',
             'duration' => 'nullable|integer|min:1|max:1440',
             'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,webp|max:5120',
@@ -99,10 +98,6 @@ class CurativeExperienceController extends Controller
         $data['thumbnail_medium'] = $thumbnails['medium'] ?? null;
         $data['thumbnail_large'] = $thumbnails['large'] ?? null;
 
-        $data['booking_time'] = json_encode(array_values(array_filter($request->booking_time, function($time) {
-            return !empty($time);
-        })));
-
         if (!isset($request->is_free)) {
             $data['is_free'] = 0;
         }
@@ -140,8 +135,7 @@ class CurativeExperienceController extends Controller
             'inventory' => 'required|integer',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'booking_time'   => 'nullable|array',
-            'booking_time.*' => 'nullable|date_format:H:i',
+            'booking_time' => 'nullable|date_format:H:i',
             'description' => 'nullable|string',
             'duration' => 'nullable|integer|min:1|max:1440',
             'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,webp|max:5120',
@@ -251,11 +245,7 @@ class CurativeExperienceController extends Controller
             $data['thumbnail_small'] = $thumbnails['small'] ?? null;
             $data['thumbnail_medium'] = $thumbnails['medium'] ?? null;
             $data['thumbnail_large'] = $thumbnails['large'] ?? null;
-        }
-
-        $data['booking_time'] = json_encode(array_values(array_filter($request->booking_time, function($time) {
-            return !empty($time);
-        })));        
+        }     
 
         if (!isset($request->is_free)) {
             $data['is_free'] = 0;

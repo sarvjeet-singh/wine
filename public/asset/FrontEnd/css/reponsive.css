@@ -53,6 +53,12 @@
 }
 }
 
+@media screen and (max-width: 1299px){
+.event-checkout-wrapper .quantity-field {
+     width: 50%;
+}
+}
+
 @media screen and (max-width: 1024px){
 .tab-content-sec ul a {
     font-size: 16px;    
@@ -90,6 +96,13 @@
 .curated-event-sec p.event-desc,
 .curated-event-sec p.event-sub-head {
     font-size: 14px;
+}
+.event-checkout-wrapper .event-thumbnail img {
+     width: 100%;
+}
+.event-single-wrapper .event-featured-image img,
+.event-single-wrapper .event-featured-image iframe {
+     height: 400px;
 }
 }
 
@@ -191,11 +204,8 @@ footer .footer-logo img {
 .single-main-slider .right .item img {
     height: 350px;
 }
-.register-top-bar.tab-content-sec ul a span {
-    display: none;
-}
 .register-top-bar.tab-content-sec ul {
-    padding: 12px 20px !important;
+    padding: 12px 0 !important;
 }
 }
 
@@ -227,6 +237,36 @@ footer .footer-logo img {
 .vendor-login-sec .form-login-option .form-check label,
 .vendor-login-sec .form-login-option a {
     font-size: 13px;
+}
+.register-top-bar.tab-content-sec ul a {
+    font-size: 9px !important;
+}
+.event-checkout-wrapper .row-container:has(#row-2) .row:first-child {
+    padding-right: 0;
+}
+.event-checkout-wrapper .row-container .row {
+    justify-content: end;
+}
+.event-checkout-wrapper .row-container .row .col-1 {
+    padding: 0 30px 10px 0;
+}
+.event-checkout-wrapper .event-address,
+.event-checkout-wrapper .event-timing {
+    font-size: 15px;
+}
+.event-single-wrapper .event-featured-image img,
+.event-single-wrapper .event-featured-image iframe {
+     height: 180px;
+}
+.event-single-wrapper .event-price {
+     font-size: 16px;
+}
+.event-single-wrapper .event-address, .event-single-wrapper .event-timing {
+     font-size: 15px;
+}
+.event-single-wrapper .event-address {
+     border-bottom: 0.5px solid #f4f4f4;
+     padding-bottom: 6px;
 }
 }
 @media screen and (max-width: 600px){
@@ -457,8 +497,9 @@ nav.navbar ul li.nav-item {
     width: 24px !important;
     height: 24px !important;
 }
-.register-top-bar ul a svg.fa-people-group {
-    width: 30px !important;
+.register-top-bar ul a svg.excursion-icon {
+    width: 28px !important;
+    height: 28px !important;
 }
 }
 
@@ -484,5 +525,8 @@ header .navbar-brand img {
 }
 .curated-event-sec .event-head h3 {
     font-size: 18px !important;
+}
+.register-top-bar.tab-content-sec ul a {
+    font-size: 7px !important;
 }
 }

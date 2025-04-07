@@ -61,9 +61,11 @@
         #proof-images {
             display: none;
         }
+
         svg.fa-circle-info {
             width: 18px;
             height: 18px;
+            color: gray;
         }
     </style>
     <div class="container main-container">
@@ -72,21 +74,22 @@
             <div class="col right-side">
                 <div class="row g-3">
                     <!-- <div class="col-xl-3 col-6">
-                                <div class="top-boxes">
-                                    <div class="box-image">
-                                        <img src="{{ asset('images/icons/bottle-bucks-box-icon.png') }}">
-                                    </div>
-                                    <div class="box-points">0 Events</div>
-                                    <div class="box-text mt-1">Today</div>
-                                </div>
-                            </div> -->
+                                                        <div class="top-boxes">
+                                                            <div class="box-image">
+                                                                <img src="{{ asset('images/icons/bottle-bucks-box-icon.png') }}">
+                                                            </div>
+                                                            <div class="box-points">0 Events</div>
+                                                            <div class="box-text mt-1">Today</div>
+                                                        </div>
+                                                    </div> -->
                     <div class="col-xl-3 col-6">
                         <a href="{{ route('wallet-history') }}">
                             <div class="top-boxes">
                                 <div class="box-image d-flex align-items-start justify-content-between">
                                     <img src="{{ asset('images/icons/amount-box-icon.png') }}">
-                                    <a class="border-0 p-0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Bottle Bucks have a 1:1 CAD cash value. Earn an additional 7% cash-back credits on all transactions.">
-                                    <i class="fa-solid fa-circle-info"></i>
+                                    <a class="border-0 p-0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="custom-tooltip"
+                                        data-bs-title="Bottle Bucks have a 1:1 CAD cash value. Earn an additional 7% cash-back credits on all transactions.">
+                                        <i class="fa-solid fa-circle-info"></i>
                                     </a>
                                 </div>
                                 <div class="box-points">${{ $balance }}</div>
@@ -95,14 +98,14 @@
                         </a>
                     </div>
                     <!-- <div class="col-xl-3 col-6">
-                                <div class="top-boxes">
-                                    <div class="box-image">
-                                        <img src="{{ asset('images/icons/messages-box-icon.png') }}">
-                                    </div>
-                                    <div class="box-points">1 + 0</div>
-                                    <div class="box-text">Prize Pools</div>
-                                </div>
-                            </div> -->
+                                                        <div class="top-boxes">
+                                                            <div class="box-image">
+                                                                <img src="{{ asset('images/icons/messages-box-icon.png') }}">
+                                                            </div>
+                                                            <div class="box-points">1 + 0</div>
+                                                            <div class="box-text">Prize Pools</div>
+                                                        </div>
+                                                    </div> -->
                     <div class="col-xl-3 col-6">
                         <div class="top-boxes">
                             <div class="box-image">
@@ -121,6 +124,25 @@
                             <div class="box-text">Approved Reviews</div>
                         </div>
                     </div>
+                    @if (Auth::guard('customer')->user()->profile_completed == 0)
+                        <div class="col-xl-3 col-6">
+                            <div class="d-flex flex-column align-items-center justify-content-center text-center"
+                                style="height: 100%;">
+                                <button id="checkActivationBtn" class="btn btn-primary wine-btn rounded-2 px-3">
+                                    Complete Your Profile
+                                </button>
+                            </div>
+                        </div>
+                    @endif
+                    @if (Auth::guard('customer')->user()->profile_completed == 1)
+                        <div class="col-xl-3 col-6">
+                            <div class="d-flex flex-column align-items-center justify-content-center text-center"
+                                style="height: 100%;">
+                                <i class="fa fa-check-circle text-success mb-1"></i>
+                                <span>Profile Fully Completed</span>
+                            </div>
+                        </div>
+                    @endif
                 </div>
                 <!-- User Profile Box Start -->
                 <div class="row mt-5">
@@ -250,7 +272,8 @@
                 <div class="row mt-5">
                     @if (Auth::user()->form_guest_registry_filled == 0)
                         <div class="col-12">
-                            <h5 class="fw-bold mb-3 theme-color">Please complete the Guest Registry to process transactions and access your Bottle Bucks credits.</h5>
+                            <h5 class="fw-bold mb-3 theme-color">Please complete the Guest Registry to process transactions
+                                and access your Bottle Bucks credits.</h5>
                         </div>
                     @endif
                     <div class="col-sm-12">
@@ -367,6 +390,29 @@
             </div>
         </div>
     </div>
+    <div class="modal fade error-modal-wrapper" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header text-white">
+                    <h5 class="modal-title" id="errorModalLabel">Your profile is incomplete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p id="errorIntro" class="fw-bold text-center">
+                        Complete your profile to unlock seamless access to testimonials, event check-ins, bookings, and
+                        more.
+                    </p>
+                    <ul id="errorMessage" class="mb-0 list-unstyled border-top pt-3"></ul>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <p id="completionNote">
+                        "A fully completed profile ensures a smooth and enhanced experience across all our services."
+                    </p>
+                    <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     @if ($first_login)
         <!-- Modal -->
@@ -451,11 +497,75 @@
     </script>
 
     <script>
-      // Initialize all tooltips on the page
-      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-      })
+        // Initialize all tooltips on the page
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+        $(document).ready(function() {
+            $('#checkActivationBtn').click(function() {
+                let customerid = "{{ Auth::guard('customer')->user()->id }}"; // Get vendor ID
+
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ route('customer.activation.check') }}",
+                    data: {
+                        customerid: customerid
+                    },
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        let messages = '';
+
+                        if (response.message && Array.isArray(response.message)) {
+                            messages = response.message.map(item => {
+                                let color = item.completed ? 'green' : item
+                                    .is_optional ? '#212529' : '#212529';
+                                let icon = item.completed ? '✅' : item.is_optional ?
+                                    '⚠️' : '⚠️';
+
+                                return `<li style="color: ${color};">
+                                ${icon} ${item.message}
+                            </li>`;
+                            }).join('');
+                        } else {
+                            messages =
+                                `<li style="color: green;">✅ Vendor is eligible for activation</li>`;
+                        }
+
+                        $('#errorMessage').html(messages);
+
+                        if (response.success) {
+                            $('#errorModalLabel').text('Your profile is complete ✅');
+                            $("#errorIntro").text('Your profile is complete now!');
+                            $("#completionNote").text(
+                                'All sections are completed, your profile will be upgraded to Vendor Partner status.'
+                            );
+                            $('#checkActivationBtn').remove();
+                            $(".modal-header").removeClass("bg-danger").addClass("bg-success");
+                        } else {
+                            $('#errorModalLabel').text('Your profile is incomplete ⚠️');
+                        }
+
+                        $('#errorModal').modal('show');
+                    },
+                    error: function() {
+                        $('#errorMessage').html(
+                            "<li style='color: red;'>❌ Something went wrong. Please try again.</li>"
+                        );
+                        $('#errorModalLabel').text('Error ❌');
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+        });
+        $(document).ready(function() {
+            $('#errorModal').on('hidden.bs.modal', function() {
+                location.reload();
+            });
+        });
     </script>
 
 @endsection

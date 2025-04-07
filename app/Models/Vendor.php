@@ -50,6 +50,7 @@ class Vendor extends Model
         'stripe_account_id',
         'stripe_onboarding_account_status',
         'settlement_duration',
+        'platform_fee',
     ];
     protected static function boot()
     {

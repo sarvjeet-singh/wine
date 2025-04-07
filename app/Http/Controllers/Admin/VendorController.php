@@ -146,6 +146,7 @@ class VendorController extends Controller
             'vendor_first_name' => 'nullable|string|max:255',
             'vendor_last_name' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
+            'platform_fee' => 'nullable|numeric|min:0',
             'phone' => 'nullable|string|max:20',
             'description' => 'nullable|string|max:1000',
             'vendor_type' => 'required|string|max:255',
@@ -256,6 +257,8 @@ class VendorController extends Controller
             'email.required' => 'The email is required.',
             'email.email' => 'The email must be a valid email address.',
             'email.max' => 'The email must not exceed 255 characters.',
+            'platform_fee.numeric' => 'The platform fee must be a number.',
+            'platform_fee.min' => 'The platform fee must be at least 0.',
             'phone.required' => 'The phone is required.',
             'phone.string' => 'The phone must be a string.',
             'phone.max' => 'The phone must not exceed 20 characters.',
@@ -348,6 +351,7 @@ class VendorController extends Controller
                 'sub_region' => $data['sub_region'],
                 'inventory_type' => $data['inventory_type'] ?? null,
                 'vendor_type' => $data['vendor_type'],
+                'platform_fee' => $data['platform_fee'] ?? null,
                 'website' => $data['website'] ?? null,
             ];
 

@@ -52,14 +52,14 @@
 
                         <div class="m-3 pt-3">
 
-                            <div class="row align-items-center">
+                            <div class="row">
 
                                 <div class="col-md-4">
 
                                     <div class="text-center">
 
                                         <img src="{{ asset('images/UserProfile/' . ($review->customer->profile_image ?? 'default-profile.png')) }}"
-                                            class="img-fluid" alt="Profle Image" />
+                                            class="img-fluid border object-fit-cover" width="200px" style="border-radius: 100px; aspect-ratio: 1/1;" alt="Profle Image" />
 
                                         <p class="fw-bold mt-2 mb-0">{{ $review->customer->firstname ?? '' }}
 
@@ -71,7 +71,7 @@
 
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
 
                                     <div>
 
@@ -127,6 +127,39 @@
 
                                 </div>
 
+                                <div class="col-md-4">
+                                    @if ($review->image)
+                                        <div class="ps-5 border-start h-100">
+                                            <h5 class="mb-3">Reviews images</h5>
+                                            <!-- Image Thumbnail -->
+                                            <img src="{{ url(Storage::url($review->image)) }}" alt="Thumbnail Image"
+                                                class="img-thumbnail" data-bs-toggle="modal" data-bs-target="#imageModal"
+                                                style="width: 100px;cursor: pointer;">
+
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="imageModal" tabindex="-1"
+                                                aria-labelledby="imageModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="imageModalLabel">Image View</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body text-center">
+                                                            <img src="{{ url(Storage::url($review->image)) }}"
+                                                                alt="{{ $review->review_description }}"
+                                                                class="img-fluid w-100 object-fit-cover"
+                                                                style="height: 450px;">
+                                                            <p class="my-2 fst-italic"></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+
                             </div>
 
                         </div>
@@ -169,7 +202,7 @@
 
                                         <!-- <p class="mb-2"><span class="fw-bold">Date of Visit: </span>
 
-                                                        {{ $review->date_of_visit ?? 'N/A' }}</p> -->
+                                                                {{ $review->date_of_visit ?? 'N/A' }}</p> -->
 
                                         <p class="mb-2"><span class="fw-bold">Vendor Contact Number: </span>
 

@@ -3314,14 +3314,31 @@ footer.vendor-footer .footer-links li a:hover {
 
 
 /* ================== CURATED EVENT PAGE START ================== */
-.curated-event-sec .event-head {
-    background-color: #b7a35f;
+.curated-event-sec .event-head:before {
+    content: "";
+    width: 100%;
+    height: 1.5px;
+    position: absolute;
+    top: 50%;
+    background-color: #eaeaea;
+    left: 0;
+    z-index: -1;
+}
+.curated-event-sec .head-btn {
+    background-color: #ffffff;
+    padding-left: 10px;
 }
 .curated-event-sec .event-head h3 {
-    color: #fff;
+    color: #212559;
+    font-size: 20px;
+    padding-right: 10px;
+    background-color: #ffffff;
+    z-index: 1;
 }
 .curated-event-sec .event-head a.view-btn {
-    background-color: #fff;
+    background-color: #bba253;
+    color: #fff;
+    z-index: 1;
 }
 .curated-event-sec .search-bar input {
     padding-left: 32px;
@@ -3333,6 +3350,22 @@ footer.vendor-footer .footer-links li a:hover {
     position: absolute;
     top: 9px;
     left: 10px;
+}
+.curated-event-sec .search-bar .autocomplete-dropdown {
+    position: absolute;
+    top: 40px;
+    background-color: #fff;
+    border: 1px solid #dedede;
+    border-radius: 6px;
+    padding: 10px;
+    width: 100%;
+    z-index: 97;
+    font-size: 15px;
+    display: none;
+}
+.curated-event-sec .search-bar .autocomplete-dropdown .dropdown-item.search-item {
+    white-space: normal;
+    line-height: normal;
 }
 .curated-event-sec .filter-bar svg {
     width: 30px;
@@ -3403,52 +3436,164 @@ footer.vendor-footer .footer-links li a:hover {
 }
 /* ================== CURATED EVENT PAGE END ================== */
 
+
+/* ================== EVENT DETAIL PAGE START ================== */
+.event-single-wrapper, .related-event-sec {
+     max-width: 1180px;
+     margin-inline: auto;
+}
+.event-single-wrapper .event-featured-image img {
+     height: 250px;
+     object-fit: cover;
+     border-radius: 15px;
+}
+.event-single-wrapper .event-featured-image iframe {
+    height: 250px;
+}
+.event-single-wrapper .event-price {
+     font-size: 18px;
+}
+.event-single-wrapper .about-event {
+     border-top: 0.5px solid #bba2535c;
+}
+.related-event-sec .event-thumbnail img {
+     width: 100%;
+     height: 250px;
+     object-fit: cover;
+     border-radius: 20px;
+}
+.related-event-sec .event-thumbnail iframe {
+    height: 250px;
+}
+.related-event-sec p.event-date, .related-event-sec .event-price {
+     font-size: 15px;
+}
+.related-event-sec .event-info h5 {
+     display: -webkit-box;
+     -webkit-line-clamp: 1;
+     -webkit-box-orient: vertical;
+     overflow: hidden;
+}
+.related-event-sec p.event-desc {
+     font-size: 15px;
+     line-height: normal;
+     display: -webkit-box;
+     -webkit-line-clamp: 2;
+     -webkit-box-orient: vertical;
+     overflow: hidden;
+}
+.related-event-sec .event-info a.btn {
+     font-size: 15px;
+     background-color: #3b8343;
+     color: #fff;
+}
+/* ================== EVENT DETAIL PAGE END ================== */
+
+
+/* ================== EVENT CHECKOUT PAGE START ================== */
+.event-checkout-wrapper .add-btn {
+     background-color: #b4a468;
+     color: #fff;
+}
+.event-checkout-wrapper .dlt-btn svg {
+     color: #dc3545;
+}
+.event-checkout-wrapper .event-thumbnail img {
+     width: 80%;
+     height: 180px;
+     object-fit: cover;
+     border-radius: 10px;
+}
+.event-checkout-wrapper .row-container:has(#row-2) .row:first-child {
+     padding-right: 44px;
+}
+.event-checkout-wrapper .total-bb,
+.event-checkout-wrapper .event-total-cost {
+     background-color: #fff;
+}
+.event-checkout-wrapper .total-bb input.form-check-input {
+     border-color: #bba253;
+     width: 18px;
+     height: 18px;
+     box-shadow: unset;
+}
+.event-checkout-wrapper .checkout-sidebar.sticky-lg-top {
+    z-index: 98;
+}
+.event-checkout-wrapper .form-check-input {
+     border-color: #bba253;
+     box-shadow: unset;
+}
+.event-checkout-wrapper .form-check-input:checked {
+     background-color: #bba253;
+}
+.event-checkout-wrapper .quantity-field {
+     width: 36%;
+     margin-inline: auto;
+     background-color: #bba253;
+}
+.event-checkout-wrapper .quantity-field button {
+     font-size: 24px;
+     color: #fff !important;
+     line-height: 30px;
+}
+.event-checkout-wrapper .quantity-field button.quantity-left-minus,
+.event-checkout-wrapper .quantity-field button.quantity-right-plus {
+     border-width: 0 1px 0 0;
+     border-style: solid;
+     border-color: #ffffff3d !important;
+}
+ .event-checkout-wrapper .quantity-field button.quantity-right-plus {
+     border-width: 0 0 0 1px;
+}
+ .event-checkout-wrapper .quantity-field input {
+     background-color: #b7a35f;
+     color: #fff;
+}
+.event-checkout-wrapper #state-wrapper span.select2-selection__arrow {
+    height: 100%;
+}
+.event-checkout-wrapper #state-wrapper span#select2-state-container {
+    height: 100%;
+    padding: 26px 36px 10px 12px;
+    line-height: normal;
+}
+.event-checkout-wrapper #state-wrapper span#select2-state-container span.select2-selection__placeholder {
+    color: #212529;
+}
+.event-checkout-wrapper #state-wrapper span.select2 .selection span.select2-selection {
+    height: 58px;
+    border-color: #dee2e6;
+}
+span.select2-dropdown.select2-dropdown-searchable {
+    border-color: #dee2e6;
+}
+/* ================== EVENT CHECKOUT PAGE END ================== */
+
+
 .age-verify-modal .modal-body img {
-
-    width: 80px;
-
+     width: 80px;
 }
-
 .age-verify-modal.show {
-
-    backdrop-filter: blur(2px);
-
+     backdrop-filter: blur(2px);
 }
-
 .age-verify-modal h3 {
-
-    color: #000;
-
-    max-width: 320px;
-
-    margin-inline: auto;
-
-    line-height: 26px;
-
+     color: #000;
+     max-width: 320px;
+     margin-inline: auto;
+     line-height: 26px;
 }
-
-.age-verify-modal h4 {
-
-    color: #000;
-
+ .age-verify-modal h4 {
+     color: #000;
 }
-
 .fa-picnic {
-
-    width: 24px;
-
-    height: 24px;
-
-    background-image: url('../../../images/picnic-table.svg');
-
-    background-size: contain;
-
-    background-repeat: no-repeat;
-
-    display: inline-block;
-
-    color: #bba253;
-
+     width: 24px;
+     height: 24px;
+     background-image: url('../../../images/picnic-table.svg');
+     background-size: contain;
+     background-repeat: no-repeat;
+     display: inline-block;
+     color: #bba253;
 }
 .status-pending {
     color: #bba253;

@@ -1,99 +1,113 @@
 @extends('FrontEnd.layouts.mainapp')
 
 @section('content')
-    <style>
-        .quantity-control {
-            display: flex;
-            align-items: center;
-        }
+<style>
+.quantity-control {
+    display: flex;
+    align-items: center;
+}
 
-        .quantity-control .btn {
-            background-color: #ddd;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
+.quantity-control .btn {
+    background-color: #ddd;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
 
-        .quantity-control .room-quantity-input {
-            width: 50px;
-            text-align: center;
-            border: 1px solid #ddd;
-            margin: 0 5px;
-        }
+.quantity-control .room-quantity-input {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ddd;
+    margin: 0 5px;
+}
 
-        .theme-btn {
-            background-color: #c0a144;
-            color: #fff;
-        }
+.theme-btn {
+    background-color: #c0a144;
+    color: #fff;
+}
 
-        .theme-btn:hover {
-            background-color: #c0a144;
-            color: #fff;
-        }
+.theme-btn:hover {
+    background-color: #c0a144;
+    color: #fff;
+}
 
-        .form-check-input {
-            box-shadow: unset !important;
-        }
+.form-check-input {
+    box-shadow: unset !important;
+}
 
-        .f-15 {
-            font-size: 15px;
-        }
+.f-15 {
+    font-size: 15px;
+}
 
 
-        #loginPopup .form-field svg {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: #c0a144;
-        }
+#loginPopup .form-field svg {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #c0a144;
+}
 
-        #loginPopup .form-field input {
-            padding-left: 35px;
-        }
+#loginPopup .form-field input {
+    padding-left: 35px;
+}
 
-        #loginPopup .form-field input::placeholder {
-            font-size: 15px;
-        }
+#loginPopup .form-field input::placeholder {
+    font-size: 15px;
+}
 
-        .daterangepicker .ends {
-            visibility: hidden;
-            /* Hides dates from previous/next months */
-        }
+.daterangepicker .ends {
+    visibility: hidden;
+    /* Hides dates from previous/next months */
+}
 
-        .cojoinDates::before {
-            border: 2px solid #c0a144;
-            position: absolute;
-            left: 50%;
-            right: 0;
-            top: 50%;
-            bottom: 0;
-            width: 30px;
-            height: 30px;
-            content: "";
-            z-index: -1;
-            transform: translate(-50%, -50%);
-        }
+.cojoinDates::before {
+    border: 2px solid #c0a144;
+    position: absolute;
+    left: 50%;
+    right: 0;
+    top: 50%;
+    bottom: 0;
+    width: 30px;
+    height: 30px;
+    content: "";
+    z-index: -1;
+    transform: translate(-50%, -50%);
+}
 
-        .cojoinDates:not(.start-package)::after {
-            content: "";
-            background: #c0a144;
-            height: 2px;
-            width: 41%;
-            position: absolute;
-            top: 50%;
-            left: -11px;
-        }
+.cojoinDates:not(.start-package)::after {
+    content: "";
+    background: #c0a144;
+    height: 2px;
+    width: 41%;
+    position: absolute;
+    top: 50%;
+    left: -11px;
+}
 
-        td.off.disabled.bookedAndBlockeddates {
-            background: #eee;
-            text-decoration: none;
-        }
+td.off.disabled.bookedAndBlockeddates {
+    background: #eee;
+    text-decoration: none;
+}
 
-        .amenities-modal ul {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
-    </style>
+.amenities-modal ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+.submit-review-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.modal button.btn-close {
+    --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+    font-size: 13px;
+}
+@media screen and (max-width: 768px){
+.submit-review-btn {
+    position: unset;
+}
+}
+</style>
     @if (Auth::guard('customer')->check() && !Auth::guard('customer')->user()->email_verified_at)
         <div class="alert alert-warning" role="alert">
             Your email isn't verified yet. Verify it now to continue with your checkout.
@@ -524,40 +538,74 @@
     </div>
 
     <div class="container mb-5 mt-lg-0 mt-5 frontend">
-        <div class="guest-favorite text-center">
-            <h2>Review and Testimonial</h2>
-            <p>This is a signature property that ranks in the top 10% of all eligible listings based on guest testimonials
-                and our own rigorous vetting process</p>
-        </div>
-        <div class="row">
-            @if ($vendor->reviews->isNotEmpty())
-                @foreach ($vendor->reviews as $review)
-                    <div class="col-md-4 pb-4">
-                        <div class="card guest-testi">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center mb-3 gap-3">
-                                    <img src="{{ !empty($review->customer->profile_image) ? asset('images/UserProfile/' . $review->customer->profile_image) : asset('images/UserProfile/default-profile.png') }}"
-                                        alt="User Image" style="height:60px; width:60px;" class="rounded-circle mr-3">
-                                    <div>
-                                        <h5 class="card-title mb-2">{{ $review->customer->firstname ?? '' }}
-                                            {{ $review->customer->lastname ?? '' }}</h5>
-                                        <h6 class="card-subtitle text-muted ">{{ $review->customer->city ?? '' }},
-                                            {{ $review->customer->state ?? '' }}</h6>
-                                        <div class="rating-star theme-color" data-rating="{{ $review->rating ?? 0.0 }}">
-                                            <small class="text-muted">{{ $review->created_at->diffForHumans() }}</small>
+        <div class="p-4 rounded-4 mb-4" style="border: 2px dashed #c0a144;">
+            <div class="guest-favorite position-relative text-center">
+                <h2 style="max-width: 76%;margin-inline: auto;">Review and Testimonial</h2>
+                <p>This is a signature property that ranks in the top 10% of all eligible listings based on guest testimonials
+                    and our own rigorous vetting process</p>
+                <div class="submit-review-btn mb-md-0 mb-3">
+                    <a href="#" class="btn theme-btn">Write a review</a>
+                </div>
+            </div>
+            <div class="row">
+                @if ($vendor->reviews->isNotEmpty())
+                    @foreach ($vendor->reviews as $review)
+                        <div class="col-md-4 pb-4">
+                            <div class="card guest-testi">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3 gap-3">
+                                        <img src="{{ !empty($review->customer->profile_image) ? asset('images/UserProfile/' . $review->customer->profile_image) : asset('images/UserProfile/default-profile.png') }}"
+                                            alt="User Image" style="height:60px; width:60px;" class="rounded-circle mr-3">
+                                        <div>
+                                            <h5 class="card-title mb-2">{{ $review->customer->firstname ?? '' }}
+                                                {{ $review->customer->lastname ?? '' }}</h5>
+                                            <h6 class="card-subtitle text-muted ">{{ $review->customer->city ?? '' }},
+                                                {{ $review->customer->state ?? '' }}</h6>
+                                            <div class="rating-star theme-color" data-rating="{{ $review->rating ?? 0.0 }}">
+                                                <small class="text-muted">{{ $review->created_at->diffForHumans() }}</small>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <p class="card-text">{{ $review->review_description ?? '' }}</p>
+                                    <p class="card-text">{{ $review->review_description ?? '' }}
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">View More</a>
+                                    </p>
 
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                      <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Comment</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                          </div>
+                                          <div class="modal-body p-4">
+                                            <h6 class="mb-2">Reviews images</h6>
+                                            <!-- Image Thumbnail -->
+                                            <a href="https://testing.winecountryweekends.ca/images/VendorImages/Wine Country Cottage/qHs5DPQfF1.png" target="_blank">
+                                                <img src="https://testing.winecountryweekends.ca/images/VendorImages/Wine Country Cottage/qHs5DPQfF1.png" alt="Thumbnail Image" class="img-thumbnail" data-bs-toggle="modal" data-bs-target="#imageModal" style="height: 100px;cursor: pointer;">
+                                            </a>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <!-- /Modal -->
+                                    
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
-            @else
-                <p>No review has added</p>
-            @endif
+                    @endforeach
+                @else
+                    <p class="text-center">No review has added</p>
+                @endif
+                
+            </div>
         </div>
+        <!-- <div>
+            <h5 class="mb-3">Reviews images</h5>
+            <a href="https://testing.winecountryweekends.ca/images/VendorImages/Wine Country Cottage/qHs5DPQfF1.png" target="_blank">
+                <img src="https://testing.winecountryweekends.ca/images/VendorImages/Wine Country Cottage/qHs5DPQfF1.png" alt="Thumbnail Image" class="img-thumbnail object-fit-cover"  style="height: 100px;cursor: pointer;">
+            </a>
+        </div> -->
     </div>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

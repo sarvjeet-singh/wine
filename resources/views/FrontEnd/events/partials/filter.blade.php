@@ -6,6 +6,9 @@
             <i class="fa-solid fa-magnifying-glass"></i>
         </button>
         <div id="autocomplete-results" class="autocomplete-dropdown"></div>
+        <div class="clear-btn text-end">
+            <a href="#" id="clearSearchFilters">Clear</a>
+        </div>
     </div>
     <div class="accordion mt-3" id="accordionPanelsStayOpenExample">
         <div class="accordion-item">
@@ -18,23 +21,23 @@
             <div id="flush-collapseOne" class="accordion-collapse collapse show" aria-labelledby="flush-headingOne">
                 <div class="accordion-body pb-2">
                     <div class="form-check mb-2">
-                        <input class="form-check-input date-filter event-filter-action" type="checkbox" name="date_filter[]" value="today"
-                            id="today">
+                        <input class="form-check-input date-filter event-filter-action" type="checkbox"
+                            name="date_filter[]" value="today" id="today">
                         <label class="form-check-label" for="today">Today</label>
                     </div>
                     <div class="form-check mb-2">
-                        <input class="form-check-input date-filter event-filter-action" type="checkbox" name="date_filter[]" value="tomorrow"
-                            id="tomorrow">
+                        <input class="form-check-input date-filter event-filter-action" type="checkbox"
+                            name="date_filter[]" value="tomorrow" id="tomorrow">
                         <label class="form-check-label" for="tomorrow">Tomorrow</label>
                     </div>
                     <div class="form-check mb-2">
-                        <input class="form-check-input date-filter event-filter-action" type="checkbox" name="date_filter[]" value="upcoming"
-                            id="upcoming">
+                        <input class="form-check-input date-filter event-filter-action" type="checkbox"
+                            name="date_filter[]" value="upcoming" id="upcoming">
                         <label class="form-check-label" for="upcoming">Upcoming</label>
                     </div>
                     <div class="form-check mb-2">
-                        <input class="form-check-input date-filter event-filter-action" type="checkbox" name="date_filter[]"
-                            value="date_range" id="date_range">
+                        <input class="form-check-input date-filter event-filter-action" type="checkbox"
+                            name="date_filter[]" value="date_range" id="date_range">
                         <label class="form-check-label" for="date_range">Date Range</label>
                     </div>
 
@@ -59,8 +62,8 @@
                 <div class="accordion-body pb-2">
                     @foreach (getExperienceCurativeCategories() as $category)
                         <div class="form-check mb-2">
-                            <input class="form-check-input category-filter" name="category" type="checkbox" value="{{ $category->id }}"
-                                id="category-{{ $category->id }}">
+                            <input class="form-check-input category-filter" name="category" type="checkbox"
+                                value="{{ $category->id }}" id="category-{{ $category->id }}">
                             <label class="form-check-label" for="category-{{ $category->id }}">
                                 {{ $category->name }}
                             </label>

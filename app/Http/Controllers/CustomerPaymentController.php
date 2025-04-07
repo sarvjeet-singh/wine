@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\StripeService;
 use App\Models\Order;
+use App\Models\CustomerOrder;
+use App\Models\EventOrderDetail;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Support\Facades\Auth;
@@ -87,7 +89,22 @@ class CustomerPaymentController extends Controller
         $payment_method_id = $request->payment_method_id;
         $order_id = $request->order_id;
         $vendor = Vendor::findOrFail($vendorid);
-        $order = Order::find($order_id);
+        if(!empty($request->order_type) && $request->order_type == 'event') {
+            $order = CustomerOrder::find($order_id);
+            $orderDetails = EventOrderDetail::where('customer_order_id', $order->id)->first();
+            $order->name = $orderDetails->full_name;
+            $order->email = $orderDetails->email;
+            $order->street_address = $orderDetails->street_address;
+            $order->contact_number = $orderDetails->contact_number;
+            $order->suite = $orderDetails->unit_suite;
+            $order->city = $orderDetails->city;
+            $order->state = $orderDetails->state;
+            $order->country = $orderDetails->country;
+            $order->postal_code = $orderDetails->postal_code;
+            $order->order_total = $order->total;
+        } else {            
+            $order = Order::find($order_id);
+        }
         return $this->stripeService->createCustomerPaymentIntent($order, $vendor, $payment_method_id, $customer->stripe_id);
     }
 

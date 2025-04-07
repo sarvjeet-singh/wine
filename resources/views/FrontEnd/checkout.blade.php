@@ -542,7 +542,7 @@
                         (!empty($vendor->accommodationMetadata->process_type) ? $vendor->accommodationMetadata->process_type : '') ==
                             'one-step' || !empty($booking->apk))
                         <!-- Stripe Payment Sec Start -->
-                        <div id="payment-methods-container" class="mt-4">
+                        <div id="payment-methods-container" class="detail-outer-box border p-sm-4 p-3 mt-4">
                             <h4 class="fw-bold">Saved Payment Methods</h4>
                             <input type="hidden" id="selectedPaymentMethodId" name="payment_method_id" value="">
                             <!-- Payment Methods List (Will be populated by AJAX) -->
@@ -555,15 +555,15 @@
                                     Card</label>
                             </div>
                         </div>
-                        <div id="checkout-payment-form" class="d-none">
+                        <div id="checkout-payment-form" class="detail-outer-box border mt-4 d-none">
                             <!-- "Back to Saved Cards" Option -->
-                            <div class="form-check mb-2">
+                            <div class="form-check m-4 mb-2">
                                 <input type="radio" name="payment_method_select" value="saved" id="back-to-saved"
                                     class="form-check-input">
                                 <label for="back-to-saved" class="form-check-label fw-bold">Use a Saved
                                     Card</label>
                             </div>
-                            <div class="cart-box p-4">
+                            <div class="cart-box p-4 pt-2">
 
                                 <h4 class="fw-bold">Checkout Payment Form</h4>
 
@@ -610,7 +610,7 @@
 
                                                 </div>
 
-                                                <div class="row">
+                                                <div class="row g-2">
 
                                                     <div class="col-md-6">
 

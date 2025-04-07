@@ -37,7 +37,7 @@
 
         <p>We look forward to working with you.</p>
 
-        <h4 style="color: #118c97; margin-bottom: 16px;">Cheers!</h4>
+        <p>Cheers!</p>
 
         <h4 style="color: #118c97;">The WCW Marketing Team</h4>
 

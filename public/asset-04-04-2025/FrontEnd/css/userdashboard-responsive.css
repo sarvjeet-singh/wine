@@ -1,0 +1,134 @@
+@media screen and (min-width: 992px){
+.left-navbar {
+    display: block !important;
+}
+}
+@media screen and (max-width: 991px){
+.left-navbar-mobile {
+    background-color: #c0a144;
+    border-radius: 6px;
+}
+.left-navbar-mobile .navbar-toggler-icon {
+    filter: brightness(0) invert(1);
+}
+.left-navbar-mobile button.navbar-toggler {
+    border-color: #fff;
+}
+.left-navbar-mobile h6.text-dark {
+    color: #fff !important;
+}
+.left-navbar-mobile nav.navbar {
+    z-index: 98;
+    background-color: unset;
+}
+.mob-cross svg {
+    font-size: 30px;
+    color: #000;
+    padding: 10px;
+}
+.left-navbar .nav {
+    position: fixed;
+    top: 16%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 90%;
+    height: calc(100% - 16%);
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 0;
+    flex-direction: row !important;
+    overflow-y: auto;
+}body.fixed-postion .left-navbar .nav {
+    top: 13%;
+}
+div#leftNavbarMobile {
+    z-index: 99;
+}
+body:has(.left-navbar.collapse.show) {
+    overflow: hidden;
+}
+.left-navbar li.nav-item span.d-none {
+    display: inline-block !important;
+}
+}
+@media screen and (max-width: 600px){
+.left-navbar-mobile {    
+    border-radius: 0;
+}
+.left-navbar .nav {    
+    width: 100%;    
+}
+.left-navbar .nav-link > img {
+    width: 22px;
+}
+.left-navbar .nav-link {
+    font-size: 16px;
+}
+.information-box-head {
+    padding: 20px;
+}
+.information-box-body {
+    padding: 15px 20px;
+}
+.box-body-label {
+    font-size: 16px;
+}
+.top-boxes {
+    height: 100%;
+}
+.top-boxes .box-points {    
+    font-size: 20px;    
+}
+.box-head-label {
+    width: fit-content;    
+}
+.information-box-head .box-head-heading {
+    justify-content: space-between;
+}
+.information-box-head a.information-box-edit {
+    font-size: 18px;
+}
+.self-check-verify {   
+    padding: 10px;
+}
+.information-box-head:has(.self-check-verify) a.information-box-edit {
+    width: 30%;
+}
+.custom-file-label {
+    width: 100%;
+}
+.custom-checkbox + label {
+    padding-top: 0;
+}
+.custom-checkbox + label::before {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+}
+.custom-checkbox + label::after {
+    top: -3px;
+    left: 3px;
+}
+}
+@media screen and (max-width: 360px){
+.left-navbar .nav {    
+    top: 12%;
+    height: calc(100% - 12%);    
+}
+.information-box-body button.wine-btn {
+    padding: 10px 30px;
+}
+.information-box-head:has(.self-check-verify) a.information-box-edit {
+    width: 50%;
+}
+.self-check-verify {    
+    flex-wrap: nowrap !important;
+}
+.self-check-verify img {
+    width: 26px;
+}
+.self-check-verify p {
+    font-size: 13px !important;
+}
+}

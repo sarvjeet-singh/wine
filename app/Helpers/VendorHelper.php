@@ -183,9 +183,15 @@ class VendorHelper
             ->where('status', 'active')
             ->where('end_date', '>', Carbon::now())
             ->exists();
-        if (!$subscription) {
-            return ['status' => false, 'messages' => [['message' => 'No active subscription on your account. Please activate your subscription.', 'completed' => false, 'is_optional' => false]]];
-        }
+
+
+        $messages[] = [
+            'message' => '<b>Subscription Status</b> (Make sure your subscription is active to stay visible on the platform.)',
+            'completed' => !$subscription ? false : true,
+            'is_optional' => false
+        ];
+        // return ['status' => false, 'messages' => [['message' => 'No active subscription on your account. Please activate your subscription.', 'completed' => false, 'is_optional' => false]]];
+
 
         // Required Fields
         $requiredVendorFields = [
@@ -293,7 +299,7 @@ class VendorHelper
             'messages' => $filteredMessages
         ];
     }
-    
+
     public static function canActivateExcursionSubscription($vendorId)
     {
         $messages = [];

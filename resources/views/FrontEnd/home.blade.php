@@ -2,17 +2,21 @@
 
 @section('content')
     <!-- ========== Tab Sec Start ========== -->
-    <section class="tab-content-sec">
-        <div class="container">
+    <!-- <section class="tab-content-sec px-sm-4 px-2">
+        <div class="container-fluid">
             <div class="inner-content">
-                <ul class="list-unstyled d-flex justify-content-between align-items-center mb-0">
+                <ul class="list-unstyled d-flex justify-content-between align-items-center mb-0 gap-3">
+                    <li><a href="{{ route('accommodations') }}" class="text-decoration-none">Directories</a></li>
                     <li><a href="{{ route('accommodations') }}" class="text-decoration-none">Accommodations</a></li>
                     <li><a href="{{ route('excursion-listing') }}" class="text-decoration-none">Excursions</a></li>
                     <li><a href="{{ route('wineries-listing') }}" class="text-decoration-none">Wineries</a></li>
+                    <li><a href="/licensed" class="text-decoration-none">Licensed</a></li>
+                    <li><a href="/non-licensed" class="text-decoration-none">Non-Licensed</a></li>
+                    <li><a href="/events" class="text-decoration-none">Events</a></li>
                 </ul>
             </div>
         </div>
-    </section>
+    </section> -->
     <!-- ========== Tab Sec End ========== -->
 
     <!-- ========== Banner Sec Start ========== -->

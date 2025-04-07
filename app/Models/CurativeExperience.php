@@ -31,6 +31,8 @@ class CurativeExperience extends Model
         'state',
         'address',
         'zipcode',
+        'quantity',
+        'listed_price',
     ];
 
     public function category()

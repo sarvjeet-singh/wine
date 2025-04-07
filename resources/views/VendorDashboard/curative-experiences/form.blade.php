@@ -64,6 +64,26 @@
 
                         <div class="information-box-body py-4">
                             <div class="row g-3">
+                                <!-- Experience Type -->
+                                <div class="col-lg-3 col-12">
+                                    <div class="form-floating">
+                                        <select name="category_id" class="form-control form-select" id="experienceType">
+                                            <option value="">Select type</option>
+                                            @if ($categories->isEmpty())
+                                                <option value="">No Category Found</option>
+                                            @else
+                                                @foreach ($categories as $key => $category)
+                                                    <option value="{{ $key }}"
+                                                        {{ old('category_id', isset($experience) ? $experience->category_id : '') == $key ? 'selected' : '' }}>
+                                                        {{ $category }}
+                                                    </option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                        <label class="form-label">Experience Type</label>
+                                    </div>
+                                </div>
+
                                 <!-- Experience Name -->
                                 <div class="col-lg-3 col-12">
                                     <div class="form-floating">
@@ -83,32 +103,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Admittance + Free -->
-                                <div class="col-lg-3 col-12">
-                                    <div class="row">
-                                        <div class="col-9">
-                                            <div class="input-group">
-                                                <span class="input-group-text">$</span>
-                                                <div class="form-floating">
-                                                    <input type="text" class="form-control" name="admittance"
-                                                        value="{{ old('admittance', isset($experience) ? $experience->admittance : '') }}"
-                                                        placeholder="Enter Admittance Fee">
-                                                    <label>Admittance</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-3 d-flex align-items-center">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="is_free"
-                                                    value="1" id="flexCheckDefault"
-                                                    {{ old('is_free', isset($experience) ? $experience->is_free : 0) ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="flexCheckDefault">
-                                                    Free
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                                 <!-- Extension -->
                                 <div class="col-lg-3 col-12">
                                     <div class="form-floating">
@@ -135,34 +129,71 @@
                                     </div>
                                 </div>
 
-                                <!-- Experience Type -->
-                                <div class="col-lg-6 col-12">
-                                    <div class="form-floating">
-                                        <select name="category_id" class="form-control form-select" id="experienceType">
-                                            <option value="">Select type</option>
-                                            @if ($categories->isEmpty())
-                                                <option value="">No Category Found</option>
-                                            @else
-                                                @foreach ($categories as $key => $category)
-                                                    <option value="{{ $key }}"
-                                                        {{ old('category_id', isset($experience) ? $experience->category_id : '') == $key ? 'selected' : '' }}>
-                                                        {{ $category }}
-                                                    </option>
-                                                @endforeach
-                                            @endif
-                                        </select>
-                                        <label class="form-label">Experience Type</label>
+                                <!-- Admittance + Free -->
+                                <div class="col-lg-3 col-12">
+                                    <div class="row">
+                                        <div class="col-9">
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <div class="form-floating">
+                                                    <input type="number" id="admittance" class="form-control"
+                                                        name="admittance"
+                                                        value="{{ old('admittance', isset($experience) ? $experience->admittance : '') }}"
+                                                        placeholder="Enter Admittance Fee">
+                                                    <label>Admittance</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-3 d-flex align-items-center">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="is_free"
+                                                    value="1" id="flexCheckDefault"
+                                                    {{ old('is_free', isset($experience) ? $experience->is_free : 0) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="flexCheckDefault">
+                                                    Free
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <!-- Listed Price -->
+                                <div class="col-lg-3 col-12">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <div class="form-floating">
+                                                    <input type="number" class="form-control" id="listed_price"
+                                                        value=""
+                                                        placeholder="Quantity" readonly>
+                                                    <label>Listed Price</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Inventory -->
-                                <div class="col-lg-6 col-12">
+                                <div class="col-lg-3 col-12">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" name="inventory"
+                                        <input type="number" class="form-control" name="inventory"
                                             value="{{ old('inventory', isset($experience) ? $experience->inventory : '') }}"
-                                            placeholder="Quantity">
-                                        <label>Inventory (in days)</label>
+                                            placeholder="Inventory">
+                                        <label>Inventory (per day)</label>
                                     </div>
                                 </div>
+
+                                <!-- Quantity -->
+                                <div class="col-lg-3 col-12">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" name="quantity"
+                                            value="{{ old('quantity', isset($experience) ? $experience->quantity : '') }}"
+                                            placeholder="Quantity">
+                                    <label>Number of guest allowed</label>
+                                    </div>
+                                </div>
+
 
                                 <!-- Start Date -->
                                 <div class="col-lg-3 col-12">
@@ -209,40 +240,11 @@
                                         <label>Duration</label>
                                     </div>
                                 </div>
-
-                                @php
-                                    // Retrieve booking times from old input or from the $experience (assumed to be an array)
-                                    $bookingTimes = old(
-                                        'booking_time',
-                                        isset($experience) ? $experience->booking_time : [],
-                                    );
-                                    // Ensure $bookingTimes is an array. If it's stored as JSON in the DB, decode it.
-                                    if (!is_array($bookingTimes)) {
-                                        $bookingTimes = json_decode($bookingTimes, true) ?? [];
-                                    }
-                                @endphp
-                                @if (count($bookingTimes) > 0)
-                                    @foreach ($bookingTimes as $index => $time)
-                                        <!-- Container for additional time inputs -->
-                                        <div class="col-lg-3 col-12">
-                                            <div class="form-floating d-flex">
-                                                <input type="time" name="booking_time[]"
-                                                    class="form-control"
-                                                    value="{{ $time }}">
-                                                <label>Select Time</label>
-                                                <button type="button" class="btn btn-danger ms-2 remove-time-btn">−</button>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @endif
-                                <div class="col-lg-3 col-12" id="extra-times">
-                                    <div class="form-floating d-flex">
-                                        <input type="time" id="booking_time" name="booking_time[]"
-                                            class="form-control"
-                                            value="">
-                                        <label>Select Time</label>
-                                        <button type="button"
-                                            class="btn btn-primary ms-2 add-time-btn">+</button>
+                                <div class="col-lg-3 col-12">
+                                    <div class="form-floating">
+                                        <input type="time" id="booking_time" name="booking_time" class="form-control"
+                                            value="{{ old('booking_time', !empty($experience) && !empty($experience->booking_time) ? \Carbon\Carbon::parse($experience->booking_time)->format('H:i') : '') }}">
+                                        <label>Start Time</label>
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-12">
@@ -262,13 +264,13 @@
                                 <div class="col-lg-3 col-12">
                                     <div class="form-floating">
                                         <input type="text" id="state" name="state" class="form-control"
-                                            value="{{ old('state', !empty($experience) && !empty($experience->state) ? $experience->state : ($vendor->state->name ?? '')) }}">
+                                            value="{{ old('state', !empty($experience) && !empty($experience->state) ? $experience->state : $vendor->state->name ?? '') }}">
                                         <label>State</label>
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-12">
                                     <div class="form-floating">
-                                        <input type="text" id="zipcode" name="zipcode" class="form-control"
+                                        <input type="text" oninput="formatPostalCode(this)" id="zipcode" maxlength="7" name="zipcode" class="form-control"
                                             value="{{ old('zipcode', !empty($experience) && !empty($experience->zipcode) ? $experience->zipcode : $vendor->postalCode) }}">
                                         <label>Zipcode</label>
                                     </div>
@@ -286,131 +288,125 @@
 
                                 <div class="col-12">
 
+
+
                                     <!-- Radio Buttons to Select Media Type -->
+
+
 
                                     <div class="mb-2 d-flex align-items-center gap-2">
 
+
+
                                         <label class="fw-bold">Choose Media Type:</label>
+
+
 
                                         <div class="form-check form-check-inline mb-0">
 
+
+
                                             <input class="form-check-input" type="radio" name="media_type"
+
                                                 id="imageOption" value="image"
+
                                                 {{ empty($experience) || (!empty($experience->image) && empty($experience->youtube_url)) ? 'checked' : '' }}>
+
+
 
                                             <label class="form-check-label" for="imageOption">Image</label>
 
+
+
                                         </div>
+
+
 
                                         <div class="form-check form-check-inline m-0">
 
+
+
                                             <input class="form-check-input" type="radio" name="media_type"
+
                                                 id="youtubeOption" value="youtube"
+
                                                 {{ !empty($experience->youtube_url) ? 'checked' : '' }}>
+
+
 
                                             <label class="form-check-label" for="youtubeOption">YouTube Link</label>
 
+
+
                                         </div>
+
+
 
                                         <!-- YouTube URL Input -->
+
                                         <div id="youtubeWrapper" class="d-none d-flex align-items-center gap-2">
+
                                             <input type="text" id="youtubeUrl" name="youtube_url"
+
                                                 class="form-control"
+
                                                 value="{{ old('youtube_url', $experience->youtube_url ?? '') }}"
+
                                                 placeholder="Enter YouTube Video URL">
-                                            <!-- YouTube Preview -->
-                                            <div id="youtubePreview" class="mt-2">
-                                                <iframe width="140" height="100" frameborder="0"
-                                                    allowfullscreen></iframe>
-                                            </div>
                                         </div>
 
-                                    </div>
 
+
+                                    </div>
 
 
                                     <!-- Image Upload Preview -->
-
                                     <div id="imageUploadWrapper" class="d-flex flex-wrap gap-2"
+
                                         style="{{ !empty($experience->youtube_url) ? 'display: none;' : '' }}">
 
+
+
                                         @if (!empty($experience) && !empty($experience->image))
+
                                             <img src="{{ Storage::url($experience->image) }}"
+
                                                 class="profile-img rounded-3"
+
                                                 style="width: 200px; height: 130px; object-fit: cover; border: 1px solid #408a95;">
+
                                         @endif
 
+
+
                                         <div class="d-flex justify-content-center align-items-center rounded-3"
+
                                             style="width: 200px; height: 130px; border: 1px solid #408a95; background-color: #f8f9fa; cursor: pointer;">
+
+
 
                                             <i class="fa-solid fa-camera fa-2x text-muted"></i>
 
+
+
                                             <input type="file" id="profileImage" name="image" class="file-input"
+
                                                 accept="image/*" style="display: none;">
+
+
 
                                         </div>
 
+
+
                                     </div>
 
+                                    <!-- YouTube Preview -->
+                                    <div id="youtubePreview" class="mt-2">
+                                        <iframe class="rounded-3" width="200" height="130" frameborder="0" allowfullscreen></iframe>
+                                    </div>
                                 </div>
-
-                                <!-- Media Upload -->
-                                {{-- <div class="col-12">
-                                    <!-- Radio Buttons to Select Media Type -->
-                                    <div class="mb-2">
-                                        <label class="fw-bold">Choose Media Type:</label>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="media_type"
-                                                id="imageOption" value="image"
-                                                {{ empty($experience) || (!empty($experience->image) && empty($experience->youtube_url)) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="imageOption">Image</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="media_type"
-                                                id="youtubeOption" value="youtube"
-                                                {{ !empty($experience->youtube_url) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="youtubeOption">YouTube Video</label>
-                                        </div>
-                                    </div>
-
-                                    <!-- Image Upload Preview -->
-                                    <div id="imageUploadWrapper" class="d-flex flex-wrap gap-2"
-                                        style="{{ !empty($experience->youtube_url) ? 'display: none;' : '' }}">
-                                        @if (!empty($experience) && !empty($experience->image))
-                                            <img src="{{ Storage::url($experience->image) }}"
-                                                class="profile-img rounded-3"
-                                                style="width: 200px; height: 130px; object-fit: cover; border: 1px solid #408a95;">
-                                        @endif
-                                        <div class="d-flex justify-content-center align-items-center rounded-3"
-                                            style="width: 200px; height: 130px; border: 1px solid #408a95; background-color: #f8f9fa; cursor: pointer;">
-                                            <i class="fa-solid fa-camera fa-2x text-muted"></i>
-                                            <input type="file" id="profileImage" name="image" class="file-input"
-                                                accept="image/*" style="display: none;">
-                                        </div>
-                                    </div>
-
-                                    <!-- YouTube URL Input -->
-                                    <div id="youtubeWrapper" class="mt-2 d-none">
-                                        <label for="youtubeUrl" class="fw-bold">YouTube Video Link</label>
-                                        <input type="text" id="youtubeUrl" name="youtube_url" class="form-control"
-                                            value="{{ old('youtube_url', $experience->youtube_url ?? '') }}"
-                                            placeholder="Enter YouTube Video URL">
-
-                                        <!-- YouTube Preview -->
-                                        <div id="youtubePreview" class="mt-2">
-                                            <iframe width="200" height="130" frameborder="0"
-                                                allowfullscreen></iframe>
-                                        </div>
-                                    </div>
-                                </div> --}}
                             </div>
-
-                            {{-- <div class="row mt-5">
-                                <div class="col-sm-12 text-center">
-                                    <button type="submit"
-                                        class="btn wine-btn">{{ isset($experience) ? 'Update' : 'Create' }}</button>
-                                </div>
-                            </div> --}}
                         </div>
                     </form>
 
@@ -575,12 +571,15 @@
                 if ($imageOption.is(":checked")) {
                     $imageUploadWrapper.removeClass("d-none").addClass("d-flex");
                     $youtubeWrapper.addClass("d-none");
+                    $youtubePreview.addClass("d-none");
                 } else if ($youtubeOption.is(":checked")) {
                     $imageUploadWrapper.addClass("d-none").removeClass("d-flex");
                     $youtubeWrapper.removeClass("d-none");
+                    $youtubePreview.removeClass("d-none");
                 } else {
                     $imageUploadWrapper.addClass("d-none");
                     $youtubeWrapper.addClass("d-none");
+                    $youtubePreview.addClass("d-none");
                 }
             }
 
@@ -619,6 +618,7 @@
             function toggleAdmittance() {
                 if ($('#flexCheckDefault').is(':checked')) {
                     $('input[name="admittance"]').prop('readonly', true).val(''); // Make readonly and clear value
+                    $('input[name="listed_price"]').prop('readonly', true).val(''); // Make readonly and clear value
                 } else {
                     $('input[name="admittance"]').prop('readonly', false);
                 }
@@ -632,28 +632,24 @@
                 toggleAdmittance();
             });
         });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelector(".add-time-btn").addEventListener("click", function() {
-                let newInput = `
-                    <div class="col-lg-3 col-12">
-                        <div class="form-floating d-flex">
-                            <input type="time" name="booking_time[]"
-                                class="form-control"
-                                value="">
-                            <label>Select Time</label>
-                            <button type="button" class="btn btn-danger ms-2 remove-time-btn">−</button>
-                        </div>
-                    </div>
-                `;
-                document.getElementById("extra-times").insertAdjacentHTML("beforebegin", newInput);
-            });
+        $("#admittance").on("input", function() {
+            var inputValue = $(this).val();
+            let platformFee = parseFloat("{{ $vendor->platform_fee ?? config('site.platform_fee') ?? '1.00' }}"); // Convert to float
+            inputValue = inputValue * (1 + (platformFee / 100));
+            $("#listed_price").val(inputValue.toFixed(2) > 0 ? inputValue.toFixed(2) : ''); // Optionally round to 2 decimal places
         });
-        $(document).ready(function() {
-            $(document).on("click", ".remove-time-btn", function() {
-                $(this).closest(".col-lg-3").remove();
-            });
-        })
+        function formatPostalCode(input) {
+            // Remove all non-alphanumeric characters and convert to uppercase
+            let value = input.value.replace(/\W/g, '').toUpperCase();
+
+            // Add a space after every 3 characters
+            if (value.length > 3) {
+                value = value.slice(0, 3) + ' ' + value.slice(3);
+            }
+
+            // Update the input value
+            input.value = value;
+        }
+        $("#admittance").trigger("input");
     </script>
 @endsection

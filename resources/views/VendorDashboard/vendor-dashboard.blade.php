@@ -82,7 +82,7 @@
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col-12">
-                                        @if ($vendor->account_status != 1 && $hasActiveSubscription)
+                                        @if ($vendor->account_status != 1)
                                             <button id="checkActivationBtn" class="btn btn-primary wine-btn rounded-2 px-3">
                                                 Complete Your Profile
                                             </button>

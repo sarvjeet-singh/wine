@@ -1,3 +1,26 @@
+<style>
+    .listing-head-sec:before {
+        content: "";
+        width: 100%;
+        height: 1.5px;
+        position: absolute;
+        top: 50%;
+        background-color: #eaeaea;
+        left: 0;
+        z-index: -1;
+    }
+
+    .listing-head-sec h3 {
+        color: #212559;
+        font-size: 20px;
+        padding-right: 10px;
+        background-color: #ffffff;
+        z-index: 1;
+    }
+</style>
+<div class="listing-head-sec position-relative d-flex align-items-center justify-content-between gap-1 py-2">
+    <h3 class="mb-0 fw-bold">PARTNERS</h3>
+</div>
 @if (count($vendors))
     @php
         $enablehr = 0;
@@ -19,6 +42,9 @@
         @if ($enablehr == 1 && $vendor->account_status == '2')
             <div style="clear:both">
             </div>
+            <div class="listing-head-sec position-relative d-flex align-items-center justify-content-between gap-1 py-2">
+                <h3 class="mb-0 fw-bold">PARTICIPANTS</h3>
+            </div>
             <!-- <hr> -->
             @php
                 $enablehr = 0;
@@ -27,6 +53,9 @@
         @endif
         @if (($enablehr1 == 1 || $enablehr == 1) && $vendor->account_status == '3')
             <div style="clear:both">
+            </div>
+            <div class="listing-head-sec position-relative d-flex align-items-center justify-content-between gap-1 py-2">
+                <h3 class="mb-0 fw-bold">PRELIMINARY</h3>
             </div>
             <!-- <hr> -->
             @php

@@ -52,9 +52,9 @@
                             </thead>
                             <tbody>
                                 @if ($experiences->count() > 0)
-                                    @foreach ($experiences as $experience)
+                                    @foreach ($experiences as $key => $experience)
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ ($experiences->currentPage() - 1) * $experiences->perPage() + $loop->iteration }}</td>
                                             <td>{{ optional($experience->category)->name ?? 'N/A' }}</td>
                                             <td>{{ $experience->admittance ?? 'N/A' }}</td>
                                             <td>{{ $experience->extension ?? 'N/A' }}</td>
@@ -83,6 +83,7 @@
                                 @endif
                             </tbody>
                         </table>
+                        <div class="pagination justify-content-end">{{ $experiences->links() }}></div>
                     </div>
                 </div>
             </div>
