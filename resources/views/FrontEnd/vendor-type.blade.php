@@ -67,40 +67,6 @@
         /* Loader CSS End */
     </style>
     <!-- ========== Tab Sec Start ========== -->
-    <section class="tab-content-sec listing-head-bar">
-        <div class="container">
-            <div class="inner-content">
-                <ul class="list-unstyled d-flex justify-content-center align-items-center mb-0">
-                    @php
-                        switch ($type):
-                            case 'accommodations':
-                                $routepath = 'accommodations';
-                                break;
-
-                            case 'excursion':
-                                $routepath = 'excursion-listing';
-                                break;
-
-                            case 'wineries':
-                                $routepath = 'wineries-listing';
-                                break;
-
-                            case 'licensed':
-                                $routepath = 'licensed';
-                                break;
-                            case 'non-licensed':
-                                $routepath = 'non-licensed';
-                                break;
-
-                            default:
-                        endswitch;
-                    @endphp
-                    <li><a href="{{ route($routepath) }}" class="text-decoration-none">{{ ucfirst($type) }} Directory</a></li>
-                </ul>
-                <div id="records-found" class="text-center">[ {{$vendorCount}} Records ]</div>
-            </div>
-        </div>
-    </section>
     <section class="listing-outer my-sm-3 my-2">
         <div class="container-fluid">
             <div class="row">

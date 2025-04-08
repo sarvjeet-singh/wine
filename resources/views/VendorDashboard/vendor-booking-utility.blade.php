@@ -218,7 +218,7 @@
                                 </div>
                             @else
                                 <div class="row mt-3">
-                                    <div class="col-sm-12 col-12">
+                                    <div class="col-sm-6 col-12">
                                         <input type="checkbox" class="custom-checkbox" id="applicable-taxes"
                                             name="apply_applicable_taxes"
                                             {{ old('apply_applicable_taxes', !empty($vendor->metadata->applicable_taxes_amount) ? 1 : 0) ? 'checked' : '' }}>
@@ -234,6 +234,25 @@
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
+                                    @if (strtolower($vendor->vendor_type) == 'winery')
+                                        <div class="col-sm-6 col-12">
+                                            <input type="checkbox" class="custom-checkbox" id="applicable-vendor-taxes"
+                                                name="apply_applicable_taxes"
+                                                {{ old('apply_applicable_taxes', !empty($vendor->metadata->applicable_vendor_taxes_amount) ? 1 : 0) ? 'checked' : '' }}>
+                                            <label class="form-label" for="applicable-vendor-taxes">Apply B2B Applicable
+                                                Taxes</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">%</span>
+                                                <input type="number" class="form-control" id="applicable-taxes-amount"
+                                                    name="applicable_vendor_taxes_amount"
+                                                    value="{{ old('applicable_vendor_taxes_amount', !empty($vendor->metadata->applicable_vendor_taxes_amount) ? $vendor->metadata->applicable_vendor_taxes_amount : '') }}"
+                                                    placeholder="Enter B2C Applicable Taxes">
+                                            </div>
+                                            @error('applicable_vendor_taxes_amount')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    @endif
                                 </div>
                             @endif
                             <div class="row mt-5">
@@ -268,7 +287,8 @@
                             <div class="row mt-3">
                                 <div class="col-12">
                                     <input type="radio" class="custom-radio" id="no-cancel-policy" name="policy"
-                                        value="no-cancel" {{ old('policy', $vendor->policy) == 'no-cancel' ? 'checked' : '' }}>
+                                        value="no-cancel"
+                                        {{ old('policy', $vendor->policy) == 'no-cancel' ? 'checked' : '' }}>
                                     <label class="form-label" for="no-cancel-policy">No Cancellation</label>
                                     <p style="font-size: 16px;padding-left: 30px;">A full refund minus transaction fees
                                         will be issued upon request up to 24 hours prior to the check-in date indicated.</p>
@@ -290,7 +310,8 @@
                             <div class="row mt-3">
                                 <div class="col-12">
                                     <input type="radio" class="custom-radio" id="seven-day-policy" name="policy"
-                                        value="seven-day" {{ old('policy', $vendor->policy) == 'seven-day' ? 'checked' : '' }}>
+                                        value="seven-day"
+                                        {{ old('policy', $vendor->policy) == 'seven-day' ? 'checked' : '' }}>
                                     <label class="form-label" for="seven-day-policy">7 Days Cancellation</label>
                                     <p style="font-size: 16px;padding-left: 30px;">All bookings are final. No portion of
                                         your transaction will be refunded. A credit or rain cheque may be issued by the

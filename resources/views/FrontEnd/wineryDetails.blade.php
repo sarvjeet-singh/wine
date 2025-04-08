@@ -852,70 +852,83 @@
     @endif
 
     <div class="container mb-5 mt-lg-0 mt-5 frontend">
-
-        <div class="guest-favorite text-center">
-
-            <h2>Review and Testimonial</h2>
-
-            <p>This is a signature property that ranks in the top 10% of all eligible listings based on guest testimonials
-
-                and our own rigorous vetting process</p>
-
-        </div>
-
-        <div class="row">
-
-            @if ($vendor->reviews->isNotEmpty())
-                @foreach ($vendor->reviews as $review)
-                    <div class="col-md-4 pb-4">
-
-                        <div class="card guest-testi">
-
-                            <div class="card-body">
-
-                                <div class="d-flex align-items-center mb-3 gap-3">
-
-                                    <img src="{{ !empty($review->customer->profile_image) ? asset('images/UserProfile/' . $review->customer->profile_image) : asset('images/UserProfile/default-profile.png') }}"
-                                        alt="User Image" style="height:60px; width:60px;" class="rounded-circle mr-3">
-
-                                    <div>
-
-                                        <h5 class="card-title mb-2">{{ $review->customer->firstname ?? '' }}
-
-                                            {{ $review->customer->lastname ?? '' }}</h5>
-
-                                        <h6 class="card-subtitle text-muted ">
-                                            {{ $review->customer->city ?? '' }},{{ $review->customer->state ?? '' }}</h6>
-
-                                        <div class="rating-star theme-color" data-rating="{{ $review->rating ?? 0.0 }}">
-
-                                            <small class="text-muted">{{ $review->created_at->diffForHumans() }}</small>
-
+        <div class="p-4 rounded-4 mb-4" style="border: 2px dashed #c0a144;">
+            <div class="guest-favorite position-relative text-center">
+                <h2 style="max-width: 76%;margin-inline: auto;">Review and Testimonial</h2>
+                <p>This is a signature property that ranks in the top 10% of all eligible listings based on guest
+                    testimonials
+                    and our own rigorous vetting process</p>
+                <div class="submit-review-btn mb-md-0 mb-3">
+                    <a href="{{ !Auth::guard('customer')->check() ? route('check-login', 'review') : route('user-review-submit') }}"
+                        class="btn theme-btn">Write a review</a>
+                </div>
+            </div>
+            <div class="row">
+                @if ($vendor->reviews->isNotEmpty())
+                    @foreach ($vendor->reviews as $review)
+                        <div class="col-md-4 pb-4">
+                            <div class="card guest-testi">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3 gap-3">
+                                        <img src="{{ !empty($review->customer->profile_image) ? asset('images/UserProfile/' . $review->customer->profile_image) : asset('images/UserProfile/default-profile.png') }}"
+                                            alt="User Image" style="height:60px; width:60px;"
+                                            class="rounded-circle mr-3">
+                                        <div>
+                                            <h5 class="card-title mb-2">{{ $review->customer->firstname ?? '' }}
+                                                {{ $review->customer->lastname ?? '' }}</h5>
+                                            <h6 class="card-subtitle text-muted ">{{ $review->customer->city ?? '' }},
+                                                {{ $review->customer->state ?? '' }}</h6>
+                                            <div class="rating-star theme-color"
+                                                data-rating="{{ $review->rating ?? 0.0 }}">
+                                                <small
+                                                    class="text-muted">{{ $review->created_at->diffForHumans() }}</small>
+                                            </div>
                                         </div>
-
                                     </div>
-
+                                    <p class="card-text">{{ $review->review_description ?? '' }}
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#commentImageModal" data-img-src="{{ url(Storage::url($review->image)) ?? '' }}">View
+                                            More</a>
+                                    </p>
                                 </div>
-
-                                <p class="card-text">{{ $review->review_description }}</p>
-
-
-
                             </div>
-
                         </div>
+                    @endforeach
+                @else
+                    <p class="text-center">No review has added</p>
+                @endif
 
-                    </div>
-                @endforeach
-            @else
-                <p>No review has added</p>
-            @endif
-
+            </div>
         </div>
-
+        <!-- <div>
+                <h5 class="mb-3">Reviews images</h5>
+                <a href="https://testing.winecountryweekends.ca/images/VendorImages/Wine Country Cottage/qHs5DPQfF1.png" target="_blank">
+                    <img src="https://testing.winecountryweekends.ca/images/VendorImages/Wine Country Cottage/qHs5DPQfF1.png" alt="Thumbnail Image" class="img-thumbnail object-fit-cover"  style="height: 100px;cursor: pointer;">
+                </a>
+            </div> -->
     </div>
 
-
+     <!-- Modal -->
+     <div class="modal fade" id="commentImageModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Comment</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <h6 class="mb-2">Reviews images</h6>
+                    <!-- Image Thumbnail -->
+                    <a href="#" id="commentImageLink"
+                        target="_blank">
+                        <img src="" id="commentImage"
+                            alt="Thumbnail Image" class="img-thumbnail d-none" data-bs-toggle="modal"
+                            data-bs-target="#imageModal" style="height: 100px;cursor: pointer;">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Modal -->
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 
@@ -1057,39 +1070,39 @@
 
                                         <!-- <tr>
 
+                                                                                                                                                                                                                                <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
+
+                                                                                                                                                                                                                                <td>Standard</td>
+
+                                                                                                                                                                                                                                <td class="room-avail">Available</td>
+
+                                                                                                                                                                                                                                <td>
+
+                                                                                                                                                                                                                                    <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+
+                                                                                                                                                                                                                                    <button class="btn">Select Room</button>
+
+                                                                                                                                                                                                                                </td>
+
+                                                                                                                                                                                                                            </tr>
+
+                                                                                                                                                                                                                            <tr>
+
                                                                                                                                                                                                                             <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
 
-                                                                                                                                                                                                                            <td>Standard</td>
+                                                                                                                                                                                                                                <td>Standard</td>
 
-                                                                                                                                                                                                                            <td class="room-avail">Available</td>
+                                                                                                                                                                                                                                <td class="room-not-avail">Not Available</td>
 
-                                                                                                                                                                                                                            <td>
+                                                                                                                                                                                                                                <td>
 
-                                                                                                                                                                                                                                <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+                                                                                                                                                                                                                                    <span class="room-price d-block fw-bold mb-2">$499/per night</span>
 
-                                                                                                                                                                                                                                <button class="btn">Select Room</button>
+                                                                                                                                                                                                                                    <button class="btn">Select Room</button>
 
-                                                                                                                                                                                                                            </td>
+                                                                                                                                                                                                                                </td>
 
-                                                                                                                                                                                                                        </tr>
-
-                                                                                                                                                                                                                        <tr>
-
-                                                                                                                                                                                                                        <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
-
-                                                                                                                                                                                                                            <td>Standard</td>
-
-                                                                                                                                                                                                                            <td class="room-not-avail">Not Available</td>
-
-                                                                                                                                                                                                                            <td>
-
-                                                                                                                                                                                                                                <span class="room-price d-block fw-bold mb-2">$499/per night</span>
-
-                                                                                                                                                                                                                                <button class="btn">Select Room</button>
-
-                                                                                                                                                                                                                            </td>
-
-                                                                                                                                                                                                                        </tr> -->
+                                                                                                                                                                                                                            </tr> -->
 
                                     </tbody>
 
@@ -2309,6 +2322,27 @@
 
             });
 
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const commentModal = document.getElementById('commentImageModal');
+
+            commentModal.addEventListener('show.bs.modal', function(event) {
+                const trigger = event.relatedTarget; // the clicked link
+                const imageUrl = trigger.getAttribute('data-img-src');
+                const image = commentModal.querySelector('#commentImage');
+                const imageLink = commentModal.querySelector('#commentImageLink');
+
+                if (imageUrl) {
+                    image.src = imageUrl;
+                    imageLink.href = imageUrl;
+                    image.classList.remove('d-none');
+                } else {
+                    image.src = '';
+                    image.classList.add('d-none');
+                }
+            });
         });
     </script>
 @endsection

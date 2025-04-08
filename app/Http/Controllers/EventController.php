@@ -63,7 +63,8 @@ class EventController extends Controller
             ->orderBy('start_date', 'asc')
             ->limit(3)
             ->get();
-        return view('FrontEnd.events.index', compact('todayEvents', 'tomorrowEvents', 'upcomingEvents'));
+        $vendorCount = CurativeExperience::where('status', 'active')->count();
+        return view('FrontEnd.events.index', compact('todayEvents', 'tomorrowEvents', 'upcomingEvents', 'vendorCount'));
     }
 
     public function getEvents(Request $request)

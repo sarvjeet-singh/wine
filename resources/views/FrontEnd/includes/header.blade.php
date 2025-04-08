@@ -150,7 +150,8 @@
                                 <a class="nav-link login-btn dropdown-toggle" href="{{ route('login') }}"
                                     id="loginOption" data-bs-toggle="dropdown" aria-expanded="false">Login</a>
                                 <ul class="dropdown-menu" aria-labelledby="loginOption">
-                                    <li><a class="dropdown-item rounded-top" href="{{ route('customer.login') }}">User Account</a></li>
+                                    <li><a class="dropdown-item rounded-top" href="{{ route('customer.login') }}">User
+                                            Account</a></li>
                                     <li><a class="dropdown-item rounded-bottom"
                                             href="{{ route('vendor.login') }}">Vendor Account</a></li>
                                 </ul>
@@ -194,13 +195,65 @@
         <div class="container-fluid">
             <div class="inner-content">
                 <ul class="list-unstyled d-flex justify-content-between align-items-center mb-0 gap-3">
-                    <li><a href="{{ route('accommodations') }}" class="text-decoration-none">Directories</a></li>
-                    <li><a href="{{ route('accommodations') }}" class="text-decoration-none">Accommodations</a></li>
-                    <li><a href="{{ route('excursion-listing') }}" class="text-decoration-none">Excursions</a></li>
-                    <li><a href="{{ route('wineries-listing') }}" class="text-decoration-none">Wineries</a></li>
-                    <li><a href="/licensed" class="text-decoration-none">Licensed</a></li>
-                    <li><a href="/non-licensed" class="text-decoration-none">Non-Licensed</a></li>
-                    <li><a href="/events" class="text-decoration-none">Events</a></li>
+                    <li>
+                        <a href="{{ route('accommodations') }}" class="text-decoration-none">
+                            Directories
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('accommodations') }}"
+                            class="text-decoration-none {{ request()->routeIs('accommodations') ? 'border-bottom border-dark' : '' }}">
+                            Accommodations
+                        </a>
+                        @if (request()->routeIs('accommodations'))
+                            <span id="records-found" class="text-center">[ {{ $vendorCount }} ]</span>
+                        @endif
+                    </li>
+                    <li>
+                        <a href="{{ route('excursion-listing') }}"
+                            class="text-decoration-none {{ request()->routeIs('excursion-listing') ? 'border-bottom border-dark' : '' }}">
+                            Excursions
+                        </a>
+                        @if (request()->routeIs('excursion-listing'))
+                            <span id="records-found" class="text-center">[ {{ $vendorCount }} ]</span>
+                        @endif
+                    </li>
+                    <li>
+                        <a href="{{ route('wineries-listing') }}"
+                            class="text-decoration-none {{ request()->routeIs('wineries-listing') ? 'border-bottom border-dark' : '' }}">
+                            Wineries
+                        </a>
+                        @if (request()->routeIs('wineries-listing'))
+                            <span id="records-found" class="text-center">[ {{ $vendorCount }} ]</span>
+                        @endif
+                    </li>
+                    <li>
+                        <a href="/licensed"
+                            class="text-decoration-none {{ request()->is('licensed') ? 'border-bottom border-dark' : '' }}">
+                            Licensed
+                        </a>
+                        @if (request()->is('licensed'))
+                            <span id="records-found" class="text-center">[ {{ $vendorCount }} ]</span>
+                        @endif
+                    </li>
+                    <li>
+                        <a href="/non-licensed"
+                            class="text-decoration-none {{ request()->is('non-licensed') ? 'border-bottom border-dark' : '' }}">
+                            Non-Licensed
+                        </a>
+                        @if (request()->is('non-licensed'))
+                            <span id="records-found" class="text-center">[ {{ $vendorCount }} ]</span>
+                        @endif
+                    </li>
+                    <li>
+                        <a href="/events"
+                            class="text-decoration-none {{ request()->is('events') ? 'border-bottom border-dark' : '' }}">
+                            Events
+                        </a>
+                        @if (request()->routeIs('events'))
+                            <span id="records-found" class="text-center">[ {{ $vendorCount }} ]</span>
+                        @endif
+                    </li>
                 </ul>
             </div>
         </div>

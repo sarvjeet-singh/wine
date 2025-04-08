@@ -181,14 +181,14 @@
                                 <div class="row">
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" id="fullname" name="fullname"
+                                            <input type="text" value="{{ Auth::user()->firstname ?? '' }} {{ Auth::user()->lastname ?? '' }}" class="form-control" id="fullname" name="fullname"
                                                 placeholder="Name">
                                             <label for="fullname">Name</label>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
-                                            <input type="email" class="form-control" id="email" name="email"
+                                            <input type="email" class="form-control" id="email" name="email" value="{{ Auth::user()->email ?? '' }}"
                                                 placeholder="Email">
                                             <label for="email">Email</label>
                                         </div>
@@ -196,27 +196,27 @@
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
                                             <input type="text" class="form-control phone-number" id="contact_number"
-                                                name="contact_number" placeholder="Contact Number">
+                                                name="contact_number" value="{{ Auth::user()->contact_number ?? '' }}" placeholder="Contact Number">
                                             <label for="contact_number">Contact Number</label>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
                                             <input type="text" class="form-control" id="street_address"
-                                                name="street_address" placeholder="Street Address">
+                                                name="street_address" value="{{ Auth::user()->street_address ?? '' }}" placeholder="Street Address">
                                             <label for="street_address">Street Address</label>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" id="unit_suite" name="unit_suite"
+                                            <input type="text" class="form-control" id="unit_suite" name="unit_suite" value="{{ Auth::user()->suite ?? '' }}"
                                                 placeholder="Unit Suite">
                                             <label for="unit_suite">Unit Suite</label>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" id="city" name="city"
+                                            <input type="text" class="form-control" id="city" name="city" value="{{ Auth::user()->city ?? '' }}"
                                                 placeholder="City/Town">
                                             <label for="city">City/Town</label>
                                         </div>
@@ -282,7 +282,7 @@
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
                                             <input type="text" class="form-control" id="postal_code"
-                                                name="postal_code" maxlength="7" oninput="formatPostalCode(this)"
+                                                name="postal_code" maxlength="7" value="{{ Auth::user()->postal_code ?? '' }}" oninput="formatPostalCode(this)"
                                                 placeholder="Postal Code">
                                             <label for="postal_code">Postal Code</label>
                                         </div>

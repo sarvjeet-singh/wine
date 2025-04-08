@@ -644,6 +644,8 @@ class VendorController extends Controller
 		}
 		if (strtolower($vendor->vendor_type) == 'winery') {
 			$metdata = VendorWineryMetadata::where('vendor_id', $request->vendorid)->first();
+			
+			$metdata->applicable_vendor_taxes_amount  =  $request->applicable_vendor_taxes_amount ?? null;
 			if (!$metdata) {
 				$metdata = new VendorWineryMetadata();
 				$metdata->vendor_id = $request->vendorid;

@@ -15,6 +15,8 @@ class VendorWineryMetadata extends Model
         'farming_practices',
         'max_group',
         'cuisines',
+        'applicable_taxes_amount',
+        'applicable_vendor_taxes_amount',
     ];
 
     public function tastingOptions() {

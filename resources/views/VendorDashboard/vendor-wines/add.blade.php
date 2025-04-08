@@ -25,7 +25,7 @@
                     <label for="image" class="form-label">Image</label>
                     <input class="form-control" type="file" name="image" id="image" accept="image/*">
                 </div>
-                
+
             </div>
         </div>
         <div class="col-12">
@@ -33,15 +33,17 @@
                 <div class="col-6 d-flex flex-column align-items-center position-relative">
                     <iframe id="pdfPreview" src=""
                         style="display:none; width:90%; height:200px; border:1px solid #ccc;margin-right: auto;"></iframe>
-                    <button type="button" id="removePdf" style="display:none; position:absolute;right:0;top:0;padding: 2px 8px;" class="btn btn-danger mt-2">
+                    <button type="button" id="removePdf"
+                        style="display:none; position:absolute;right:0;top:0;padding: 2px 8px;"
+                        class="btn btn-danger mt-2">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
                 <div class="col-6 img-box d-flex flex-column align-items-center position-relative">
                     <img id="imagePreview" src="" alt="Image Preview"
                         style="display:none; max-width:100%;height:auto;max-height:200px;" />
-                    <button type="button" id="removeImage" style="display:none; top: 0;padding: 2px 8px;" class="btn btn-danger mt-2"><i
-                            class="fa-solid fa-xmark"></i></button>
+                    <button type="button" id="removeImage" style="display:none; top: 0;padding: 2px 8px;"
+                        class="btn btn-danger mt-2"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
         </div>
@@ -101,6 +103,7 @@
                     <label for="" class="form-label">Vintage Date</label>
 
                     <select class="form-select" id="vintage_date" name="vintage_date">
+                        <option value="">Select Year</option>
                         @foreach (range(date('Y'), 1900) as $year)
                             <option value="{{ $year }}">{{ $year }}</option>';
                         @endforeach
@@ -304,7 +307,7 @@
                             value="Drink Now" {{ old('cellar') == 'Drink Now' ? 'checked' : '' }}>
                         <label class="form-check-label" for="cellar1">
                             <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
-                            <p>Drink Now</p>
+                            <p>Drink Now (1-3yrs)</p>
                         </label>
                     </div>
                 </div>
@@ -314,7 +317,7 @@
                             value="Drink or Cellar" {{ old('cellar') == 'Drink or Cellar' ? 'checked' : '' }}>
                         <label class="form-check-label" for="cellar2">
                             <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
-                            <p>Drink or Hold</p>
+                            <p>Drink or Hold (4-6yrs)</p>
                         </label>
                     </div>
                 </div>
@@ -324,7 +327,7 @@
                             {{ old('cellar') == 'Cellar' ? 'checked' : '' }}>
                         <label class="form-check-label" for="cellar3">
                             <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
-                            <p>Cellar</p>
+                            <p>Cellar (9+yrs)</p>
                         </label>
                     </div>
                 </div>
@@ -412,10 +415,25 @@
                     required: true
                 },
 
-                // series: {
+                vintage_date: {
 
-                //     required: true
-                // },
+                    required: true
+                },
+
+                bottle_size: {
+
+                    required: true
+                },
+
+                "varietal_type[]": {
+
+                    required: true
+                },
+
+                "varietal_blend[]": {
+
+                    required: true
+                },
 
                 abv: {
 
@@ -642,4 +660,15 @@
         document.getElementById('pdfPreview').style.display = "none";
         this.style.display = "none";
     });
+    $(document).ready(function() {
+        $(document).on('click', ".rs-values", function() {
+            $(this).siblings().children('input').prop('checked', true);
+            const inputs = document.querySelectorAll('input.form-control.rs-values');
+
+            // Loop through and clear all except the selected one
+            inputs.forEach(input => {
+                input.value = ''; // Clear the value
+            });
+        });
+    })
 </script>

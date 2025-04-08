@@ -40,23 +40,25 @@
         }
 
         /*.progress-bar {
-            width: 0%;
-            height: 100%;
-            background: green;
-            text-align: center;
-            line-height: 20px;
-            color: white;
-            font-weight: bold;
-            transition: width 0.3s;
-        }*/
+                        width: 0%;
+                        height: 100%;
+                        background: green;
+                        text-align: center;
+                        line-height: 20px;
+                        color: white;
+                        font-weight: bold;
+                        transition: width 0.3s;
+                    }*/
         .progress {
             width: 80%;
             height: 12px;
             font-size: 10px;
         }
+
         .progress-btns {
             width: 20%;
         }
+
         .progress-bar {
             background-color: #408a95;
         }
@@ -221,29 +223,38 @@
 
     <div class="col right-side">
         <!-- <div class="upload-container">
-            <h3>Upload Your Files</h3>
-            <div class="dropbox" id="dropbox">
-                Drag & Drop files here or click to upload
-            </div>
-            <input type="file" id="fileInput" multiple style="display: none;">
+                        <h3>Upload Your Files</h3>
+                        <div class="dropbox" id="dropbox">
+                            Drag & Drop files here or click to upload
+                        </div>
+                        <input type="file" id="fileInput" multiple style="display: none;">
 
-            <div class="progress-container" style="display: none;">
-                <div class="progress-bar" id="progressBar">0%</div>
-            </div>
+                        <div class="progress-container" style="display: none;">
+                            <div class="progress-bar" id="progressBar">0%</div>
+                        </div>
 
-            <div id="status"></div>
-        </div> -->
+                        <div id="status"></div>
+                    </div> -->
 
-        <div class="mb-4 d-flex justify-content-between align-items-center gap-2">
-            <!-- Progress Bar -->
-            <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
-              <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 75%">75%</div>
-            </div>
-            <!-- /Progress Bar -->
+        <div class="container mb-4">
+            <div class="row align-items-start">
+                <!-- Progress Bar & Status -->
+                <div class="col-md-9 col-12 mb-3 mb-md-0">
+                    <div class="progress progress-container w-100 mb-2" style="display: none;" role="progressbar"
+                        aria-label="Animated striped example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"
+                            id="progressBar">0%</div>
+                    </div>
+                    <div id="status" class="text-muted small"></div>
+                </div>
 
-            <div class="progress-btns text-end">
-                <button type="button" class="btn wine-btn rounded px-4 open-modal-btn" data-url="add" data-id="{{ $vendor_id }}"> Add Wine</button>
-                <button type="button" class="btn wine-btn rounded px-4">Upload</button>
+                <!-- Buttons -->
+                <div class="col-md-3 col-12 text-md-end text-start d-flex justify-content-md-end gap-2">
+                    <button type="button" class="btn wine-btn rounded px-4 open-modal-btn" data-url="add"
+                        data-id="{{ $vendor_id }}">Add Wine</button>
+                    <input type="file" id="fileInput" multiple style="display: none;">
+                    <button type="button" id="dropbox" class="btn wine-btn rounded px-4">Upload</button>
+                </div>
             </div>
         </div>
 
@@ -257,7 +268,7 @@
 
                         <th scope="col">S.No</th>
 
-                        <th scope="col">Series</th>
+                        <th scope="col">Label</th>
                         <th scope="col">Image</th>
                         <th scope="col">Inventory</th>
 
@@ -277,7 +288,7 @@
 
                             <td>{{ $key + 1 }}</td>
 
-                            <td>{{ $wine->series }}</td>
+                            <td>{{ $wine->winery_name }}</td>
 
                             <td>
                                 @if ($wine->image)

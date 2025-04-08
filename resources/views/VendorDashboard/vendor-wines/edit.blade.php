@@ -34,15 +34,17 @@
             <div class="col-12">
                 <div class="row">
                     <div class="col-md-6 d-flex flex-column align-items-center">
-                        @if(isset($wine) && $wine->pdf) 
-                            <iframe id="pdfPreview" src="{{ asset('storage/'.$wine->pdf) }}"
-                                    style="width:100%; height:200px; border:1px solid #ccc;"></iframe>
-                            <button type="button" id="removePdf" style="position: absolute; right: 0px; top: 0px; padding: 2px 8px;" class="btn btn-danger mt-2">
+                        @if (isset($wine) && $wine->pdf)
+                            <iframe id="pdfPreview" src="{{ asset('storage/' . $wine->pdf) }}"
+                                style="width:100%; height:200px; border:1px solid #ccc;"></iframe>
+                            <button type="button" id="removePdf"
+                                style="position: absolute; right: 0px; top: 0px; padding: 2px 8px;"
+                                class="btn btn-danger mt-2">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         @else
                             <iframe id="pdfPreview" src=""
-                                    style="display:none; width:100%; height:200px; border:1px solid #ccc;"></iframe>
+                                style="display:none; width:100%; height:200px; border:1px solid #ccc;"></iframe>
                             <button type="button" id="removePdf" style="display:none;" class="btn btn-danger mt-2">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -395,7 +397,7 @@
                             value="Drink Now" {{ old('cellar', $wine->cellar) == 'Drink Now' ? 'checked' : '' }}>
                         <label class="form-check-label" for="cellar1">
                             <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
-                            <p>Drink Now</p>
+                            <p>Drink Now (1-3yrs)</p>
                         </label>
                     </div>
                 </div>
@@ -406,7 +408,7 @@
                             {{ old('cellar', $wine->cellar) == 'Drink or Cellar' ? 'checked' : '' }}>
                         <label class="form-check-label" for="cellar2">
                             <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
-                            <p>Drink or Hold</p>
+                            <p>Drink or Hold (4-6yrs)</p>
                         </label>
                     </div>
                 </div>
@@ -416,7 +418,7 @@
                             {{ old('cellar', $wine->cellar) == 'Cellar' ? 'checked' : '' }}>
                         <label class="form-check-label" for="cellar3">
                             <img src="{{ asset('images/wine-drink.png') }}" class="img-fluid" alt="Wine Image">
-                            <p>Cellar</p>
+                            <p>Cellar (9+yrs)</p>
                         </label>
                     </div>
                 </div>
@@ -448,9 +450,25 @@
                     winery_name: {
                         required: true
                     },
-                    // series: {
-                    //     required: true
-                    // },
+                    vintage_date: {
+
+                        required: true
+                    },
+
+                    bottle_size: {
+
+                        required: true
+                    },
+
+                    "varietal_type[]": {
+
+                        required: true
+                    },
+
+                    "varietal_blend[]": {
+
+                        required: true
+                    },
                 },
 
                 errorElement: "div", // error element as span
@@ -717,7 +735,7 @@
     </script>
 </div>
 <script>
-    document.getElementById('pdf').addEventListener('change', function (event) {
+    document.getElementById('pdf').addEventListener('change', function(event) {
         const file = event.target.files[0];
         const pdfPreview = document.getElementById('pdfPreview');
         const removePdf = document.getElementById('removePdf');
@@ -734,7 +752,7 @@
         }
     });
 
-    document.getElementById('removePdf').addEventListener('click', function () {
+    document.getElementById('removePdf').addEventListener('click', function() {
         document.getElementById('pdf').value = "";
         document.getElementById('pdfPreview').style.display = "none";
         this.style.display = "none";

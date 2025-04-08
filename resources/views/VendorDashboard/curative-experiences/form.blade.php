@@ -618,7 +618,7 @@
             function toggleAdmittance() {
                 if ($('#flexCheckDefault').is(':checked')) {
                     $('input[name="admittance"]').prop('readonly', true).val(''); // Make readonly and clear value
-                    $('input[name="listed_price"]').prop('readonly', true).val(''); // Make readonly and clear value
+                    $('#listed_price').prop('readonly', true).val(''); // Make readonly and clear value
                 } else {
                     $('input[name="admittance"]').prop('readonly', false);
                 }

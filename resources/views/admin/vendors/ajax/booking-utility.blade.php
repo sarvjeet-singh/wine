@@ -9,7 +9,9 @@
         <div class="m-3">
             <div class="row g-4">
                 <div class="box-body-label fw-bold fs-5">Booking Options</div>
-                <form id="bookingUtilityForm" action="{{ route('admin.vendor.details.ajax-booking-utility-update', $vendor->id) }}" method="post">
+                <form id="bookingUtilityForm"
+                    action="{{ route('admin.vendor.details.ajax-booking-utility-update', $vendor->id) }}"
+                    method="post">
                     @csrf
                     <div class="row mt-3">
                         <div class="col-sm-4 col-12">
@@ -183,7 +185,7 @@
                         </div>
                     @else
                         <div class="row mt-3">
-                            <div class="col-sm-12 col-12">
+                            <div class="col-sm-12 col-6">
                                 <input type="checkbox" class="custom-checkbox" id="applicable-taxes"
                                     name="apply_applicable_taxes"
                                     {{ old('apply_applicable_taxes', !empty($vendor->metadata->applicable_taxes_amount) ? 1 : 0) ? 'checked' : '' }}>
@@ -218,7 +220,8 @@
         </div>
         <div class="m-3">
             <div class="row g-4">
-                <form id="policyForm" action="{{ route('admin.vendor.details.ajax-settings-policy-update', $vendor->id) }}"
+                <form id="policyForm"
+                    action="{{ route('admin.vendor.details.ajax-settings-policy-update', $vendor->id) }}"
                     method="post">
                     @csrf
                     <div class="row mt-3">
@@ -364,7 +367,8 @@
                         showToast("Error", errorMessages.join('<br>'), "error");
                     } else {
                         // Other errors
-                        showToast("Error", "An error occurred while updating experiences.", "error");
+                        showToast("Error", "An error occurred while updating experiences.",
+                            "error");
                     }
                 },
             });
@@ -391,7 +395,8 @@
                         showToast("Error", errorMessages.join('<br>'), "error");
                     } else {
                         // Other errors
-                        showToast("Error", "An error occurred while updating experiences.", "error");
+                        showToast("Error", "An error occurred while updating experiences.",
+                            "error");
                     }
                 },
             });

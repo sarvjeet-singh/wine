@@ -45,6 +45,7 @@
                                 <tr>
                                     <th>Sr. No.</th>
                                     <th>Experience Type</th>
+                                    <th>Name</th>
                                     <th>Admittance</th>
                                     <th>Extension</th>
                                     <th>Action</th>
@@ -56,6 +57,7 @@
                                         <tr>
                                             <td>{{ ($experiences->currentPage() - 1) * $experiences->perPage() + $loop->iteration }}</td>
                                             <td>{{ optional($experience->category)->name ?? 'N/A' }}</td>
+                                            <td>{{ $experience->name ?? 'N/A' }}</td>
                                             <td>{{ $experience->admittance ?? 'N/A' }}</td>
                                             <td>{{ $experience->extension ?? 'N/A' }}</td>
                                             <td>

@@ -1408,7 +1408,7 @@ class FrontEndController extends Controller
         } elseif ($type == 'accommodations') {
             $vendor_type = 'accommodation';
         }
-
+        
         $vendorCount = Vendor::where('vendor_type', $vendor_type)
             ->where(function ($query) {
                 $query->where('account_status', 1)
