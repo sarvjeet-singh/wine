@@ -465,6 +465,10 @@
                                     </div>
 
                                 @endif
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <p class="fw-bold mb-0">Tax</p>
+                                    <p class="fw-bold mb-0">${{ $order->tax_amount ? $order->tax_amount : '0.00' }}</p>
+                                </div>
 
                                 <div class="d-flex align-items-center justify-content-between mb-2">
 

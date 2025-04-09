@@ -39,6 +39,8 @@ class WineryOrder extends Model
         'shipping_country',
         'delivery',
         'stocking_fee',
+        'tax',
+        'tax_amount',
     ];
 
     public function wines()

@@ -66,8 +66,8 @@ class WineryCheckoutController extends Controller
 
         $tax = VendorWineryMetadata::where('vendor_id', $shopid)->first();
         $taxPercentage = 0.00;
-        if (!empty($tax) && $tax->applicable_taxes_amount > 0) {
-            $taxPercentage = $tax->applicable_taxes_amount;
+        if (!empty($tax) && $tax->applicable_vendor_taxes_amount > 0) {
+            $taxPercentage = $tax->applicable_vendor_taxes_amount;
         }
 
         $vendor = Vendor::find($shopid);
@@ -148,10 +148,10 @@ class WineryCheckoutController extends Controller
 
         $tax = VendorWineryMetadata::where('vendor_id', $shopid)->first();
         $tax_amount = 0.00;
-        if (!empty($tax) && $tax->applicable_taxes_amount > 0) {
-            $tax_percentage = $tax->applicable_taxes_amount;
+        if (!empty($tax) && $tax->applicable_vendor_taxes_amount > 0) {
+            $tax_percentage = $tax->applicable_vendor_taxes_amount;
             $tax_amount = ($cartTotal + $deliveryFee)  * ($tax_percentage / 100);
-            $tax_amount += $tax_amount;
+            // $tax_amount += $tax_amount;
         }
 
         DB::beginTransaction();
@@ -164,7 +164,7 @@ class WineryCheckoutController extends Controller
             'stocking_fee' => $stockingFee,
             'total_price' => $cartTotal + $deliveryFee + $tax_amount, // Total cart amount
             'status' => 'pending',
-            'tax' => $tax->applicable_taxes_amount,
+            'tax' => $tax->applicable_vendor_taxes_amount,
             'tax_amount' => $tax_amount,
             // Billing Details
             'billing_first_name' => $request->input('billing_first_name'),
