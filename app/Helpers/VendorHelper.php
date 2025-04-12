@@ -186,7 +186,7 @@ class VendorHelper
 
 
         $messages[] = [
-            'message' => '<b>Subscription Status</b> (Make sure your subscription is active to stay visible on the platform.)',
+            'message' => '<b><a target="_blank" href="' . route('subscription.index',$vendorId) . '">Subscription Status</b> (Make sure your subscription is active to stay visible on the platform.)',
             'completed' => !$subscription ? false : true,
             'is_optional' => false
         ];
@@ -208,6 +208,7 @@ class VendorHelper
             'sub_region',
             'short_code',
             'qr_code',
+            'description',
         ];
         $isVendorComplete = true;
         foreach ($requiredVendorFields as $field) {
@@ -216,16 +217,37 @@ class VendorHelper
                 break;
             }
         }
-        $messages[] = [
-            'message' => "<b>Vendor Account Details</b> (Please ensure basic contact details are correct or updated)",
-            'completed' => $isVendorComplete,
-            'is_optional' => false
-        ];
+        if (!$isVendorComplete) {
+            $messages[] = [
+                'message' => '<b><a target="_blank" href="' . route('vendor-settings',$vendorId) . '">Vendor Account Details</a></b> (Please ensure basic contact details are correct or updated)',
+                'completed' => $isVendorComplete,
+                'is_optional' => false
+            ];
+        }
+        if ($isVendorComplete) {
+            $vendorWineryMetadata = VendorWineryMetadata::where('vendor_id', $vendorId)->first();
+            $requiredVendorMetadataFields = [
+                'applicable_taxes_amount',
+                'applicable_vendor_taxes_amount',
+            ];
+            $isVendorComplete = true;
+            foreach ($requiredVendorMetadataFields as $field) {
+                if (empty($vendorWineryMetadata->$field)) {
+                    $isVendorComplete = false;
+                    break;
+                }
+            }
+            $messages[] = [
+                'message' => '<b><a target="_blank" href="' . route('vendor-booking-utility',$vendorId) . '">Vendor Account Details</a></b> (Please ensure basic contact details are correct or updated)',
+                'completed' => $isVendorComplete,
+                'is_optional' => false
+            ];
+        }
 
         // Wine Catalogue
         $wines = VendorWine::where('vendor_id', $vendorId)->exists();
         $messages[] = [
-            'message' => "<b>Wine Catalogue</b> (Please input as many wines as you would like to make available to resellers)",
+            'message' => '<b><a target="_blank" href="' . route('vendor-wines.index',$vendorId) . '">Wine Catalogue</a></b> (Please input as many wines as you would like to make available to resellers)',
             'completed' => $wines,
             'is_optional' => false
         ];
@@ -233,14 +255,14 @@ class VendorHelper
         // Media Gallery
         $mediaCount = VendorMediaGallery::where('vendor_id', $vendorId)->count();
         $messages[] = [
-            'message' => "<b>Media Gallery</b> (Please upload images or links to YouTube videos to help promote experiences)",
+            'message' => '<b><a target="_blank" href="' . route('vendor-media-gallary',$vendorId) . '">Media Gallery</a></b> (Please upload images or links to YouTube videos to help promote experiences)',
             'completed' => $mediaCount > 4,
             'is_optional' => false
         ];
 
         // Refund Policy
         $messages[] = [
-            'message' => "<b>Refund Policy</b> (Please set the policy most applicable to your transactions)",
+            'message' => '<b><a target="_blank" href="' . route('vendor-booking-utility',$vendorId) . '">Refund Policy</a></b> (Please set the policy most applicable to your transactions)',
             'completed' => !empty($vendor->policy),
             'is_optional' => false
         ];
@@ -248,7 +270,7 @@ class VendorHelper
         // Stripe Account
         $isStripeConnected = !empty($vendor->stripe_account_id) && $vendor->stripe_onboarding_account_status === 'active';
         $messages[] = [
-            'message' => "<b>Stripe Account</b> (Please integrate a Stripe payment gateway account for seamless payments)",
+            'message' => '<b><a target="_blank" href="' . route('stripe.details.show',$vendorId) . '">Stripe Account</a></b> (Please integrate a Stripe payment gateway account for seamless payments)',
             'completed' => $isStripeConnected,
             'is_optional' => false
         ];
@@ -256,7 +278,7 @@ class VendorHelper
         // Business Hours (Optional)
         $businessHours = BusinessHour::where('vendor_id', $vendorId)->exists();
         $messages[] = [
-            'message' => "<b>Business Hours</b> (Please update applicable business hours so users know when you are open)",
+            'message' => '<b><a target="_blank" href="' . route('business-hours.index',$vendorId) . '">Business Hours</a></b> (Please update applicable business hours so users know when you are open)',
             'completed' => $businessHours,
             'is_optional' => true
         ];
@@ -264,7 +286,7 @@ class VendorHelper
         // Amenities (Optional)
         $vendorAmenities = VendorAmenity::where('vendor_id', $vendorId)->exists();
         $messages[] = [
-            'message' => "<b>Amenities</b> (Please indicate any amenities applicable to your establishment)",
+            'message' => '<b><a target="_blank" href="' . route('vendor-amenities',$vendorId) . '">Amenities</a></b> (Please indicate any amenities applicable to your establishment)',
             'completed' => $vendorAmenities,
             'is_optional' => true
         ];

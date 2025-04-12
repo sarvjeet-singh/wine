@@ -236,7 +236,7 @@
                         <div id="status"></div>
                     </div> -->
 
-        <div class="container mb-4">
+        <div class="mb-4">
             <div class="row align-items-start">
                 <!-- Progress Bar & Status -->
                 <div class="col-md-9 col-12 mb-3 mb-md-0">

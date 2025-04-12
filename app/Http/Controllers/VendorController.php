@@ -443,6 +443,7 @@ class VendorController extends Controller
 			'description' => 'nullable|string|max:1000',
 			'hide_street_address' => 'integer|max:1',
 			'website' => 'nullable|string|max:255',
+			'description' => 'required|string|max:1000',
 		]);
 		$vendor = Vendor::find($request->vendorid);
 		$data = $request->all();

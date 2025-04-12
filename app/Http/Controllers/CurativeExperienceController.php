@@ -14,7 +14,9 @@ class CurativeExperienceController extends Controller
 
     public function index(Request $request, $vendor_id)
     {
-        $experiences = CurativeExperience::with('category')->paginate(10);
+        $experiences = CurativeExperience::with('category')
+            ->where('vendor_id', $vendor_id)
+            ->paginate(10);
         $vendor = Vendor::find($vendor_id);
         return view('VendorDashboard.curative-experiences.index', compact('experiences', 'vendor'));
     }
@@ -104,7 +106,7 @@ class CurativeExperienceController extends Controller
         // Create experience
         $experience = CurativeExperience::create($data);
 
-        return redirect()->route('curative-experiences.index', $vendorid)->with('success', 'Experience created successfully.');
+        return redirect()->route('curative-experiences.index', $vendorid)->with('success', 'Your event will appear once system admin approves it.');
     }
 
     public function edit(Request $request, $id, $vendor_id)
@@ -245,7 +247,7 @@ class CurativeExperienceController extends Controller
             $data['thumbnail_small'] = $thumbnails['small'] ?? null;
             $data['thumbnail_medium'] = $thumbnails['medium'] ?? null;
             $data['thumbnail_large'] = $thumbnails['large'] ?? null;
-        }     
+        }
 
         if (!isset($request->is_free)) {
             $data['is_free'] = 0;

@@ -303,21 +303,32 @@ header.vendor-header .nav-link:hover {
 
 /* ================== TABS ON HOMEPAGE START ================== */
 
-.tab-content-sec ul{
-
-    padding: 35px 0;
-
+.tab-content-sec ul {
+    padding: 20px 0;
+    overflow-x: scroll;
+    white-space: nowrap;
 }
-
+.tab-content-sec ul::-webkit-scrollbar {
+    -webkit-appearance: none;
+    height: 4px;
+}
+.tab-content-sec ul::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgb(196 175 107);
+}
+.tab-content-sec ul::-webkit-scrollbar-track {
+    background-color: transparent;
+    border-radius: 10px;
+}
 .tab-content-sec ul a {
 
     font-size: 18px;
 
-    font-weight: 600;
+/*    font-weight: 600;*/
 
-    text-transform: uppercase;
+/*    text-transform: uppercase;*/
 
-    letter-spacing: 10px;
+/*    letter-spacing: 10px;*/
 
 }
 
@@ -326,7 +337,14 @@ header.vendor-header .nav-link:hover {
     color: #c0a144;
 
 }
-
+.tab-content-sec ul li:first-child {
+    border-right: 1px solid #00000057;
+    padding-right: 30px;
+}
+.tab-content-sec ul li:first-child a {
+    color: #262626;
+    font-weight: 600;
+}
 /* ================== TABS ON HOMEPAGE END ================== */
 
 

@@ -135,7 +135,7 @@
 
                                                                         </div> -->
 
-                                                    <h5 class="fw-bold mb-1">{{ $wine->series }}
+                                                    <h5 class="fw-bold mb-1">{{ $wine->winery_name }}
 
                                                         {{ !empty($wine->vintage_date) ? '(' . $wine->vintage_date . ')' : '' }}
 

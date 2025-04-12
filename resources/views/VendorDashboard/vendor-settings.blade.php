@@ -4,57 +4,75 @@
 
 @section('css')
     <link rel="stylesheet" href="{{ asset('asset/css/select2.min.css') }}">
-    <style>
-        /* Style for the button loader */
-        .loader-btn {
-            position: absolute;
-            /* Absolute positioning */
-            top: 50%;
-            /* Vertically center the loader */
-            left: 50%;
-            /* Horizontally center the loader */
-            transform: translate(-50%, -50%);
-            /* Fine-tune centering */
-            width: 20px;
-            height: 20px;
-            display: none;
-            /* Hidden by default */
-        }
+<style>
+/* Style for the button loader */
+.loader-btn {
+    position: absolute;
+    /* Absolute positioning */
+    top: 50%;
+    /* Vertically center the loader */
+    left: 50%;
+    /* Horizontally center the loader */
+    transform: translate(-50%, -50%);
+    /* Fine-tune centering */
+    width: 20px;
+    height: 20px;
+    display: none;
+    /* Hidden by default */
+}
 
-        /* Loader spinner style */
-        .loader-btn .spinner {
-            border: 2px solid #f3f3f3;
-            /* Light grey */
-            border-top: 2px solid #3498db;
-            /* Blue */
-            border-radius: 50%;
-            width: 100%;
-            height: 100%;
-            animation: spin 1s linear infinite;
-        }
+/* Loader spinner style */
+.loader-btn .spinner {
+    border: 2px solid #f3f3f3;
+    /* Light grey */
+    border-top: 2px solid #3498db;
+    /* Blue */
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    animation: spin 1s linear infinite;
+}
 
-        /* Spinner animation */
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
+/* Spinner animation */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
 
-            100% {
-                transform: rotate(360deg);
-            }
-        }
+    100% {
+        transform: rotate(360deg);
+    }
+}
 
-        /* Button with relative position to hold the spinner */
-        .upload-image-youtube-button {
-            position: relative;
-            padding-right: 30px;
-            /* Make room for the spinner */
-            min-width: 100px;
-            /* Ensure the button has a minimum width */
-            height: 40px;
-            /* Set a fixed height for consistency */
-        }
-    </style>
+/* Button with relative position to hold the spinner */
+.upload-image-youtube-button {
+    position: relative;
+    padding-right: 30px;
+    /* Make room for the spinner */
+    min-width: 100px;
+    /* Ensure the button has a minimum width */
+    height: 40px;
+    /* Set a fixed height for consistency */
+}
+.select2 span.select2-selection {
+    padding-bottom: 0;
+    border-radius: 6px;
+}
+.select2 ul.select2-selection__rendered {
+    padding: 0 !important;
+}
+.select2 span.select2-selection span.select2-search {
+    height: 36px;
+    display: inline-block;
+}
+.select2 span.select2-selection textarea.select2-search__field {
+    margin-block: 0;
+    height: 15px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    margin-bottom: 5px;
+}
+</style>
 @endsection
 @section('content')
     <div class="col right-side">

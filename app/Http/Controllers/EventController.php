@@ -29,8 +29,11 @@ class EventController extends Controller
 {
     public function events(Request $request)
     {
-        $query = CurativeExperience::with('category', 'vendor')
-            ->where('status', 'active'); // Only active events
+        $query = CurativeExperience::with(['category', 'vendor'])
+            ->where('status', 'active')
+            ->whereHas('vendor', function ($q) {
+                $q->whereIn('account_status', [1, 2]);
+            });
 
         if ($request->has('search') && !empty($request->search)) {
             $searchTerm = $request->search;
@@ -177,6 +180,7 @@ class EventController extends Controller
         $searchTerm = $request->query('term');
 
         $results = CurativeExperience::where('name', 'LIKE', "%{$searchTerm}%")
+            ->where('status', 'active')
             ->limit(5)
             ->pluck('name', 'id'); // Only return titles
 
@@ -186,6 +190,7 @@ class EventController extends Controller
     function eventDetails(Request $request, $id)
     {
         $event = CurativeExperience::with('category')->find($id);
+        $vendor = $event->vendor()->first();
         if (!$event) {
             abort(404);
         }
@@ -199,7 +204,7 @@ class EventController extends Controller
             ->get();
         $totalTickets = getEventOrderTicketsUsedPerDay($event->id, Carbon::now()->format('Y-m-d'));
         $event->remaining_tickets = $event->inventory - $totalTickets;
-        return view('FrontEnd.events.event-details', compact('event', 'relatedEvents'));
+        return view('FrontEnd.events.event-details', compact('event', 'relatedEvents', 'vendor'));
     }
 
     function eventCheckout($event_id)
@@ -211,14 +216,29 @@ class EventController extends Controller
             return redirect()->route('events');
         }
         $event = CurativeExperience::with('category', 'vendor')->find($event_id);
+        if ($event->vendor->account_status != 1) {
+            return redirect()->route('events');
+        }
         if (!$event) {
             return redirect()->route('events');
         }
         if (!Auth::guard('customer')->check()) {
             return redirect()->route('login');
         }
+        if (strtolower($event->vendor->vendor_type) == 'accommodation') {
+            $metadata = VendorAccommodationMetadata::where('vendor_id', $event->vendor_id)->first();
+        } else if (strtolower($event->vendor->vendor_type) == 'winery') {
+            $metadata = VendorWineryMetadata::where('vendor_id', $event->vendor_id)->first();
+        } else if (strtolower($event->vendor->vendor_type) == 'excursion') {
+            $metadata = VendorExcursionMetadata::where('vendor_id', $event->vendor_id)->first();
+        } else if (strtolower($event->vendor->vendor_type) == 'licensed') {
+            $metadata = VendorLicenseMetadata::where('vendor_id', $event->vendor_id)->first();
+        } else if (strtolower($event->vendor->vendor_type) == 'non-licensed') {
+            $metadata = VendorNonLicenseMetadata::where('vendor_id', $event->vendor_id)->first();
+        }
+        $tax = $metadata->applicable_taxes_amount;
         $wallet = Wallet::where('customer_id', Auth::user()->id)->first();
-        return view('FrontEnd.events.event-checkout', compact('event', 'wallet'));
+        return view('FrontEnd.events.event-checkout', compact('event', 'wallet', 'tax'));
     }
 
     function eventCheckoutProcess(Request $request)
@@ -250,22 +270,22 @@ class EventController extends Controller
         $platform_fee = platformFeeCalculator($event);
         $noOfJoinees = !empty($validated['joinee']) ? count($validated['joinee']) : 0;
         $tickets =  1;
-        if($event->extension == '/Person') {
+        if ($event->extension == '/Person') {
             $tickets = $noOfJoinees + 1;
         }
         $subtotal = $event->admittance + $platform_fee;
         if ($event->extension == '/Person') {
             $subtotal = $noOfJoinees * ($event->admittance + $platform_fee);
         }
-        if(strtolower($event->vendor->vendor_type) == 'accommodation') {
+        if (strtolower($event->vendor->vendor_type) == 'accommodation') {
             $metadata = VendorAccommodationMetadata::where('vendor_id', $event->vendor_id)->first();
-        } else if(strtolower($event->vendor->vendor_type) == 'winery') {
+        } else if (strtolower($event->vendor->vendor_type) == 'winery') {
             $metadata = VendorWineryMetadata::where('vendor_id', $event->vendor_id)->first();
-        } else if(strtolower($event->vendor->vendor_type) == 'excursion') {
+        } else if (strtolower($event->vendor->vendor_type) == 'excursion') {
             $metadata = VendorExcursionMetadata::where('vendor_id', $event->vendor_id)->first();
-        } else if(strtolower($event->vendor->vendor_type) == 'licensed') {
+        } else if (strtolower($event->vendor->vendor_type) == 'licensed') {
             $metadata = VendorLicenseMetadata::where('vendor_id', $event->vendor_id)->first();
-        } else if(strtolower($event->vendor->vendor_type) == 'non-licensed') {
+        } else if (strtolower($event->vendor->vendor_type) == 'non-licensed') {
             $metadata = VendorNonLicenseMetadata::where('vendor_id', $event->vendor_id)->first();
         }
         $applicable_taxes_amount = $metadata->applicable_taxes_amount ?? 0;
@@ -455,7 +475,11 @@ class EventController extends Controller
         if (!$customer) {
             return redirect()->route('customer.login')->withErrors('Please login to access your orders.');
         }
-        $orders = CustomerOrder::with('vendor', 'eventOrderDetail')->where('customer_id', Auth::guard('customer')->user()->id)->get();
+        $orders = CustomerOrder::with('eventOrderDetail')
+        ->where('customer_id', Auth::guard('customer')
+        ->user()->id)
+        ->orderBy('id', 'desc')
+        ->get();
         return view('UserDashboard.event-transactions', compact('orders'));
     }
 
@@ -481,10 +505,13 @@ class EventController extends Controller
     public function vendorOrders($vendorid)
     {
         $vendor = Auth::guard('vendor')->user();
-        if(!$vendor) {
+        if (!$vendor) {
             return redirect()->route('vendor.login')->withErrors('Please login to access your orders.');
         }
-        $orders = CustomerOrder::with('customer','eventOrderDetail')->where('vendor_id', $vendorid)->get();
+        $orders = CustomerOrder::with('customer', 'eventOrderDetail')
+        ->where('vendor_id', $vendorid)
+        ->orderBy('id', 'desc')
+        ->get();
         return view('VendorDashboard.event-transactions', compact('orders'));
     }
 
@@ -501,11 +528,13 @@ class EventController extends Controller
     public function vendorEventOrderDetail($order_id, $vendorid)
     {
         $vendor = Auth::guard('vendor')->user();
-        if(!$vendor) {
+        if (!$vendor) {
             return redirect()->route('vendor.login')->withErrors('Please login to access your orders.');
         }
-        $order = CustomerOrder::with('eventOrderDetail', 'eventGuestDetails', 'vendor', 'eventOrderTransactions')->where('id', $order_id)->where('vendor_id', $vendorid)
-            ->first();
+        $order = CustomerOrder::with('eventOrderDetail', 'eventGuestDetails', 'vendor', 'eventOrderTransactions')
+        ->where('id', $order_id)
+        ->where('vendor_id', $vendorid)
+        ->first();
         return view('VendorDashboard.event-order-detail', compact('order'));
     }
 

@@ -128,7 +128,7 @@
                         @if (!empty($event->booking_url))
                             <a href="{{ $event->booking_url }}" class="btn px-3">Buy Now</a>
                         @else
-                            <a href="{{ route('events.detail', $event->id) }}" class="btn px-3">Buy Now</a>
+                            <a href="{{ route('events.detail', $event->id) }}" class="btn px-3">{{$event->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                         @endif
 
                     </div>

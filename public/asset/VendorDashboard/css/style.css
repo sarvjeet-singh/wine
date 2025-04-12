@@ -1273,6 +1273,8 @@ html .ui-button.ui-state-disabled:active {
 }
 .cellaring-value-sec .cellaring-value-3 img {
     rotate: 90deg;
+    position: relative;
+    top: 10px;
 }
 .cellaring-value-sec .form-check-label p {
     font-size: 14px;

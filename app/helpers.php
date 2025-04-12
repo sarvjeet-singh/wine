@@ -620,7 +620,12 @@ if (!function_exists('getEventMinMaxPrice')) {
 
         // Get the latest event date
         $maxDate = App\Models\CurativeExperience::max('end_date');
-
+        if (empty($maxDate)) {
+            return [
+                'min_price' => 0,
+                'max_price' => 0,
+            ];
+        }
         // Fetch the min and max price (admittance) for events that are active between start_date and end_date
         $prices = App\Models\CurativeExperience::whereDate('start_date', '<=', $maxDate) // Event must have started or will start soon
             ->whereDate('end_date', '>=', $today) // Event must still be ongoing or upcoming
@@ -647,15 +652,17 @@ if (!function_exists('getEventOrderTicketsUsedPerDay')) {
     }
 }
 
-if(!function_exists('platformFeeCalculator')) {
-    function platformFeeCalculator($event) {
+if (!function_exists('platformFeeCalculator')) {
+    function platformFeeCalculator($event)
+    {
         $platform_fee = $event->vendor->platform_fee ?? (config('site.platform_fee') ?? '0.00');
         return number_format($event->admittance * ($platform_fee / 100), 2, '.', '');
     }
 }
 
-if(!function_exists('platformFeeCalculator')) {
-    function platformFeeCalculator($event) {
+if (!function_exists('platformFeeCalculator')) {
+    function platformFeeCalculator($event)
+    {
         $platform_fee = $event->vendor->platform_fee ?? (config('site.platform_fee') ?? '0.00');
         return $platform_fee;
     }

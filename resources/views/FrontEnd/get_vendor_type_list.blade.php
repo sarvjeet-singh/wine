@@ -18,9 +18,6 @@
         z-index: 1;
     }
 </style>
-<div class="listing-head-sec position-relative d-flex align-items-center justify-content-between gap-1 py-2">
-    <h3 class="mb-0 fw-bold">PARTNERS</h3>
-</div>
 @if (count($vendors))
     @php
         $enablehr = 0;
@@ -33,7 +30,18 @@
         ];
     @endphp
     @foreach ($vendors as $vendorkey => $vendor)
+        @if($vendor->account_status != '1' && $vendorkey == 0) {
+            @php
+                $enablehr = 1;
+            @endphp
+        }
         @if ($vendor->account_status == '1')
+            @if ($enablehr == 0)
+                <div
+                    class="listing-head-sec position-relative d-flex align-items-center justify-content-between gap-1 py-2">
+                    <h3 class="mb-0 fw-bold">PARTNERS</h3>
+                </div>
+            @endif
             @php
                 $enablehr = 1;
             @endphp
@@ -249,7 +257,7 @@
                     </ul>
                 </div>
                 <div class="d-flex gap-2">
-                    @if ($vendor->business_hours_count > 0)
+                    @if ($vendor->business_hours_count > 0 && $vendor->account_status == '1')
                         <button type="button" class="btn book-btn open-modal-btn" data-url="get-hours"
                             data-id="{{ $vendor->id }}">
                             Hour’s

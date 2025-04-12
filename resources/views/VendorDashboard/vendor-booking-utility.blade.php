@@ -36,18 +36,28 @@
                             method="post">
                             @csrf
                             <div class="row mt-3">
-                                <div class="col-sm-4 col-12">
-                                    <input type="radio" class="custom-radio" id="one-step" name="process_type"
-                                        value="one-step"
-                                        {{ old('process_type', !empty($vendor->metadata->process_type) ? $vendor->metadata->process_type : '') == 'one-step' ? 'checked' : '' }}>
-                                    <label class="form-label" for="one-step">One Step Process!</label>
-                                </div>
-                                <div class="col-sm-4 col-12">
-                                    <input type="radio" class="custom-radio" id="two-step" name="process_type"
-                                        value="two-step"
-                                        {{ old('process_type', !empty($vendor->metadata->process_type) ? $vendor->metadata->process_type : '') == 'two-step' ? 'checked' : '' }}>
-                                    <label class="form-label" for="two-step">Two Step Process</label>
-                                </div>
+                                @if (strtolower($vendor->vendor_type) != 'winery')
+                                    <div class="col-sm-4 col-12">
+                                        <input type="radio" class="custom-radio" id="one-step" name="process_type"
+                                            value="one-step"
+                                            {{ old('process_type', !empty($vendor->metadata->process_type) ? $vendor->metadata->process_type : '') == 'one-step' ? 'checked' : '' }}>
+                                        <label class="form-label" for="one-step">One Step Process!</label>
+                                    </div>
+                                    <div class="col-sm-4 col-12">
+                                        <input type="radio" class="custom-radio" id="two-step" name="process_type"
+                                            value="two-step"
+                                            {{ old('process_type', !empty($vendor->metadata->process_type) ? $vendor->metadata->process_type : '') == 'two-step' ? 'checked' : '' }}>
+                                        <label class="form-label" for="two-step">Two Step Process</label>
+                                    </div>
+                                @elseif(strtolower($vendor->vendor_type) == 'winery')
+                                    <div class="col-sm-4 col-12">
+                                        <input type="radio" class="custom-radio" id="one-step" name="process_type"
+                                            value="one-step"
+                                            {{ old('process_type', $vendor->metadata->process_type ?? 'one-step') == 'one-step' ? 'checked' : '' }}>
+                                        <label class="form-label" for="one-step">Process payment with Our Platform
+                                            (Recommended)!</label>
+                                    </div>
+                                @endif
                                 <div class="col-sm-4 col-12">
                                     <input type="radio" class="custom-radio" id="redirect-url" name="process_type"
                                         value="redirect-url"
@@ -239,8 +249,7 @@
                                             <input type="checkbox" class="custom-checkbox" id="applicable-vendor-taxes"
                                                 name="apply_applicable_taxes"
                                                 {{ old('apply_applicable_taxes', !empty($vendor->metadata->applicable_vendor_taxes_amount) ? 1 : 0) ? 'checked' : '' }}>
-                                            <label class="form-label" for="applicable-vendor-taxes">Apply B2B Applicable
-                                                Taxes</label>
+                                            <label class="form-label" for="applicable-vendor-taxes">Alcohol Taxes</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">%</span>
                                                 <input type="number" class="form-control" id="applicable-taxes-amount"

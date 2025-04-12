@@ -62,7 +62,7 @@
 @media screen and (max-width: 1024px){
 .tab-content-sec ul a {
     font-size: 16px;    
-    letter-spacing: 3px;
+    letter-spacing: 1px;
 }
 .text-with-img-sec .sec-content {
     padding: 30px 50px 0 50px;
@@ -274,14 +274,13 @@ header .navbar-collapse .navbar-nav {
     padding: 15px;    
 }
 .tab-content-sec ul {
-    padding: 20px 0;
+    padding: 12px 0;
+}
+.tab-content-sec ul li:first-child {
+    padding-right: 15px;
 }
 .tab-content-sec ul a {
-    font-size: 12px;
-    letter-spacing: 0;
-}
-.tab-content-sec ul a {
-    letter-spacing: 2px;
+    font-size: 14px;
 }
 .banner-sec .sec-content h3 {
     font-size: 25px;
@@ -508,8 +507,7 @@ header .navbar-brand img {
     height: 60px;
 }
 .tab-content-sec ul {
-    padding: 20px 0;    
-    flex-direction: column;
+    padding: 15px 0;    
 }
 .text-with-img-sec h3 {
     font-size: 20px;    

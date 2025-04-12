@@ -59,14 +59,17 @@
                         </p>
 
                         <div class="mt-4">
-
-                            @if (!Auth::guard('customer')->check())
-                                <a href="{{ route('check-login', 'book-now') }}" class="btn book-btn">Book Now</a>
-                            @else
-                                @if ($event->remaining_tickets > 0)
-                                    <a href="{{ route('events.checkout', $event->id) }}" class="btn book-btn">Book Now</a>
+                            @if ($vendor->account_status == 1)
+                                @if (!Auth::guard('customer')->check())
+                                    <a href="{{ route('check-login', 'book-now') }}" class="btn book-btn">Book Now</a>
                                 @else
-                                    <a href="javascript:void(0);" class="btn book-btn disabled">Booking Not Available</a>
+                                    @if ($event->remaining_tickets > 0)
+                                        <a href="{{ route('events.checkout', $event->id) }}" class="btn book-btn">Book
+                                            Now</a>
+                                    @else
+                                        <a href="javascript:void(0);" class="btn book-btn disabled">Booking Not
+                                            Available</a>
+                                    @endif
                                 @endif
                             @endif
 

@@ -145,7 +145,7 @@
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('winery.vendor.orders') ? 'active' : '' }}"
                                     href="{{ route('winery.vendor.orders', ['vendorid' => $id]) }}">
-                                    <i class="fas fa-wrench menu-icon"></i> Order History
+                                    <i class="fas fa-wrench menu-icon"></i> Purchase History
                                 </a>
                             </li>
                         @endif

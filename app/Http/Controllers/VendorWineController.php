@@ -320,4 +320,16 @@ class VendorWineController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
+
+    public function checkWineName(Request $request)
+    {
+        $wineName = $request->input('winery_name');
+        $wine_id = $request->input('wine_id');
+        if (!empty($wine_id)) {
+            $exists = VendorWine::where('winery_name', $wineName)->where('id', '!=', $wine_id)->exists();
+            return response()->json(!$exists);
+        }
+        $exists = VendorWine::where('winery_name', $wineName)->exists();
+        return response()->json(!$exists); // true if not exists (valid), false if exists (invalid)
+    }
 }

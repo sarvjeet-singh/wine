@@ -181,43 +181,46 @@
                                 <div class="row">
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
-                                            <input type="text" value="{{ Auth::user()->firstname ?? '' }} {{ Auth::user()->lastname ?? '' }}" class="form-control" id="fullname" name="fullname"
-                                                placeholder="Name">
+                                            <input type="text"
+                                                value="{{ Auth::user()->firstname ?? '' }} {{ Auth::user()->lastname ?? '' }}"
+                                                class="form-control" id="fullname" name="fullname" placeholder="Name">
                                             <label for="fullname">Name</label>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
-                                            <input type="email" class="form-control" id="email" name="email" value="{{ Auth::user()->email ?? '' }}"
-                                                placeholder="Email">
+                                            <input type="email" class="form-control" id="email" name="email"
+                                                value="{{ Auth::user()->email ?? '' }}" placeholder="Email">
                                             <label for="email">Email</label>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
                                             <input type="text" class="form-control phone-number" id="contact_number"
-                                                name="contact_number" value="{{ Auth::user()->contact_number ?? '' }}" placeholder="Contact Number">
+                                                name="contact_number" value="{{ Auth::user()->contact_number ?? '' }}"
+                                                placeholder="Contact Number">
                                             <label for="contact_number">Contact Number</label>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
                                             <input type="text" class="form-control" id="street_address"
-                                                name="street_address" value="{{ Auth::user()->street_address ?? '' }}" placeholder="Street Address">
+                                                name="street_address" value="{{ Auth::user()->street_address ?? '' }}"
+                                                placeholder="Street Address">
                                             <label for="street_address">Street Address</label>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" id="unit_suite" name="unit_suite" value="{{ Auth::user()->suite ?? '' }}"
-                                                placeholder="Unit Suite">
+                                            <input type="text" class="form-control" id="unit_suite" name="unit_suite"
+                                                value="{{ Auth::user()->suite ?? '' }}" placeholder="Unit Suite">
                                             <label for="unit_suite">Unit Suite</label>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" id="city" name="city" value="{{ Auth::user()->city ?? '' }}"
-                                                placeholder="City/Town">
+                                            <input type="text" class="form-control" id="city" name="city"
+                                                value="{{ Auth::user()->city ?? '' }}" placeholder="City/Town">
                                             <label for="city">City/Town</label>
                                         </div>
                                     </div>
@@ -282,8 +285,9 @@
                                     <div class="col-lg-4 col-md-6">
                                         <div class="form-floating mb-3">
                                             <input type="text" class="form-control" id="postal_code"
-                                                name="postal_code" maxlength="7" value="{{ Auth::user()->postal_code ?? '' }}" oninput="formatPostalCode(this)"
-                                                placeholder="Postal Code">
+                                                name="postal_code" maxlength="7"
+                                                value="{{ Auth::user()->postal_code ?? '' }}"
+                                                oninput="formatPostalCode(this)" placeholder="Postal Code">
                                             <label for="postal_code">Postal Code</label>
                                         </div>
                                     </div>
@@ -333,14 +337,14 @@
                                         <span>Sub-Total</span>
                                         <span id="subtotal">$0.00</span>
                                     </div>
-                                    {{-- <div class="d-flex align-items-center justify-content-between mb-2">
-                                        <span>Applicable Tax</span>
-                                        <span id="applicable_tax">13%</span>
-                                    </div> --}}
                                     <div class="d-flex align-items-center justify-content-between mb-2 d-none"
                                         id="bottle_bucks_container">
                                         <span>Bottle Bucks Used</span>
                                         <span id="walletused">$0.00</span>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span>Tax</span>
+                                        <span id="applicable_tax">$0.00</span>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between mb-2">
                                         <span>Total Charges</span>
@@ -556,7 +560,7 @@
         var price = parseFloat(
             "{{ number_format($event->admittance + ($event->admittance * ($event->vendor->platform_fee ?? (config('site.platform_fee') ?? 1.0))) / 100, 2, '.', '') }}"
         );
-        var tax = 0.00;
+        var tax_percentage = {{ $tax ?? 0.0 }};
         var total = 0.00;
         var subtotal = 0.00;
         var walletUsed = 0;
@@ -597,12 +601,6 @@
             });
         });
         $(document).ready(function() {
-            // $(".add-btn").on("click", function(e) {
-            //     e.preventDefault();
-            //     tickets += 1;
-            //     $("#ticket_count").text(tickets);
-            //     priceCalculation();
-            // });
             $(document).on("click", ".dlt-btn", function(e) {
                 e.preventDefault();
                 tickets -= 1;
@@ -612,19 +610,22 @@
         });
 
         function priceCalculation() {
-            if (extension == 'hr') {
-                subtotal = tickets * (price * duration);
+            if (extension == '/person') {
+                subtotal = tickets * (price);
             } else {
-                subtotal = tickets * price;
+                subtotal = price;
             }
+            tax = (subtotal * (tax_percentage / 100));
             if ($("#use_wallet").is(":checked")) {
                 $("#walletused").text("$" + walletUsed.toFixed(2));
                 $("#wallet_amount").val(walletUsed);
-                total = parseFloat(subtotal) - parseFloat(walletUsed);
+                $("#applicable_tax").text('$' + tax.toFixed(2));
+                total = (parseFloat(subtotal) + parseFloat(tax)) - parseFloat(walletUsed);
             } else {
                 $("#walletused").text("$" + "0.00");
                 $("#wallet_amount").val(0);
-                total = parseFloat(subtotal);
+                $("#applicable_tax").text('$' + tax.toFixed(2));
+                total = parseFloat(subtotal) + parseFloat(tax);
             }
             $("#subtotal").text('$' + subtotal.toFixed(2));
             $("#total").text('$' + total.toFixed(2));

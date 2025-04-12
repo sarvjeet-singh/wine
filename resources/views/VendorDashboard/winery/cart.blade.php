@@ -100,7 +100,7 @@
 
                                                                             <div class="fw-bold">
 
-                                                                                {{ $item->product->series }}
+                                                                                {{ $item->product->winery_name }}
 
                                                                             </div>
 

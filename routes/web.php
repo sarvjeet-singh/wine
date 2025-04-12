@@ -383,8 +383,10 @@ Route::group(['middleware' => ['auth:vendor', 'checkPasswordUpdated', 'check.ven
     Route::get('/business-hours/{vendorid?}', [VendorSettingController::class, 'getBusinessHours'])->name('business-hours.index');
     Route::put('/business-hours/{vendorid?}', [VendorSettingController::class, 'updateBusinessHours'])->name('business-hours.update');
 
+
     Route::get('/vendor/vendor-wines/{vendorid?}', [VendorWineController::class, 'index'])->name('vendor-wines.index');
     Route::get('/vendor/vendor-wines/add/{vendorid?}', [VendorWineController::class, 'add'])->name('vendor-wines.add');
+    Route::post('/vendor/vendor-wines/check-wine-name/{vendorid?}', [VendorWineController::class, 'checkWineName'])->name('check-wine-name');
     Route::post('/vendor/vendor-wines/store/{vendorid?}', [VendorWineController::class, 'store'])->name('vendor-wines.store');
     Route::get('/vendor/vendor-wines/edit/{id}/{vendorid?}', [VendorWineController::class, 'edit'])->name('vendor-wines.edit');
     Route::put('/vendor/vendor-wines/update/{id}/{vendorid?}', [VendorWineController::class, 'update'])->name('vendor-wines.update');

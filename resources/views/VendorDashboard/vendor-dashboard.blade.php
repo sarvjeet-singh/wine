@@ -82,11 +82,11 @@
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col-12">
-                                        @if ($vendor->account_status != 1)
+                                        {{-- @if ($vendor->account_status != 1) --}}
                                             <button id="checkActivationBtn" class="btn btn-primary wine-btn rounded-2 px-3">
                                                 Complete Your Profile
                                             </button>
-                                        @endif
+                                        {{-- @endif --}}
                                     </div>
                                 </div>
                             </div>
@@ -147,8 +147,7 @@
                 </div>
                 <div class="modal-footer">
                     <p id="completionNote">
-                        "Once all sections are completed, your profile will be upgraded to Vendor Partner status
-                        automatically."
+                        "Once all sections are complete, your account can be upgraded to “Vendor Partner”, with full access to all utilities and a “Dedicated Vendor Page”."
                     </p>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>

@@ -132,7 +132,7 @@
                                                 <a href="{{ $todayEvent->booking_url }}" class="btn px-3">Buy Now</a>
                                             @else
                                                 <a href="{{ route('events.detail', $todayEvent->id) }}"
-                                                    class="btn px-3">Buy Now</a>
+                                                    class="btn px-3">{{$todayEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                                             @endif
                                         </div>
                                     </div>
@@ -231,7 +231,7 @@
                                                 <a href="{{ $tomorrowEvent->booking_url }}" class="btn px-3">Buy Now</a>
                                             @else
                                                 <a href="{{ route('events.detail', $tomorrowEvent->id) }}"
-                                                    class="btn px-3">Buy Now</a>
+                                                    class="btn px-3">{{$tomorrowEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                                             @endif
                                         </div>
                                     </div>
@@ -330,7 +330,7 @@
                                                 <a href="{{ $upcomingEvent->booking_url }}" class="btn px-3">Buy Now</a>
                                             @else
                                                 <a href="{{ route('events.detail', $upcomingEvent->id) }}"
-                                                    class="btn px-3">Buy Now</a>
+                                                    class="btn px-3">{{$upcomingEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                                             @endif
                                         </div>
                                     </div>

@@ -13,25 +13,23 @@
 
             <div class="col-sm-12">
                 <div class="information-box p-0">
-
                     <div class="information-box-head d-flex align-items-center gap-3">
                         <button class="btn back-btn d-flex align-items-center p-0" onclick="window.history.back()">
                             <i class="fa-solid fa-arrow-left"></i>
                         </button>
-                        <div class="box-head-heading"> <span class="box-head-label theme-color fw-bold">{{ $wine->series }}
-                                Details</span> </div>
+                        <div class="box-head-heading"> <span
+                                class="box-head-label theme-color fw-bold">{{ $wine->winery_name }}
+                                Details
+                            </span>
+                        </div>
                     </div>
 
                     <div class="information-box-body">
 
                         <div class="wine-detail-sec py-4">
-
                             <div class="row">
-
                                 <div class="col-md-4">
-
                                     <div class="wine-thumbnail sticky-top text-center">
-
                                         @if ($wine->image)
                                             <img src="{{ asset('storage/' . $wine->image) }}" class="img-fluid"
                                                 alt="Wine Image">
@@ -48,8 +46,13 @@
 
                                     <div class="wine-info px-3">
 
-                                        <h3 class="fw-bold theme-color">{{ $wine->series }}</h3>
-
+                                        <h3 class="fw-bold theme-color">{{ $wine->winery_name }}
+                                            @if (!empty($wine->pdf))
+                                                <a href="{{ url(Storage::url($wine->pdf)) }}" target="_blank"><i
+                                                        class="fas fa-file-pdf"></i>
+                                                </a>
+                                            @endif
+                                        </h3>
                                         <p class="wine-price mb-3">${{ $wine->price }}</p>
                                         @if ($vendor->account_status == 1)
                                             <div class="add-wines-cart d-flex align-items-center gap-3">
@@ -60,8 +63,10 @@
                                                                 class="glyphicon glyphicon-minus">-</span> </button> </span>
 
                                                     <input type="text" class="form-control input-number quantity"
-                                                        min="1" max="{{ $wine->inventory }}" oninput="this.value = this.value < this.min ? this.min : this.value" value="1"> <span
-                                                        class="input-group-btn"> <button type="button"
+                                                        min="1" max="{{ $wine->inventory }}"
+                                                        oninput="this.value = this.value < this.min ? this.min : this.value"
+                                                        value="1"> <span class="input-group-btn"> <button
+                                                            type="button"
                                                             class="quantity-right-plus btn btn-success btn-number"
                                                             data-type="plus" data-field=""> <span
                                                                 class="glyphicon glyphicon-plus">+</span> </button> </span>
@@ -89,7 +94,8 @@
                                                 <div class="cart-btn">
                                                     {{-- @if ($wine->inventory > 12) --}}
                                                     <a href="javascript:void(0)" data-id="{{ $wine->id }}"
-                                                        data-quantity="{{$wine->inventory > 12 ? 12 : 1}}" class="btn wine-btn add-to-cart">Add
+                                                        data-quantity="{{ $wine->inventory > 12 ? 12 : 1 }}"
+                                                        class="btn wine-btn add-to-cart">Add
                                                         to Cart</a>
                                                     {{-- @else
                                                     <a href="javascript:void(0)" class="btn wine-btn disabled">Add to
@@ -98,23 +104,23 @@
                                                 </div>
 
                                                 <!-- <div class="d-flex align-items-center gap-2">
-                                                            <div class="cart-btn">
-                                                                <a href="javascript:void(0)" data-type="bottle"
-                                                                    data-id="{{ $wine->id }}" class="btn wine-btn add-to-cart">Add
-                                                                    Bottle</a>
-                                                            </div>
-                                                            <div class="cart-btn">
-                                                                @if ($wine->inventory > 12)
+                                                                                            <div class="cart-btn">
+                                                                                                <a href="javascript:void(0)" data-type="bottle"
+                                                                                                    data-id="{{ $wine->id }}" class="btn wine-btn add-to-cart">Add
+                                                                                                    Bottle</a>
+                                                                                            </div>
+                                                                                            <div class="cart-btn">
+                                                                                                @if ($wine->inventory > 12)
     <a href="javascript:void(0)" data-type="case"
-                                                                        data-id="{{ $wine->id }}"
-                                                                        class="btn wine-btn add-to-cart">Add
-                                                                        Case</a>
+                                                                                                        data-id="{{ $wine->id }}"
+                                                                                                        class="btn wine-btn add-to-cart">Add
+                                                                                                        Case</a>
 @else
     <a href="javascript:void(0)" class="btn wine-btn disabled">Add
-                                                                        Case</a>
+                                                                                                        Case</a>
     @endif
-                                                            </div>
-                                                        </div> -->
+                                                                                            </div>
+                                                                                        </div> -->
 
                                             </div>
                                         @endif
@@ -160,7 +166,8 @@
                                                         <td><span>{{ $wine->bottle_size }}</span></td>
                                                     </tr>
                                                     <tr>
-                                                        <th><span class="theme-color fw-bold">Alcohol By Volume:</span></th>
+                                                        <th><span class="theme-color fw-bold">Alcohol By Volume:</span>
+                                                        </th>
                                                         <td><span>{{ $wine->abv }}%</span></td>
                                                     </tr>
                                                     <tr>
@@ -172,19 +179,19 @@
 
                                                                     switch ($residualSugar) {
                                                                         case '0-1':
-                                                                            echo $wine->rs_value .' g/l (Bone Dry)';
+                                                                            echo $wine->rs_value . ' g/l (Bone Dry)';
                                                                             break;
                                                                         case '1-9':
-                                                                            echo $wine->rs_value .' g/l (Dry)';
+                                                                            echo $wine->rs_value . ' g/l (Dry)';
                                                                             break;
                                                                         case '10-49':
-                                                                            echo $wine->rs_value .' g/l (Off Dry)';
+                                                                            echo $wine->rs_value . ' g/l (Off Dry)';
                                                                             break;
                                                                         case '50-120':
-                                                                            echo $wine->rs_value .' g/l (Semi-Sweet)';
+                                                                            echo $wine->rs_value . ' g/l (Semi-Sweet)';
                                                                             break;
                                                                         case '120+':
-                                                                            echo $wine->rs_value .' g/l (Sweet)';
+                                                                            echo $wine->rs_value . ' g/l (Sweet)';
                                                                             break;
                                                                         default:
                                                                             echo '';
@@ -193,7 +200,7 @@
                                                     </tr>
                                                     <tr>
                                                         <th><span class="theme-color fw-bold">Blend:</span></th>
-                                                        
+
                                                         <td>
                                                             @if ($wine->varietal_blend)
                                                                 @php
@@ -223,85 +230,88 @@
 
                                         <!-- <div class="wine-feature mt-4">
 
-                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Business/Vendor
+                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Business/Vendor
 
-                                                                                            Name:</span> {{ $wine->vendor->vendor_name }}</p>
+                                                                                                                            Name:</span> {{ $wine->vendor->vendor_name }}</p>
 
-                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Region: </span>
+                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Region: </span>
 
-                                                                                        {{ ucfirst($wine->region) }} </p>
+                                                                                                                        {{ ucfirst($wine->region) }} </p>
 
-                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Sub-Region: </span>
+                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Sub-Region: </span>
 
-                                                                                        {{ $wine->sub_region }} </p>
+                                                                                                                        {{ $wine->sub_region }} </p>
 
-                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Series: </span>
+                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Series: </span>
 
-                                                                                        {{ $wine->series }} </p>
+                                                                                                                        {{ $wine->series }} </p>
 
-                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Varietal/Bland: </span>
+                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Varietal/Bland: </span>
 
-                                                                                        Erem Lpsum</p>
+                                                                                                                        Erem Lpsum</p>
 
-                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Grape Varietals: </span>
+                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Grape Varietals: </span>
 
-                                                                                        Mrrem psum</p>
+                                                                                                                        Mrrem psum</p>
 
-                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Cellaring Value: </span>
+                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Cellaring Value: </span>
 
-                                                                                        {{ $wine->cellar }}</p>
+                                                                                                                        {{ $wine->cellar }}</p>
 
-                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Vintage Date: </span>
+                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Vintage Date: </span>
 
-                                                                                        {{ $wine->vintage_date }} </p>
+                                                                                                                        {{ $wine->vintage_date }} </p>
 
-                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Bottle Size: </span>
+                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Bottle Size: </span>
 
-                                                                                        {{ $wine->bottle_size }}</p>
+                                                                                                                        {{ $wine->bottle_size }}</p>
 
-                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Alcohol By Volume: </span>
+                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Alcohol By Volume: </span>
 
-                                                                                        {{ $wine->abv }}%</p>
+                                                                                                                        {{ $wine->abv }}%</p>
 
-                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Residual Sugars: </span>
+                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Residual Sugars: </span>
 
-                                                                                        @php
+                                                                                                                        @php
 
-                                                                                            $residualSugar = $wine->rs; // Replace with the actual variable holding the value
+                                                                                                                            $residualSugar =
+                                                                                                                                $wine->rs; // Replace with the actual variable holding the value
 
-                                                                                            switch ($residualSugar) {
-                                                                                                case '0-1':
-                                                                                                    echo '0 - 1 g/l (Bone Dry)';
+                                                                                                                            switch (
+                                                                                                                                $residualSugar
+                                                                                                                            ) {
+                                                                                                                                case '0-1':
+                                                                                                                                    echo '0 - 1 g/l (Bone Dry)';
 
-                                                                                                    break;
+                                                                                                                                    break;
 
-                                                                                                case '1-9':
-                                                                                                    echo '1 - 9 g/l (Dry)';
+                                                                                                                                case '1-9':
+                                                                                                                                    echo '1 - 9 g/l (Dry)';
 
-                                                                                                    break;
+                                                                                                                                    break;
 
-                                                                                                case '10-49':
-                                                                                                    echo '10 - 49 g/l (Off Dry)';
+                                                                                                                                case '10-49':
+                                                                                                                                    echo '10 - 49 g/l (Off Dry)';
 
-                                                                                                    break;
+                                                                                                                                    break;
 
-                                                                                                case '50-120':
-                                                                                                    echo '50 - 120 g/l (Semi-Sweet)';
+                                                                                                                                case '50-120':
+                                                                                                                                    echo '50 - 120 g/l (Semi-Sweet)';
 
-                                                                                                    break;
+                                                                                                                                    break;
 
-                                                                                                case '120+':
-                                                                                                    echo '120+ g/l (Sweet)';
+                                                                                                                                case '120+':
+                                                                                                                                    echo '120+ g/l (Sweet)';
 
-                                                                                                    break;
+                                                                                                                                    break;
 
-                                                                                                default:
-                                                                                                    echo 'Unknown';
-                                                                                            }
+                                                                                                                                default:
+                                                                                                                                    echo 'Unknown';
+                                                                                                                            }
 
-                                                                                        @endphp
+                                                                                                                        @endphp
 
-                                                                                </div> -->
+                                                                                                                </div> -->
 
                                     </div>
 
@@ -426,11 +436,13 @@
                                                         <div class="cart-btn text-end"> <a href="javascript:void(0)"
                                                                 data-id="{{ $wine->id }}"
                                                                 class="btn wine-btn add-to-cart-slider"
-                                                                data-quantity="{{$wine->inventory > 12 ? 12 : 1}}">Add to Cart</a>
+                                                                data-quantity="{{ $wine->inventory > 12 ? 12 : 1 }}">Add
+                                                                to Cart</a>
                                                         </div>
                                                     </div>
                                                 @else
-                                                    <div class="text-center"> <a href="{{ route('winery-shop.detail', ['wineid' => $wine->id, 'shopid' => $wine->vendor_id, 'vendorid' => $vendorid]) }}"
+                                                    <div class="text-center"> <a
+                                                            href="{{ route('winery-shop.detail', ['wineid' => $wine->id, 'shopid' => $wine->vendor_id, 'vendorid' => $vendorid]) }}"
                                                             class="btn wine-btn" data-quantity="1">View Details</a>
                                                     </div>
                                                 @endif

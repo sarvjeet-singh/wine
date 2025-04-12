@@ -21,18 +21,34 @@
         <div class="col-12">
             <div class="row">
                 <div class="col-md-6">
-                    <label for="pdf" class="form-label">Upload PDF</label>
-                    <input class="form-control" type="file" name="pdf" id="pdf" accept="application/pdf">
-                </div>
-                <div class="col-md-6">
                     <label for="image" class="form-label">Image</label>
                     <input class="form-control" type="file" name="image" id="image" accept="image/*">
+                </div>
+                <div class="col-md-6">
+                    <label for="pdf" class="form-label">Upload PDF</label>
+                    <input class="form-control" type="file" name="pdf" id="pdf" accept="application/pdf">
                 </div>
             </div>
         </div>
         <div class="col-12">
             <div class="col-12">
                 <div class="row">
+                    <div class="col-md-6 img-box d-flex flex-column align-items-center">
+                        @if ($wine->image)
+                            <img id="imagePreview" src="{{ asset('storage/' . $wine->image) }}"
+                                alt="{{ $wine->winery_name }}" style="max-width:100%; height:auto; max-height:200px;" />
+                            <button type="button" id="removeImage" class="btn btn-danger mt-2">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        @else
+                            <img id="imagePreview" src="{{ asset('storage/' . $wine->image) }}" alt="Image Preview"
+                                style="display:none; max-width:100%; height:auto; max-height:200px;" />
+                            <button type="button" id="removeImage" style="display:none;" class="btn btn-danger mt-2">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        @endif
+                        <input type="hidden" name="image_removed" id="imageRemoved" value="false">
+                    </div>
                     <div class="col-md-6 d-flex flex-column align-items-center">
                         @if (isset($wine) && $wine->pdf)
                             <iframe id="pdfPreview" src="{{ asset('storage/' . $wine->pdf) }}"
@@ -50,22 +66,6 @@
                             </button>
                         @endif
                         <input type="hidden" name="remove_pdf" id="remove_pdf" value="0">
-                    </div>
-                    <div class="col-md-6 img-box d-flex flex-column align-items-center">
-                        @if ($wine->image)
-                            <img id="imagePreview" src="{{ asset('storage/' . $wine->image) }}"
-                                alt="{{ $wine->winery_name }}" style="max-width:100%; height:auto; max-height:200px;" />
-                            <button type="button" id="removeImage" class="btn btn-danger mt-2">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        @else
-                            <img id="imagePreview" src="{{ asset('storage/' . $wine->image) }}" alt="Image Preview"
-                                style="display:none; max-width:100%; height:auto; max-height:200px;" />
-                            <button type="button" id="removeImage" style="display:none;" class="btn btn-danger mt-2">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        @endif
-                        <input type="hidden" name="image_removed" id="imageRemoved" value="false">
                     </div>
                 </div>
             </div>
@@ -121,16 +121,16 @@
 
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label for="" class="form-label">Label Name</label>
-
-                    <input type="text" name="winery_name" value="{{ old('winery_name', $wine->winery_name) }}"
-                        class="form-control" id="Label">
-                </div>
-                <div class="col-md-6">
                     <label for="" class="form-label">Series Name</label>
 
                     <input type="text" name="series" value="{{ old('series', $wine->series) }}"
                         class="form-control" id="Series">
+                </div>
+                <div class="col-md-6">
+                    <label for="" class="form-label">Label Name</label>
+
+                    <input type="text" name="winery_name" id="winery_name"
+                        value="{{ old('winery_name', $wine->winery_name) }}" class="form-control" id="Label">
                 </div>
             </div>
 
@@ -435,7 +435,7 @@
 
         <div class="col-12 text-center">
 
-            <button type="submit" class="btn wine-btn w-25 px-3">Update</button>
+            <button type="submit" id="submit-button" class="btn wine-btn w-25 px-3">Update</button>
 
         </div>
 
@@ -448,7 +448,22 @@
             $('#vendorWineFormEdit').validate({
                 rules: {
                     winery_name: {
-                        required: true
+                        required: true,
+                        remote: {
+                            url: "{{ route('check-wine-name', $vendor_id) }}",
+                            type: "post",
+                            data: {
+                                winery_name: function() {
+                                    return $('#winery_name').val();
+                                },
+                                wine_id: function() {
+                                    return "{{$wine->id}}";
+                                },
+                                _token: function() {
+                                    return $('meta[name="csrf-token"]').attr('content');
+                                }
+                            }
+                        }
                     },
                     vintage_date: {
 
@@ -469,6 +484,25 @@
 
                         required: true
                     },
+                },
+
+                messages: {
+                    winery_name: {
+                        required: "Please enter a winery name",
+                        remote: "Wine name already exists"
+                    },
+                    vintage_date: {
+                        required: "Please enter a vintage date"
+                    },
+                    bottle_size: {
+                        required: "Please enter a bottle size"
+                    },
+                    "varietal_type[]": {
+                        required: "Please select at least one varietal type"
+                    },
+                    "varietal_blend[]": {
+                        required: "Please enter at least one varietal blend"
+                    }
                 },
 
                 errorElement: "div", // error element as span
@@ -493,7 +527,9 @@
 
                     var wineId = $('#wine_id').val(); // Replace with the correct ID field
 
-
+                    $('#submit-button').prop("disabled", true).html(
+                        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...'
+                        );
 
                     $.ajax({
 
@@ -518,7 +554,7 @@
                         success: function(response) {
 
                             if (response.success) {
-
+                                $('#submit-button').prop("disabled", false).html('Update');
                                 Swal.fire({
                                     icon: 'success', // Can be 'success', 'error', 'warning', 'info', or 'question'
                                     title: 'Success',
@@ -550,6 +586,8 @@
                                     0] + '</span>');
 
                             });
+
+                            $('#submit-button').prop("disabled", false).html('Update');
 
                         }
 
@@ -739,6 +777,12 @@
         const file = event.target.files[0];
         const pdfPreview = document.getElementById('pdfPreview');
         const removePdf = document.getElementById('removePdf');
+
+        if (file && file.size > 5 * 1024 * 1024) { // 5 MB in bytes
+            swal.fire("Error!", "Please select a file less than 5MB.", "error");
+            this.value = ''; // Clear the input
+            return;
+        }
 
         if (file && file.type === "application/pdf") {
             const objectURL = URL.createObjectURL(file);

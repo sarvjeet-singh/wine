@@ -13,23 +13,27 @@
     <form class="row g-3" id="vendorWineFormAdd" enctype="multipart/form-data" method="POST">
 
         @csrf
-
         @method('POST')
         <div class="col-12">
             <div class="row">
                 <div class="col-6">
-                    <label for="pdf" class="form-label">Upload PDF</label>
-                    <input class="form-control" type="file" name="pdf" id="pdf" accept="application/pdf">
-                </div>
-                <div class="col-6">
                     <label for="image" class="form-label">Image</label>
                     <input class="form-control" type="file" name="image" id="image" accept="image/*">
                 </div>
-
+                <div class="col-6">
+                    <label for="pdf" class="form-label">Upload PDF</label>
+                    <input class="form-control" type="file" name="pdf" id="pdf" accept="application/pdf">
+                </div>
             </div>
         </div>
         <div class="col-12">
             <div class="row">
+                <div class="col-6 img-box d-flex flex-column align-items-center position-relative">
+                    <img id="imagePreview" src="" alt="Image Preview"
+                        style="display:none; max-width:100%;height:auto;max-height:200px;" />
+                    <button type="button" id="removeImage" style="display:none; top: 0;padding: 2px 8px;"
+                        class="btn btn-danger mt-2"><i class="fa-solid fa-xmark"></i></button>
+                </div>
                 <div class="col-6 d-flex flex-column align-items-center position-relative">
                     <iframe id="pdfPreview" src=""
                         style="display:none; width:90%; height:200px; border:1px solid #ccc;margin-right: auto;"></iframe>
@@ -38,12 +42,6 @@
                         class="btn btn-danger mt-2">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                </div>
-                <div class="col-6 img-box d-flex flex-column align-items-center position-relative">
-                    <img id="imagePreview" src="" alt="Image Preview"
-                        style="display:none; max-width:100%;height:auto;max-height:200px;" />
-                    <button type="button" id="removeImage" style="display:none; top: 0;padding: 2px 8px;"
-                        class="btn btn-danger mt-2"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
         </div>
@@ -82,16 +80,15 @@
 
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label for="" class="form-label">Label Name</label>
-
-                    <input type="text" name="winery_name" class="form-control" id="Label">
-                </div>
-                <div class="col-md-6">
                     <label for="" class="form-label">Series Name</label>
 
                     <input type="text" name="series" class="form-control" id="Series">
                 </div>
+                <div class="col-md-6">
+                    <label for="" class="form-label">Label Name</label>
 
+                    <input type="text" name="winery_name" class="form-control" id="winery_name">
+                </div>
             </div>
 
         </div>
@@ -412,7 +409,19 @@
             rules: {
 
                 winery_name: {
-                    required: true
+                    required: true,
+                    remote: {
+                        url: "{{ route('check-wine-name', $vendor_id) }}",
+                        type: "POST",
+                        data: {
+                            winery_name: function() {
+                                return $('#winery_name').val();
+                            },
+                            _token: function() {
+                                return $('meta[name="csrf-token"]').attr('content');
+                            }
+                        }
+                    }
                 },
 
                 vintage_date: {
@@ -463,6 +472,25 @@
 
             },
 
+            messages: {
+                winery_name: {
+                    required: "Please enter a winery name",
+                    remote: "Wine name already exists"
+                },
+                vintage_date: {
+                    required: "Please enter a vintage date"
+                },
+                bottle_size: {
+                    required: "Please enter a bottle size"
+                },
+                "varietal_type[]": {
+                    required: "Please select at least one varietal type"
+                },
+                "varietal_blend[]": {
+                    required: "Please enter at least one varietal blend"
+                }
+            },
+
 
             errorElement: "div", // error element as span
 
@@ -479,6 +507,9 @@
                 event.preventDefault();
 
                 let formData = new FormData(form);
+                $('#submit-button').prop("disabled", true).html(
+                    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...'
+                );
 
                 $.ajax({
 
@@ -516,6 +547,7 @@
                             });
 
                             // Optionally, close modal or reset form
+                            $("#submit-button").prop("disabled", false).text('Save');
 
                             $('#vendorWineFormAdd')[0].reset();
 
@@ -540,6 +572,8 @@
                                 0] + '</span>');
 
                         });
+
+                        $('#submit-button').prop("disabled", false).text('Save');
 
                     }
 
@@ -643,6 +677,11 @@
         const file = event.target.files[0];
         const pdfPreview = document.getElementById('pdfPreview');
         const removePdf = document.getElementById('removePdf');
+        if (file && file.size > 5 * 1024 * 1024) { // 5 MB in bytes
+            swal.fire("Error!", "Please select a file less than 5MB.", "error");
+            this.value = ''; // Clear the input
+            return;
+        }
 
         if (file && file.type === "application/pdf") {
             const objectURL = URL.createObjectURL(file);

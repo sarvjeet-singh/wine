@@ -566,15 +566,15 @@
                         <h5 class="border-bottom pb-3 fw-bold">Things to Know</h5>
 
                         <div class="pt-3">
+                            @if ($hours != 'Closed Today')
+                                <div class="d-flex justify-content-between">
 
-                            <div class="d-flex justify-content-between">
+                                    <span class="fa-lg">Business Hours:</span>
 
-                                <span class="fa-lg">Business Hours:</span>
+                                    <strong class="fa-lg text-muted">{{ $hours }}</strong>
 
-                                <strong class="fa-lg text-muted">{{ $hours }}</strong>
-
-                            </div>
-
+                                </div>
+                            @endif
                             <div class="d-flex justify-content-between">
 
                                 <span class="fa-lg">Cuisine Type:</span>
@@ -886,7 +886,8 @@
                                         </div>
                                     </div>
                                     <p class="card-text">{{ $review->review_description ?? '' }}
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#commentImageModal" data-img-src="{{ url(Storage::url($review->image)) ?? '' }}">View
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#commentImageModal"
+                                            data-img-src="{{ url(Storage::url($review->image)) ?? '' }}">View
                                             More</a>
                                     </p>
                                 </div>
@@ -900,15 +901,16 @@
             </div>
         </div>
         <!-- <div>
-                <h5 class="mb-3">Reviews images</h5>
-                <a href="https://testing.winecountryweekends.ca/images/VendorImages/Wine Country Cottage/qHs5DPQfF1.png" target="_blank">
-                    <img src="https://testing.winecountryweekends.ca/images/VendorImages/Wine Country Cottage/qHs5DPQfF1.png" alt="Thumbnail Image" class="img-thumbnail object-fit-cover"  style="height: 100px;cursor: pointer;">
-                </a>
-            </div> -->
+                    <h5 class="mb-3">Reviews images</h5>
+                    <a href="https://testing.winecountryweekends.ca/images/VendorImages/Wine Country Cottage/qHs5DPQfF1.png" target="_blank">
+                        <img src="https://testing.winecountryweekends.ca/images/VendorImages/Wine Country Cottage/qHs5DPQfF1.png" alt="Thumbnail Image" class="img-thumbnail object-fit-cover"  style="height: 100px;cursor: pointer;">
+                    </a>
+                </div> -->
     </div>
 
-     <!-- Modal -->
-     <div class="modal fade" id="commentImageModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- Modal -->
+    <div class="modal fade" id="commentImageModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -918,11 +920,9 @@
                 <div class="modal-body p-4">
                     <h6 class="mb-2">Reviews images</h6>
                     <!-- Image Thumbnail -->
-                    <a href="#" id="commentImageLink"
-                        target="_blank">
-                        <img src="" id="commentImage"
-                            alt="Thumbnail Image" class="img-thumbnail d-none" data-bs-toggle="modal"
-                            data-bs-target="#imageModal" style="height: 100px;cursor: pointer;">
+                    <a href="#" id="commentImageLink" target="_blank">
+                        <img src="" id="commentImage" alt="Thumbnail Image" class="img-thumbnail d-none"
+                            data-bs-toggle="modal" data-bs-target="#imageModal" style="height: 100px;cursor: pointer;">
                     </a>
                 </div>
             </div>
@@ -1070,39 +1070,39 @@
 
                                         <!-- <tr>
 
+                                                                                                                                                                                                                                    <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
+
+                                                                                                                                                                                                                                    <td>Standard</td>
+
+                                                                                                                                                                                                                                    <td class="room-avail">Available</td>
+
+                                                                                                                                                                                                                                    <td>
+
+                                                                                                                                                                                                                                        <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+
+                                                                                                                                                                                                                                        <button class="btn">Select Room</button>
+
+                                                                                                                                                                                                                                    </td>
+
+                                                                                                                                                                                                                                </tr>
+
+                                                                                                                                                                                                                                <tr>
+
                                                                                                                                                                                                                                 <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
 
-                                                                                                                                                                                                                                <td>Standard</td>
+                                                                                                                                                                                                                                    <td>Standard</td>
 
-                                                                                                                                                                                                                                <td class="room-avail">Available</td>
+                                                                                                                                                                                                                                    <td class="room-not-avail">Not Available</td>
 
-                                                                                                                                                                                                                                <td>
+                                                                                                                                                                                                                                    <td>
 
-                                                                                                                                                                                                                                    <span class="room-price d-block fw-bold mb-2">$499/per night</span>
+                                                                                                                                                                                                                                        <span class="room-price d-block fw-bold mb-2">$499/per night</span>
 
-                                                                                                                                                                                                                                    <button class="btn">Select Room</button>
+                                                                                                                                                                                                                                        <button class="btn">Select Room</button>
 
-                                                                                                                                                                                                                                </td>
+                                                                                                                                                                                                                                    </td>
 
-                                                                                                                                                                                                                            </tr>
-
-                                                                                                                                                                                                                            <tr>
-
-                                                                                                                                                                                                                            <td class="room-img"><img src="/images/FrontEnd/pexels-pixabay-271624.jpg"></td>
-
-                                                                                                                                                                                                                                <td>Standard</td>
-
-                                                                                                                                                                                                                                <td class="room-not-avail">Not Available</td>
-
-                                                                                                                                                                                                                                <td>
-
-                                                                                                                                                                                                                                    <span class="room-price d-block fw-bold mb-2">$499/per night</span>
-
-                                                                                                                                                                                                                                    <button class="btn">Select Room</button>
-
-                                                                                                                                                                                                                                </td>
-
-                                                                                                                                                                                                                            </tr> -->
+                                                                                                                                                                                                                                </tr> -->
 
                                     </tbody>
 
