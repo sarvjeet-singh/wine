@@ -44,6 +44,7 @@ class Order extends Model
         'inquiry_id',
         'wallet_used',
         'platform_service_fee',
+        'platform_service_fee_percentage',
         'cancelled_at',
         'cancel_reason',
         'vendor_cancelled',

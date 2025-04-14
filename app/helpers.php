@@ -653,17 +653,57 @@ if (!function_exists('getEventOrderTicketsUsedPerDay')) {
 }
 
 if (!function_exists('platformFeeCalculator')) {
-    function platformFeeCalculator($event)
+    function platformFeeCalculator($vendor,  $totalAmount, $eventID = null, $wineryb2b = false)
     {
-        $platform_fee = $event->vendor->platform_fee ?? (config('site.platform_fee') ?? '0.00');
-        return number_format($event->admittance * ($platform_fee / 100), 2, '.', '');
+        // Check if the vendor is a B2B winery
+
+        $vendor_type = strtolower($vendor->vendor_type);
+        if ($eventID) {
+            $platform_fee = $event->vendor->event_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+        } else {
+            if ($vendor_type == 'accommodation') {
+                // Accommodation vendors have a different fee structure
+                $platform_fee = $event->vendor->accommodation_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+            } else if ($vendor_type == 'winery') {
+                if ($wineryb2b) {
+                    // B2B wineries have a different fee structure
+                    $platform_fee = $event->vendor->winery_b2b_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+                } else {
+                    // Winery vendors have a different fee structure
+                    $platform_fee = $event->vendor->winery_b2c_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+                }
+            } else if ($vendor_type == 'excursion') {
+                // Accommodation vendors have a different fee structure
+                $platform_fee = $event->vendor->excursion_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+            }
+        }
+        return number_format($totalAmount * ($platform_fee / 100), 2, '.', '');
     }
 }
 
-if (!function_exists('platformFeeCalculator')) {
-    function platformFeeCalculator($event)
+if (!function_exists('platformFee')) {
+    function platformFee($vendor,  $totalAmount, $eventID = null, $wineryb2b = false)
     {
-        $platform_fee = $event->vendor->platform_fee ?? (config('site.platform_fee') ?? '0.00');
+        $vendor_type = strtolower($vendor->vendor_type);
+        if ($eventID) {
+            $platform_fee = $event->vendor->event_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+        } else {
+            if ($vendor_type == 'accommodation') {
+                // Accommodation vendors have a different fee structure
+                $platform_fee = $event->vendor->accommodation_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+            } else if ($vendor_type == 'winery') {
+                if ($wineryb2b) {
+                    // B2B wineries have a different fee structure
+                    $platform_fee = $event->vendor->winery_b2b_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+                } else {
+                    // Winery vendors have a different fee structure
+                    $platform_fee = $event->vendor->winery_b2c_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+                }
+            } else if ($vendor_type == 'excursion') {
+                // Accommodation vendors have a different fee structure
+                $platform_fee = $event->vendor->excursion_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+            }
+        }
         return $platform_fee;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\PublishSeason;
+use App\Models\Vendor;
 use App\Models\VendorPricing;
 use Carbon\Carbon;
 
@@ -36,7 +37,7 @@ class SeasonHelper
                 break;
             }
         }
-
+        
         if (!$currentSeason) {
             return ['season' => null, 'price' => null];
         }
@@ -59,6 +60,13 @@ class SeasonHelper
         // Handle special price if applicable
         if ($pricing && $pricing->special_price && $pricing->special_price_value) {
             $price = $pricing->special_price_value;
+        }
+        $vendor = Vendor::find($vendorId);
+        // check for platform fee
+        $platformFee = platformFeeCalculator($vendor, $price);
+
+        if ($platformFee) {
+            $price += $platformFee;
         }
 
         return ['season' => $currentSeason, 'price' => $price];

@@ -30,11 +30,11 @@
         ];
     @endphp
     @foreach ($vendors as $vendorkey => $vendor)
-        @if($vendor->account_status != '1' && $vendorkey == 0) {
+        @if($vendor->account_status != '1' && $vendorkey == 0)
             @php
                 $enablehr = 1;
             @endphp
-        }
+        @endif
         @if ($vendor->account_status == '1')
             @if ($enablehr == 0)
                 <div

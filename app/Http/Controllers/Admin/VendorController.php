@@ -1433,4 +1433,40 @@ class VendorController extends Controller
         $orders = Order::with('vendor')->where('vendor_id', $id)->get();
         return view('admin.vendors.ajax.transaction', compact('orders'));
     }
+
+    public function getPlatformFeeTab($id)
+    {
+        $vendor = Vendor::find($id);
+
+        // Decrypt sensitive fields before passing to the view
+        if (!$vendor) {
+            return redirect()->back()->with('error', 'Vendor not found.');
+        }
+        return view('admin.vendors.ajax.commission', compact('vendor'));
+    }
+
+    public function updatePlatformFee(Request $request, $id)
+    {
+        $request->validate([
+            'event_platform_fee' => 'nullable|numeric',
+            'accommodation_platform_fee' => 'nullable|numeric',
+            'accommodation_event_platform_fee' => 'nullable|numeric',
+            'winery_b2c_platform_fee' => 'nullable|numeric',
+            'winery_b2b_platform_fee' => 'nullable|numeric',
+            'excursion_platform_fee' => 'nullable|numeric',
+        ]);
+        $vendor = Vendor::find($id);
+        $vendor->event_platform_fee = $request->event_platform_fee ?? NULL;
+        $vendor->accommodation_platform_fee = $request->accommodation_platform_fee ?? NULL;
+        $vendor->accommodation_event_platform_fee = $request->accommodation_event_platform_fee ?? NULL;
+        $vendor->winery_b2c_platform_fee = $request->winery_b2c_platform_fee ?? NULL;
+        $vendor->winery_b2b_platform_fee = $request->winery_b2b_platform_fee ?? NULL;
+        $vendor->excursion_platform_fee = $request->excursion_platform_fee ?? NULL;
+        $updated = $vendor->save();
+        if ($updated) {
+            return response()->json(['status' => 'success', 'message' => 'Vendor Platform fee updated successfully.']);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'An error occurred while updating vendor Platform fee.'], 500);
+        }
+    }
 }

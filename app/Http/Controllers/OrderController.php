@@ -214,8 +214,9 @@ class OrderController extends Controller
                     'postal_code' => $request->postal_code,
                 ];
             }
-            $platform_service_fee_percentage = config('site.platform_service_fee', 0.00);
-            $platform_service_fee = calculatePlatformProcessingFee($order_total, $platform_service_fee_percentage);
+            $vendor = Vendor::find($booking['vendor_id']);
+            $platform_service_fee_percentage = platformFee($vendor, $order_total);
+            $platform_service_fee = platformFeeCalculator($vendor, $order_total);
             $order += [
                 'customer_id' => Auth::guard('customer')->user()->id,
                 'vendor_id' => $booking['vendor_id'],
@@ -237,6 +238,7 @@ class OrderController extends Controller
                 'tax_rate' => $tax_rate,
                 'wallet_used' => $wallet_used,
                 'order_total' => $order_total,
+                'platform_service_fee_percentage' => $platform_service_fee_percentage,
                 'platform_service_fee' => $platform_service_fee,
                 'inquiry_id' => $inquiry_id,
             ];

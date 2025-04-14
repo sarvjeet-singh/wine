@@ -558,6 +558,8 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::get('admin/vendors/vendor-details/{id}/ajax-social-media', [AdminVendorController::class, 'getSocialMediaTab'])->name('admin.vendor.details.ajax-social-media');
     Route::post('admin/vendor-media-delete/{vendorid?}', [AdminVendorController::class, 'deleteMedia'])->name('admin.vendor.details.ajax-media-delete');
     Route::post('admin/vendor/media/set-default/{vendorid?}', [AdminVendorController::class, 'setDefaultMedia'])->name('admin.vendor.details.ajax-media-set-default');
+    Route::get('admin/vendors/vendor-details/{id}/ajax-platform-fee', [AdminVendorController::class, 'getPlatformFeeTab'])->name('admin.vendor.details.ajax-platform-fee');
+    Route::put('admin/vendors/vendor-details/{id}/ajax-platform-fee-update', [AdminVendorController::class, 'updatePlatformFee'])->name('admin.vendor.details.ajax-platform-fee-update');
 
     Route::post('admin/vendor/upload-media/{vendorid?}', [AdminVendorController::class, 'uploadMedia'])->name('admin.vendor.details.ajax.upload_media');
     Route::post('admin/vendors/vendor-details/{id}/ajax-social-media-update', [AdminVendorController::class, 'updateSocialMedia'])->name('admin.vendor.details.ajax-social-media-update');

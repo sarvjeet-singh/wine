@@ -183,6 +183,13 @@
                                         data-url="{{ route('admin.vendor.details.ajax-system-admin', $vendor->id) }}"
                                         aria-selected="false">System Admin</button>
                                 </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="tab-platform-fee" data-bs-toggle="tab"
+                                        data-bs-target="#tab-pane-platform-fee" type="button" role="tab"
+                                        aria-controls="tab-pane-platform-fee"
+                                        data-url="{{ route('admin.vendor.details.ajax-platform-fee', $vendor->id) }}"
+                                        aria-selected="false">Platform Fee</button>
+                                </li>
                                 @if(strtolower($vendor->vendor_type) == 'winery')
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="tab-wine-listing" data-bs-toggle="tab"
