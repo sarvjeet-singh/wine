@@ -53,7 +53,7 @@
                                                 </a>
                                             @endif
                                         </h3>
-                                        <p class="wine-price mb-3">${{ $wine->price }}</p>
+                                        <p class="wine-price mb-3">${{ winery_b2b_price($vendor, $wine) }}</p>
                                         @if ($vendor->account_status == 1)
                                             <div class="add-wines-cart d-flex align-items-center gap-3">
                                                 <div class="input-group"> <span class="input-group-btn"> <button
@@ -388,7 +388,7 @@
 
                                                 </h5>
 
-                                                <p class="wine-price fw-bold">${{ number_format($wine->price, 2) }}</p>
+                                                <p class="wine-price fw-bold">${{ number_format(winery_b2b_price($vendor, $wine), 2) }}</p>
 
                                                 <!-- Add to Cart Button -->
                                                 @if ($vendor->account_status == 1)

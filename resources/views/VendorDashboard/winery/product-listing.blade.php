@@ -195,7 +195,7 @@
                                                                         </label>
                                                                     </div>
                                                                 </div>
-                                                                <p class="wine-price fw-bold mb-0">${{ $wine->price }}</p>
+                                                                <p class="wine-price fw-bold mb-0">${{ winery_b2b_price($vendor, $wine) }}</p>
                                                             </div>
                                                             <!-- <div
                                                                                                                 class="d-flex align-items-center justify-content-between gap-2 mt-3">

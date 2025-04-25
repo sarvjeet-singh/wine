@@ -2,7 +2,7 @@
 @section('content')
     <div class="main-content-inner">
         <div class="main-head d-flex align-items-center justify-content-between mb-4">
-            <h2 class="mb-0">Curative Experience Categories</h2>
+            <h2 class="mb-0">Manage Event Types</h2>
             <a href="{{ route('admin.curative-experience-categories.create') }}"
                 class="btn theme-btn text-center py-2 px-4">Add</a>
         </div>

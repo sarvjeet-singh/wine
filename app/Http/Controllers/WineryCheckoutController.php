@@ -45,7 +45,7 @@ class WineryCheckoutController extends Controller
 
         if ($cart) {
             foreach ($cart->items as $item) {
-                $cartTotal += $item->product->price * $item->quantity;
+                $cartTotal += winery_b2b_price($shop, $item->product) * $item->quantity;
                 $totalQuantity += $item->quantity; // Calculate the total quantity
             }
         }

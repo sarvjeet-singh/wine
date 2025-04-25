@@ -2,7 +2,7 @@
 @section('content')
     <div class="main-content-inner">
         <div class="main-head d-flex align-items-center justify-content-between mb-4">
-            <h2 class="mb-0">Curative Experiences</h2>
+            <h2 class="mb-0">Manage Events</h2>
             <form id="searchForm" method="GET" action="{{ route('admin.curative-experiences.index') }}">
                 <div class="input-group">
                     <!-- Vendor Search -->

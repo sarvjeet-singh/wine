@@ -73,7 +73,7 @@
 
                                     {{ \Carbon\Carbon::parse($event->start_date)->format('d M Y') }}
 
-                                    {{ \Carbon\Carbon::parse($event->start_time)->format('H:i A') }}
+                                    {{ !empty($event->start_time) ? \Carbon\Carbon::parse($event->start_time)->format('H:i A') : '' }}
 
                                 </p>
 
@@ -91,10 +91,10 @@
                                     <p class="event-price fw-bold mb-0">
                                         @php
                                             $platform_fee =
-                                                $event->vendor->platform_fee ??
+                                                $event->vendor->event_platform_fee ??
                                                 (config('site.platform_fee') ?? '1.00');
                                         @endphp
-                                        ${{ number_format($event->admittance + ($event->admittance * $platform_fee) / 100, 2, '.', '') }}{{ $event->extension }}
+                                        {{ !empty($event->admittance) ? '$'. number_format($event->admittance + ($event->admittance * $platform_fee) / 100, 2, '.', '') : '' }}{{ $event->extension }}
 
                                     </p>
                                 @endif
@@ -126,7 +126,7 @@
                     <div>
 
                         @if (!empty($event->booking_url))
-                            <a href="{{ $event->booking_url }}" class="btn px-3">Buy Now</a>
+                            <a href="{{ $event->booking_url }}" class="btn px-3">{{$event->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                         @else
                             <a href="{{ route('events.detail', $event->id) }}" class="btn px-3">{{$event->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                         @endif

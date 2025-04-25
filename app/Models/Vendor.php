@@ -50,7 +50,13 @@ class Vendor extends Model
         'stripe_account_id',
         'stripe_onboarding_account_status',
         'settlement_duration',
-        'platform_fee',
+        'event_platform_fee',
+        'accommodation_platform_fee',
+        'accommodation_event_platform_fee',
+        'excursion_platform_fee',
+        'winery_b2b_platform_fee',
+        'winery_b2c_platform_fee',
+        'stocking_fee_waiver',
     ];
     protected static function boot()
     {

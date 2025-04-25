@@ -1,6 +1,14 @@
 <div class="modal-header px-4">
 
-    <h1 class="modal-title fw-bold fs-5" id="exampleModalLabel">Add Wine - {{ $vendor->vendor_name }}</h1>
+    <h1 class="modal-title fw-bold fs-5 d-flex align-items-center justify-content-between" id="exampleModalLabel">
+        Add Wine - {{ $vendor->vendor_name }}
+
+        <div class="form-check form-switch ms-3 d-flex align-items-center">
+            <input class="form-check-input me-2" type="checkbox" id="statusToggle" name="status" value="1"
+                {{ old('status', 1) ? '' : '' }}>
+            <label class="form-check-label" for="statusToggle" id="toggleLabel">Publish</label>
+        </div>
+    </h1>
 
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
@@ -340,7 +348,7 @@
         </div>
 
         <div class="col-12 text-center">
-
+            <input type="hidden" name="status" id="wineStatus" value="0">
             <button type="submit" id="submit-button" class="btn wine-btn w-25 px-3">Save</button>
 
         </div>
@@ -403,7 +411,17 @@
 </script>
 <script>
     $(document).ready(function() {
+        $.validator.addMethod('validImage', function(value, element) {
+            if ($('#wineStatus').val() != '1') return true; // skip check if not publish
 
+            if (element.files.length === 0) return false;
+
+            const file = element.files[0];
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+
+            return validTypes.includes(file.type) && file.size <= maxSize;
+        }, 'Please upload a valid image (jpg, png, gif) under 5MB');
         $('#vendorWineFormAdd').validate({
 
             rules: {
@@ -468,8 +486,15 @@
 
                 inventory: {
                     digits: true
+                },
+                image: {
+                    required: {
+                        depends: function() {
+                            return $('#wineStatus').val() == '1';
+                        }
+                    },
+                    validImage: true,
                 }
-
             },
 
             messages: {

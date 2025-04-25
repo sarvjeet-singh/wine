@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Repositories\WineryCartRepository;
 use Illuminate\Http\Request;
 use App\Models\VendorWine;
+use App\Models\Vendor;
 use Auth;
 
 class WineryCartController extends Controller
@@ -18,11 +19,13 @@ class WineryCartController extends Controller
 
     public function index($shopid = null, $vendorid)
     {
+        $vendor = Vendor::where('id', $shopid)
+            ->first();
         $cart = null;
         if ($shopid) {
             $cart = $this->cartRepository->getCart(Auth::id(), $shopid, $vendorid);
         }
-        return view('VendorDashboard.winery.cart', compact('cart', 'vendorid'));
+        return view('VendorDashboard.winery.cart', compact('cart', 'vendorid', 'vendor'));
     }
 
     public function add(Request $request, $shopid, $vendorid)

@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\CurativeExperience;
 use App\Models\CurativeExperienceCategory;
+use App\Models\CurativeExperienceGenre;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AdminEventSubmissionMail;
+use Illuminate\Support\Collection;
 
 class CurativeExperienceController extends Controller
 {
@@ -16,6 +20,7 @@ class CurativeExperienceController extends Controller
     {
         $experiences = CurativeExperience::with('category')
             ->where('vendor_id', $vendor_id)
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
         $vendor = Vendor::find($vendor_id);
         return view('VendorDashboard.curative-experiences.index', compact('experiences', 'vendor'));
@@ -25,23 +30,26 @@ class CurativeExperienceController extends Controller
     {
         $vendor = Vendor::find($vendor_id);
         $categories = CurativeExperienceCategory::where('status', 'active')->orderBy('position', 'asc')->pluck('name', 'id');
-        return view('VendorDashboard.curative-experiences.form', compact('categories', 'vendor'));
+        $genres = CurativeExperienceGenre::where('status', 'active')->orderBy('position', 'asc')->pluck('name', 'id');
+        return view('VendorDashboard.curative-experiences.form', compact('categories', 'vendor', 'genres'));
     }
 
     public function store(Request $request, $vendorid)
     {
-        $request->validate([
-            'category_id' => 'required|exists:curative_experience_categories,id',
-            'name' => 'required|string|max:255',
-            'admittance' => 'required_if:is_free,0',
+        $baseRules = [
+            'is_published' => 'required|boolean',
+            'category_id' => 'exists:curative_experience_categories,id',
+            'name' => 'string|max:255',
+            'genre_id' => 'exists:curative_experience_genres,id',
+            'admittance' => 'nullable|numeric', // not required unless both conditions are met
             'media_type' => 'nullable|string|in:image,youtube',
             'youtube_url' => 'nullable|url',
             'is_free'  => 'nullable|boolean',
-            'extension'  => 'required|string',
+            'extension'  => 'nullable|string',
             'booking_url' => 'nullable|url',
-            'inventory' => 'required|integer',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'inventory' => 'nullable|integer',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
             'booking_time' => 'nullable|date_format:H:i',
             'description' => 'nullable|string',
             'duration' => 'nullable|integer|min:1|max:1440',
@@ -50,7 +58,41 @@ class CurativeExperienceController extends Controller
             'city' => 'nullable|string',
             'state' => 'nullable|string',
             'zipcode' => 'nullable|string',
-        ], [
+            'venue_name' => 'nullable|string|max:255',
+            'venue_phone' => 'nullable|string|max:255',
+            'event_rating' => 'nullable|string|max:255',
+        ];
+
+        if ($request->is_published == 1) {
+            // When published, enforce required rules
+            $rules = array_merge($baseRules, [
+                'category_id' => 'required|exists:curative_experience_categories,id',
+                'genre_id' => 'required|exists:curative_experience_genres,id',
+                'name' => 'required|string|max:255',
+                'admittance' => 'required_if:is_free,0',
+                'start_date' => 'required|date',
+                'end_date' => 'nullable|date|after_or_equal:start_date',
+                'address' => 'required|string|max:255',
+                'city' => 'required|string|max:255',
+                'state' => 'required|string|max:255',
+                'zipcode' => 'nullable|string|max:255',
+                'media_type' => 'required|string|in:image,youtube',
+                'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,webp|max:5120',
+                'youtube_url' => 'nullable|url',
+                'venue_name' => 'required|string|max:255',
+                'venue_phone' => 'required|string|max:255',
+                'event_rating' => 'required|string|max:255',
+                'description' => 'required|string',
+            ]);
+        } else {
+            // When not published, only a few fields are required
+            $rules = array_merge($baseRules, [
+                'category_id' => 'required|exists:curative_experience_categories,id',
+                'name' => 'required|string|max:255',
+                'genre_id' => 'required|exists:curative_experience_genres,id',
+            ]);
+        }
+        $request->validate($rules, [
             'category_id.required' => 'The category field is required.',
             'category_id.exists' => 'The selected category is invalid.'
         ]);
@@ -103,15 +145,26 @@ class CurativeExperienceController extends Controller
         if (!isset($request->is_free)) {
             $data['is_free'] = 0;
         }
+        $data['status'] = 'inactive';
         // Create experience
-        $experience = CurativeExperience::create($data);
-
-        return redirect()->route('curative-experiences.index', $vendorid)->with('success', 'Your event will appear once system admin approves it.');
+        $curativeExperience = CurativeExperience::create($data);
+        // if(isset($request->is_published) && $request->is_published == 1) {
+        //     return redirect()->route('curative-experiences.index', $vendorid)->with('success', 'Your event will appear once system admin approves it.');
+        // }
+        if ($curativeExperience->is_published == 1 && $curativeExperience->status == 'inactive') {
+            // Send email to admin
+            $curativeExperience->load('vendor');
+            $curativeExperience->load('category');
+            Mail::to(env('ADMIN_EMAIL'))->send(new AdminEventSubmissionMail($curativeExperience));
+            return redirect()->route('curative-experiences.index', $vendorid)->with('success', 'Your event will appear once system admin approves it.');
+        }
+        return redirect()->route('curative-experiences.index', $vendorid)->with('success', 'Event draft has been saved successfully.');
     }
 
     public function edit(Request $request, $id, $vendor_id)
     {
         $categories = CurativeExperienceCategory::where('status', 'active')->orderBy('position', 'asc')->pluck('name', 'id');
+        $genres = CurativeExperienceGenre::where('status', 'active')->orderBy('position', 'asc')->pluck('name', 'id');
         $vendor = Vendor::find($vendor_id);
         $experience = CurativeExperience::findOrFail($id);
         if (isset($experience->image) && (str_contains($experience->image, 'youtube') || str_contains($experience->image, 'youtu.be'))) {
@@ -120,37 +173,92 @@ class CurativeExperienceController extends Controller
             $experience->image = null;
         }
         // print_r($experience); die;
-        return view('VendorDashboard.curative-experiences.form', compact('experience', 'categories', 'vendor'));
+        return view('VendorDashboard.curative-experiences.form', compact('experience', 'categories', 'vendor', 'genres'));
     }
 
     public function update(Request $request, $id, $vendorid)
     {
-        $request->validate([
-            'category_id' => 'required|exists:curative_experience_categories,id',
-            'name' => 'required|string|max:255',
-            'admittance' => 'required_if:is_free,0',
-            'media_type' => 'nullable|string|in:image,youtube',
-            'youtube_url' => 'nullable|url',
-            'is_free'  => 'nullable|boolean',
-            'extension'  => 'required|string',
-            'booking_url' => 'nullable|url',
-            'inventory' => 'required|integer',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'booking_time' => 'nullable|date_format:H:i',
-            'description' => 'nullable|string',
-            'duration' => 'nullable|integer|min:1|max:1440',
-            'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,webp|max:5120',
-            'address' => 'nullable|string',
-            'city' => 'nullable|string',
-            'state' => 'nullable|string',
-            'zipcode' => 'nullable|string',
-        ], [
-            'category_id.required' => 'The category field is required.',
-            'category_id.exists' => 'The selected category is invalid.'
-        ]);
-
         $curativeExperience = CurativeExperience::find($id);
+        if (!$curativeExperience) {
+            return redirect()->back()->with('error', 'Experience not found.');
+        }
+        if ($curativeExperience->is_published == 1) {
+            unset($request['is_published']);
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'end_date' => 'nullable|date|after_or_equal:start_date',
+                'admittance' => 'required_if:is_free,0',
+                'duration' => 'nullable|integer|min:1|max:1440',
+                'media_type' => 'required|string|in:image,youtube',
+                'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,webp|max:5120',
+                'youtube_url' => 'nullable|url',
+                'extension' => 'nullable|string',
+                'inventory' => 'nullable|integer',
+                'quantity' => 'nullable|integer',
+                'description' => 'required|string',
+            ]);
+        } else {
+            $baseRules = [
+                'is_published' => 'required|boolean',
+                'category_id' => 'exists:curative_experience_categories,id',
+                'name' => 'string|max:255',
+                'genre_id' => 'exists:curative_experience_genres,id',
+                'admittance' => 'nullable|numeric', // not required unless both conditions are met
+                'media_type' => 'required|string|in:image,youtube',
+                'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,webp|max:5120',
+                'youtube_url' => 'nullable|url',
+                'is_free'  => 'nullable|boolean',
+                'extension'  => 'nullable|string',
+                'booking_url' => 'nullable|url',
+                'inventory' => 'nullable|integer',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date|after_or_equal:start_date',
+                'booking_time' => 'nullable|date_format:H:i',
+                'description' => 'nullable|string',
+                'duration' => 'nullable|integer|min:1|max:1440',
+                'address' => 'nullable|string',
+                'city' => 'nullable|string',
+                'state' => 'nullable|string',
+                'zipcode' => 'nullable|string',
+                'venue_name' => 'nullable|string|max:255',
+                'venue_phone' => 'nullable|string|max:255',
+                'event_rating' => 'nullable|string|max:255',
+            ];
+
+            if ($request->is_published == 1) {
+                // When published, enforce required rules
+                $rules = array_merge($baseRules, [
+                    'category_id' => 'required|exists:curative_experience_categories,id',
+                    'genre_id' => 'required|exists:curative_experience_genres,id',
+                    'name' => 'required|string|max:255',
+                    'admittance' => 'required_if:is_free,0',
+                    'start_date' => 'required|date',
+                    'end_date' => 'nullable|date|after_or_equal:start_date',
+                    'address' => 'required|string|max:255',
+                    'city' => 'required|string|max:255',
+                    'state' => 'required|string|max:255',
+                    'zipcode' => 'nullable|string|max:255',
+                    'media_type' => 'required|string|in:image,youtube',
+                    'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,webp|max:5120',
+                    'youtube_url' => 'nullable|url',
+                    'venue_name' => 'required|string|max:255',
+                    'venue_phone' => 'required|string|max:255',
+                    'event_rating' => 'required|string|max:255',
+                    'description' => 'required|string',
+                ]);
+            } else {
+                // When not published, only a few fields are required
+                $rules = array_merge($baseRules, [
+                    'category_id' => 'required|exists:curative_experience_categories,id',
+                    'name' => 'required|string|max:255',
+                    'genre_id' => 'required|exists:curative_experience_genres,id',
+                ]);
+            }
+            $request->validate($rules, [
+                'category_id.required' => 'The category field is required.',
+                'category_id.exists' => 'The selected category is invalid.'
+            ]);
+        }
         $image = '';
         $thumbnails = [];
         if ($request->media_type == 'youtube') {
@@ -260,7 +368,13 @@ class CurativeExperienceController extends Controller
 
         // Update the record
         $curativeExperience->update($data); // Don't update medias here
-
+        if ($curativeExperience->is_published == 1 && $curativeExperience->status == 'inactive') {
+            // Send email to admin
+            $curativeExperience->load('vendor');
+            $curativeExperience->load('category');
+            Mail::to(env('ADMIN_EMAIL'))->send(new AdminEventSubmissionMail($curativeExperience));
+            return redirect()->route('curative-experiences.index', $vendorid)->with('success', 'Your event will appear once system admin approves it.');
+        }
         return redirect()->route('curative-experiences.index', $vendorid)->with('success', 'Experience updated successfully.');
     }
 
@@ -269,5 +383,19 @@ class CurativeExperienceController extends Controller
         $curativeExperience = CurativeExperience::find($id);
         $curativeExperience->delete();
         return redirect()->route('curative-experiences.index', $vendorid)->with('success', 'Experience deleted successfully.');
+    }
+
+    public function preview(Request $request, $id, $vendorid)
+    {
+        $event = CurativeExperience::with('category')
+            ->where('id', $id)
+            ->first();
+        $vendor = $event->vendor()->first();
+        if (!$event) {
+            abort(404);
+        }
+        $relatedEvents = collect();
+        $preview = 1;
+        return view('FrontEnd.events.event-details', compact('event', 'vendor', 'relatedEvents', 'preview'));
     }
 }

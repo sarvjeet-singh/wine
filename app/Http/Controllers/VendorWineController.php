@@ -86,6 +86,7 @@ class VendorWineController extends Controller
             'inventory' => 'nullable|integer',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust image validation as needed
             'pdf' => 'nullable|mimes:pdf|max:5120',
+            'status' => 'nullable|boolean',
         ]);
         $rs_value = null;
 
@@ -143,6 +144,7 @@ class VendorWineController extends Controller
         $vendorWine->price = $request->input('price') ?? 0.00;
         $vendorWine->inventory = $request->input('inventory') ?? 0;
         $vendorWine->image = $imagePath;
+        $vendorWine->delisted = $request->input('status') == 1 ? 0 : 1;
         $vendorWine->pdf = $pdfPath;
 
         if (!empty($vendorWine->cost)) {
@@ -183,6 +185,7 @@ class VendorWineController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust image validation as needed
             'pdf' => 'nullable|mimes:pdf|max:5120',
             'remove_pdf' => 'nullable|boolean',
+            'status' => 'nullable|boolean',
         ]);
 
         // Process varietal_blend and varietal_type
@@ -269,7 +272,7 @@ class VendorWineController extends Controller
             'inventory' => $request->input('inventory') ?? 0,
             'image' => $imagePath,
             'pdf' => $pdfPath,
-
+            'delisted' => $request->input('status') == 1 ? 0 : 1,
         ];
 
         // Use the private method to calculate stocking fee and final price

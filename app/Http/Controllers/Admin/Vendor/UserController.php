@@ -48,16 +48,22 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'master_user' => $request->has('master_user') ? 1 : 0
+        ]);
         $request->validate([
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'contact_number' => 'required|string|max:20',
             'password' => 'required|string|min:8',
-            'vendor_id' => 'required|array|min:1',  // Allow it to be null
+            'master_user' => 'nullable|boolean',
+            'vendor_id' => 'required_if:master_user,0|array|min:1',  // Allow it to be null
             'vendor_id.*' => 'exists:vendors,id', // Check each vendor ID exists
         ], [
             'vendor_id.required' => 'Please select at least one vendor.',
+            'vendor_id.required_if' => 'Please select at least one vendor if the user is not a master user.',
+            'vendor_id.*.exists' => 'One or more selected vendors are invalid.',
         ]);
 
         // Check if any of the selected vendors are already assigned to another user
@@ -77,6 +83,7 @@ class UserController extends Controller
             'email' => $request->email,
             'contact_number' => $request->contact_number,
             'password' => bcrypt($request->password),
+            'master_user' => $request->master_user ?? 0,
         ]);
 
         // Update vendors with the new user ID
@@ -110,13 +117,21 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+        $request->merge([
+            'master_user' => $request->has('master_user') ? 1 : 0
+        ]);
         $request->validate([
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'contact_number' => 'required|string|max:20',
-            'vendor_id' => 'required|array|min:1',
+            'vendor_id' => 'required_if:master_user,0|array|min:1',
+            'master_user' => 'nullable|boolean',
             'vendor_id.*' => 'exists:vendors,id', // Validate vendor existence
+        ],[
+            'vendor_id.required' => 'Please select at least one vendor.',
+            'vendor_id.required_if' => 'Please select at least one vendor if the user is not a master user.',
+            'vendor_id.*.exists' => 'One or more selected vendors are invalid.',
         ]);
 
         DB::beginTransaction();
@@ -134,7 +149,14 @@ class UserController extends Controller
             }
 
             // Update user details
-            $user->update($request->only(['firstname', 'lastname', 'email', 'contact_number']));
+            $user->update([
+                'firstname' => $request->firstname,
+                'lastname' => $request->lastname,
+                'email' => $request->email,
+                'contact_number' => $request->contact_number,
+                'master_user' => $request->master_user ?? 0,
+                'password' => !empty($request->password) ? bcrypt($request->password) : $user->password,
+            ]);
 
             // Remove previous vendor associations
             Vendor::where('user_id', $user->id)->update(['user_id' => null]);

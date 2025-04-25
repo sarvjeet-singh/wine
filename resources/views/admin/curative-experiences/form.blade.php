@@ -2,7 +2,7 @@
 @section('content')
     <div class="main-content-inner">
         <div class="main-head d-flex align-items-center justify-content-between mb-4">
-            <h2 class="mb-0"> View Curative Experience</h2>
+            <h2 class="mb-0"> View Event</h2>
         </div>
         <div class="row">
             <div class="col-12">

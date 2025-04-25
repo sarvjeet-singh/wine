@@ -2,7 +2,7 @@
 @section('content')
     <div class="main-content-inner">
         <div class="main-head d-flex align-items-center justify-content-between mb-4">
-            <h2 class="mb-0"> {{ isset($category) ? 'Edit Category' : 'Add Category' }}</h2>
+            <h2 class="mb-0"> {{ isset($category) ? 'Edit Type' : 'Add Type' }}</h2>
         </div>
         <div class="row">
             <div class="col-12">

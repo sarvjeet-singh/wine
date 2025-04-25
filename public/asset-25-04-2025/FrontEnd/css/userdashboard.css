@@ -1,0 +1,390 @@
+/* ================= User Dashboard Left Navbar Start ================= */
+/*.left-navbar{
+    position: fixed;
+    width: 17.5rem;
+    overflow: hidden;
+    height: calc(100vh - 150px);
+}*/
+
+/*.left-navbar:hover {
+    overflow: auto;
+}*/
+
+/*.fixed-postion .left-navbar{
+    margin-top: 92px;
+}*/
+
+.table-custom a.btn-primary {
+    background-color: #c0a144;
+    border-color: #c0a144;
+}
+.dt-length label {
+    text-transform: capitalize;
+    padding-left: 10px;
+}
+
+.left-navbar .nav{
+    background: #F9F9F9;
+    border-radius: 0.80rem;
+}
+
+.left-navbar ul,
+.left-navbar ul li
+{
+    width: 100%;
+    --bs-nav-pills-border-radius:0;
+}
+
+.left-navbar .nav-link{
+    color: #757575;
+    font-size: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.left-navbar .nav-link > img{
+    width: 20px;
+}
+
+.left-navbar .nav-item.active a{
+    color: var(--theme-text-color);
+}
+
+.left-navbar ul li:first-child{
+    border-top-right-radius: 0.80rem;
+    border-top-left-radius: 0.80rem;
+    --bs-nav-pills-border-radius: 0.80rem;
+}
+.left-navbar ul li:last-child{
+    border-bottom-right-radius: 0.80rem;
+    border-bottom-left-radius: 0.80rem;
+    --bs-nav-pills-border-radius: 0.80rem;
+}
+.left-navbar ul li:last-child .nav-link{
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+}
+
+.left-navbar .nav-item:hover a,
+.left-navbar .nav-item:focus a,
+.left-navbar .nav-item:active a,
+.left-navbar .nav-item.active{
+    color: var(--theme-text-color);
+    background-color: var(--theme-main-color);
+}
+
+.left-navbar .inner-sec {
+    position: sticky;
+    top: 100px;
+}
+.left-navbar .side-head {    
+    background-color: #c0a144;
+}
+
+/* ================= User Dashboard Left Navbar End ================= */
+
+/* ================= User Dashboard Right Side Start ================= */
+/*.right-side{
+    margin-left: 18rem;
+}*/
+/* ================= User Dashboard Right Side End ================= */
+
+/* ================= User DashBoard Profile Start ================= */
+
+/* ================= User DashBoard Four Box Start ================= */
+    .top-boxes{
+        background: #F9F9F9;
+        border: 1px solid #CBCBCB;
+        border-radius: 20px;
+        padding: 15px;
+    }
+
+    .box-image img{
+        width: 45px;
+    }
+
+    .box-points {
+        margin-top: 10px;
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--theme-main-color);
+        font-family: Inter_Tight_bold;
+    }
+
+    .box-text{
+        color: #757575;
+    }
+
+/* ================= User DashBoard Four Box End ================= */
+
+/* ================= User DashBoard Box Start ================= */
+    .information-box{
+        width: 100%;
+        border: 1px solid #CBCBCB;
+        background-color: #F9F9F9;
+        border-radius: 15px;
+        
+    }
+    .information-box-head{
+        border-bottom: 1px solid #CBCBCB;
+        padding: 20px 30px;
+        border-radius: 15px 15px 0px 0px;
+        background: var(--theme-secondary-color);
+    }
+    .information-box-head.grey-head{
+        background-color: #F9F9F9;
+    }
+    .box-head-heading{
+        font-size: 20px;
+    }
+    .box-head-label{
+        width: 90%;
+        font-family: Inter_Tight_bold;
+    }
+
+    .information-box-edit{
+        color: var(--theme-main-color);
+    }
+
+    .box-edit-icon{
+        font-weight: 400;
+        font-size: 18px;
+        border-bottom: 1px solid;
+    }
+
+    .box-head-description,
+    .box-body-information{
+        font-size: 15px;
+        color: #757575;
+    }
+
+    .information-box-body{
+        padding: 15px 30px;
+    }
+
+    .box-body-label{
+        font-family: Inter_Tight_bold;
+        font-size: 18px;
+    }
+
+    .profile-parent{
+        position: relative;
+    }
+
+    .box-userprofile-image{
+        width: 100%;
+    }
+
+    .verify-icon{
+        position: absolute;
+        top: -25px;
+        right: -10px;
+    }
+
+    .box-social-icon{
+        width: 22px;
+    }
+    svg.box-social-svg {
+        padding-inline: 1px;
+        color: #bba253;
+        width: 16px;
+        height: 16px;
+    }
+
+
+
+/* ================= User DashBoard Four Box End ================= */
+
+
+
+/* ================= User DashBoard Profile End ================= */
+
+
+/* ================= User Guest Registry Start ================= */
+
+.custom-file-input {
+    position: relative;
+    height: 50px;
+    opacity: 0;
+    z-index: 2;
+    display: none;
+}
+
+.custom-file-label {
+    padding: 35px 20px;
+    background-color: #fff;
+    border: 1px dashed #ced4da;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    width: 92%;
+}
+.guest-reg-sec .box-head-label {
+    width: fit-content;
+}
+.self-check-verify {
+    background-color: #96FFB9;
+    border-radius: 16px;
+    padding: 10px 20px;
+}
+/* ================= UserGuest Registry End ================= */
+
+/* ================= DataTable Header Start ================= */
+    .table-custom th {
+        background-color: var(--theme-secondary-color);
+    }
+
+    .table-custom th:first-child {
+        border-top-left-radius: 15px;
+    }
+
+    .table-custom th:last-child {
+        border-top-right-radius: 15px;
+    }
+
+    img.userprofile-image-icon {
+        width: 50px;
+        height: 54px;
+        border-radius: 50%;
+    }
+
+    #example table.dataTable.display>tbody>tr>*{
+        font-size: 14px;
+    }
+/* ================= DataTable Header End ================= */
+
+/* ================= FAQ START ================= */
+    .accordion-item.custom-item{
+        border-color: var(--theme-secondary-color);
+        border-top-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+    }
+
+    .accordion-item:not(:first-child) {
+        margin-top: 15px;
+    }
+
+    .accordion-button{
+        box-shadow: none;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .accordion-button:focus{
+        box-shadow: none;
+    }
+
+    .accordion-button:not(.collapsed){
+        background-color: #fff;
+        color: #000;
+    }
+
+    .accordion-body.custom-body{
+        color: #757575;
+        font-size: 14px;
+    }
+
+    .custom-accodion-button{
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+/* ================= FAQ END ================= */
+
+/* ================= LOGOUT START ================= */
+    .modal .btn-close{
+        border: 1px solid #CBCBCB;
+        --bs-btn-close-bg: none;
+        border-radius: 50%;
+        line-height: 0;
+        opacity: 1;
+    }
+    
+    .modal .btn-close .close-icon{
+        color: var(--theme-main-color)
+    }
+
+    #logoutModal .modal-header{
+        border: 0px;
+    }
+/* ================= FAQ END ================= */
+
+
+#readMoreModal .btn-close span {
+    font-size: 24px;
+}
+#readMoreModal .modal-content {
+    border-radius: 15px;
+}
+
+.svg-active-637{
+    fill: var(--theme-main-color) !important;
+}
+
+.gurest_vendorlist, .gurest_social_media{
+    display: none;
+}
+.form-check .form-check-input {
+    border-color: var(--theme-main-color);
+    padding: 10px;
+    position: relative;
+    top: -3px;
+    left: -3px;
+}
+
+.form-check-input:checked {
+    background-color: var(--theme-main-color);
+    border-color: var(--theme-main-color);
+}
+
+
+/* ================= Won Bucks Popup Start ================= */
+#bottleBucks .modal-dialog {
+    max-width: 400px;
+}
+#bottleBucks .modal-content {
+    border-radius: 20px;
+}
+#bottleBucks .modal-body img {
+    width: 16%;
+}
+#bottleBucks .btn-close {
+    --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+    font-size: 10px;
+}
+/* ================= Won Bucks Popup End ================= */
+
+#cropImage .modal-footer button.btn.btn-primary.image-crop {
+    background-color: #c0a144;
+    border-color: #c0a144;
+}
+#cropImage .modal-header button.btn-close {
+    --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+    font-size: 10px;
+}
+
+/* ================= Incomplete Profile Popup Start ================= */
+.error-modal-wrapper .modal-header {
+    background-color: #c0a144;
+}
+.error-modal-wrapper p#errorIntro {
+    max-width: 70%;
+    margin-inline: auto;
+}
+.error-modal-wrapper li:not(:last-child) {
+    margin-bottom: 6px;
+}
+.error-modal-wrapper button.btn-close {
+    --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+    filter: brightness(0) invert(1);
+    width: 12px;
+    height: 12px;
+    font-size: 12px;
+}
+.error-modal-wrapper .modal-footer p {
+    font-size: 15px;
+    font-style: italic;
+}
+.error-modal-wrapper li a {
+    color: #212529;
+}
+/* ================= Incomplete Profile Popup End ================= */

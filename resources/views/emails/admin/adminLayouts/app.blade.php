@@ -86,8 +86,8 @@ body {
 </style>
 </head>
 <body>
-    @include('emails.adminLayouts.header')
+    @include('emails.admin.adminLayouts.header')
     @yield('content')
-    @include('emails.adminLayouts.footer')
+    @include('emails.admin.adminLayouts.footer')
 </body>
 </html>

@@ -97,7 +97,7 @@
                                                     <p class="event-date mb-0 fw-bold"
                                                         @if ($youtubeId) style="bottom:6px;" @endif>
                                                         {{ \Carbon\Carbon::parse($todayEvent->start_date)->format('d M Y') }}
-                                                        {{ \Carbon\Carbon::parse($todayEvent->start_time)->format('H:i A') }}
+                                                        {{ !empty($todayEvent->start_time) ? \Carbon\Carbon::parse($todayEvent->start_time)->format('H:i A') : '' }}
                                                     </p>
                                                 </div>
                                                 <div>
@@ -109,10 +109,10 @@
                                                         <p class="event-price fw-bold mb-0">
                                                             @php
                                                                 $platform_fee =
-                                                                    $todayEvent->vendor->platform_fee ??
-                                                                    (config('site.platform_fee') ?? '1.00');
+                                                                    $todayEvent->vendor->event_platform_fee ??
+                                                                    (config('site.platform_fee') ?? '0.00');
                                                             @endphp
-                                                            ${{ number_format($todayEvent->admittance + ($todayEvent->admittance * $platform_fee) / 100, 2, '.', '') }}{{ $todayEvent->extension }}
+                                                            {{ !empty($todayEvent->admittance) ? '$'. number_format($todayEvent->admittance + ($todayEvent->admittance * $platform_fee) / 100, 2, '.', '') : '' }}{{ $todayEvent->extension }}
                                                         </p>
                                                     @endif
                                                 </div>
@@ -129,10 +129,10 @@
                                         </div>
                                         <div>
                                             @if (!empty($todayEvent->booking_url))
-                                                <a href="{{ $todayEvent->booking_url }}" class="btn px-3">Buy Now</a>
+                                                <a href="{{ $todayEvent->booking_url }}" class="btn px-3">{{ $todayEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                                             @else
                                                 <a href="{{ route('events.detail', $todayEvent->id) }}"
-                                                    class="btn px-3">{{$todayEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
+                                                    class="btn px-3">{{ $todayEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                                             @endif
                                         </div>
                                     </div>
@@ -196,7 +196,7 @@
                                                     <p class="event-date mb-0 fw-bold"
                                                         @if ($youtubeId) style="bottom:6px;" @endif>
                                                         {{ \Carbon\Carbon::parse($tomorrowEvent->start_date)->format('d M Y') }}
-                                                        {{ \Carbon\Carbon::parse($tomorrowEvent->start_time)->format('H:i A') }}
+                                                        {{ !empty($tomorrowEvent->start_time) ? \Carbon\Carbon::parse($tomorrowEvent->start_time)->format('H:i A') : '' }}
                                                     </p>
                                                 </div>
                                                 <div>
@@ -208,10 +208,10 @@
                                                         <p class="event-price fw-bold mb-0">
                                                             @php
                                                                 $platform_fee =
-                                                                    $tomorrowEvent->vendor->platform_fee ??
-                                                                    (config('site.platform_fee') ?? '1.00');
+                                                                    $tomorrowEvent->vendor->event_platform_fee ??
+                                                                    (config('site.platform_fee') ?? '0.00');
                                                             @endphp
-                                                            ${{ number_format($tomorrowEvent->admittance + ($tomorrowEvent->admittance * $platform_fee) / 100, 2, '.', '') }}{{ $tomorrowEvent->extension }}
+                                                            {{ !empty($tomorrowEvent->admittance) ? '$'. number_format($tomorrowEvent->admittance + ($tomorrowEvent->admittance * $platform_fee) / 100, 2, '.', '') : '' }}{{ $tomorrowEvent->extension }}
                                                         </p>
                                                     @endif
                                                 </div>
@@ -228,10 +228,10 @@
                                         </div>
                                         <div>
                                             @if (!empty($tomorrowEvent->booking_url))
-                                                <a href="{{ $tomorrowEvent->booking_url }}" class="btn px-3">Buy Now</a>
+                                                <a href="{{ $tomorrowEvent->booking_url }}" class="btn px-3">{{ $tomorrowEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                                             @else
                                                 <a href="{{ route('events.detail', $tomorrowEvent->id) }}"
-                                                    class="btn px-3">{{$tomorrowEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
+                                                    class="btn px-3">{{ $tomorrowEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                                             @endif
                                         </div>
                                     </div>
@@ -295,7 +295,7 @@
                                                     <p class="event-date mb-0 fw-bold"
                                                         @if ($youtubeId) style="bottom:6px;" @endif>
                                                         {{ \Carbon\Carbon::parse($upcomingEvent->start_date)->format('d M Y') }}
-                                                        {{ \Carbon\Carbon::parse($upcomingEvent->start_time)->format('H:i A') }}
+                                                        {{ !empty($upcomingEvent->start_time) ? \Carbon\Carbon::parse($upcomingEvent->start_time)->format('H:i A') : '' }}
                                                     </p>
                                                 </div>
                                                 <div>
@@ -307,10 +307,13 @@
                                                         <p class="event-price fw-bold mb-0">
                                                             @php
                                                                 $platform_fee =
-                                                                    $upcomingEvent->vendor->platform_fee ??
-                                                                    (config('site.platform_fee') ?? '1.00');
+                                                                    $upcomingEvent->vendor->event_platform_fee ??
+                                                                    (config('site.platform_fee') ?? '0.00');
                                                             @endphp
-                                                            ${{ number_format($upcomingEvent->admittance + ($upcomingEvent->admittance * $platform_fee) / 100, 2, '.', '') }}{{ $upcomingEvent->extension }}
+                                                            {{ !empty($upcomingEvent->admittance)
+                                                                ? '$' . number_format($upcomingEvent->admittance + ($upcomingEvent->admittance * $platform_fee) / 100, 2, '.', '')
+                                                                : '' }}
+                                                            {{ $upcomingEvent->extension }}
                                                         </p>
                                                     @endif
                                                 </div>
@@ -327,10 +330,10 @@
                                         </div>
                                         <div>
                                             @if (!empty($upcomingEvent->booking_url))
-                                                <a href="{{ $upcomingEvent->booking_url }}" class="btn px-3">Buy Now</a>
+                                                <a href="{{ $upcomingEvent->booking_url }}" class="btn px-3">{{ $upcomingEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                                             @else
                                                 <a href="{{ route('events.detail', $upcomingEvent->id) }}"
-                                                    class="btn px-3">{{$upcomingEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
+                                                    class="btn px-3">{{ $upcomingEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                                             @endif
                                         </div>
                                     </div>
@@ -443,6 +446,16 @@
                 $('.category-filter').prop('checked', false);
                 triggerFilter();
             });
+            $('#clearGenres').on('click', function(e) {
+                e.preventDefault();
+                $('.genre-filter').prop('checked', false);
+                triggerFilter();
+            });
+            $('#clearRatings').on('click', function(e) {
+                e.preventDefault();
+                $('.rating-filter').prop('checked', false);
+                triggerFilter();
+            });
         });
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -481,7 +494,12 @@
             let selectedCategories = $('input[name="category"]:checked').map(function() {
                 return $(this).val();
             }).get(); // Collect all checked categories as an array
-
+            let selectedGenres = $('input[name="genre"]:checked').map(function() {
+                return $(this).val();
+            }).get(); // Collect all checked categories as an array
+            let selectedEventRatings = $('input[name="event_ratings"]:checked').map(function() {
+                return $(this).val();
+            }).get();
             let selectedDateFilter = $('input[name="date_filter[]"]:checked').map(function() {
                 return $(this).val();
             }).get();
@@ -499,13 +517,21 @@
             }
 
             fetchFilteredEvents(selectedCategories, selectedDateFilter, selectedDateRange, isFree, minPrice,
-                maxPrice, startDate, endDate, search);
+                maxPrice, startDate, endDate, search, selectedGenres, selectedEventRatings);
         }
         $(document).ready(function() {
             // Function to trigger filtering on any change
 
             // Handle category filter change
             $('.category-filter').on('change', function() {
+                triggerFilter();
+            });
+
+            $('.genre-filter').on('change', function() {
+                triggerFilter();
+            });
+
+            $('.rating-filter').on('change', function() {
                 triggerFilter();
             });
 
@@ -547,7 +573,7 @@
         });
 
         function fetchFilteredEvents(categories, dateFilter, dateRange, isFree, minPrice, maxPrice, startDate, endDate,
-            searchTerm) {
+            searchTerm, genres, eventRatings) {
             $.ajax({
                 url: "{{ route('get-events') }}", // Replace with your actual route
                 type: "GET",
@@ -560,7 +586,9 @@
                     max_price: maxPrice,
                     start_date: startDate,
                     end_date: endDate,
-                    q: searchTerm
+                    q: searchTerm,
+                    genres: genres,
+                    event_ratings: eventRatings
                 },
                 success: function(response) {
                     $('#eventList').html(response.html); // Dynamically update event list
@@ -569,6 +597,7 @@
                     let params = new URLSearchParams();
 
                     categories.forEach(category => params.append("categories[]", category));
+
                     dateFilter.forEach(date => params.append("date_filter[]", date));
 
                     if (dateRange.start && dateRange.end) {
@@ -586,6 +615,14 @@
 
                     if (searchTerm) params.set("q", searchTerm);
 
+                    if (genres.length > 0) {
+                        genres.forEach(genre => params.append("genres[]", genre));
+                    }
+
+                    if (eventRatings.length > 0) {
+                        eventRatings.forEach(event_rating => params.append("event_ratings[]", event_rating));
+                    }
+
                     let newUrl = `${window.location.pathname}?${params.toString()}`;
                     history.pushState(null, "", newUrl);
                 },
@@ -599,6 +636,8 @@
 
             let categories = params.getAll("categories[]") || [];
             let dateFilter = params.getAll("date_filter[]") || [];
+            let eventRatings = params.getAll("event_ratings[]") || [];
+            let genres = params.getAll("genres[]") || [];
             let startDate = params.get("start_date") || null;
             let endDate = params.get("end_date") || null;
             let isFree = params.get("is_free") ? 1 : null;
@@ -613,6 +652,9 @@
 
             // ✅ Restore UI elements
             categories.forEach(cat => $(`input[name="categories"][value="${cat}"]`).prop("checked", true));
+            genres.forEach(genre => $(`input[name="genres"][value="${genre}"]`).prop("checked", true));
+            eventRatings.forEach(rating => $(`input[name="event_ratings"][value="${rating}"]`).prop("checked",
+                true));
             dateFilter.forEach(df => $(`input[name="date_filter"][value="${df}"]`).prop("checked", true));
 
             if (startDate && endDate) {
@@ -633,6 +675,12 @@
             // Restore category selections
             params.getAll("categories[]").forEach(category => {
                 $(`.category-filter[value="${category}"]`).prop("checked", true);
+            });
+            params.getAll("genres[]").forEach(category => {
+                $(`.genre-filter[value="${category}"]`).prop("checked", true);
+            });
+            params.getAll("event_ratings[]").forEach(event_rating => {
+                $(`.rating-filter[value="${event_rating}"]`).prop("checked", true);
             });
 
             // Restore date filters

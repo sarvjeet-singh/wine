@@ -10,29 +10,32 @@
 
 
 
-<style>
+    <style>
+        label {
+            font-weight: 400;
+        }
 
-label {
-    font-weight: 400;
-}
-.form-control:focus,
-.form-check-input:focus {
-    box-shadow: unset;
-    border-color: #408a95;
-}
-#imageUploadWrapper {
-    width: fit-content;
-}
-#admittance-error {
-    position: absolute;
-    left: -34px;
-}
-@media screen and (max-width: 991px){
-.input-group:has(#admittance-error) {
-    padding-bottom: 26px;
-}
-}
-</style>
+        .form-control:focus,
+        .form-check-input:focus {
+            box-shadow: unset;
+            border-color: #408a95;
+        }
+
+        #imageUploadWrapper {
+            width: fit-content;
+        }
+
+        #admittance-error {
+            position: absolute;
+            left: -34px;
+        }
+
+        @media screen and (max-width: 991px) {
+            .input-group:has(#admittance-error) {
+                padding-bottom: 26px;
+            }
+        }
+    </style>
 
 
 
@@ -45,27 +48,31 @@ label {
                 <div class="information-box">
 
                     <form
-
                         action="{{ isset($experience) ? route('curative-experiences.update', [$experience->id, $vendor->id]) : route('curative-experiences.store', $vendor->id) }}"
-
                         method="POST" id="experienceForm" enctype="multipart/form-data">
 
                         <div class="information-box-head">
 
                             <div class="box-head-heading d-flex align-items-center justify-content-between gap-2">
 
-                                <span class="box-head-label theme-color">Curated Experience</span>
-
-                                <button type="submit"
-
-                                    class="btn wine-btn px-4">{{ isset($experience) ? 'Update' : 'Create' }}</button>
-
+                                <span class="box-head-label theme-color">{{ isset($experience) ? 'Update' : 'Create' }}
+                                    Event</span>
+                                @if (isset($experience))
+                                    <a target="_blank"
+                                        href="{{ isset($experience) ? route('curative-experiences.preview', [$experience->id, $vendor->id]) : route('curative-experiences.preview', $vendor->id) }}"
+                                        class="btn wine-btn">Preview</a>
+                                @endif
+                                <div class="form-check form-switch ms-3 d-flex align-items-center">
+                                    <input class="form-check-input me-2" type="checkbox" id="statusToggle" value="1"
+                                        {{ old('status', isset($experience) ? $experience->is_published == 1 : 0) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="statusToggle"
+                                        id="toggleLabel">{{ isset($experience) ? ($experience->is_published == 1 ? 'Publish' : 'Draft') : 'Draft' }}</label>
+                                </div>
                             </div>
 
                         </div>
 
                         @if (session('success'))
-
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
 
                                 {{ session('success') }}
@@ -77,13 +84,11 @@ label {
                                 </button>
 
                             </div>
-
                         @endif
 
 
 
                         @if (session('error'))
-
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
 
                                 {{ session('error') }}
@@ -95,7 +100,6 @@ label {
                                 </button>
 
                             </div>
-
                         @endif
 
                         @if ($errors->any())
@@ -105,9 +109,7 @@ label {
                                 <ul>
 
                                     @foreach ($errors->all() as $error)
-
                                         <li>{{ $error }}</li>
-
                                     @endforeach
 
                                 </ul>
@@ -121,9 +123,7 @@ label {
                         @csrf
 
                         @if (isset($experience))
-
                             @method('PUT')
-
                         @endif
 
 
@@ -145,32 +145,57 @@ label {
                                             @if ($categories->isEmpty())
 
                                                 <option value="">No Category Found</option>
-
                                             @else
-
                                                 @foreach ($categories as $key => $category)
-
                                                     <option value="{{ $key }}"
-
                                                         {{ old('category_id', isset($experience) ? $experience->category_id : '') == $key ? 'selected' : '' }}>
 
                                                         {{ $category }}
 
                                                     </option>
-
                                                 @endforeach
 
                                             @endif
 
                                         </select>
 
-                                        <label class="form-label">Experience Type</label>
+                                        <label class="form-label">Event Type</label>
 
                                     </div>
 
                                 </div>
 
+                                <!-- Genre -->
+                                <div class="col-lg-3 col-12">
 
+                                    <div class="form-floating">
+
+                                        <select name="genre_id" class="form-control form-select" id="experienceGenre">
+
+                                            <option value="">Select Genre</option>
+
+                                            @if ($genres->isEmpty())
+
+                                                <option value="">No Genre Found</option>
+                                            @else
+                                                @foreach ($genres as $key => $genre)
+                                                    <option value="{{ $key }}"
+                                                        {{ old('genre_id', isset($experience) ? $experience->genre_id : '') == $key ? 'selected' : '' }}>
+
+                                                        {{ $genre }}
+
+                                                    </option>
+                                                @endforeach
+
+                                            @endif
+
+                                        </select>
+
+                                        <label class="form-label">Genre</label>
+
+                                    </div>
+
+                                </div>
 
                                 <!-- Experience Name -->
 
@@ -179,12 +204,98 @@ label {
                                     <div class="form-floating">
 
                                         <input type="text" class="form-control" name="name"
-
                                             value="{{ old('name', isset($experience) ? $experience->name : '') }}"
-
                                             placeholder="Experience Name">
 
-                                        <label>Experience Name</label>
+                                        <label>Event Name</label>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Start Date -->
+
+                                <div class="col-lg-3 col-12">
+
+                                    <div class="form-floating">
+
+                                        <input type="date" class="form-control" name="start_date"
+                                            value="{{ old('start_date', isset($experience) ? $experience->start_date : '') }}">
+
+                                        <label>Date</label>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- End Date -->
+
+                                <div class="col-lg-3 col-12">
+
+                                    <div class="form-floating">
+
+                                        <input type="date" class="form-control" name="end_date"
+                                            value="{{ old('end_date', isset($experience) ? $experience->end_date : '') }}">
+
+                                        <label>End Date</label>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Start Time -->
+                                <div class="col-lg-3 col-12">
+
+                                    <div class="form-floating">
+
+                                        <input type="time" id="booking_time" name="booking_time" class="form-control"
+                                            value="{{ old('booking_time', !empty($experience) && !empty($experience->booking_time) ? \Carbon\Carbon::parse($experience->booking_time)->format('H:i') : '') }}">
+
+                                        <label>Start Time</label>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Duration -->
+                                <div class="col-lg-3 col-12">
+
+                                    <div class="form-floating">
+
+                                        <select class="form-select" name="duration">
+
+                                            <option value="">Select Duration</option>
+
+                                            @for ($i = 15; $i <= 1440; $i += 15)
+                                                @php
+
+                                                    $hours = floor($i / 60);
+
+                                                    $minutes = $i % 60;
+
+                                                    if ($hours == 1) {
+                                                        $displayValue =
+                                                            '1 hour' . ($minutes ? " $minutes minutes" : '');
+                                                    } elseif ($hours > 1) {
+                                                        $displayValue =
+                                                            "$hours hours" . ($minutes ? " $minutes minutes" : '');
+                                                    } else {
+                                                        $displayValue = "$minutes minutes";
+                                                    }
+
+                                                @endphp
+
+                                                <option value="{{ $i }}"
+                                                    {{ old('duration', isset($experience) && $experience->duration == $i ? 'selected' : '') }}>
+
+                                                    {{ $displayValue }}
+
+                                                </option>
+                                            @endfor
+
+                                        </select>
+
+                                        <label>Duration</label>
 
                                     </div>
 
@@ -197,109 +308,27 @@ label {
                                     <div class="form-floating">
 
                                         <input type="text" class="form-control" name="booking_url"
-
                                             value="{{ old('booking_url', isset($experience) ? $experience->booking_url : '') }}"
-
                                             placeholder="URL (Booking Platform)">
 
-                                        <label>URL (Booking Platform)</label>
+                                        <label>URL (Payment Gateway)</label>
 
                                     </div>
 
                                 </div>
 
+                                <!-- List Price + Free -->
 
-
-                                <!-- Extension -->
-
-                                <div class="col-lg-3 col-12">
-
-                                    <div class="form-floating">
-
-                                        <select name="extension" class="form-control">
-
-                                            @php
-
-                                                $selectedExtension = old(
-
-                                                    'extension',
-
-                                                    isset($experience) ? $experience->extension : '',
-
-                                                );
-
-                                            @endphp
-
-                                            <option value="">Select Extension</option>
-
-                                            <option value="+">+</option>
-
-                                            <option value="/Hr" {{ $selectedExtension == '/Hr' ? 'selected' : '' }}>/Hr
-
-                                            </option>
-
-                                            <option value="/Person"
-
-                                                {{ $selectedExtension == '/Person' ? 'selected' : '' }}>
-
-                                                /Person</option>
-
-                                            <option value="/Night" {{ $selectedExtension == '/Night' ? 'selected' : '' }}>
-
-                                                /Night</option>
-
-                                            <option value="/Session"
-
-                                                {{ $selectedExtension == '/Session' ? 'selected' : '' }}>/Session</option>
-
-                                        </select>
-
-                                        <label>Extension</label>
-
-                                    </div>
-
-                                </div>
-
-
-
-                                <!-- Admittance + Free -->
-
-                                <div class="col-lg-3 col-12">
+                                <div class="col-lg-4 col-12">
 
                                     <div class="row">
-
-                                        <div class="col-9">
-
-                                            <div class="input-group pb-lg-0 pb-4">
-
-                                                <span class="input-group-text">$</span>
-
-                                                <div class="form-floating">
-
-                                                    <input type="number" id="admittance" class="form-control"
-
-                                                        name="admittance"
-
-                                                        value="{{ old('admittance', isset($experience) ? $experience->admittance : '') }}"
-
-                                                        placeholder="Enter Admittance Fee">
-
-                                                    <label>Admittance</label>
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
 
                                         <div class="col-3 d-flex align-items-center">
 
                                             <div class="form-check">
 
                                                 <input class="form-check-input" type="checkbox" name="is_free"
-
                                                     value="1" id="flexCheckDefault"
-
                                                     {{ old('is_free', isset($experience) ? $experience->is_free : 0) ? 'checked' : '' }}>
 
                                                 <label class="form-check-label" for="flexCheckDefault">
@@ -312,15 +341,63 @@ label {
 
                                         </div>
 
+                                        <div class="col-9">
+
+                                            <div class="input-group pb-lg-0 pb-4">
+
+                                                <span class="input-group-text">$</span>
+
+                                                <div class="form-floating">
+
+                                                    <input type="number" id="admittance" class="form-control"
+                                                        name="admittance"
+                                                        value="{{ old('admittance', isset($experience) ? $experience->admittance : '') }}"
+                                                        placeholder="Enter Admittance Fee">
+
+                                                    <label>List Price</label>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
                                     </div>
 
                                 </div>
 
+                                <!-- Platform Fee -->
 
+                                <div class="col-lg-4 col-12">
 
-                                <!-- Listed Price -->
+                                    <div class="row">
 
-                                <div class="col-lg-3 col-12">
+                                        <div class="col-12">
+
+                                            <div class="input-group">
+
+                                                <span class="input-group-text">$</span>
+
+                                                <div class="form-floating">
+
+                                                    <input type="number" class="form-control" id="platform_fee"
+                                                        value="" placeholder="Platform Fee" readonly>
+
+                                                    <label>Platform Fee</label>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Platform Price -->
+
+                                <div class="col-lg-4 col-12">
 
                                     <div class="row">
 
@@ -333,12 +410,9 @@ label {
                                                 <div class="form-floating">
 
                                                     <input type="number" class="form-control" id="listed_price"
+                                                        value="" placeholder="Quantity" readonly>
 
-                                                        value=""
-
-                                                        placeholder="Quantity" readonly>
-
-                                                    <label>Listed Price</label>
+                                                    <label>Platform Price</label>
 
                                                 </div>
 
@@ -350,18 +424,61 @@ label {
 
                                 </div>
 
+                                <!-- Extension -->
 
+                                <div class="col-lg-4 col-12">
+
+                                    <div class="form-floating">
+
+                                        <select name="extension" class="form-control">
+
+                                            @php
+
+                                                $selectedExtension = old(
+                                                    'extension',
+
+                                                    isset($experience) ? $experience->extension : '',
+                                                );
+
+                                            @endphp
+
+                                            <option value="">Select Extension</option>
+
+                                            <option value="+" {{ $selectedExtension == '+' ? 'selected' : '' }}>+
+                                            </option>
+
+                                            <option value="/Hr" {{ $selectedExtension == '/Hr' ? 'selected' : '' }}>/Hr
+
+                                            </option>
+
+                                            <option value="/Person"
+                                                {{ $selectedExtension == '/Person' ? 'selected' : '' }}>
+
+                                                /Person</option>
+
+                                            <option value="/Night" {{ $selectedExtension == '/Night' ? 'selected' : '' }}>
+
+                                                /Night</option>
+
+                                            <option value="/Session"
+                                                {{ $selectedExtension == '/Session' ? 'selected' : '' }}>/Session</option>
+
+                                        </select>
+
+                                        <label>Extension</label>
+
+                                    </div>
+
+                                </div>
 
                                 <!-- Inventory -->
 
-                                <div class="col-lg-3 col-12">
+                                <div class="col-lg-4 col-12">
 
                                     <div class="form-floating">
 
                                         <input type="number" class="form-control" name="inventory"
-
                                             value="{{ old('inventory', isset($experience) ? $experience->inventory : '') }}"
-
                                             placeholder="Inventory">
 
                                         <label>Inventory (per day)</label>
@@ -370,155 +487,115 @@ label {
 
                                 </div>
 
-
-
                                 <!-- Quantity -->
 
-                                <div class="col-lg-3 col-12">
+                                <div class="col-lg-4 col-12">
 
                                     <div class="form-floating">
 
                                         <input type="number" class="form-control" name="quantity"
-
                                             value="{{ old('quantity', isset($experience) ? $experience->quantity : '') }}"
-
                                             placeholder="Quantity">
 
-                                    <label>Number of guest allowed</label>
+                                        <label>Number of guest allowed</label>
 
                                     </div>
 
                                 </div>
 
+                                <!-- Venue Name -->
 
-
-
-
-                                <!-- Start Date -->
-
-                                <div class="col-lg-3 col-12">
+                                <div class="col-lg-4 col-12">
 
                                     <div class="form-floating">
 
-                                        <input type="date" class="form-control" name="start_date"
+                                        <input type="text" class="form-control" name="venue_name"
+                                            value="{{ old('venue_name', isset($experience) ? $experience->venue_name : '') }}"
+                                            placeholder="Venue Name">
 
-                                            value="{{ old('start_date', isset($experience) ? $experience->start_date : '') }}">
-
-                                        <label>Start Date</label>
+                                        <label>Venue Name</label>
 
                                     </div>
 
                                 </div>
 
+                                <!-- Venue Phone -->
 
-
-                                <!-- End Date -->
-
-                                <div class="col-lg-3 col-12">
+                                <div class="col-lg-4 col-12">
 
                                     <div class="form-floating">
 
-                                        <input type="date" class="form-control" name="end_date"
+                                        <input type="text" class="form-control phone-number" name="venue_phone"
+                                            value="{{ old('venue_phone', isset($experience) ? $experience->venue_phone : '') }}"
+                                            placeholder="Venue Phone">
 
-                                            value="{{ old('end_date', isset($experience) ? $experience->end_date : '') }}">
-
-                                        <label>End Date</label>
+                                        <label>Venue Phone</label>
 
                                     </div>
 
                                 </div>
 
+                                <!-- Event Rating -->
 
-
-                                <div class="col-lg-3 col-12">
+                                <div class="col-lg-4 col-12">
 
                                     <div class="form-floating">
 
-                                        <select class="form-select" name="duration">
+                                        <select name="event_rating" class="form-control">
 
-                                            <option value="">Select Duration</option>
+                                            @php
 
-                                            @for ($i = 15; $i <= 1440; $i += 15)
+                                                $selectedExtension = old(
+                                                    'event_rating',
 
-                                                @php
+                                                    isset($experience) ? $experience->event_rating : '',
+                                                );
 
-                                                    $hours = floor($i / 60);
+                                            @endphp
 
-                                                    $minutes = $i % 60;
-
-                                                    if ($hours == 1) {
-
-                                                        $displayValue =
-
-                                                            '1 hour' . ($minutes ? " $minutes minutes" : '');
-
-                                                    } elseif ($hours > 1) {
-
-                                                        $displayValue =
-
-                                                            "$hours hours" . ($minutes ? " $minutes minutes" : '');
-
-                                                    } else {
-
-                                                        $displayValue = "$minutes minutes";
-
-                                                    }
-
-                                                @endphp
-
-                                                <option value="{{ $i }}"
-
-                                                    {{ old('duration', isset($experience) && $experience->duration == $i ? 'selected' : '') }}>
-
-                                                    {{ $displayValue }}
-
-                                                </option>
-
-                                            @endfor
+                                            <option value="">Select Rating</option>
+                                            <option value="family" {{ $selectedExtension == 'family' ? 'selected' : '' }}>
+                                                Family</option>
+                                            <option value="19" {{ $selectedExtension == '19' ? 'selected' : '' }}>19+
+                                            </option>
 
                                         </select>
 
-                                        <label>Duration</label>
+                                        <label>Event Rating</label>
 
                                     </div>
 
                                 </div>
 
-                                <div class="col-lg-3 col-12">
-
-                                    <div class="form-floating">
-
-                                        <input type="time" id="booking_time" name="booking_time" class="form-control"
-
-                                            value="{{ old('booking_time', !empty($experience) && !empty($experience->booking_time) ? \Carbon\Carbon::parse($experience->booking_time)->format('H:i') : '') }}">
-
-                                        <label>Start Time</label>
-
-                                    </div>
-
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" value="1" id="sameAsVendor"
+                                        onclick="fillAddressIfChecked()">
+                                    <label class="form-check-label" for="sameAsVendor">
+                                        Same as Vendor Address
+                                    </label>
                                 </div>
 
-                                <div class="col-lg-3 col-12">
+                                <!-- Address -->
+                                <div class="col-lg-4 col-12">
 
                                     <div class="form-floating">
 
                                         <input type="text" id="address" name="address" class="form-control"
+                                            value="{{ old('address', !empty($experience) && !empty($experience->address) ? $experience->address : '') }}">
 
-                                            value="{{ old('address', !empty($experience) && !empty($experience->address) ? $experience->address : $vendor->street_address) }}">
-
-                                        <label>Address</label>
+                                        <label>Venue Address</label>
 
                                     </div>
 
                                 </div>
 
-                                <div class="col-lg-3 col-12">
+                                <!-- City, State, Zipcode -->
+                                <div class="col-lg-4 col-12">
 
                                     <div class="form-floating">
 
                                         <input type="text" id="city" name="city" class="form-control"
-
-                                            value="{{ old('city', !empty($experience) && !empty($experience->city) ? $experience->city : $vendor->city) }}">
+                                            value="{{ old('city', !empty($experience) && !empty($experience->city) ? $experience->city : '') }}">
 
                                         <label>City</label>
 
@@ -526,37 +603,36 @@ label {
 
                                 </div>
 
-                                <div class="col-lg-3 col-12">
+                                <div class="col-lg-4 col-12">
 
                                     <div class="form-floating">
 
                                         <input type="text" id="state" name="state" class="form-control"
+                                            value="{{ old('state', !empty($experience) && !empty($experience->state) ? $experience->state : '' ?? '') }}">
 
-                                            value="{{ old('state', !empty($experience) && !empty($experience->state) ? $experience->state : $vendor->state->name ?? '') }}">
-
-                                        <label>State</label>
+                                        <label>Province/State</label>
 
                                     </div>
 
                                 </div>
 
-                                <div class="col-lg-3 col-12">
+                                {{-- <div class="col-lg-3 col-12">
 
                                     <div class="form-floating">
 
-                                        <input type="text" oninput="formatPostalCode(this)" id="zipcode" maxlength="7" name="zipcode" class="form-control"
+                                        <input type="text" oninput="formatPostalCode(this)" id="zipcode"
+                                            maxlength="7" name="zipcode" class="form-control"
+                                            value="{{ old('zipcode', !empty($experience) && !empty($experience->zipcode) ? $experience->zipcode : '') }}">
 
-                                            value="{{ old('zipcode', !empty($experience) && !empty($experience->zipcode) ? $experience->zipcode : $vendor->postalCode) }}">
-
-                                        <label>Zipcode</label>
+                                        <label>Postal/Zip</label>
 
                                     </div>
 
-                                </div>
+                                </div> --}}
 
 
 
-                                <!-- Description -->
+                                <!-- Experience Description -->
 
                                 <div class="col-12">
 
@@ -564,18 +640,13 @@ label {
 
                                         <textarea class="form-control" name="description" style="height: 100px">{{ old('description', isset($experience) ? $experience->description : '') }}</textarea>
 
-                                        <label>Description</label>
+                                        <label>Experience Description</label>
 
                                     </div>
 
                                 </div>
 
-
-
                                 <!-- Media Upload -->
-
-
-
                                 <div class="col-12">
 
 
@@ -603,83 +674,30 @@ label {
                                         <label class="fw-bold">Choose Media Type:</label>
 
 
+                                        @php
+                                            $selectedMediaType = 'image'; // default
 
-
-
-
+                                            if (!empty($experience)) {
+                                                if (!empty($experience->youtube_url)) {
+                                                    $selectedMediaType = 'youtube';
+                                                } elseif (!empty($experience->image)) {
+                                                    $selectedMediaType = 'image';
+                                                }
+                                            }
+                                        @endphp
 
                                         <div class="form-check form-check-inline mb-0">
-
-
-
-
-
-
-
                                             <input class="form-check-input" type="radio" name="media_type"
-
-
-
                                                 id="imageOption" value="image"
-
-
-
-                                                {{ empty($experience) || (!empty($experience->image) && empty($experience->youtube_url)) ? 'checked' : '' }}>
-
-
-
-
-
-
-
+                                                {{ $selectedMediaType === 'image' ? 'checked' : '' }}>
                                             <label class="form-check-label" for="imageOption">Image</label>
-
-
-
-
-
-
-
                                         </div>
 
-
-
-
-
-
-
                                         <div class="form-check form-check-inline m-0">
-
-
-
-
-
-
-
                                             <input class="form-check-input" type="radio" name="media_type"
-
-
-
                                                 id="youtubeOption" value="youtube"
-
-
-
-                                                {{ !empty($experience->youtube_url) ? 'checked' : '' }}>
-
-
-
-
-
-
-
+                                                {{ $selectedMediaType === 'youtube' ? 'checked' : '' }}>
                                             <label class="form-check-label" for="youtubeOption">YouTube Link</label>
-
-
-
-
-
-
-
                                         </div>
 
 
@@ -697,17 +715,8 @@ label {
 
 
                                             <input type="text" id="youtubeUrl" name="youtube_url"
-
-
-
                                                 class="form-control"
-
-
-
                                                 value="{{ old('youtube_url', $experience->youtube_url ?? '') }}"
-
-
-
                                                 placeholder="Enter YouTube Video URL">
 
                                         </div>
@@ -727,9 +736,6 @@ label {
                                     <!-- Image Upload Preview -->
 
                                     <div id="imageUploadWrapper" class="d-flex flex-wrap gap-2"
-
-
-
                                         style="{{ !empty($experience->youtube_url) ? 'display: none;' : '' }}">
 
 
@@ -739,21 +745,9 @@ label {
 
 
                                         @if (!empty($experience) && !empty($experience->image))
-
-
-
                                             <img src="{{ Storage::url($experience->image) }}"
-
-
-
                                                 class="profile-img rounded-3"
-
-
-
                                                 style="width: 200px; height: 130px; object-fit: cover; border: 1px solid #408a95;">
-
-
-
                                         @endif
 
 
@@ -763,9 +757,6 @@ label {
 
 
                                         <div class="d-flex justify-content-center align-items-center rounded-3"
-
-
-
                                             style="width: 200px; height: 130px; border: 1px solid #408a95; background-color: #f8f9fa; cursor: pointer;">
 
 
@@ -783,9 +774,6 @@ label {
 
 
                                             <input type="file" id="profileImage" name="image" class="file-input"
-
-
-
                                                 accept="image/*" style="display: none;">
 
 
@@ -810,7 +798,8 @@ label {
 
                                     <div id="youtubePreview" class="mt-2">
 
-                                        <iframe class="rounded-3" width="200" height="130" frameborder="0" allowfullscreen></iframe>
+                                        <iframe class="rounded-3" width="200" height="130" frameborder="0"
+                                            allowfullscreen></iframe>
 
                                     </div>
 
@@ -819,7 +808,11 @@ label {
                             </div>
 
                         </div>
-
+                        <div class="col-12 text-center mb-2">
+                            <input type="hidden" name="is_published" id="publishStatus" value="0">
+                            <button type="submit"
+                                class="btn wine-btn px-4">{{ isset($experience) ? 'Update' : 'Create' }}</button>
+                        </div>
                     </form>
 
 
@@ -839,13 +832,10 @@ label {
 @section('js')
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js"
-
         integrity="sha512-KFHXdr2oObHKI9w4Hv1XPKc898mE4kgYx58oqsc/JqqdLMDI4YjOLzom+EMlW8HFUd0QfjfAvxSL6sEq/a42fQ=="
-
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
-
         $(document).ready(function() {
 
             let $startDate = $("input[name='start_date']");
@@ -923,7 +913,7 @@ label {
 
 
             $("#experienceForm").validate({
-
+                ignore: ":hidden:not(#profileImage)",
                 rules: {
 
                     category_id: {
@@ -940,15 +930,24 @@ label {
 
                     },
 
-                    admittance: {
+                    genre_id: {
 
-                        required: function() {
-
-                            return !$('#flexCheckDefault').is(':checked');
-
-                        }
+                        required: true
 
                     },
+
+                    // admittance: {
+
+                    //     required: {
+                    //         depends: function() {
+                    //             const isFreeChecked = $('#flexCheckDefault').is(':checked');
+                    //             const bookingUrl = $('input[name="booking_url"]').val().trim();
+                    //             return !isFreeChecked && bookingUrl === '' && $("#publishStatus")
+                    //                 .val() == 1;
+                    //         }
+                    //     }
+
+                    // },
 
                     is_free: {
 
@@ -956,11 +955,11 @@ label {
 
                     },
 
-                    extension: {
+                    // extension: {
 
-                        required: true
+                    //     required: true
 
-                    },
+                    // },
 
                     booking_url: {
 
@@ -970,8 +969,6 @@ label {
 
                     inventory: {
 
-                        required: true,
-
                         number: true,
 
                         min: 1
@@ -980,7 +977,12 @@ label {
 
                     start_date: {
 
-                        required: true,
+                        required: {
+
+                            depends: function() {
+                                return $("#publishStatus").val() == 1;
+                            }
+                        },
 
                         date: true
 
@@ -988,7 +990,7 @@ label {
 
                     end_date: {
 
-                        required: true,
+                        // required: true,
 
                         date: true
 
@@ -996,9 +998,138 @@ label {
 
                     image: {
 
-                        extension: "jpg|jpeg|png|gif|mp4",
+                        required: {
+                            depends: function() {
+                                let hasExistingImage = @json(isset($experience) && $experience->image);
+                                const isImageType = $("input[name='media_type']:checked").val() ===
+                                    'image';
+                                const isPublished = $("#publishStatus").val() == 1;
 
-                        filesize: 2048 * 1024
+                                return isImageType && isPublished && !hasExistingImage;
+                            }
+                        }
+
+                    },
+                    youtube_url: {
+                        required: {
+                            depends: function() {
+                                return $("input[name='media_type']:checked").val() === 'youtube';
+                            }
+                        },
+
+                        url: true
+                    },
+
+                    description: {
+
+                        required: {
+                            depends: function() {
+                                return $("#publishStatus").val() == 1;
+                            }
+                        },
+
+                        maxlength: 1000
+
+                    },
+                    venue_name: {
+
+                        required: {
+                            depends: function() {
+                                return $("#publishStatus").val() == 1;
+                            }
+                        },
+
+                        maxlength: 255
+
+                    },
+                    venue_phone: {
+
+                        required: {
+                            depends: function() {
+                                return $("#publishStatus").val() == 1;
+                            }
+                        }
+
+                    },
+                    address: {
+
+                        required: {
+                            depends: function() {
+                                return $("#publishStatus").val() == 1;
+                            }
+                        },
+
+                        maxlength: 255
+
+                    },
+                    city: {
+
+                        required: {
+                            depends: function() {
+                                return $("#publishStatus").val() == 1;
+                            }
+                        },
+
+                        maxlength: 255
+
+                    },
+                    state: {
+
+                        required: {
+                            depends: function() {
+                                return $("#publishStatus").val() == 1;
+                            }
+                        },
+
+                        maxlength: 255
+
+                    },
+                    // zipcode: {
+
+                    //     required: {
+                    //         depends: function() {
+                    //             return $("#publishStatus").val() == 1;
+                    //         }
+                    //     },
+
+                    //     maxlength: 7
+
+                    // },
+                    event_rating: {
+
+                        required: {
+                            depends: function() {
+                                return $("#publishStatus").val() == 1;
+                            }
+                        },
+
+                    },
+                    booking_time: {
+
+                        // required: true;
+
+                    },
+                    duration: {
+
+                        // required: {
+                        //     depends: function() {
+                        //         return $("#publishStatus").val() == 1;
+                        //     }
+                        // }
+
+                    },
+                    quantity: {
+
+                        // required: {
+
+                        //     depends: function() {
+                        //         return $("#publishStatus").val() == 1;
+                        //     }
+                        // },
+
+                        number: true,
+
+                        min: 1
 
                     }
 
@@ -1019,14 +1150,6 @@ label {
                         number: "Please enter a valid number.",
 
                         min: "Inventory must be at least 1."
-
-                    },
-
-                    end_time: {
-
-                        required: "End time is required.",
-
-                        timeGreater: "End time must be greater than Start time."
 
                     },
 
@@ -1115,11 +1238,9 @@ label {
             });
 
         });
-
     </script>
 
     <script>
-
         $(document).ready(function() {
 
             const $imageOption = $("#imageOption");
@@ -1227,11 +1348,9 @@ label {
             showYouTubePreview();
 
         });
-
     </script>
 
     <script>
-
         $(document).ready(function() {
 
             function toggleAdmittance() {
@@ -1241,6 +1360,7 @@ label {
                     $('input[name="admittance"]').prop('readonly', true).val(''); // Make readonly and clear value
 
                     $('#listed_price').prop('readonly', true).val(''); // Make readonly and clear value
+                    $('#platform_fee').prop('readonly', true).val(''); // Make readonly and clear value
 
                 } else {
 
@@ -1269,15 +1389,22 @@ label {
         });
 
         $("#admittance").on("input", function() {
+            var inputValue = parseFloat($(this).val());
 
-            var inputValue = $(this).val();
+            let platformFee = parseFloat(
+                "{{ $vendor->event_platform_fee ?? (config('site.platform_fee') ?? '0.00') }}"
+            );
 
-            let platformFee = parseFloat("{{ $vendor->platform_fee ?? config('site.platform_fee') ?? '1.00' }}"); // Convert to float
+            if (!isNaN(inputValue) && inputValue > 0 && !isNaN(platformFee)) {
+                let feeAmount = inputValue * (platformFee / 100);
+                let totalPrice = inputValue + feeAmount;
 
-            inputValue = inputValue * (1 + (platformFee / 100));
-
-            $("#listed_price").val(inputValue.toFixed(2) > 0 ? inputValue.toFixed(2) : ''); // Optionally round to 2 decimal places
-
+                $("#platform_fee").val(feeAmount.toFixed(2));
+                $("#listed_price").val(totalPrice.toFixed(2));
+            } else {
+                $("#platform_fee").val('');
+                $("#listed_price").val('');
+            }
         });
 
         function formatPostalCode(input) {
@@ -1305,8 +1432,68 @@ label {
         }
 
         $("#admittance").trigger("input");
-
     </script>
+    <script>
+        function fillAddressIfChecked() {
+            const checkbox = document.getElementById('sameAsVendor');
+            const addressField = document.getElementById('address');
+            const cityField = document.getElementById('city');
+            const stateField = document.getElementById('state');
+            const zipcodeField = document.getElementById('zipcode');
+            const vendorAddress = @json($vendor->street_address ?? '');
+            const vendorCity = @json($vendor->city ?? '');
+            const vendorState = @json($vendor->state->name ?? '');
+            const vendorZipcode = @json($vendor->postalCode ?? '');
 
+            if (checkbox.checked) {
+                addressField.value = vendorAddress;
+                cityField.value = vendorCity;
+                stateField.value = vendorState;
+                zipcodeField.value = vendorZipcode;
+
+            } else {
+                addressField.value = '';
+                cityField.value = '';
+                stateField.value = '';
+                zipcodeField.value = '';
+            }
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.phone-number').forEach(function(input) {
+                input.addEventListener('input', function(e) {
+                    const value = e.target.value.replace(/\D/g,
+                        ''); // Remove all non-digit characters
+                    let formattedValue = '';
+                    if (value.length > 3 && value.length <= 6) {
+                        formattedValue = value.slice(0, 3) + '-' + value.slice(3);
+                    } else if (value.length > 6) {
+                        formattedValue = value.slice(0, 3) + '-' + value.slice(3, 6) + '-' + value
+                            .slice(6, 10);
+                    } else {
+                        formattedValue = value;
+                    }
+                    e.target.value = formattedValue;
+                });
+            });
+        });
+        $(document).on('click', '#statusToggle', function() {
+            const $toggle = $('#statusToggle');
+            const $label = $('#toggleLabel');
+            const $statusInput = $("#publishStatus");
+
+            function updateLabel() {
+                const isChecked = $toggle.is(':checked');
+                $label.text(isChecked ? 'Publish' : 'Draft');
+                $statusInput.val(isChecked ? 1 : 0);
+            }
+
+            // Attach change event (once modal content is visible)
+            $toggle.off('change').on('change', updateLabel);
+
+            // Set initial label
+            updateLabel();
+        });
+    </script>
 @endsection
-

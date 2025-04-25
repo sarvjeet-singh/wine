@@ -68,13 +68,13 @@
             <!-- Parent Menu 5 -->
             <li class="nav-item my-1">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menu5" role="button"
-                    aria-expanded="{{ request()->routeIs('vendor-amenities', 'vendor-curated-experience') ? 'true' : 'false' }}"
+                    aria-expanded="{{ request()->routeIs('vendor-amenities') ? 'true' : 'false' }}"
                     aria-controls="menu5">
                     <div><i class="fas fa-cogs menu-icon"></i> Guest Services</div>
                     <i
-                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-amenities', 'vendor-curated-experience', 'vendor.events-transactions') ? 'rotate' : '' }}"></i>
+                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-amenities',) ? 'rotate' : '' }}"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('vendor-amenities', 'curative-experiences.index', 'vendor.events-transactions') ? 'show' : '' }}"
+                <div class="collapse {{ request()->routeIs('vendor-amenities') ? 'show' : '' }}"
                     id="menu5">
                     <ul class="nav flex-column sub-menu mt-2">
                         <li class="nav-item">
@@ -83,10 +83,24 @@
                                 <i class="fas fa-wrench menu-icon"></i> Amenities
                             </a>
                         </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item my-1">
+                <a class="nav-link" data-bs-toggle="collapse" href="#menu9" role="button"
+                    aria-expanded="{{ request()->routeIs('curative-experiences.*','vendor.events-transactions') ? 'true' : 'false' }}"
+                    aria-controls="menu9">
+                    <div><i class="fas fa-cogs menu-icon"></i> Events</div>
+                    <i
+                        class="fas fa-angle-right expand-icon {{ request()->routeIs('curative-experiences.*', 'vendor.events-transactions') ? 'rotate' : '' }}"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('curative-experiences.*', 'vendor.events-transactions') ? 'show' : '' }}"
+                    id="menu9">
+                    <ul class="nav flex-column sub-menu mt-2">
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('curative-experiences.index') ? 'active' : '' }}"
+                            <a class="nav-link {{ request()->routeIs('curative-experiences.*') ? 'active' : '' }}"
                                 href="{{ route('curative-experiences.index', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i> Curated Experiences
+                                <i class="fas fa-wrench menu-icon"></i> Events
                             </a>
                         </li>
                         <li class="nav-item">
@@ -101,18 +115,18 @@
             <!-- Sales & Orders Menu -->
             <li class="nav-item my-1">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menu4" role="button"
-                    aria-expanded="{{ request()->routeIs('vendor-wines.index', 'winery.shop.orders', 'winery-shop.index', 'winery.vendor.orders') ? 'true' : 'false' }}"
+                    aria-expanded="{{ request()->routeIs('vendor-wines.index', 'winery.shop.orders', 'winery-shop.index', 'winery.vendor.orders','winery-shop.products','winery-shop.detail','cart.index','winery.checkout') ? 'true' : 'false' }}"
                     aria-controls="menu4">
                     <div><i class="fas fa-cogs menu-icon"></i> Wine Catalogue (B2B)</div>
                     <i
-                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-wines.index', 'winery.shop.orders', 'winery-shop.index', 'winery.vendor.orders') ? 'rotate' : '' }}"></i>
+                        class="fas fa-angle-right expand-icon {{ request()->routeIs('vendor-wines.index', 'winery.shop.orders', 'winery-shop.index', 'winery.vendor.orders','winery-shop.products','winery-shop.detail','cart.index','winery.checkout') ? 'rotate' : '' }}"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('vendor-wines.index', 'winery.shop.orders', 'winery-shop.index', 'winery.vendor.orders') ? 'show' : '' }}"
+                <div class="collapse {{ request()->routeIs('vendor-wines.index', 'winery.shop.orders', 'winery-shop.index', 'winery.vendor.orders','winery-shop.products','winery-shop.detail','cart.index','winery.checkout') ? 'show' : '' }}"
                     id="menu4">
                     <ul class="nav flex-column sub-menu mt-2">
                         @if (strtolower($vendor->vendor_type) == 'winery')
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('winery-shop.index') ? 'active' : '' }}"
+                                <a class="nav-link {{ request()->routeIs('winery-shop.index','winery-shop.products','winery-shop.detail','cart.index','winery.checkout') ? 'active' : '' }}"
                                     href="{{ route('winery-shop.index', ['vendorid' => $id]) }}">
                                     <i class="fas fa-wrench menu-icon"></i> Purchases
                                 </a>

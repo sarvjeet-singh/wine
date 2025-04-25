@@ -73,16 +73,36 @@
             @include('UserDashboard.includes.leftNav')
             <div class="col right-side">
                 <div class="row g-3">
-                    <!-- <div class="col-xl-3 col-6">
-                                                        <div class="top-boxes">
-                                                            <div class="box-image">
-                                                                <img src="{{ asset('images/icons/bottle-bucks-box-icon.png') }}">
-                                                            </div>
-                                                            <div class="box-points">0 Events</div>
-                                                            <div class="box-text mt-1">Today</div>
-                                                        </div>
-                                                    </div> -->
-                    <div class="col-xl-3 col-6">
+                    @if (Auth::guard('customer')->user()->profile_completed == 0)
+                        <div class="col-12">
+                            <div class="d-flex flex-column align-items-end text-center"
+                                style="height: 100%;">
+                                <button id="checkActivationBtn" class="btn btn-primary wine-btn rounded-2 px-3">
+                                    <i class="fa-solid fa-user"></i>
+                                    <span>Complete Your Profile</span>
+                                </button>
+                            </div>
+                        </div>
+                    @endif
+                    @if (Auth::guard('customer')->user()->profile_completed == 1)
+                        <div class="col-12">
+                            <div class="d-flex flex-column align-items-start text-center"
+                                style="height: 100%;">
+                                <i class="fa fa-check-circle text-success mb-1"></i>
+                                <span>Profile Fully Completed</span>
+                            </div>
+                        </div>
+                    @endif
+                    <!-- <div class="col-lg-4 col-6">
+                        <div class="top-boxes">
+                            <div class="box-image">
+                                <img src="{{ asset('images/icons/bottle-bucks-box-icon.png') }}">
+                            </div>
+                            <div class="box-points">0 Events</div>
+                            <div class="box-text mt-1">Today</div>
+                        </div>
+                    </div> -->
+                    <div class="col-lg-4 col-6">
                         <a href="{{ route('wallet-history') }}">
                             <div class="top-boxes">
                                 <div class="box-image d-flex align-items-start justify-content-between">
@@ -97,16 +117,16 @@
                             </div>
                         </a>
                     </div>
-                    <!-- <div class="col-xl-3 col-6">
-                                                        <div class="top-boxes">
-                                                            <div class="box-image">
-                                                                <img src="{{ asset('images/icons/messages-box-icon.png') }}">
-                                                            </div>
-                                                            <div class="box-points">1 + 0</div>
-                                                            <div class="box-text">Prize Pools</div>
-                                                        </div>
-                                                    </div> -->
-                    <div class="col-xl-3 col-6">
+                    <!-- <div class="col-lg-4 col-6">
+                        <div class="top-boxes">
+                            <div class="box-image">
+                                <img src="{{ asset('images/icons/messages-box-icon.png') }}">
+                            </div>
+                            <div class="box-points">1 + 0</div>
+                            <div class="box-text">Prize Pools</div>
+                        </div>
+                    </div> -->
+                    <div class="col-lg-4 col-6">
                         <div class="top-boxes">
                             <div class="box-image">
                                 <img src="{{ asset('images/icons/reviews-box-icon.png') }}">
@@ -115,7 +135,7 @@
                             <div class="box-text">Reviews Submitted</div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-6">
+                    <div class="col-lg-4 col-6">
                         <div class="top-boxes">
                             <div class="box-image">
                                 <img src="{{ asset('images/icons/reviews-box-icon.png') }}">
@@ -124,25 +144,6 @@
                             <div class="box-text">Approved Reviews</div>
                         </div>
                     </div>
-                    @if (Auth::guard('customer')->user()->profile_completed == 0)
-                        <div class="col-xl-3 col-6">
-                            <div class="d-flex flex-column align-items-center justify-content-center text-center"
-                                style="height: 100%;">
-                                <button id="checkActivationBtn" class="btn btn-primary wine-btn rounded-2 px-3">
-                                    Complete Your Profile
-                                </button>
-                            </div>
-                        </div>
-                    @endif
-                    @if (Auth::guard('customer')->user()->profile_completed == 1)
-                        <div class="col-xl-3 col-6">
-                            <div class="d-flex flex-column align-items-center justify-content-center text-center"
-                                style="height: 100%;">
-                                <i class="fa fa-check-circle text-success mb-1"></i>
-                                <span>Profile Fully Completed</span>
-                            </div>
-                        </div>
-                    @endif
                 </div>
                 <!-- User Profile Box Start -->
                 <div class="row mt-5">

@@ -87,7 +87,7 @@
                                                                             @if ($item->product->image)
                                                                                 <img width="100px"
                                                                                     src="{{ asset('storage/' . $item->product->image) }}"
-                                                                                    class="img-fluid" alt="Wine Image">
+                                                                                    class="img-fluid" alt="{{ winery_b2b_price($vendor, $item->product) }}">
                                                                             @else
                                                                                 <img width="100px"
                                                                                     src="{{ asset('images/vendorbydefault.png') }}"
@@ -127,8 +127,7 @@
                                                                 <td>
 
                                                                     <div class="prod-price">
-
-                                                                        ${{ number_format($item->product->price, 2) }}</div>
+                                                                        ${{ number_format(winery_b2b_price($vendor,$item->product), 2) }}</div>
 
                                                                 </td>
 
@@ -174,7 +173,7 @@
                                                                     @php
 
                                                                         $itemTotal =
-                                                                            $item->product->price * $item->quantity;
+                                                                        winery_b2b_price($vendor,$item->product) * $item->quantity;
 
                                                                         $cartTotal += $itemTotal;
 

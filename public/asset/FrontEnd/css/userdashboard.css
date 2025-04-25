@@ -388,3 +388,9 @@
     color: #212529;
 }
 /* ================= Incomplete Profile Popup End ================= */
+
+@media screen and (max-width: 767px){
+.error-modal-wrapper p#errorIntro {
+    max-width: 100%;
+}
+}

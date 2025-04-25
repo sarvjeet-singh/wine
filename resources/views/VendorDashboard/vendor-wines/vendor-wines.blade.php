@@ -40,15 +40,15 @@
         }
 
         /*.progress-bar {
-                        width: 0%;
-                        height: 100%;
-                        background: green;
-                        text-align: center;
-                        line-height: 20px;
-                        color: white;
-                        font-weight: bold;
-                        transition: width 0.3s;
-                    }*/
+                                width: 0%;
+                                height: 100%;
+                                background: green;
+                                text-align: center;
+                                line-height: 20px;
+                                color: white;
+                                font-weight: bold;
+                                transition: width 0.3s;
+                            }*/
         .progress {
             width: 80%;
             height: 12px;
@@ -223,18 +223,18 @@
 
     <div class="col right-side">
         <!-- <div class="upload-container">
-                        <h3>Upload Your Files</h3>
-                        <div class="dropbox" id="dropbox">
-                            Drag & Drop files here or click to upload
-                        </div>
-                        <input type="file" id="fileInput" multiple style="display: none;">
+                                <h3>Upload Your Files</h3>
+                                <div class="dropbox" id="dropbox">
+                                    Drag & Drop files here or click to upload
+                                </div>
+                                <input type="file" id="fileInput" multiple style="display: none;">
 
-                        <div class="progress-container" style="display: none;">
-                            <div class="progress-bar" id="progressBar">0%</div>
-                        </div>
+                                <div class="progress-container" style="display: none;">
+                                    <div class="progress-bar" id="progressBar">0%</div>
+                                </div>
 
-                        <div id="status"></div>
-                    </div> -->
+                                <div id="status"></div>
+                            </div> -->
 
         <div class="mb-4">
             <div class="row align-items-start">
@@ -785,5 +785,23 @@
             }
         });
     </script>
+    <script>
+        $(document).on('shown.bs.modal', '#addWineModal', function() {
+            const $toggle = $('#statusToggle');
+            const $label = $('#toggleLabel');
+            const $statusInput = $("#wineStatus");
 
+            function updateLabel() {
+                const isChecked = $toggle.is(':checked');
+                $label.text(isChecked ? 'Publish' : 'Draft');
+                $statusInput.val(isChecked ? 1 : 0);
+            }
+
+            // Attach change event (once modal content is visible)
+            $toggle.off('change').on('change', updateLabel);
+
+            // Set initial label
+            updateLabel();
+        });
+    </script>
 @endsection

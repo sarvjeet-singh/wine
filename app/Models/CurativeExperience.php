@@ -33,11 +33,21 @@ class CurativeExperience extends Model
         'zipcode',
         'quantity',
         'listed_price',
+        'genre_id',
+        'venue_name',
+        'venue_phone',
+        'event_rating',
+        'is_published',
     ];
 
     public function category()
     {
         return $this->belongsTo(CurativeExperienceCategory::class);
+    }
+
+    public function genre()
+    {
+        return $this->belongsTo(CurativeExperienceGenre::class);
     }
 
     public function vendor()

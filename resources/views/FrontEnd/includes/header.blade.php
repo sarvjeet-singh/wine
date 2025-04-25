@@ -190,10 +190,10 @@
     </nav>
 
     <!-- ========== Tab Sec Start ========== -->
-    <section class="tab-content-sec px-sm-4 px-2">
+    <section class="tab-content-sec px-sm-4 px-2 border-bottom">
         <div class="container-fluid">
             <div class="inner-content">
-                <ul class="list-unstyled d-flex justify-content-between align-items-center mb-0 gap-3">
+                <ul class="list-unstyled d-flex align-items-center mb-0 gap-4">
                     <li>
                         <a href="{{ route('accommodations') }}" class="text-decoration-none">
                             Directories
@@ -227,6 +227,15 @@
                         @endif
                     </li>
                     <li>
+                        <a href="/events"
+                            class="text-decoration-none {{ request()->is('events') ? 'border-bottom border-dark' : '' }}">
+                            Events
+                        </a>
+                        @if (request()->routeIs('events'))
+                            <span id="records-found" class="text-center">[ {{ $vendorCount }} ]</span>
+                        @endif
+                    </li>
+                    <li>
                         <a href="/licensed"
                             class="text-decoration-none {{ request()->is('licensed') ? 'border-bottom border-dark' : '' }}">
                             Licensed
@@ -241,15 +250,6 @@
                             Non-Licensed
                         </a>
                         @if (request()->is('non-licensed'))
-                            <span id="records-found" class="text-center">[ {{ $vendorCount }} ]</span>
-                        @endif
-                    </li>
-                    <li>
-                        <a href="/events"
-                            class="text-decoration-none {{ request()->is('events') ? 'border-bottom border-dark' : '' }}">
-                            Events
-                        </a>
-                        @if (request()->routeIs('events'))
                             <span id="records-found" class="text-center">[ {{ $vendorCount }} ]</span>
                         @endif
                     </li>

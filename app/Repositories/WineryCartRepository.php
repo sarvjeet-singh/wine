@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\WineryCart;
 use App\Models\WineryCartItem;
+use App\Models\Vendor;
 
 class WineryCartRepository
 {

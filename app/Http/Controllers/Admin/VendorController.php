@@ -1462,6 +1462,7 @@ class VendorController extends Controller
         $vendor->winery_b2c_platform_fee = $request->winery_b2c_platform_fee ?? NULL;
         $vendor->winery_b2b_platform_fee = $request->winery_b2b_platform_fee ?? NULL;
         $vendor->excursion_platform_fee = $request->excursion_platform_fee ?? NULL;
+        $vendor->stocking_fee_waiver = $request->stocking_fee_waiver ?? 0;
         $updated = $vendor->save();
         if ($updated) {
             return response()->json(['status' => 'success', 'message' => 'Vendor Platform fee updated successfully.']);

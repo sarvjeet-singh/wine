@@ -37,6 +37,7 @@ class VendorWine extends Model
         'description',
         'grape_varietals',
         'pdf',
+        'delisted',
     ];
 
     public function vendor()

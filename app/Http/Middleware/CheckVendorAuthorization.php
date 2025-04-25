@@ -19,6 +19,9 @@ class CheckVendorAuthorization
     public function handle(Request $request, Closure $next)
     {
         $user = Auth::user();
+        if($user->master_user == 1){
+            return $next($request);
+        }
 
         // Check if vendorid is present in the URL and is valid
         $vendorid = $request->route('vendorid');

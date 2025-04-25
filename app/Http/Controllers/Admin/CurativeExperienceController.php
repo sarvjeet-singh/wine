@@ -14,7 +14,8 @@ class CurativeExperienceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = CurativeExperience::with('vendor');
+        $query = CurativeExperience::with('vendor')
+            ->where('is_published', 1);
         if ($request->has('vendor')) {
             $query->whereHas('vendor', function ($q) use ($request) {
                 $q->where('vendor_name', 'like', '%' . $request->vendor . '%');
@@ -38,6 +39,7 @@ class CurativeExperienceController extends Controller
 
         if ($request->has('experience')) {
             $experiences = CurativeExperience::where('name', 'like', '%' . $request->experience . '%')
+                ->where('is_published', 1)
                 ->pluck('name');
             return response()->json($experiences);
         }

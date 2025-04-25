@@ -26,6 +26,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\VendorFileUploadController;
 use App\Http\Controllers\TimezoneController;
 use App\Http\Controllers\WalletController;
+use App\Http\Controllers\ShopController;
 use App\Http\Controllers\Admin\WalletController as AdminWalletController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\ErrorLogController as AdminErrorLogController;
@@ -63,6 +64,7 @@ use App\Http\Controllers\Admin\Vendor\UserController as AdminVendorUserControlle
 use Mews\Captcha\CaptchaController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Admin\CurativeExperienceCategoryController as AdminCurativeExperienceCategoryController;
+use App\Http\Controllers\Admin\CurativeExperienceGenreController as AdminCurativeExperienceGenreController;
 use App\Http\Controllers\Admin\CurativeExperienceController as AdminCurativeExperienceController;
 use App\Http\Controllers\CurativeExperienceController;
 use App\Http\Controllers\Admin\VendorSubscriptionController as AdminVendorSubscriptionController;
@@ -87,6 +89,9 @@ use Illuminate\Support\Facades\Artisan;
 
 Auth::routes(['verify' => true, 'login' => false]);
 Route::post('/save-user-location', [LocationController::class, 'store']);
+Route::get('/shop', [ShopController::class, 'index'])->name('frontend-shop');
+Route::get('/shop/products', [ShopController::class, 'products'])->name('frontend-shop.products');
+Route::get('/shop/product-detail', [ShopController::class, 'productDetail'])->name('frontend-shop.product-detail');
 Route::get('/events', [EventController::class, 'events'])->name('events');
 Route::get('/get-events', [EventController::class, 'getEvents'])->name('get-events');
 Route::get('/events/search', [EventController::class, 'searchEvents'])->name('events.search');
@@ -457,6 +462,7 @@ Route::group(['middleware' => ['auth:vendor', 'checkPasswordUpdated', 'check.ven
     Route::get('/vendor/curative-experiences/edit/{curativeExperienceId}/{vendorid?}', [CurativeExperienceController::class, 'edit'])->name('curative-experiences.edit');
     Route::put('/vendor/curative-experiences/update/{curativeExperienceId}/{vendorid?}', [CurativeExperienceController::class, 'update'])->name('curative-experiences.update');
     Route::delete('/vendor/curative-experiences/delete/{curativeExperienceId}/{vendorid?}', [CurativeExperienceController::class, 'destroy'])->name('curative-experiences.destroy');
+    Route::get('/vendor/curative-experiences/preview/{curativeExperienceId}/{vendorid?}', [CurativeExperienceController::class, 'preview'])->name('curative-experiences.preview');
 });
 // ================= ADMIN ============== //
 
@@ -511,6 +517,8 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::get('/vendors/uploaded-files/{id}', [AdminVendorController::class, 'getUploadedFiles'])->name('vendors.uploaded-files');
         Route::post('curative-experience-categories/update-order', [AdminCurativeExperienceCategoryController::class, 'updateOrder'])->name('curative-experience-categories.updateOrder');
         Route::resource('curative-experience-categories', AdminCurativeExperienceCategoryController::class)->names('curative-experience-categories');
+        Route::post('curative-experience-genres/update-order', [AdminCurativeExperienceGenreController::class, 'updateOrder'])->name('curative-experience-genres.updateOrder');
+        Route::resource('curative-experience-genres', AdminCurativeExperienceGenreController::class)->names('curative-experience-genres');
         Route::get('curative-experiences/search', [AdminCurativeExperienceController::class, 'search'])->name('curative-experiences.search');
         Route::post('curative-experiences/toggle-status', [AdminCurativeExperienceController::class, 'toggleStatus'])->name('curative-experiences.toggleStatus');
         Route::post('curative-experiences/bulk-status-update', [AdminCurativeExperienceController::class, 'bulkStatusUpdate'])->name('curative-experiences.bulkStatusUpdate');

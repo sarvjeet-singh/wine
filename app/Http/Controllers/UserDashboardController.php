@@ -438,6 +438,10 @@ class UserDashboardController extends Controller
         $user->guestrewards_vendor_id = $request->guestrewards == 'Niagara Region Vendor' ? $request->guestrewards_vendor_id : null;
         $user->save();
 
+        if($user->first_login == 1){
+            return redirect()->route('user-dashboard')->with('success', 'Referral settings updated successfully.');
+        }
+
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Referral settings updated successfully.');
     }

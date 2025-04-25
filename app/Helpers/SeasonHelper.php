@@ -64,7 +64,6 @@ class SeasonHelper
         $vendor = Vendor::find($vendorId);
         // check for platform fee
         $platformFee = platformFeeCalculator($vendor, $price);
-
         if ($platformFee) {
             $price += $platformFee;
         }

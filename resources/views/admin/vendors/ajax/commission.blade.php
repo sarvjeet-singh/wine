@@ -34,56 +34,71 @@
                                     <label for="floatingInput">Event Platform Fee</label>
                                 </div>
                             </div>
-                            <div class="col-sm-4 col-12">
-                                <div class="form-floating">
-                                    <input type="text"
-                                        class="form-control @error('accommodation_platform_fee') is-invalid @enderror"
-                                        name="accommodation_platform_fee"
-                                        value="{{ old('accommodation_platform_fee', !empty($vendor->accommodation_platform_fee) ? $vendor->accommodation_platform_fee : '') }}"
-                                        placeholder="Enter Accommodation Platform Fee">
-                                    <label for="floatingInput">Accommodation Platform Fee</label>
+                            @if (strtolower($vendor->vendor_type) == 'accommodation')
+                                <div class="col-sm-4 col-12">
+                                    <div class="form-floating">
+                                        <input type="text"
+                                            class="form-control @error('accommodation_platform_fee') is-invalid @enderror"
+                                            name="accommodation_platform_fee"
+                                            value="{{ old('accommodation_platform_fee', !empty($vendor->accommodation_platform_fee) ? $vendor->accommodation_platform_fee : '') }}"
+                                            placeholder="Enter Accommodation Platform Fee">
+                                        <label for="floatingInput">Accommodation Platform Fee</label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-4 col-12">
-                                <div class="form-floating">
-                                    <input type="text"
-                                        class="form-control @error('accommodation_event_platform_fee') is-invalid @enderror"
-                                        name="accommodation_event_platform_fee"
-                                        value="{{ old('accommodation_event_platform_fee',!empty($vendor->accommodation_event_platform_fee) ? $vendor->accommodation_event_platform_fee : '') }}"
-                                        placeholder="Enter accommodation event Platform Fee">
-                                    <label for="floatingInput">Accommodation Event Platform Fee</label>
+                                <div class="col-sm-4 col-12">
+                                    <div class="form-floating">
+                                        <input type="text"
+                                            class="form-control @error('accommodation_event_platform_fee') is-invalid @enderror"
+                                            name="accommodation_event_platform_fee"
+                                            value="{{ old('accommodation_event_platform_fee', !empty($vendor->accommodation_event_platform_fee) ? $vendor->accommodation_event_platform_fee : '') }}"
+                                            placeholder="Enter accommodation event Platform Fee">
+                                        <label for="floatingInput">Accommodation Event Platform Fee</label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-4 col-12">
-                                <div class="form-floating">
-                                    <input type="text"
-                                        class="form-control @error('winery_b2b_platform_fee') is-invalid @enderror"
-                                        name="winery_b2b_platform_fee"
-                                        value="{{ old('winery_b2b_platform_fee', !empty($vendor->winery_b2b_platform_fee) ? $vendor->winery_b2b_platform_fee : '') }}"
-                                        placeholder="Enter Winery B2B Platform Fee">
-                                    <label for="floatingInput">Winery B2B Platform Fee</label>
+                            @endif
+                            @if (strtolower($vendor->vendor_type) == 'winery')
+                                <div class="col-sm-4 col-12">
+                                    <div class="form-floating">
+                                        <input type="text"
+                                            class="form-control @error('winery_b2b_platform_fee') is-invalid @enderror"
+                                            name="winery_b2b_platform_fee"
+                                            value="{{ old('winery_b2b_platform_fee', !empty($vendor->winery_b2b_platform_fee) ? $vendor->winery_b2b_platform_fee : '') }}"
+                                            placeholder="Enter Winery B2B Platform Fee">
+                                        <label for="floatingInput">Winery B2B Platform Fee</label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-4 col-12">
-                                <div class="form-floating">
-                                    <input type="text"
-                                        class="form-control @error('winery_b2c_platform_fee') is-invalid @enderror"
-                                        name="winery_b2c_platform_fee"
-                                        value="{{ old('winery_b2c_platform_fee', !empty($vendor->winery_b2c_platform_fee) ? $vendor->winery_b2c_platform_fee : '') }}"
-                                        placeholder="Enter Winery B2C Platform Fee">
-                                    <label for="floatingInput">Winery B2C Platform Fee</label>
+                                <div class="col-sm-4 col-12">
+                                    <div class="form-floating">
+                                        <input type="text"
+                                            class="form-control @error('winery_b2c_platform_fee') is-invalid @enderror"
+                                            name="winery_b2c_platform_fee"
+                                            value="{{ old('winery_b2c_platform_fee', !empty($vendor->winery_b2c_platform_fee) ? $vendor->winery_b2c_platform_fee : '') }}"
+                                            placeholder="Enter Winery B2C Platform Fee">
+                                        <label for="floatingInput">Winery B2C Platform Fee</label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-4 col-12">
-                                <div class="form-floating">
-                                    <input type="text"
-                                        class="form-control @error('excursion_platform_fee') is-invalid @enderror"
-                                        name="excursion_platform_fee"
-                                        value="{{ old('excursion_platform_fee', !empty($vendor->excursion_platform_fee) ? $vendor->excursion_platform_fee : '') }}"
-                                        placeholder="Enter Excursion Platform Fee">
-                                    <label for="floatingInput">Excursion Platform Fee</label>
+                                <div class="col-sm-4 col-12">
+                                    <div class="form-check form-switch mt-4">
+                                        <input type="checkbox" class="form-check-input" id="stocking_fee_waiver"
+                                            name="stocking_fee_waiver" value="1"
+                                            {{ old('stocking_fee_waiver', !empty($vendor->stocking_fee_waiver) ? $vendor->stocking_fee_waiver : false) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="stocking_fee_waiver">Exempt from Stocking
+                                            Fee</label>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
+                            @if (strtolower($vendor->vendor_type) == 'excursion')
+                                <div class="col-sm-4 col-12">
+                                    <div class="form-floating">
+                                        <input type="text"
+                                            class="form-control @error('excursion_platform_fee') is-invalid @enderror"
+                                            name="excursion_platform_fee"
+                                            value="{{ old('excursion_platform_fee', !empty($vendor->excursion_platform_fee) ? $vendor->excursion_platform_fee : '') }}"
+                                            placeholder="Enter Excursion Platform Fee">
+                                        <label for="floatingInput">Excursion Platform Fee</label>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                     <!-- Account Status Sec End -->

@@ -1,12 +1,21 @@
 @php
+    use App\Models\Vendor;
     $user = Auth::user();
-    $vendors = $user->vendors;
+    if($user->master_user == 1) {
+        $vendors = Vendor::all();
+    } else {
+        $vendors = $user->vendors;
+    }
     $vendor = $vendors->first();
     $currentUrl = Request::url();
     $urlParts = explode('/', $currentUrl);
     $vendorId = end($urlParts);
     $shopId = $urlParts[count($urlParts) - 2];
-    $name = $user->vendors->find($vendorId);
+    if($user->master_user == 1) {
+        $name = $vendors->find($vendorId);
+    } else {
+        $name = $user->vendors->find($vendorId);
+    }
     $cartItemCount = wineryCart($shopId, $vendorId);
 @endphp
 <header>

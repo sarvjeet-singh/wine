@@ -2,85 +2,33 @@
 
 @section('content')
 
-
+    <style>
+        .event-single-wrapper {
+            padding: 0 15px;
+        }
+    </style>
     <!-- Event Single HTML Start -->
-    <section class="event-single-wrapper my-sm-5 my-4">
+    @if (isset($preview) && $preview == 1)
+        <div class="container-fluid" style="background-color: #fff3cd; color: #856404;">
+            <div class="row">
+                <div class="col-12" style="text-align: center;">
+                    <div style="padding: 10px 15px; border: 1px solid #ffeeba; border-radius: 4px;">
+                        <strong>Preview Mode:</strong> This is a preview of the event page. Changes are not live until
+                        published and approved.
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+    <section class="event-single-wrapper my-5">
 
         <div class="container">
 
-            <div class="row flex-lg-row flex-column-reverse">
-
-                <div class="col-lg-8">
-
-                    <div class="event-info">
-
-                        <div>
-
-                            <h6 class="vendor-name mb-0 fw-bold">{{ $event->vendor->vendor_name }}</h6>
-
-                        </div>
-
-                        <h2 class="theme-color my-2">{{ $event->name }}</h2>
-
-                        <p class="mb-sm-1 mb-2 event-address">{{ $event->address }}, {{ $event->city }},
-
-                            {{ $event->state }}, {{ $event->zipcode }}</p>
-
-                        <p class="mb-0 event-timing">
-
-                            <span>{{ \Carbon\Carbon::parse($event->start_date)->format('D d M Y') }} -
-
-                                {{ \Carbon\Carbon::parse($event->end_date)->format('D d M Y') }}</span> | Starts at
-
-                            <span>{{ \Carbon\Carbon::parse($event->start_time)->format('h:i A') }}</span> |
-
-                            <span>
-
-                                {{ intdiv($event->duration, 60) }} {{ intdiv($event->duration, 60) == 1 ? 'hr' : 'hrs' }}
-
-                                {{ $event->duration % 60 }} {{ $event->duration % 60 == 1 ? 'min' : 'mins' }}
-
-                            </span>
-
-                        </p>
-
-                        <p class="event-price fw-bold my-2">
-
-                            @if ($event->is_free == 1)
-                                Free
-                            @else
-                                @php
-                                    $platform_fee =
-                                        $event->vendor->platform_fee ?? (config('site.platform_fee') ?? '1.00');
-                                @endphp
-                                ${{ number_format($event->admittance + ($event->admittance * $platform_fee) / 100, 2, '.', '') }}{{ $event->extension }}
-                            @endif
-
-                        </p>
-
-                        <div class="mt-4">
-                            @if ($vendor->account_status == 1)
-                                @if (!Auth::guard('customer')->check())
-                                    <a href="{{ route('check-login', 'book-now') }}" class="btn book-btn">Book Now</a>
-                                @else
-                                    @if ($event->remaining_tickets > 0)
-                                        <a href="{{ route('events.checkout', $event->id) }}" class="btn book-btn">Book
-                                            Now</a>
-                                    @else
-                                        <a href="javascript:void(0);" class="btn book-btn disabled">Booking Not
-                                            Available</a>
-                                    @endif
-                                @endif
-                            @endif
-
-                        </div>
-
-                    </div>
-
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="theme-color mb-3">{{ $event->name }}</h2>
                 </div>
-
-                <div class="col-lg-4">
-
+                <div class="col-lg-8">
                     <div class="event-featured-image mb-3">
 
                         @if (!empty($event->image) && Str::contains($event->image, 'youtube'))
@@ -104,27 +52,119 @@
                         @endif
 
                     </div>
+                    <div class="event-tags d-flex align-items-center gap-2">
+                        @if (!empty($event->category->name))
+                            <div>{{ $event->category->name ?? '' }}</div>
+                        @endif
+                        @if (!empty($event->genre->name))
+                            <div>{{ $event->genre->name ?? '' }}</div>
+                        @endif
+                    </div>
 
-                </div>
-
-            </div>
-
-            <div class="row">
-
-                <div class="col-12">
-
-                    <div class="about-event pt-4 mt-4">
-
-                        <h4 class="fw-bold">About</h4>
-
+                    <div class="about-event mt-sm-5 mt-4 pe-md-5">
+                        <h4 class="mb-3 fw-bold">About The Event</h4>
                         <p>{{ $event->description ?? 'No description available.' }}</p>
-
                     </div>
 
                 </div>
 
-            </div>
+                <div class="col-lg-4">
+                    <div class="event-info-box border rounded-4">
+                        <ul class="list-unstyled">
+                            <li class="organizer-name position-relative mb-3">
+                                <i class="fa-regular fa-circle-user"></i>
+                                {{ $event->vendor->vendor_name ?? 'Organizer' }}
+                            </li>
+                            <li class="event-timing position-relative mb-3">
+                                <i class="fa-regular fa-calendar"></i>
+                                <span>{{ !empty($event->start_date) ? \Carbon\Carbon::parse($event->start_date)->format('D d M Y') : 'No date specified' }}
 
+                                    {{ !empty($event->end_date) && $event->end_date != $event->start_date ? ' - ' . \Carbon\Carbon::parse($event->end_date)->format('D d M Y') : '' }}</span>
+                            </li>
+                            <li class="start-timing position-relative mb-3">
+                                <i class="fa-regular fa-clock"></i>
+                                @if (!empty($event->booking_time))
+                                    <span>Starts at
+                                        {{ \Carbon\Carbon::parse($event->booking_time)->format('h:i A') }}</span>
+                                @endif
+                            </li>
+                            <li class="event-duration position-relative mb-3">
+                                <i class="fa-regular fa-hourglass-half"></i>
+                                <span>
+                                    @if ($event->duration > 0)
+                                        {{ intdiv($event->duration, 60) }}
+                                        {{ intdiv($event->duration, 60) == 1 ? 'hr' : 'hrs' }}
+
+                                        @if ($event->duration % 60 > 0)
+                                            {{ $event->duration % 60 }} {{ $event->duration % 60 == 1 ? 'min' : 'mins' }}
+                                        @endif
+                                    @else
+                                        No duration specified
+                                    @endif
+                                </span>
+                            </li>
+                            <li class="age-restriction position-relative mb-3">
+                                <i class="fa-solid fa-user"></i>
+                                @if (!empty($event->event_rating))
+                                    {{ $event->event_rating == 'family' ? 'Family' : 'Adult' }}
+                                @else
+                                    No Rating specified
+                                @endif
+                            </li>
+                            <li class="event-type position-relative mb-3">
+                                <i class="fa-solid fa-tag"></i>
+                                {{ $event->category->name ?? '' }}
+                            </li>
+                            <li class="event-address position-relative mb-3">
+                                <i class="fa-solid fa-location-dot"></i>
+                                @if (!empty($event->address) || !empty($event->city) || !empty($event->state))
+                                    {{ !empty($event->address) ? $event->address . ',' : '' }}
+                                    {{ !empty($event->city) ? $event->city . ',' : '' }}
+                                    {{ !empty($event->state) ? $event->state . ',' : '' }}
+                                @else
+                                    No address specified
+                                @endif
+                            </li>
+                            <li class="venue-name position-relative mb-3">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                                {{ $event->venue_name ?? 'No venue specified' }}
+                            </li>
+                        </ul>
+                        <div class="d-flex align-items-center justify-content-between gap-1 border-top mt-4 pt-4">
+                            <div class="event-price">
+                                <p class="fw-bold mb-0">
+                                    @if ($event->is_free == 1)
+                                        Free Admittance
+                                    @else
+                                        @php
+                                            $platform_fee =
+                                                $event->vendor->event_platform_fee ??
+                                                (config('site.platform_fee') ?? '0.00');
+                                        @endphp
+                                        {{ !empty($event->admittance) ? '$' . number_format($event->admittance + ($event->admittance * $platform_fee) / 100, 2, '.', '') : '' }}{!! !empty($event->extension) && !empty($event->admittance) ? '<span>' . $event->extension . '</span>' : '' !!}
+                                    @endif
+                                </p>
+                            </div>
+                            <div>
+                                @if ($vendor->account_status == 1)
+                                    @if (!Auth::guard('customer')->check())
+                                        <a href="{{ route('check-login', 'book-now') }}" class="btn book-btn">Book Now</a>
+                                    @else
+                                        @if ($event->remaining_tickets > 0)
+                                            <a href="{{ route('events.checkout', $event->id) }}" class="btn book-btn">Book
+                                                Now</a>
+                                        @else
+                                            <a href="javascript:void(0);" class="btn book-btn disabled">Booking Not
+                                                Available</a>
+                                        @endif
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
     </section>

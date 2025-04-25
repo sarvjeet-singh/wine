@@ -195,6 +195,22 @@ header li.dropdown .dropdown-menu.show {
 .detail-form-sec button.book-btn {
     width: fit-content;
 }
+.curated-event-sec .event-filters {
+    position: unset;
+}
+.event-filters .accordion {
+    display: none;
+    transform: translateX(100%);
+    padding: 35px 20px 20px 20px;
+}
+.event-filters .filter-close button.filter-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 6px;
+    padding: 0;
+    z-index: 1;
+}
 footer .footer-logo img {
     width: 30%;
 }

@@ -85,13 +85,13 @@
         <li class="position-relative parent-menu">
             <a href="#">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
-                <span class="link_name">Manage Curative Experiences</span>
+                <span class="link_name">Manage Events</span>
             </a>
             <i class="fa-solid fa-angle-right"></i>
             <ul class="sub-menu list-unstyled mt-2">
-                <li class="mb-2"><a href="{{ route('admin.curative-experience-categories.index') }}">Manage
-                        Categories</a></li>
-                <li class="mb-2"><a href="{{ route('admin.curative-experiences.index') }}">Manage Experiences</a>
+                <li class="mb-2"><a href="{{ route('admin.curative-experience-categories.index') }}">Manage Types</a></li>
+                <li class="mb-2"><a href="{{ route('admin.curative-experience-genres.index') }}">Manage Genres</a></li>
+                <li class="mb-2"><a href="{{ route('admin.curative-experiences.index') }}">Manage Events</a>
                 </li>
             </ul>
         </li>

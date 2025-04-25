@@ -1,6 +1,12 @@
 <div class="modal-header px-4">
-
-    <h1 class="modal-title fw-bold fs-5" id="exampleModalLabel">Edit Wine - {{ $vendor->vendor_name }}</h1>
+    <h1 class="modal-title fw-bold fs-5 d-flex align-items-center justify-content-between" id="exampleModalLabel">
+        Edit Wine - {{ $vendor->vendor_name }}
+        <div class="form-check form-switch ms-3 d-flex align-items-center">
+            <input class="form-check-input me-2" type="checkbox" id="statusToggle" name="status" value="1"
+                {{ old('status', $wine->delisted == 0) ? 'checked' : '' }}>
+            <label class="form-check-label" for="statusToggle" id="toggleLabel">Publish</label>
+        </div>
+    </h1>
 
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
@@ -41,7 +47,7 @@
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         @else
-                            <img id="imagePreview" src="{{ asset('storage/' . $wine->image) }}" alt="Image Preview"
+                            <img id="imagePreview" src="{{ !empty($wine->image) ?asset('storage/' . $wine->image) : '' }}" alt="Image Preview"
                                 style="display:none; max-width:100%; height:auto; max-height:200px;" />
                             <button type="button" id="removeImage" style="display:none;" class="btn btn-danger mt-2">
                                 <i class="fa-solid fa-xmark"></i>
@@ -316,7 +322,7 @@
         <div class="col-md-6">
             <div class="d-flex align-items-center gap-2">
                 <div>
-                    <label for="casesInput" class="form-label">Casew</label>
+                    <label for="casesInput" class="form-label">Cases</label>
                     <input type="number" class="form-control w-100" id="casesInput" min="0"
                         placeholder="Enter cases" style="width: 50%;">
                 </div>
@@ -434,9 +440,8 @@
         </div>
 
         <div class="col-12 text-center">
-
+            <input type="hidden" name="status" id="wineStatus" value="0">
             <button type="submit" id="submit-button" class="btn wine-btn w-25 px-3">Update</button>
-
         </div>
 
     </form>
@@ -444,7 +449,26 @@
     <!-- Form End  -->
     <script>
         $(document).ready(function() {
+            $.validator.addMethod('validImage', function(value, element) {
+                const wineStatus = $('#wineStatus').val();
 
+                // If not published, skip validation
+                if (wineStatus != '1') return true;
+
+                const hasPreviewImage = $('#imagePreview').attr('src')?.trim() !== '';
+
+                // If image already exists, don't require a new upload
+                if (hasPreviewImage) return true;
+
+                // If no file selected, validation fails
+                if (element.files.length === 0) return false;
+
+                const file = element.files[0];
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                const maxSize = 5 * 1024 * 1024; // 5MB
+
+                return validTypes.includes(file.type) && file.size <= maxSize;
+            }, 'Please upload a valid image (jpg, png, gif) under 5MB.');
             $('#vendorWineFormEdit').validate({
                 rules: {
                     winery_name: {
@@ -457,7 +481,7 @@
                                     return $('#winery_name').val();
                                 },
                                 wine_id: function() {
-                                    return "{{$wine->id}}";
+                                    return "{{ $wine->id }}";
                                 },
                                 _token: function() {
                                     return $('meta[name="csrf-token"]').attr('content');
@@ -484,8 +508,19 @@
 
                         required: true
                     },
+                    image: {
+                        required: {
+                            depends: function() {
+                                const isWineStatusPublished = $('#wineStatus').val() ===
+                                    '1'; // Wine status is Publish
+                                const hasPreviewImage = $('#imagePreview').attr('src') && $(
+                                    '#imagePreview').attr('src') !== '';
+                                return isWineStatusPublished && !hasPreviewImage;
+                            }
+                        },
+                        validImage: true,
+                    }
                 },
-
                 messages: {
                     winery_name: {
                         required: "Please enter a winery name",
@@ -504,35 +539,22 @@
                         required: "Please enter at least one varietal blend"
                     }
                 },
-
                 errorElement: "div", // error element as span
-
                 errorPlacement: function(error, element) {
 
                     error.insertAfter(element); // Insert error after the element
 
                 },
-
                 submitHandler: function(form, event) {
-
                     // Handle AJAX submission here
-
                     event.preventDefault();
-
                     let formData = new FormData(form);
-
-
-
                     // Get the wine ID for the update, assuming it's stored in a hidden input or as part of the form
-
                     var wineId = $('#wine_id').val(); // Replace with the correct ID field
-
                     $('#submit-button').prop("disabled", true).html(
                         '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...'
-                        );
-
+                    );
                     $.ajax({
-
                         url: '{{ route('vendor-wines.update', ['id' => $wine->id, 'vendorid' => $vendor_id]) }}',
 
                         type: 'POST',
@@ -554,7 +576,8 @@
                         success: function(response) {
 
                             if (response.success) {
-                                $('#submit-button').prop("disabled", false).html('Update');
+                                $('#submit-button').prop("disabled", false).html(
+                                    'Update');
                                 Swal.fire({
                                     icon: 'success', // Can be 'success', 'error', 'warning', 'info', or 'question'
                                     title: 'Success',
@@ -581,9 +604,10 @@
 
                                 $('#' + key).addClass('error');
 
-                                $('#' + key).after('<span class="error">' + value[
+                                $('#' + key).after('<span class="error">' +
+                                    value[
 
-                                    0] + '</span>');
+                                        0] + '</span>');
 
                             });
 

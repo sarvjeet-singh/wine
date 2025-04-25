@@ -20,10 +20,13 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Stripe\Stripe;
 use Stripe\Customer as StripeCustomer;
 use Stripe\PaymentIntent;
 use Stripe\PaymentMethod;
+use App\Mail\EventBookingConfirmationMail;
+use App\Mail\VendorNewBookingNotificationMail;
 
 class EventController extends Controller
 {
@@ -31,6 +34,7 @@ class EventController extends Controller
     {
         $query = CurativeExperience::with(['category', 'vendor'])
             ->where('status', 'active')
+            ->where('is_published', 1)
             ->whereHas('vendor', function ($q) {
                 $q->whereIn('account_status', [1, 2]);
             });
@@ -66,7 +70,16 @@ class EventController extends Controller
             ->orderBy('start_date', 'asc')
             ->limit(3)
             ->get();
-        $vendorCount = CurativeExperience::where('status', 'active')->count();
+        $vendorCount = CurativeExperience::where('status', 'active')
+            ->where('is_published', 1)
+            ->whereHas('vendor', function ($q) {
+                $q->whereIn('account_status', [1, 2]);
+            })
+            ->where(function ($query) {
+                $query->whereDate('start_date', '>=', now())
+                    ->orWhereDate('end_date', '>=', now());
+            })
+            ->count();
         return view('FrontEnd.events.index', compact('todayEvents', 'tomorrowEvents', 'upcomingEvents', 'vendorCount'));
     }
 
@@ -76,7 +89,11 @@ class EventController extends Controller
             return !is_null($value) && $value !== '' && $value !== [];
         }))) {
             $query = CurativeExperience::with('category', 'vendor')
-                ->where('status', 'active'); // Only active events
+                ->where('status', 'active') // Only active events
+                ->where('is_published', 1)
+                ->whereHas('vendor', function ($q) {
+                    $q->whereIn('account_status', [1, 2]);
+                });
 
             if ($request->has('search') && !empty($request->search)) {
                 $searchTerm = $request->search;
@@ -114,7 +131,12 @@ class EventController extends Controller
             ]);
         }
 
-        $query = CurativeExperience::with('category')->where('status', 'active'); // Active events only
+        $query = CurativeExperience::with('category')
+            ->where('status', 'active') // Only active events
+            ->where('is_published', 1)
+            ->whereHas('vendor', function ($q) {
+                $q->whereIn('account_status', [1, 2]);
+            });
 
         $today = Carbon::today();
         $tomorrow = Carbon::tomorrow();
@@ -151,6 +173,14 @@ class EventController extends Controller
             $query->whereIn('category_id', $request->categories);
         }
 
+        if ($request->has('genres') && is_array($request->genres)) {
+            $query->whereIn('genre_id', $request->genres);
+        }
+
+        if ($request->has('event_ratings') && is_array($request->event_ratings)) {
+            $query->whereIn('event_rating', $request->event_ratings);
+        }
+
         // ✅ Price Filters
         if (!empty($request->min_price) && !empty($request->max_price)) {
             $query->where('is_free', 0); // Only paid events
@@ -181,6 +211,10 @@ class EventController extends Controller
 
         $results = CurativeExperience::where('name', 'LIKE', "%{$searchTerm}%")
             ->where('status', 'active')
+            ->where('is_published', 1)
+            ->whereHas('vendor', function ($q) {
+                $q->whereIn('account_status', [1, 2]);
+            })
             ->limit(5)
             ->pluck('name', 'id'); // Only return titles
 
@@ -189,7 +223,14 @@ class EventController extends Controller
 
     function eventDetails(Request $request, $id)
     {
-        $event = CurativeExperience::with('category')->find($id);
+        $event = CurativeExperience::with('category')
+            ->where('is_published', 1)
+            ->whereHas('vendor', function ($q) {
+                $q->whereIn('account_status', [1, 2]);
+            })
+            ->where('status', 'active')
+            ->where('id', $id)
+            ->first();
         $vendor = $event->vendor()->first();
         if (!$event) {
             abort(404);
@@ -197,6 +238,10 @@ class EventController extends Controller
         $relatedEvents = CurativeExperience::with('category')
             ->where('category_id', $event->category_id)
             ->where('id', '!=', $event->id)
+            ->where('is_published', 1)
+            ->whereHas('vendor', function ($q) {
+                $q->whereIn('account_status', [1, 2]);
+            })
             ->where('status', 'active') // Assuming there's an 'is_active' field to check if it's active
             ->where('start_date', '>=', now()) // Check if start_date is greater than today
             ->where('end_date', '>=', now()) // Check if end_date is greater than today
@@ -267,7 +312,7 @@ class EventController extends Controller
         ]);
 
         $event = CurativeExperience::with('vendor')->find($validated['event_id']);
-        $platform_fee = platformFeeCalculator($event);
+        $platform_fee = platformFeeCalculator($event->vendor, $event->admittance, $event->id);
         $noOfJoinees = !empty($validated['joinee']) ? count($validated['joinee']) : 0;
         $tickets =  1;
         if ($event->extension == '/Person') {
@@ -308,7 +353,7 @@ class EventController extends Controller
                 'order_type' => 'event',
                 'vendor_price' => $event->admittance,
                 'listed_price' => $event->admittance + $platform_fee,
-                'platform_fee_percentage' => platformFeeCalculator($event),
+                'platform_fee_percentage' => platformFee($event->vendor,  $event->admittance, $event->id),
                 'platform_service_fee' => $platform_fee,
                 'sub_total' => $subtotal, // Replace with actual calculation
                 'tax' => $tax, // Replace with actual calculation
@@ -379,11 +424,7 @@ class EventController extends Controller
             return redirect()->route('order.thankyou', ['id' => $customerOrder->id, 'orderType' => 'event']);
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback on failure
-            print_r("Error message: " . $e->getMessage() . "\n");
-            print_r("File: " . $e->getFile() . "\n");
-            print_r("Line: " . $e->getLine() . "\n");
-            die;
-            return redirect()->back()->with('error', 'An error occurred. Please try again.');
+            return redirect()->back()->withErrors(['general' => $e->getMessage()]);
         }
     }
 
@@ -406,7 +447,7 @@ class EventController extends Controller
         $order_id = $request->input('order_id');
         $payment_intent_id = $request->input('payment_intent_id');
         $transaction = CustomerOrderTransaction::where('order_id', $order_id)->first();
-        $order = CustomerOrder::find($order_id);
+        $order = CustomerOrder::with('eventOrderDetail', 'vendor', 'customer')->find($order_id);
 
         if (!$order) {
             return response()->json([
@@ -446,6 +487,11 @@ class EventController extends Controller
         if (!empty($transaction)) {
             $customer = Auth::guard('customer')->user();
             app(WalletController::class)->addCashback($customer, $transaction->transaction_amount, $order_id, 'event');
+            Mail::to($customer->email)->send(new EventBookingConfirmationMail($order));
+            if (!empty($order->vendor->vendor_email)) {
+                Mail::to($order->vendor->vendor_email)->send(new VendorNewBookingNotificationMail($order));
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Transaction details stored successfully.',
@@ -476,10 +522,10 @@ class EventController extends Controller
             return redirect()->route('customer.login')->withErrors('Please login to access your orders.');
         }
         $orders = CustomerOrder::with('eventOrderDetail')
-        ->where('customer_id', Auth::guard('customer')
-        ->user()->id)
-        ->orderBy('id', 'desc')
-        ->get();
+            ->where('customer_id', Auth::guard('customer')
+                ->user()->id)
+            ->orderBy('id', 'desc')
+            ->get();
         return view('UserDashboard.event-transactions', compact('orders'));
     }
 
@@ -509,9 +555,9 @@ class EventController extends Controller
             return redirect()->route('vendor.login')->withErrors('Please login to access your orders.');
         }
         $orders = CustomerOrder::with('customer', 'eventOrderDetail')
-        ->where('vendor_id', $vendorid)
-        ->orderBy('id', 'desc')
-        ->get();
+            ->where('vendor_id', $vendorid)
+            ->orderBy('id', 'desc')
+            ->get();
         return view('VendorDashboard.event-transactions', compact('orders'));
     }
 
@@ -532,9 +578,9 @@ class EventController extends Controller
             return redirect()->route('vendor.login')->withErrors('Please login to access your orders.');
         }
         $order = CustomerOrder::with('eventOrderDetail', 'eventGuestDetails', 'vendor', 'eventOrderTransactions')
-        ->where('id', $order_id)
-        ->where('vendor_id', $vendorid)
-        ->first();
+            ->where('id', $order_id)
+            ->where('vendor_id', $vendorid)
+            ->first();
         return view('VendorDashboard.event-order-detail', compact('order'));
     }
 

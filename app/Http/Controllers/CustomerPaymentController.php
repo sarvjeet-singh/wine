@@ -49,6 +49,17 @@ class CustomerPaymentController extends Controller
         $customer = Auth::guard('customer')->user();
         $paymentMethodId = $request->payment_method_id;
 
+        // Create a Setup Intent for saving the payment method
+        if (!$customer->stripe_id) {
+            $customer_data = [
+                'email' => $customer->email,
+                'name' => $customer->firstname . ' ' . $customer->lastname,
+                'phone' => $customer->contact_number,
+            ];
+            $customer->stripe_id = $this->stripeService->createCustomer($customer_data);
+            $customer->save();
+        }
+        
         $paymentMethodId = $this->stripeService->attachPaymentMethod($customer->stripe_id, $paymentMethodId);
         // $user->update(['default_payment_method' => $paymentMethodId]);
 

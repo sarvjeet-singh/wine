@@ -173,6 +173,16 @@
                                                 @enderror
                                             </div>
                                         </div>
+                                        <div class="col-md-6">
+                                            <div>
+                                                <label for="master_user" class="form-label fw-bold">Master User </label>
+                                                <input type="checkbox" id="master_user" class="form-check-input" @if (isset($user) && $user->master_user == 1) checked @endif name="master_user"
+                                                    value="1">
+                                                @error('master_user')
+                                                    <div class="error">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

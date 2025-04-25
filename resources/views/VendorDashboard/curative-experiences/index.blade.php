@@ -23,7 +23,7 @@
                 <div class="information-box">
                     <div class="information-box-head">
                         <div class="box-head-heading d-flex align-items-center justify-content-between gap-2">
-                            <span class="box-head-label theme-color">Curated Experience</span>
+                            <span class="box-head-label theme-color">Events</span>
                             <a href="{{ route('curative-experiences.create', $vendor->id) }}"
                                 class="btn wine-btn px-4">Create</a>
                         </div>
@@ -44,10 +44,11 @@
                             <thead>
                                 <tr>
                                     <th>Sr. No.</th>
-                                    <th>Experience Type</th>
-                                    <th>Name</th>
-                                    <th>Admittance</th>
-                                    <th>Extension</th>
+                                    <th>Event Name</th>
+                                    <th>Event Type</th>
+                                    <th>Price</th>
+                                    <th>Event Status</th>
+                                    <th>Admin Approval</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -55,11 +56,19 @@
                                 @if ($experiences->count() > 0)
                                     @foreach ($experiences as $key => $experience)
                                         <tr>
-                                            <td>{{ ($experiences->currentPage() - 1) * $experiences->perPage() + $loop->iteration }}</td>
-                                            <td>{{ optional($experience->category)->name ?? 'N/A' }}</td>
+                                            <td>{{ ($experiences->currentPage() - 1) * $experiences->perPage() + $loop->iteration }}
+                                            </td>
                                             <td>{{ $experience->name ?? 'N/A' }}</td>
-                                            <td>{{ $experience->admittance ?? 'N/A' }}</td>
-                                            <td>{{ $experience->extension ?? 'N/A' }}</td>
+                                            <td>{{ optional($experience->category)->name ?? 'N/A' }}</td>
+                                            <td>{{ !empty($experience->admittance) ? '$' . $experience->admittance : '' }} {{$experience->is_free ? 'Free' : ''}}</td>
+                                            <td>{{ $experience->is_published ? 'Published' : 'Draft' }}</td>
+                                            <td>
+                                                @if ($experience->status == 'active')
+                                                    <span class="badge bg-success">Approved</span>
+                                                @else
+                                                    <span class="badge bg-danger">Pending</span>
+                                                @endif
+                                            </td>
                                             <td>
                                                 <a
                                                     href="{{ route('curative-experiences.edit', [$experience->id, $vendor->id]) }}">
@@ -80,12 +89,12 @@
                                     @endforeach
                                 @else
                                     <tr>
-                                        <td colspan="5" class="text-center">No experiences found.</td>
+                                        <td colspan="7" class="text-center">No experiences found.</td>
                                     </tr>
                                 @endif
                             </tbody>
                         </table>
-                        <div class="pagination justify-content-end">{{ $experiences->links() }}></div>
+                        <div class="pagination justify-content-end">{{ $experiences->links() }}</div>
                     </div>
                 </div>
             </div>
