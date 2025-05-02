@@ -37,10 +37,10 @@
                         <p class="mb-1"><span class="fw-bold">Account Status: </span>
                             {{ $vendor->accountStatus->name ?? '' }}
                         </p>
-                        <p class="mb-1"><span class="fw-bold">Sub Category: </span>Entire
-                            home
+                        <p class="mb-1"><span class="fw-bold">Sub Category: </span>
+                            {{ $vendor->sub_category->name ?? '' }}
                         </p>
-                        <p class="mb-1"><span class="fw-bold">Provision/State:
+                        <p class="mb-1"><span class="fw-bold">Province/State:
                             </span>{{ $vendor->state->name ?? '' }}</p>
                     </div>
                     <div class="my-4">

@@ -27,8 +27,8 @@
                             Support Local
                         </a>
                         <ul class="dropdown-menu p-0">
-                            <li><a class="dropdown-item" href="{{ route('licensed') }}">Licensed</a></li>
-                            <li><a class="dropdown-item" href="{{ route('non-licensed') }}">Non-Licensed</a></li>
+                            <li><a class="dropdown-item" href="{{ route('licensed') }}">Licensees</a></li>
+                            <li><a class="dropdown-item" href="{{ route('non-licensed') }}">Non-Licensees</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">

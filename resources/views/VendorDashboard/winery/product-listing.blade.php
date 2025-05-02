@@ -128,12 +128,12 @@
 
                                                     <!-- <div class="d-flex align-items-center justify-content-between mb-1">
 
-                                                                            <h6 class="wine-title mb-0 fw-bold"><a
-                                                                                    href="{{ route('winery-shop.detail', ['wineid' => $wine->id, 'shopid' => $wine->vendor_id, 'vendorid' => $vendorid]) }}">{{ $vendor->vendor_name }}</a>
+                                                                                            <h6 class="wine-title mb-0 fw-bold"><a
+                                                                                                    href="{{ route('winery-shop.detail', ['wineid' => $wine->id, 'shopid' => $wine->vendor_id, 'vendorid' => $vendorid]) }}">{{ $vendor->vendor_name }}</a>
 
-                                                                            </h6>
+                                                                                            </h6>
 
-                                                                        </div> -->
+                                                                                        </div> -->
 
                                                     <h5 class="fw-bold mb-1">{{ $wine->winery_name }}
 
@@ -149,7 +149,40 @@
                                                         class="rs-value d-flex align-items-center justify-content-between gap-1">
                                                         <h6 class="fs-7 mb-0 fw-bold">Residual Sugars</h6>
                                                         <p class="fs-7 mb-0">
-                                                            {{ $wine->rs ? getResidualSugars($wine->rs, $wine->rs_value) : '-' }}
+                                                            @php
+                                                                $residualSugar = $wine->rs; // Residual sugar category
+                                                                $rsValue = $wine->rs_value; // Actual numeric value
+                                                                $rsValue =
+                                                                    $rsValue == (int) $rsValue
+                                                                        ? (int) $rsValue
+                                                                        : rtrim(rtrim($rsValue, '0'), '.');
+                                                                $label = '';
+                                                                switch ($residualSugar) {
+                                                                    case '0-1':
+                                                                        $label = 'Bone Dry';
+                                                                        break;
+                                                                    case '1-9':
+                                                                        $label = 'Dry';
+                                                                        break;
+                                                                    case '10-49':
+                                                                        $label = 'Off Dry';
+                                                                        break;
+                                                                    case '50-120':
+                                                                        $label = 'Semi-Sweet';
+                                                                        break;
+                                                                    case '120+':
+                                                                        $label = 'Sweet';
+                                                                        break;
+                                                                }
+
+                                                                if (!empty($rsValue)) {
+                                                                    echo $rsValue .
+                                                                        'g/l' .
+                                                                        ($label ? " ({$label})" : '');
+                                                                } elseif ($label) {
+                                                                    echo $label;
+                                                                }
+                                                            @endphp
                                                         </p>
                                                     </div>
                                                     <div
@@ -164,7 +197,7 @@
                                                         @endphp
                                                         <p class="fs-7 mb-0">{{ $grape_varietals }}</p>
                                                     </div>
-                                                @if ($vendor->account_status == 1)
+                                                    @if ($vendor->account_status == 1)
                                                         <div>
                                                             <div
                                                                 class="d-flex align-items-center justify-content-between gap-2 mt-2">
@@ -195,25 +228,26 @@
                                                                         </label>
                                                                     </div>
                                                                 </div>
-                                                                <p class="wine-price fw-bold mb-0">${{ winery_b2b_price($vendor, $wine) }}</p>
+                                                                <p class="wine-price fw-bold mb-0">
+                                                                    ${{ winery_b2b_price($vendor, $wine) }}</p>
                                                             </div>
                                                             <!-- <div
-                                                                                                                class="d-flex align-items-center justify-content-between gap-2 mt-3">
-                                                                                                                <div class="cart-btn text-end">
-                                                                                                                    <a href="javascript:void(0)" data-type="bottle"
-                                                                                                                        data-id="{{ $wine->id }}"
-                                                                                                                        class="btn wine-btn add-to-cart w-100">Add Bottle</a>
-                                                                                                                </div>
-                                                                                                                <div class="cart-btn text-end">
-                                                                                                                    @if ($wine->inventory > 12)
+                                                                                                                                class="d-flex align-items-center justify-content-between gap-2 mt-3">
+                                                                                                                                <div class="cart-btn text-end">
+                                                                                                                                    <a href="javascript:void(0)" data-type="bottle"
+                                                                                                                                        data-id="{{ $wine->id }}"
+                                                                                                                                        class="btn wine-btn add-to-cart w-100">Add Bottle</a>
+                                                                                                                                </div>
+                                                                                                                                <div class="cart-btn text-end">
+                                                                                                                                    @if ($wine->inventory > 12)
     <a href="javascript:void(0)" data-type="case"
-                                                                                                                        data-id="{{ $wine->id }}"
-                                                                                                                        class="btn wine-btn add-to-cart w-100">Add Case</a>
+                                                                                                                                        data-id="{{ $wine->id }}"
+                                                                                                                                        class="btn wine-btn add-to-cart w-100">Add Case</a>
 @else
     <a href="javascript:void(0)" title="Low Inventory" class="btn wine-btn w-100 disabled">Add Case</a>
     @endif
-                                                                                                                </div>
-                                                                                                            </div> -->
+                                                                                                                                </div>
+                                                                                                                            </div> -->
                                                             <div
                                                                 class="d-flex align-items-center justify-content-between gap-2 mt-3">
                                                                 <div class="input-group">

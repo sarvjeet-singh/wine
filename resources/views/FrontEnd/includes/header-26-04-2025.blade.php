@@ -117,15 +117,6 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            Shop
-                        </a>
-                        <ul class="dropdown-menu p-0">
-                            <li><a class="dropdown-item" href="/shop">Wine</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
                             Niagara Region
                         </a>
                         <ul class="dropdown-menu p-0">
@@ -143,8 +134,8 @@
                             Support Local
                         </a>
                         <ul class="dropdown-menu p-0">
-                            <li><a class="dropdown-item" href="{{ route('licensed') }}">Licensees</a></li>
-                            <li><a class="dropdown-item" href="{{ route('non-licensed') }}">Non-Licensees</a></li>
+                            <li><a class="dropdown-item" href="{{ route('licensed') }}">Licensed</a></li>
+                            <li><a class="dropdown-item" href="{{ route('non-licensed') }}">Non-Licensed</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -247,7 +238,7 @@
                     <li>
                         <a href="/licensed"
                             class="text-decoration-none {{ request()->is('licensed') ? 'border-bottom border-dark' : '' }}">
-                            Licensees
+                            Licensed
                         </a>
                         @if (request()->is('licensed'))
                             <span id="records-found" class="text-center">[ {{ $vendorCount }} ]</span>
@@ -256,7 +247,7 @@
                     <li>
                         <a href="/non-licensed"
                             class="text-decoration-none {{ request()->is('non-licensed') ? 'border-bottom border-dark' : '' }}">
-                            Non-Licensees
+                            Non-Licensed
                         </a>
                         @if (request()->is('non-licensed'))
                             <span id="records-found" class="text-center">[ {{ $vendorCount }} ]</span>

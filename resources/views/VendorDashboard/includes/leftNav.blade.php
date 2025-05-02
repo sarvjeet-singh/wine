@@ -220,7 +220,10 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('vendor-settings') ? 'active' : '' }}"
                                 href="{{ route('vendor-settings', ['vendorid' => $id]) }}">
-                                <i class="fas fa-wrench menu-icon"></i> {{ ucfirst($vendor->vendor_type) }} Details
+                                <i class="fas fa-wrench menu-icon"></i> 
+                                {{-- {{ ucfirst($vendor->vendor_type) }}  --}}
+                                Vendor 
+                                Details
                             </a>
                         </li>
                         <li class="nav-item">

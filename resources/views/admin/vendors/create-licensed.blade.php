@@ -82,6 +82,28 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        <div class="col-md-6">
+                                            <div>
+                                                <label for="" class="form-label fw-bold">Licensee #</label>
+                                                <input type="text" class="form-control" name="license_number"
+                                                    value="{{ old('license_number', $vendor->metadata->license_number ?? '') }}"
+                                                    placeholder="License Number">
+                                                @error('license_number')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div>
+                                                <label for="" class="form-label fw-bold">Licensee Expiry</label>
+                                                <input type="date" class="form-control" name="license_expiry_date"
+                                                    value="{{ old('license_expiry_date', $vendor->metadata->license_expiry_date ?? '') }}"
+                                                    placeholder="License Expiry Date" id="datepicker">
+                                                @error('license_expiry_date')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
                                         <div class="col-md-12">
                                             <div>
                                                 <label for="" class="form-label fw-bold">Cuisine</label>

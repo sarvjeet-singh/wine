@@ -79,6 +79,7 @@ class VendorWineController extends Controller
             'series' => 'nullable|string',
             'bottle_size' => 'nullable|string',
             'sku' => 'nullable|string',
+            'retail_price' => 'nullable|numeric',
             'cost' => 'nullable|numeric',
             'commission' => 'nullable|numeric',
             'price' => 'nullable|numeric',
@@ -138,10 +139,11 @@ class VendorWineController extends Controller
         $vendorWine->series = $request->input('series') ?? null;
         $vendorWine->bottle_size = $request->input('bottle_size') ?? null;
         $vendorWine->sku = $request->input('sku') ?? null;
-        $vendorWine->cost = $request->input('cost') ?? 0.00;
+        $vendorWine->retail_price = $request->input('retail_price') ?? null;
+        $vendorWine->cost = $request->input('cost') ?? null;
         $vendorWine->cellar = $request->input('cellar') ?? null;
-        $vendorWine->commission_delivery_fee = $request->input('commission') ?? 0.00;
-        $vendorWine->price = $request->input('price') ?? 0.00;
+        $vendorWine->commission_delivery_fee = $request->input('commission') ?? null;
+        $vendorWine->price = $request->input('price') ?? null;
         $vendorWine->inventory = $request->input('inventory') ?? 0;
         $vendorWine->image = $imagePath;
         $vendorWine->delisted = $request->input('status') == 1 ? 0 : 1;
@@ -177,6 +179,7 @@ class VendorWineController extends Controller
             'series' => 'nullable|string',
             'bottle_size' => 'nullable|string',
             'sku' => 'nullable|string',
+            'retail_price' => 'nullable|numeric',
             'cost' => 'nullable|numeric',
             'commission' => 'nullable|numeric',
             'cellar' => 'nullable|string',
@@ -265,10 +268,11 @@ class VendorWineController extends Controller
             'bottle_size' => $request->input('bottle_size'),
             'series' => $request->input('series'),
             'sku' => $request->input('sku'),
-            'cost' => $request->input('cost') ?? 0.00,
+            'retail_price' => $request->input('retail_price') ?? null,
+            'cost' => $request->input('cost') ?? null,
             'cellar' => $request->input('cellar') ?? null,
-            'commission_delivery_fee' => $request->input('commission') ?? 0.00,
-            'price' => $request->input('price') ?? 0.00,
+            'commission_delivery_fee' => $request->input('commission') ?? null,
+            'price' => $request->input('price') ?? null,
             'inventory' => $request->input('inventory') ?? 0,
             'image' => $imagePath,
             'pdf' => $pdfPath,

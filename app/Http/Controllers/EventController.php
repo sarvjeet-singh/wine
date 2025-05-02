@@ -177,6 +177,10 @@ class EventController extends Controller
             $query->whereIn('genre_id', $request->genres);
         }
 
+        if ($request->has('cities') && is_array($request->cities)) {
+            $query->whereIn('city', $request->cities);
+        }
+
         if ($request->has('event_ratings') && is_array($request->event_ratings)) {
             $query->whereIn('event_rating', $request->event_ratings);
         }

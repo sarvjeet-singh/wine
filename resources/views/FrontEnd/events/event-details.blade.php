@@ -139,14 +139,16 @@
                                         @php
                                             $platform_fee =
                                                 $event->vendor->event_platform_fee ??
-                                                (config('site.platform_fee') ?? '0.00');
+                                                '0.00';
                                         @endphp
                                         {{ !empty($event->admittance) ? '$' . number_format($event->admittance + ($event->admittance * $platform_fee) / 100, 2, '.', '') : '' }}{!! !empty($event->extension) && !empty($event->admittance) ? '<span>' . $event->extension . '</span>' : '' !!}
                                     @endif
                                 </p>
                             </div>
                             <div>
-                                @if ($vendor->account_status == 1)
+                                @if (isset($preview) && $preview == 1)
+                                    <a href="javascript:void(0);" class="btn book-btn">Book Now</a>
+                                @elseif ($vendor->account_status == 1)
                                     @if (!Auth::guard('customer')->check())
                                         <a href="{{ route('check-login', 'book-now') }}" class="btn book-btn">Book Now</a>
                                     @else

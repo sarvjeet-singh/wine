@@ -8,16 +8,22 @@ use Stripe\Stripe;
 use Stripe\Account;
 use Illuminate\Support\Facades\Log;
 
-class CheckStripeStatus extends Command
+class CheckStripePayoutStatus extends Command
 {
-    protected $signature = 'stripe:check-status';
+    protected $signature = 'stripe:check-payout-status';
     protected $description = 'Check all statuses of connected Stripe accounts';
 
     public function handle()
     {
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
-        $vendors = Vendor::whereNotNull('stripe_account_id')->get();
+        $vendors = Vendor::whereNotNull('stripe_account_id')
+            ->where(function ($query) {
+                $query->where('stripe_onboarding_account_status', '!=', 'active')
+                    ->orWhereNull('stripe_onboarding_account_status');
+            })
+            ->get();
+
 
         foreach ($vendors as $vendor) {
             try {

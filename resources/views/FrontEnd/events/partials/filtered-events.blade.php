@@ -68,13 +68,23 @@
 
                             <div>
 
-                                <p class="event-date mb-0 fw-bold"
-                                    @if ($youtubeId) style="bottom:6px;" @endif>
-
-                                    {{ \Carbon\Carbon::parse($event->start_date)->format('d M Y') }}
-
-                                    {{ !empty($event->start_time) ? \Carbon\Carbon::parse($event->start_time)->format('H:i A') : '' }}
-
+                                <p class="event-date mb-0 fw-bold" @if ($youtubeId) style="bottom:6px;" @endif>
+                                    @php
+                                        $startDate = $event->start_date ? \Carbon\Carbon::parse($event->start_date) : null;
+                                        $endDate = $event->end_date ? \Carbon\Carbon::parse($event->end_date) : null;
+                                    @endphp
+                                
+                                    @if ($startDate)
+                                        {{ $startDate->format('d M Y') }}
+                                
+                                        @if ($endDate && $endDate->gt($startDate))
+                                            onwards
+                                        @endif
+                                    @endif
+                                
+                                    @if (!empty($event->start_time))
+                                        {{ \Carbon\Carbon::parse($event->start_time)->format('H:i A') }}
+                                    @endif
                                 </p>
 
                             </div>
@@ -92,7 +102,7 @@
                                         @php
                                             $platform_fee =
                                                 $event->vendor->event_platform_fee ??
-                                                (config('site.platform_fee') ?? '1.00');
+                                                '0.00';
                                         @endphp
                                         {{ !empty($event->admittance) ? '$'. number_format($event->admittance + ($event->admittance * $platform_fee) / 100, 2, '.', '') : '' }}{{ $event->extension }}
 
@@ -126,7 +136,7 @@
                     <div>
 
                         @if (!empty($event->booking_url))
-                            <a href="{{ $event->booking_url }}" class="btn px-3">{{$event->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
+                            <a href="{{ $event->booking_url }}" target="_blank" class="btn px-3">{{$event->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                         @else
                             <a href="{{ route('events.detail', $event->id) }}" class="btn px-3">{{$event->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                         @endif

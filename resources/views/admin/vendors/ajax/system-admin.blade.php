@@ -7,6 +7,9 @@
                 <div class="text-white">System Admin</div>
             </div>
         </div>
+        <div class="alert alert-warning mt-3 d-none" id="platformFeeAlert" role="alert">
+            Kindly add the platform fee under the Platform Fee section.
+        </div>
         <div class="m-3 pb-3">
             <div class="row g-4">
                 <form id="accountForm"
@@ -137,6 +140,24 @@
                     }
                 });
             }
+        });
+    });
+    $(document).ready(function() {
+        function toggleAlert() {
+            var selectedValue = $('input[name="account_status"]:checked').val();
+            if (selectedValue == 1) {
+                $('#platformFeeAlert').removeClass('d-none');
+            } else {
+                $('#platformFeeAlert').addClass('d-none');
+            }
+        }
+
+        // Run on page load
+        toggleAlert();
+
+        // Run on change
+        $('input[name="account_status"]').on('change', function() {
+            toggleAlert();
         });
     });
 </script>

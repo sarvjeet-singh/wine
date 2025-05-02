@@ -189,17 +189,6 @@
                     @enderror
                 </div>
             </div>
-            <div class="col-md-6">
-                <div>
-                    <label for="" class="form-label fw-bold">Platform Fee (%)</label>
-                    <input type="text" class="form-control percent @error('platform_fee') is-invalid @enderror"
-                        name="platform_fee" placeholder="Platform Fee"
-                        value="{{ !empty($vendor) ? $vendor->platform_fee : old('platform_fee') }}">
-                    @error('platform_fee')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
             <div class="col-12">
                 <div>
                     <label for="" class="form-label fw-bold">Description</label>

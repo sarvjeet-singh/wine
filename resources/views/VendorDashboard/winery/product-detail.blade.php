@@ -104,23 +104,23 @@
                                                 </div>
 
                                                 <!-- <div class="d-flex align-items-center gap-2">
-                                                                                            <div class="cart-btn">
-                                                                                                <a href="javascript:void(0)" data-type="bottle"
-                                                                                                    data-id="{{ $wine->id }}" class="btn wine-btn add-to-cart">Add
-                                                                                                    Bottle</a>
-                                                                                            </div>
-                                                                                            <div class="cart-btn">
-                                                                                                @if ($wine->inventory > 12)
+                                                                                                    <div class="cart-btn">
+                                                                                                        <a href="javascript:void(0)" data-type="bottle"
+                                                                                                            data-id="{{ $wine->id }}" class="btn wine-btn add-to-cart">Add
+                                                                                                            Bottle</a>
+                                                                                                    </div>
+                                                                                                    <div class="cart-btn">
+                                                                                                        @if ($wine->inventory > 12)
     <a href="javascript:void(0)" data-type="case"
-                                                                                                        data-id="{{ $wine->id }}"
-                                                                                                        class="btn wine-btn add-to-cart">Add
-                                                                                                        Case</a>
+                                                                                                                data-id="{{ $wine->id }}"
+                                                                                                                class="btn wine-btn add-to-cart">Add
+                                                                                                                Case</a>
 @else
     <a href="javascript:void(0)" class="btn wine-btn disabled">Add
-                                                                                                        Case</a>
+                                                                                                                Case</a>
     @endif
-                                                                                            </div>
-                                                                                        </div> -->
+                                                                                                    </div>
+                                                                                                </div> -->
 
                                             </div>
                                         @endif
@@ -146,17 +146,28 @@
                                                         <th><span class="theme-color fw-bold">Series:</span></th>
                                                         <td><span>{{ $wine->series }}</span></td>
                                                     </tr>
-                                                    <tr>
-                                                        <th><span class="theme-color fw-bold">Cellaring Value:</span></th>
-                                                        <!-- <td><span>{{ $wine->cellar }}</span></td> -->
-                                                        <td>
-                                                            <div class="d-inline">
-                                                                <img src="{{ asset('images/wine-drink.png') }}"
-                                                                    class="img-fluid" alt="Wine Image">
-                                                            </div>
-                                                            <span>{{ $wine->cellar }}</span>
-                                                        </td>
-                                                    </tr>
+                                                    @if (!empty($wine->cellar))
+                                                        <tr>
+                                                            <th><span class="theme-color fw-bold">Cellaring Value:</span>
+                                                            </th>
+                                                            <!-- <td><span>{{ $wine->cellar }}</span></td> -->
+                                                            <td>
+                                                                <div class="d-inline">
+                                                                    <img src="{{ asset('images/wine-drink.png') }}"
+                                                                        class="img-fluid" alt="Wine Image">
+                                                                </div>
+                                                                <span>
+                                                                    @if ($wine->cellar == 'Drink Now')
+                                                                        Drink Now (1-3yrs)
+                                                                    @elseif($wine->cellar == 'Drink or Cellar')
+                                                                        Drink or Hold (4-6yrs)
+                                                                    @else
+                                                                        Cellar (9+yrs)
+                                                                    @endif
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    @endif
                                                     <tr>
                                                         <th><span class="theme-color fw-bold">Vintage Date:</span></th>
                                                         <td><span>{{ $wine->vintage_date }}</span></td>
@@ -199,7 +210,7 @@
                                                                 @endphp</span></td>
                                                     </tr>
                                                     <tr>
-                                                        <th><span class="theme-color fw-bold">Blend:</span></th>
+                                                        <th><span class="theme-color fw-bold">Varietal:</span></th>
 
                                                         <td>
                                                             @if ($wine->varietal_blend)
@@ -212,7 +223,7 @@
                                                                     @foreach ($varietals as $varietal)
                                                                         <div>
                                                                             {{-- Display blend percentage and mapped varietal type --}}
-                                                                            <span>{{ $varietal->blend ?? 'N/A' }}%</span> -
+                                                                            <span>{{ $varietal->blend ?? 'N/A' }}%</span>
                                                                             <span>{{ getGrapeVarietalsById($varietal->type) ?? 'Unknown Type' }}</span>
                                                                         </div>
                                                                     @endforeach
@@ -230,88 +241,88 @@
 
                                         <!-- <div class="wine-feature mt-4">
 
-                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Business/Vendor
+                                                                                                                            <p class="my-1 p-2"><span class="theme-color fw-bold">Business/Vendor
 
-                                                                                                                            Name:</span> {{ $wine->vendor->vendor_name }}</p>
+                                                                                                                                    Name:</span> {{ $wine->vendor->vendor_name }}</p>
 
-                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Region: </span>
+                                                                                                                            <p class="my-1 p-2"><span class="theme-color fw-bold">Region: </span>
 
-                                                                                                                        {{ ucfirst($wine->region) }} </p>
+                                                                                                                                {{ ucfirst($wine->region) }} </p>
 
-                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Sub-Region: </span>
+                                                                                                                            <p class="my-1 p-2"><span class="theme-color fw-bold">Sub-Region: </span>
 
-                                                                                                                        {{ $wine->sub_region }} </p>
+                                                                                                                                {{ $wine->sub_region }} </p>
 
-                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Series: </span>
+                                                                                                                            <p class="my-1 p-2"><span class="theme-color fw-bold">Series: </span>
 
-                                                                                                                        {{ $wine->series }} </p>
+                                                                                                                                {{ $wine->series }} </p>
 
-                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Varietal/Bland: </span>
+                                                                                                                            <p class="my-1 p-2"><span class="theme-color fw-bold">Varietal/Bland: </span>
 
-                                                                                                                        Erem Lpsum</p>
+                                                                                                                                Erem Lpsum</p>
 
-                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Grape Varietals: </span>
+                                                                                                                            <p class="my-1 p-2"><span class="theme-color fw-bold">Grape Varietals: </span>
 
-                                                                                                                        Mrrem psum</p>
+                                                                                                                                Mrrem psum</p>
 
-                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Cellaring Value: </span>
+                                                                                                                            <p class="my-1 p-2"><span class="theme-color fw-bold">Cellaring Value: </span>
 
-                                                                                                                        {{ $wine->cellar }}</p>
+                                                                                                                                {{ $wine->cellar }}</p>
 
-                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Vintage Date: </span>
+                                                                                                                            <p class="my-1 p-2"><span class="theme-color fw-bold">Vintage Date: </span>
 
-                                                                                                                        {{ $wine->vintage_date }} </p>
+                                                                                                                                {{ $wine->vintage_date }} </p>
 
-                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Bottle Size: </span>
+                                                                                                                            <p class="my-1 p-2"><span class="theme-color fw-bold">Bottle Size: </span>
 
-                                                                                                                        {{ $wine->bottle_size }}</p>
+                                                                                                                                {{ $wine->bottle_size }}</p>
 
-                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Alcohol By Volume: </span>
+                                                                                                                            <p class="my-1 p-2"><span class="theme-color fw-bold">Alcohol By Volume: </span>
 
-                                                                                                                        {{ $wine->abv }}%</p>
+                                                                                                                                {{ $wine->abv }}%</p>
 
-                                                                                                                    <p class="my-1 p-2"><span class="theme-color fw-bold">Residual Sugars: </span>
+                                                                                                                            <p class="my-1 p-2"><span class="theme-color fw-bold">Residual Sugars: </span>
 
-                                                                                                                        @php
+                                                                                                                                @php
 
-                                                                                                                            $residualSugar =
-                                                                                                                                $wine->rs; // Replace with the actual variable holding the value
+                                                                                                                                    $residualSugar =
+                                                                                                                                        $wine->rs; // Replace with the actual variable holding the value
 
-                                                                                                                            switch (
-                                                                                                                                $residualSugar
-                                                                                                                            ) {
-                                                                                                                                case '0-1':
-                                                                                                                                    echo '0 - 1 g/l (Bone Dry)';
+                                                                                                                                    switch (
+                                                                                                                                        $residualSugar
+                                                                                                                                    ) {
+                                                                                                                                        case '0-1':
+                                                                                                                                            echo '0 - 1 g/l (Bone Dry)';
 
-                                                                                                                                    break;
+                                                                                                                                            break;
 
-                                                                                                                                case '1-9':
-                                                                                                                                    echo '1 - 9 g/l (Dry)';
+                                                                                                                                        case '1-9':
+                                                                                                                                            echo '1 - 9 g/l (Dry)';
 
-                                                                                                                                    break;
+                                                                                                                                            break;
 
-                                                                                                                                case '10-49':
-                                                                                                                                    echo '10 - 49 g/l (Off Dry)';
+                                                                                                                                        case '10-49':
+                                                                                                                                            echo '10 - 49 g/l (Off Dry)';
 
-                                                                                                                                    break;
+                                                                                                                                            break;
 
-                                                                                                                                case '50-120':
-                                                                                                                                    echo '50 - 120 g/l (Semi-Sweet)';
+                                                                                                                                        case '50-120':
+                                                                                                                                            echo '50 - 120 g/l (Semi-Sweet)';
 
-                                                                                                                                    break;
+                                                                                                                                            break;
 
-                                                                                                                                case '120+':
-                                                                                                                                    echo '120+ g/l (Sweet)';
+                                                                                                                                        case '120+':
+                                                                                                                                            echo '120+ g/l (Sweet)';
 
-                                                                                                                                    break;
+                                                                                                                                            break;
 
-                                                                                                                                default:
-                                                                                                                                    echo 'Unknown';
-                                                                                                                            }
+                                                                                                                                        default:
+                                                                                                                                            echo 'Unknown';
+                                                                                                                                    }
 
-                                                                                                                        @endphp
+                                                                                                                                @endphp
 
-                                                                                                                </div> -->
+                                                                                                                        </div> -->
 
                                     </div>
 
@@ -388,7 +399,8 @@
 
                                                 </h5>
 
-                                                <p class="wine-price fw-bold">${{ number_format(winery_b2b_price($vendor, $wine), 2) }}</p>
+                                                <p class="wine-price fw-bold">
+                                                    ${{ number_format(winery_b2b_price($vendor, $wine), 2) }}</p>
 
                                                 <!-- Add to Cart Button -->
                                                 @if ($vendor->account_status == 1)

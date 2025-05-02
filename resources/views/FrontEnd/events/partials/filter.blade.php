@@ -199,6 +199,42 @@
 
         <div class="accordion-item">
 
+            <h2 class="accordion-header" id="flush-headingCity">
+
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+
+                    data-bs-target="#flush-collapseCity" aria-expanded="false" aria-controls="flush-collapseCity">
+
+                    City / Town
+
+                </button>
+
+            </h2>
+
+            <div id="flush-collapseCity" class="accordion-collapse collapse" aria-labelledby="flush-headingCity">
+                <div class="accordion-body pb-2">
+            
+                    @foreach (getCurativeExperienceCities() as $city)
+                        <div class="form-check mb-2">
+                            <input class="form-check-input city-filter" name="city" type="checkbox"
+                                value="{{ $city }}" id="city-{{ Str::slug($city) }}">
+                            <label class="form-check-label" for="city-{{ Str::slug($city) }}">
+                                {{ $city }}
+                            </label>
+                        </div>
+                    @endforeach
+            
+                    <div class="clear-btn text-end">
+                        <a href="javascript:void(0)" id="clearCities">Clear</a>
+                    </div>
+            
+                </div>
+            </div>
+
+        </div>
+
+        <div class="accordion-item">
+
             <h2 class="accordion-header" id="flush-headingFive">
 
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"

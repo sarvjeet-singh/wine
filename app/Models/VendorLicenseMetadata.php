@@ -14,6 +14,8 @@ class VendorLicenseMetadata extends Model
         'farming_practices',
         'max_group',
         'cuisines',
+        'license_number',
+        'license_expiry_date',
     ];
 
     public function cuisine()

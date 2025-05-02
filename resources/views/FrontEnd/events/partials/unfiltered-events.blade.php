@@ -49,10 +49,23 @@
                         @endif
                         <div class="d-flex align-items-center justify-content-between gap-1 p-2">
                             <div>
-                                <p class="event-date mb-0 fw-bold"
-                                    @if ($youtubeId) style="bottom:6px;" @endif>
-                                    {{ \Carbon\Carbon::parse($todayEvent->start_date)->format('d M Y') }}
-                                    {{ !empty($todayEvent->start_time) ? \Carbon\Carbon::parse($todayEvent->start_time)->format('H:i A') : '' }}
+                                <p class="event-date mb-0 fw-bold" @if ($youtubeId) style="bottom:6px;" @endif>
+                                    @php
+                                        $startDate = $todayEvent->start_date ? \Carbon\Carbon::parse($todayEvent->start_date) : null;
+                                        $endDate = $todayEvent->end_date ? \Carbon\Carbon::parse($todayEvent->end_date) : null;
+                                    @endphp
+                                
+                                    @if ($startDate)
+                                        {{ $startDate->format('d M Y') }}
+                                
+                                        @if ($endDate && $endDate->gt($startDate))
+                                            onwards
+                                        @endif
+                                    @endif
+                                
+                                    @if (!empty($todayEvent->start_time))
+                                        {{ \Carbon\Carbon::parse($todayEvent->start_time)->format('H:i A') }}
+                                    @endif
                                 </p>
                             </div>
                             <div>
@@ -65,7 +78,7 @@
                                         @php
                                             $platform_fee =
                                                 $todayEvent->vendor->event_platform_fee ??
-                                                (config('site.platform_fee') ?? '0.00');
+                                                '0.00';
                                         @endphp
                                         {{ !empty($todayEvent->admittance) ? '$'. number_format($todayEvent->admittance + ($todayEvent->admittance * $platform_fee) / 100, 2, '.', '') : '' }}{{ $todayEvent->extension }}
                                     </p>
@@ -84,7 +97,7 @@
                     </div>
                     <div>
                         @if (!empty($todayEvent->booking_url))
-                            <a href="{{ $todayEvent->booking_url }}" class="btn px-3">{{ $todayEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
+                            <a href="{{ $todayEvent->booking_url }}"  target="_blank" class="btn px-3">{{ $todayEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                         @else
                             <a href="{{ route('events.detail', $todayEvent->id) }}"
                                 class="btn px-3">{{ $todayEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
@@ -148,10 +161,23 @@
                         @endif
                         <div class="d-flex align-items-center justify-content-between gap-1 p-2">
                             <div>
-                                <p class="event-date mb-0 fw-bold"
-                                    @if ($youtubeId) style="bottom:6px;" @endif>
-                                    {{ \Carbon\Carbon::parse($tomorrowEvent->start_date)->format('d M Y') }}
-                                    {{ !empty($tomorrowEvent->start_time) ? \Carbon\Carbon::parse($tomorrowEvent->start_time)->format('H:i A') : '' }}
+                                <p class="event-date mb-0 fw-bold" @if ($youtubeId) style="bottom:6px;" @endif>
+                                    @php
+                                        $startDate = $tomorrowEvent->start_date ? \Carbon\Carbon::parse($tomorrowEvent->start_date) : null;
+                                        $endDate = $tomorrowEvent->end_date ? \Carbon\Carbon::parse($tomorrowEvent->end_date) : null;
+                                    @endphp
+                                
+                                    @if ($startDate)
+                                        {{ $startDate->format('d M Y') }}
+                                
+                                        @if ($endDate && $endDate->gt($startDate))
+                                            onwards
+                                        @endif
+                                    @endif
+                                
+                                    @if (!empty($tomorrowEvent->start_time))
+                                        {{ \Carbon\Carbon::parse($tomorrowEvent->start_time)->format('H:i A') }}
+                                    @endif
                                 </p>
                             </div>
                             <div>
@@ -164,7 +190,7 @@
                                         @php
                                             $platform_fee =
                                                 $tomorrowEvent->vendor->event_platform_fee ??
-                                                (config('site.platform_fee') ?? '0.00');
+                                                '0.00';
                                         @endphp
                                         {{ !empty($tomorrowEvent->admittance) ? '$'. number_format($tomorrowEvent->admittance + ($tomorrowEvent->admittance * $platform_fee) / 100, 2, '.', '') : '' }}{{ $tomorrowEvent->extension }}
                                     </p>
@@ -183,7 +209,7 @@
                     </div>
                     <div>
                         @if (!empty($tomorrowEvent->booking_url))
-                            <a href="{{ $tomorrowEvent->booking_url }}" class="btn px-3">{{ $tomorrowEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
+                            <a href="{{ $tomorrowEvent->booking_url }}"  target="_blank" class="btn px-3">{{ $tomorrowEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                         @else
                             <a href="{{ route('events.detail', $tomorrowEvent->id) }}"
                                 class="btn px-3">{{ $tomorrowEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
@@ -247,10 +273,23 @@
                         @endif
                         <div class="d-flex align-items-center justify-content-between gap-1 p-2">
                             <div>
-                                <p class="event-date mb-0 fw-bold"
-                                    @if ($youtubeId) style="bottom:6px;" @endif>
-                                    {{ \Carbon\Carbon::parse($upcomingEvent->start_date)->format('d M Y') }}
-                                    {{ !empty($upcomingEvent->start_time) ? \Carbon\Carbon::parse($upcomingEvent->start_time)->format('H:i A') : '' }}
+                                <p class="event-date mb-0 fw-bold" @if ($youtubeId) style="bottom:6px;" @endif>
+                                    @php
+                                        $startDate = $upcomingEvent->start_date ? \Carbon\Carbon::parse($upcomingEvent->start_date) : null;
+                                        $endDate = $upcomingEvent->end_date ? \Carbon\Carbon::parse($upcomingEvent->end_date) : null;
+                                    @endphp
+                                
+                                    @if ($startDate)
+                                        {{ $startDate->format('d M Y') }}
+                                
+                                        @if ($endDate && $endDate->gt($startDate))
+                                            onwards
+                                        @endif
+                                    @endif
+                                
+                                    @if (!empty($upcomingEvent->start_time))
+                                        {{ \Carbon\Carbon::parse($upcomingEvent->start_time)->format('H:i A') }}
+                                    @endif
                                 </p>
                             </div>
                             <div>
@@ -263,7 +302,7 @@
                                         @php
                                             $platform_fee =
                                                 $upcomingEvent->vendor->event_platform_fee ??
-                                                (config('site.platform_fee') ?? '0.00');
+                                                '0.00';
                                         @endphp
                                         {{ !empty($upcomingEvent->admittance)
                                             ? '$' . number_format($upcomingEvent->admittance + ($upcomingEvent->admittance * $platform_fee) / 100, 2, '.', '')
@@ -285,7 +324,7 @@
                     </div>
                     <div>
                         @if (!empty($upcomingEvent->booking_url))
-                            <a href="{{ $upcomingEvent->booking_url }}" class="btn px-3">{{ $upcomingEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
+                            <a href="{{ $upcomingEvent->booking_url }}" target="_blank" class="btn px-3">{{ $upcomingEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>
                         @else
                             <a href="{{ route('events.detail', $upcomingEvent->id) }}"
                                 class="btn px-3">{{ $upcomingEvent->vendor->account_status == 1 ? 'Buy Now' : 'View Details' }}</a>

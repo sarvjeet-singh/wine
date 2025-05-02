@@ -29,6 +29,7 @@ class VendorWine extends Model
         'sku',
         'image',
         'cellar',
+        'retail_price',
         'cost',
         'commission_delivery_fee',
         'price',

@@ -4,6 +4,8 @@ use App\Models\Review;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Helpers\TimezoneHelper;
+use App\Models\CurativeExperience;
+use Illuminate\Support\Facades\DB;
 
 // use Auth;
 
@@ -666,11 +668,11 @@ if (!function_exists('platformFeeCalculator')) {
 
         $vendor_type = strtolower($vendor->vendor_type);
         if ($eventID) {
-            $platform_fee = $vendor->event_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+            $platform_fee = $vendor->event_platform_fee ?? '0.00';
         } else {
             if ($vendor_type == 'accommodation') {
                 // Accommodation vendors have a different fee structure
-                $platform_fee = $vendor->accommodation_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+                $platform_fee = $vendor->accommodation_platform_fee ?? '0.00';
             } else if ($vendor_type == 'winery') {
                 if ($wineryb2b) {
                     // B2B wineries have a different fee structure
@@ -681,7 +683,7 @@ if (!function_exists('platformFeeCalculator')) {
                 }
             } else if ($vendor_type == 'excursion') {
                 // Accommodation vendors have a different fee structure
-                $platform_fee = $vendor->excursion_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+                $platform_fee = $vendor->excursion_platform_fee ?? '0.00';
             }
         }
         return number_format($totalAmount * ($platform_fee / 100), 2, '.', '');
@@ -693,11 +695,11 @@ if (!function_exists('platformFee')) {
     {
         $vendor_type = strtolower($vendor->vendor_type);
         if ($eventID) {
-            $platform_fee = $vendor->event_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+            $platform_fee = $vendor->event_platform_fee ?? '0.00';
         } else {
             if ($vendor_type == 'accommodation') {
                 // Accommodation vendors have a different fee structure
-                $platform_fee = $vendor->accommodation_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+                $platform_fee = $vendor->accommodation_platform_fee ?? '0.00';
             } else if ($vendor_type == 'winery') {
                 if ($wineryb2b) {
                     // B2B wineries have a different fee structure
@@ -708,20 +710,20 @@ if (!function_exists('platformFee')) {
                 }
             } else if ($vendor_type == 'excursion') {
                 // Accommodation vendors have a different fee structure
-                $platform_fee = $vendor->excursion_platform_fee ?? (config('site.platform_fee') ?? '0.00');
+                $platform_fee = $vendor->excursion_platform_fee ?? '0.00';
             }
         }
         return $platform_fee;
     }
 }
 
-if(!function_exists('winery_b2b_price')) {
+if (!function_exists('winery_b2b_price')) {
     function winery_b2b_price($vendor, $wine)
     {
         $vendor_type = strtolower($vendor->vendor_type);
         $price = $wine->price;
         if ($vendor_type == 'winery') {
-            if($vendor->stocking_fee_waiver == 1) {
+            if ($vendor->stocking_fee_waiver == 1) {
                 $platform_fee = platformFeeCalculator($vendor, $wine->cost, null, true);
                 $price = $wine->cost + $platform_fee;
             } else {
@@ -730,5 +732,34 @@ if(!function_exists('winery_b2b_price')) {
             }
         }
         return number_format($price, 2, '.', '');
+    }
+}
+
+if (!function_exists('winery_b2c_price')) {
+    function winery_b2c_price($vendor, $wine)
+    {
+        $vendor_type = strtolower($vendor->vendor_type);
+        $price = $wine->retail_price;
+        if ($vendor_type == 'winery') {
+            $platform_fee = platformFeeCalculator($vendor, $wine->cost, null, false);
+            if ($vendor->account_status == 1) {
+                $price = $wine->retail_price + $platform_fee;
+            } else {
+                $price = $wine->retail_price;
+            }
+        }
+        return number_format($price, 2, '.', '');
+    }
+}
+
+if (!function_exists('getCurativeExperienceCities')) {
+    function getCurativeExperienceCities()
+    {
+        return CurativeExperience::select(DB::raw('DISTINCT city'))
+            ->whereNotNull('city')
+            ->where('city', '!=', '')
+            ->orderBy('city')
+            ->pluck('city')
+            ->toArray();
     }
 }

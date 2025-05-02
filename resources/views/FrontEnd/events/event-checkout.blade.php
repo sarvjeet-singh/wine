@@ -558,7 +558,7 @@
         var walletBalance = {{ $wallet->balance ?? 0.0 }};
         var tickets = 1;
         var price = parseFloat(
-            "{{ number_format($event->admittance + ($event->admittance * ($event->vendor->event_platform_fee ?? (config('site.platform_fee') ?? 1.0))) / 100, 2, '.', '') }}"
+            "{{ number_format($event->admittance + ($event->admittance * ($event->vendor->event_platform_fee ?? 0.00)) / 100, 2, '.', '') }}"
         );
         var tax_percentage = {{ $tax ?? 0.0 }};
         var total = 0.00;

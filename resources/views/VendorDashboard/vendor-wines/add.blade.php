@@ -262,10 +262,24 @@
         </div>
 
 
+        <div class="col-md-3">
 
-        <div class="col-md-4">
+            <label for="" class="form-label">Retail Price</label>
 
-            <label for="" class="form-label">Listed Price</label>
+            <div class="input-group mb-3">
+
+                <span class="input-group-text">$</span>
+
+                <input type="text" name="retail_price" placeholder="0.00"
+                    onkeypress="return handleInput(event, this)" id="retail_price" class="form-control"
+                    aria-label="Amount (to the nearest dollar)">
+
+            </div>
+
+        </div>
+        <div class="col-md-3">
+
+            <label for="" class="form-label">List Price</label>
 
             <div class="input-group mb-3">
 
@@ -278,7 +292,7 @@
 
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
 
             <label for="" class="form-label">Stocking Fee</label>
 
@@ -287,7 +301,7 @@
 
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
 
             <label for="" class="form-label">Reseller Price</label>
 
@@ -609,6 +623,48 @@
         });
     });
     $(document).ready(function() {
+        function handleInput(evt, input) {
+            const charCode = (evt.which) ? evt.which : evt.keyCode;
+
+            // Allow: backspace, delete, tab, escape, enter, Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+            if ([8, 9, 27, 13].indexOf(charCode) !== -1 ||
+                (charCode === 65 && evt.ctrlKey === true) ||
+                (charCode === 67 && evt.ctrlKey === true) ||
+                (charCode === 86 && evt.ctrlKey === true) ||
+                (charCode === 88 && evt.ctrlKey === true) ||
+                // Allow: decimal point if it doesn't already exist
+                (charCode === 46 && input.value.indexOf('.') === -1)) {
+                return true;
+            }
+
+            // Prevent any other key presses except numbers
+            if (charCode < 48 || charCode > 57) {
+                return false;
+            }
+
+            // Handle formatting after input
+            setTimeout(() => {
+                let value = input.value;
+
+                // Replace any non-numeric characters (except decimal)
+                value = value.replace(/[^0-9.]/g, '');
+
+                // Split into whole and decimal parts
+                const parts = value.split('.');
+                if (parts.length > 2) {
+                    value = parts[0] + '.' + parts.slice(1).join('').substring(0, 2);
+                } else if (parts.length === 2) {
+                    // Limit decimal part to 2 digits
+                    parts[1] = parts[1].substring(0, 2);
+                    value = parts.join('.');
+                }
+
+                // Update input value
+                input.value = value;
+            }, 0);
+
+            return true;
+        }
         // Function to calculate total bottles from cases and individual bottles
         function calculateTotalBottles() {
             var cases = parseInt($('#casesInput').val(), 10) || 0;
@@ -629,8 +685,8 @@
             var cases = Math.floor(totalBottles / 12);
             var remainingBottles = totalBottles % 12;
 
-            $('#casesInput').val(cases);
-            $('#bottlesInput').val(remainingBottles);
+            $('#casesInput').val(cases > 0 ? cases : '');
+            $('#bottlesInput').val(remainingBottles > 0 ? remainingBottles : '');
         }
 
         // Event listeners for input fields

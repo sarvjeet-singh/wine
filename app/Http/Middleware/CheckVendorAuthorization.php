@@ -20,6 +20,10 @@ class CheckVendorAuthorization
     {
         $user = Auth::user();
         if($user->master_user == 1){
+            $vendorid = $request->route('vendorid');
+            if (is_null($vendorid) || !Vendor::where('id', $vendorid)->exists()) {
+                abort(404, 'No vendor found for the given vendorid in the URL. Please check the URL and try again.');
+            }
             return $next($request);
         }
 

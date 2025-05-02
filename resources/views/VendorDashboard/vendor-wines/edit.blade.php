@@ -353,10 +353,23 @@
             </div>
         </div>
 
+        <div class="col-md-3">
 
-        <div class="col-md-4">
+            <label for="cost" class="form-label">Retail Price</label>
 
-            <label for="cost" class="form-label">Listed Price</label>
+            <div class="input-group mb-3">
+
+                <span class="input-group-text">$</span>
+
+                <input type="text" name="retail_price" placeholder="0.00" onkeypress="return handleInput(event, this)"
+                    id="retail_price" class="form-control" value="{{ old('retail_price', $wine->retail_price) }}">
+
+            </div>
+
+        </div>
+        <div class="col-md-3">
+
+            <label for="cost" class="form-label">List Price</label>
 
             <div class="input-group mb-3">
 
@@ -369,7 +382,7 @@
 
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
 
             <label for="commission" class="form-label">Stocking Fee</label>
 
@@ -379,7 +392,7 @@
 
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
 
             <label for="price" class="form-label">Reseller Price</label>
 
@@ -684,8 +697,8 @@
                 var cases = Math.floor(totalBottles / 12);
                 var remainingBottles = totalBottles % 12;
 
-                $('#casesInput').val(cases);
-                $('#bottlesInput').val(remainingBottles);
+                $('#casesInput').val(cases > 0 ? cases : '');
+                $('#bottlesInput').val(remainingBottles > 0 ? remainingBottles : '');
             }
 
             // Event listeners for input fields
