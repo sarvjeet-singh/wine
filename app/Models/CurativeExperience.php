@@ -38,6 +38,8 @@ class CurativeExperience extends Model
         'venue_phone',
         'event_rating',
         'is_published',
+        'is_featured',
+        'price_type',
     ];
 
     public function category()

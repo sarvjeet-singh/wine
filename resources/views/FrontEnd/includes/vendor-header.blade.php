@@ -28,7 +28,7 @@
                         </a>
                         <ul class="dropdown-menu p-0">
                             <li><a class="dropdown-item" href="{{ route('licensed') }}">Licensees</a></li>
-                            <li><a class="dropdown-item" href="{{ route('non-licensed') }}">Non-Licensees</a></li>
+                            <li><a class="dropdown-item" href="{{ route('non-licensed') }}">Non-Licensed</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">

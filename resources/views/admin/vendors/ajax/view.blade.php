@@ -14,10 +14,10 @@
                             {{ $vendor->vendor_name ?? '' }}</p>
                         <p class="mb-1"><span class="fw-bold">Street Address:</span>
                             {{ $vendor->street_address ?? '' }}</p>
-                        <p class="mb-1"><span class="fw-bold">Sub -Region:</span>
+                        <p class="mb-1"><span class="fw-bold">Sub-Region:</span>
                             {{ $vendor->sub_regions->name ?? '' }}
                         </p>
-                        <p class="mb-1"><span class="fw-bold">City Town</span> {{ $vendor->city ?? '' }}</p>
+                        <p class="mb-1"><span class="fw-bold">City/Town</span> {{ $vendor->city ?? '' }}</p>
                     </div>
                     <div>
                         <h4 class="fw-bold">Vendor Contact</h4>
@@ -37,7 +37,7 @@
                         <p class="mb-1"><span class="fw-bold">Account Status: </span>
                             {{ $vendor->accountStatus->name ?? '' }}
                         </p>
-                        <p class="mb-1"><span class="fw-bold">Sub Category: </span>
+                        <p class="mb-1"><span class="fw-bold">Sub-Category: </span>
                             {{ $vendor->sub_category->name ?? '' }}
                         </p>
                         <p class="mb-1"><span class="fw-bold">Province/State:

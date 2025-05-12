@@ -257,7 +257,7 @@
                     </ul>
                 </div>
                 <div class="d-flex gap-2">
-                    @if ($vendor->business_hours_count > 0 && $vendor->account_status == '1')
+                    @if ($vendor->business_hours_count > 0 && ($vendor->account_status == '1' || $vendor->account_status == '2'))
                         <button type="button" class="btn book-btn open-modal-btn" data-url="get-hours"
                             data-id="{{ $vendor->id }}">
                             Hour’s

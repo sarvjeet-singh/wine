@@ -443,6 +443,8 @@ class VendorController extends Controller
 			'description' => 'nullable|string|max:1000',
 			'hide_street_address' => 'integer|max:1',
 			'website' => 'nullable|string|max:255',
+			'license_number' => 'nullable|string|max:255',
+			'license_expiry_date' => 'nullable|date',
 			'description' => 'required|string|max:1000',
 		]);
 		$vendor = Vendor::find($request->vendorid);
@@ -453,6 +455,16 @@ class VendorController extends Controller
 
 		// Update the vendor with the processed data
 		$vendor->update($data);
+		if(strtolower($vendor->vendor_type) == 'licensed'){
+			$metadata = VendorLicenseMetadata::where('vendor_id', $vendor->id)->first();
+			if (!$metadata) {
+				$metadata = new VendorLicenseMetadata();
+				$metadata->vendor_id = $vendor->id;
+			}
+			$metadata->license_number = $request->license_number ?? NULL;
+			$metadata->license_expiry_date = $request->license_expiry_date ?? NULL;
+			$metadata->save();
+		}
 		return redirect()->route('vendor-settings', ['vendorid' => $vendor->id])
 			->with('property-success', 'Vendor details updated successfully.');
 	}
@@ -827,7 +839,7 @@ class VendorController extends Controller
 	{
 		// Find the vendor using the vendor ID
 		$vendor = Vendor::find($vendorid);
-		$usersCount = Customer::where('guestrewards_vendor_id', $vendorid)->count();
+		$usersCount = Customer::count();
 		$mostCommonLocation = Customer::select('country', 'city', \DB::raw('COUNT(*) as user_count'))
 			->whereNotNull('country') // Exclude NULL countries
 			->where('country', '!=', '') // Exclude empty strings

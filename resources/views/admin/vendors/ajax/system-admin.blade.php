@@ -45,7 +45,28 @@
                                     @endforeach
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <!-- Account Status Sec End -->
+                    <div class="text-center mb-3">
+                        <button type="submit" class="btn theme-btn px-5">Update</button>
+                    </div>
+                </form>
+                <form id="pricePointForm"
+                    action="{{ route('admin.vendor.details.ajax-account-status-update', $vendor->id) }}" method="POST">
+                    <!-- Account Status Sec Start -->
+                    @method('PUT')
+                    @csrf
 
+                    <div class="m-3 pb-4">
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        @endif
+                        <div class="row g-4">
                             <div class="col-12">
                                 <div><label for="" class="form-label fw-bold">Price Point</label></div>
                                 <div class="row g-2">
@@ -74,6 +95,30 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="errorModalLabel">Your profile is incomplete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="errorIntro">
+                    Your profile is incomplete. Please complete the following required sections to get Vendor Partner
+                    status:
+                </p>
+                <ul id="errorMessage" class="mb-0 list-unstyled"></ul>
+            </div>
+            <div class="modal-footer">
+                <p id="completionNote">
+                    Once all sections are complete, your account can be upgraded to “Vendor Partner”, with full access
+                    to all utilities and a “Dedicated Vendor Page”.
+                </p>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     $(document).ready(function() {
         // Initialize form validation
@@ -81,15 +126,85 @@
             rules: {
                 account_status: {
                     required: true
-                },
-                price_point: {
-                    // required: true
                 }
             },
             messages: {
                 account_status: {
                     required: "Please select an account status."
-                },
+                }
+            },
+            errorPlacement: function(error, element) {
+                // Append the error message to the parent container of the closest row
+                error.appendTo(element.closest('.row').parent());
+            },
+            submitHandler: function(form, event) {
+                event.preventDefault(); // Prevent normal form submission
+
+                let vendorid = "{{ $vendor->id }}"; // Get vendor ID
+
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ route('admin.vendor.details.ajax-account-status-update', $vendor->id) }}",
+                    data: {
+                        vendorid: vendorid,
+                        account_status: $('input[name="account_status"]:checked').val()
+                    },
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        let messages = '';
+
+                        if (response.message && Array.isArray(response.message)) {
+                            messages = response.message.map(item => {
+                                let color = item.completed ? 'green' : item
+                                    .is_optional ? 'orange' : 'red';
+                                let icon = item.completed ? '✅' : item.is_optional ?
+                                    '⚠️' : '❌';
+
+                                return `<li style="color: ${color};">
+            ${icon} ${item.message}
+        </li>`;
+                            }).join('');
+                        } else {
+                            messages =
+                                `<li style="color: green;">✅ Vendor is eligible for activation</li>`;
+                        }
+
+                        $('#errorMessage').html(messages);
+
+                        if (response.success) {
+                            $('#errorModalLabel').text('Your profile is complete ✅');
+                            $("#errorIntro").text('Your profile is complete now!');
+                            $("#completionNote").text(
+                                'All sections are completed, your profile will be upgraded to Vendor Partner status.'
+                            );
+                            $('#checkActivationBtn').remove();
+                            $(".modal-header").removeClass("bg-danger").addClass("bg-success");
+                        } else {
+                            $('#errorModalLabel').text('Your profile is incomplete ❌');
+                        }
+
+                        $('#errorModal').modal('show');
+                    },
+                    error: function() {
+                        $('#errorMessage').html(
+                            "<li style='color: red;'>❌ Something went wrong. Please try again.</li>"
+                        );
+                        $('#errorModalLabel').text('Error ❌');
+                        $('#errorModal').modal('show');
+                    }
+                });
+            }
+        });
+        $('#pricePointForm').validate({
+            rules: {
+                price_point: {
+                    // required: true
+                }
+            },
+            messages: {
                 price_point: {
                     // required: "Please select a price point."
                 }
@@ -102,7 +217,7 @@
                 event.preventDefault(); // Prevent normal form submission
 
                 $.ajax({
-                    url: "{{ route('admin.vendor.details.ajax-account-status-update', $vendor->id) }}",
+                    url: "{{ route('admin.vendor.details.ajax-price-point-update', $vendor->id) }}",
                     method: "PUT", // Matches @method('PUT') in the form
                     data: $(form).serialize(),
                     headers: {
@@ -133,7 +248,7 @@
                             // General error message for unexpected errors
                             showToast(
                                 "Error",
-                                "An error occurred while updating account details.",
+                                "An error occurred while updating price point.",
                                 "error"
                             );
                         }
@@ -158,6 +273,11 @@
         // Run on change
         $('input[name="account_status"]').on('change', function() {
             toggleAlert();
+        });
+    });
+    $(document).ready(function() {
+        $('#errorModal').on('hidden.bs.modal', function() {
+            location.reload();
         });
     });
 </script>

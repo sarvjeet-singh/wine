@@ -4,75 +4,80 @@
 
 @section('css')
     <link rel="stylesheet" href="{{ asset('asset/css/select2.min.css') }}">
-<style>
-/* Style for the button loader */
-.loader-btn {
-    position: absolute;
-    /* Absolute positioning */
-    top: 50%;
-    /* Vertically center the loader */
-    left: 50%;
-    /* Horizontally center the loader */
-    transform: translate(-50%, -50%);
-    /* Fine-tune centering */
-    width: 20px;
-    height: 20px;
-    display: none;
-    /* Hidden by default */
-}
+    <style>
+        /* Style for the button loader */
+        .loader-btn {
+            position: absolute;
+            /* Absolute positioning */
+            top: 50%;
+            /* Vertically center the loader */
+            left: 50%;
+            /* Horizontally center the loader */
+            transform: translate(-50%, -50%);
+            /* Fine-tune centering */
+            width: 20px;
+            height: 20px;
+            display: none;
+            /* Hidden by default */
+        }
 
-/* Loader spinner style */
-.loader-btn .spinner {
-    border: 2px solid #f3f3f3;
-    /* Light grey */
-    border-top: 2px solid #3498db;
-    /* Blue */
-    border-radius: 50%;
-    width: 100%;
-    height: 100%;
-    animation: spin 1s linear infinite;
-}
+        /* Loader spinner style */
+        .loader-btn .spinner {
+            border: 2px solid #f3f3f3;
+            /* Light grey */
+            border-top: 2px solid #3498db;
+            /* Blue */
+            border-radius: 50%;
+            width: 100%;
+            height: 100%;
+            animation: spin 1s linear infinite;
+        }
 
-/* Spinner animation */
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
+        /* Spinner animation */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
 
-    100% {
-        transform: rotate(360deg);
-    }
-}
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
-/* Button with relative position to hold the spinner */
-.upload-image-youtube-button {
-    position: relative;
-    padding-right: 30px;
-    /* Make room for the spinner */
-    min-width: 100px;
-    /* Ensure the button has a minimum width */
-    height: 40px;
-    /* Set a fixed height for consistency */
-}
-.select2 span.select2-selection {
-    padding-bottom: 0;
-    border-radius: 6px;
-}
-.select2 ul.select2-selection__rendered {
-    padding: 0 !important;
-}
-.select2 span.select2-selection span.select2-search {
-    height: 36px;
-    display: inline-block;
-}
-.select2 span.select2-selection textarea.select2-search__field {
-    margin-block: 0;
-    height: 15px;
-}
-.select2-container--default .select2-selection--multiple .select2-selection__choice {
-    margin-bottom: 5px;
-}
-</style>
+        /* Button with relative position to hold the spinner */
+        .upload-image-youtube-button {
+            position: relative;
+            padding-right: 30px;
+            /* Make room for the spinner */
+            min-width: 100px;
+            /* Ensure the button has a minimum width */
+            height: 40px;
+            /* Set a fixed height for consistency */
+        }
+
+        .select2 span.select2-selection {
+            padding-bottom: 0;
+            border-radius: 6px;
+        }
+
+        .select2 ul.select2-selection__rendered {
+            padding: 0 !important;
+        }
+
+        .select2 span.select2-selection span.select2-search {
+            height: 36px;
+            display: inline-block;
+        }
+
+        .select2 span.select2-selection textarea.select2-search__field {
+            margin-block: 0;
+            height: 15px;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            margin-bottom: 5px;
+        }
+    </style>
 @endsection
 @section('content')
     <div class="col right-side">
@@ -282,7 +287,7 @@
                                                             <label for="front_License_image" {{-- upload-button --}}
                                                                 class="custom-file-label">
                                                                 <!-- <img src="{{ asset('images/media-gallary/plus-icon.png') }}"
-                                                                                                                                                                                            width="20"> -->
+                                                                                                                                                                                                        width="20"> -->
                                                                 <a href="{{ route('vendor-media-gallary') }}">
                                                                     <i class="fa-solid fa-arrow-up-from-bracket"></i>
                                                                 </a>
@@ -309,6 +314,32 @@
                                     </div>
                                 </div>
                             </div>
+                            @if (strtolower($vendor->vendor_type) == 'licensed')
+                                <div class="row mt-3">
+                                    <div class="col-sm-6 col-12">
+                                        <label class="form-label">Licensee #</label>
+                                        <input type="text"
+                                            class="form-control @error('license_number') is-invalid @enderror"
+                                            name="license_number" maxlength="20"
+                                            value="{{ old('license_number', !empty($metadata->license_number) ? $metadata->license_number : '') }}"
+                                            placeholder="Please enter License Number">
+                                        @error('license_number')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-sm-6 col-12">
+                                        <label class="form-label">License Expiry Date #</label>
+                                        <input type="date"
+                                            class="form-control @error('license_expiry_date') is-invalid @enderror"
+                                            name="license_expiry_date"
+                                            value="{{ old('license_expiry_date', !empty($metadata->license_expiry_date) ? $metadata->license_expiry_date : '') }}"
+                                            placeholder="Please enter License Expiry Date">
+                                        @error('license_expiry_date')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            @endif
                             <div class="row mt-3">
                                 <div class="col-12">
                                     <label class="form-label">Description</label>
@@ -634,7 +665,7 @@
                     </div>
                 </div>
             </div>
-        @endif        
+        @endif
     </div>
     <div class="modal mediaGalleryModal fade" id="editMediaModal" tabindex="-1" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -988,7 +1019,8 @@
 
                 if (regionId) {
                     $.ajax({
-                        url: '{{ route('get.subregions', ['regionId' => ':regionId']) }}' .replace(':regionId', regionId), // Adjust the URL to your route
+                        url: '{{ route('get.subregions', ['regionId' => ':regionId']) }}'.replace(
+                            ':regionId', regionId), // Adjust the URL to your route
                         type: 'GET',
                         dataType: 'json',
                         success: function(data) {

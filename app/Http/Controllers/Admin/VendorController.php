@@ -51,6 +51,7 @@ use App\Models\VendorStripeDetail;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
+use App\Helpers\VendorHelper;
 
 class VendorController extends Controller
 {
@@ -639,8 +640,8 @@ class VendorController extends Controller
     {
         $vendor = Vendor::find($vendor_id);
         $files = VendorFileUpload::where('vendor_id', $vendor_id)
-        ->orderBy('created_at', 'desc')
-        ->paginate(10);
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
         return view('admin.vendors.uploaded-files', compact('vendor', 'files'));
     }
 
@@ -732,21 +733,48 @@ class VendorController extends Controller
     {
         try {
             $vendor = Vendor::findOrFail($id); // Use findOrFail to handle invalid IDs
-
+            $vendorid = $id;
             // Update account status and track the change timestamp
-            if ($vendor->account_status != $request->account_status) {
-                $vendor->account_status_updated_at = \Carbon\Carbon::now();
+            
+
+            if (empty($vendorid)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => ['Vendor ID is required.'], // Return as an array
+                ], 400);
+            }
+            if ($request->account_status == 1) {
+                if (strtolower($vendor->vendor_type) == 'accommodation') {
+                    $response = VendorHelper::canActivateSubscription($vendorid);
+                } else if (strtolower($vendor->vendor_type) == 'winery') {
+                    $response = VendorHelper::canActivateWinerySubscription($vendorid);
+                } else if (strtolower($vendor->vendor_type) == 'excursion') {
+                    $response = VendorHelper::canActivateExcursionSubscription($vendorid);
+                } 
+                // else {
+                //     $response = ['status' => true];
+                //     $vendor->account_status = $request->account_status;
+                //     $vendor->save();
+                // }
+
+                if (is_array($response['messages'])) {
+                    return response()->json([
+                        'success' => $response['status'],
+                        'message' => is_array($response['messages']) ? $response['messages'] : [$response['messages']],
+                    ]);
+                }
             }
 
             $vendor->account_status = $request->account_status;
-            $vendor->price_point = $request->price_point ?? $vendor->price_point ?? null;
-
+            if ($vendor->account_status != $request->account_status) {
+                $vendor->account_status_updated_at = \Carbon\Carbon::now();
+            }
             // Save the updates
             $vendor->save();
 
             // Return success response
             return response()->json([
-                'status' => 'success',
+                'status' => 'true',
                 'message' => 'Account status updated successfully.'
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -760,6 +788,38 @@ class VendorController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while updating the account status.',
+                'error' => $e->getMessage() // Optional: Include error details for debugging
+            ], 500);
+        }
+    }
+
+    public function updatePricePoint(Request $request, $id)
+    {
+        try {
+            $vendor = Vendor::findOrFail($id); // Use findOrFail to handle invalid IDs
+
+            // Update account status and track the change timestamp
+            $vendor->price_point = $request->price_point ?? $vendor->price_point ?? null;
+
+            // Save the updates
+            $vendor->save();
+
+            // Return success response
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Price point updated successfully.'
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Handle case where Vendor is not found
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Vendor not found.'
+            ], 404);
+        } catch (\Exception $e) {
+            // Handle general exceptions
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while updating the price point.',
                 'error' => $e->getMessage() // Optional: Include error details for debugging
             ], 500);
         }

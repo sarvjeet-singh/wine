@@ -551,11 +551,6 @@
                             <table>
                                 <tbody>
                                     <tr>
-                                        <th><span class="theme-color fw-bold">Business/Vendor Name:</span>
-                                        </th>
-                                        <td><span>{{ $wine->vendor->vendor_name }}</span></td>
-                                    </tr>
-                                    <tr>
                                         <th><span class="theme-color fw-bold">Region:</span></th>
                                         <td><span>{{ ucfirst(optional($wine->regions)->name ?? ($wine->custom_region ?? '-')) }}</span>
                                         </td>

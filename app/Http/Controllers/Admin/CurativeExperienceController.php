@@ -75,6 +75,20 @@ class CurativeExperienceController extends Controller
             'status' => $experience->status
         ]);
     }
+
+    public function toggleFeatured(Request $request)
+    {
+        $experience = CurativeExperience::findOrFail($request->id);
+
+        // Toggle status
+        $experience->is_featured = $experience->is_featured === 'active' ? 'inactive' : 'active';
+        $experience->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $experience->is_featured
+        ]);
+    }
     public function bulkStatusUpdate(Request $request)
     {
         $request->validate([

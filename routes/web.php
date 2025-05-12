@@ -396,7 +396,7 @@ Route::group(['middleware' => ['auth:vendor', 'checkPasswordUpdated', 'check.ven
     Route::get('/vendor/vendor-wines/edit/{id}/{vendorid?}', [VendorWineController::class, 'edit'])->name('vendor-wines.edit');
     Route::put('/vendor/vendor-wines/update/{id}/{vendorid?}', [VendorWineController::class, 'update'])->name('vendor-wines.update');
     Route::post('/vendor/vendor-wines/delete/{id}/{vendorid?}', [VendorWineController::class, 'delete'])->name('vendor-wines.destroy');
-    Route::put('/vendorvendor-metadata/update/{vendorid?}', [VendorController::class, 'updateMetadata'])->name('vendor.metadata.update');
+    Route::put('/vendor/vendor-metadata/update/{vendorid?}', [VendorController::class, 'updateMetadata'])->name('vendor.metadata.update');
     Route::put('vendor/user-details-update/{vendorid?}', [VendorController::class, 'userDetailsUpdate'])->name('user.details.update');
     Route::get('/vendorvendor-faqs/{vendorid?}', [VendorController::class, 'vendorFaqs'])->name('vendor-faqs');
     Route::get('/vendor/social-media/{vendorid?}', [VendorController::class, 'vendorSocialMedia'])->name('vendor-social-media');
@@ -521,6 +521,7 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::resource('curative-experience-genres', AdminCurativeExperienceGenreController::class)->names('curative-experience-genres');
         Route::get('curative-experiences/search', [AdminCurativeExperienceController::class, 'search'])->name('curative-experiences.search');
         Route::post('curative-experiences/toggle-status', [AdminCurativeExperienceController::class, 'toggleStatus'])->name('curative-experiences.toggleStatus');
+        Route::post('curative-experiences/toggle-featured', [AdminCurativeExperienceController::class, 'toggleFeatured'])->name('curative-experiences.toggleFeatured');
         Route::post('curative-experiences/bulk-status-update', [AdminCurativeExperienceController::class, 'bulkStatusUpdate'])->name('curative-experiences.bulkStatusUpdate');
         Route::resource('curative-experiences', AdminCurativeExperienceController::class)->names('curative-experiences');
         Route::resource('vendor/subscriptions', AdminVendorSubscriptionController::class)->names('vendor.subscriptions');
@@ -583,7 +584,8 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::get('admin/vendors/vendor-details/{id}/ajax-settings', [AdminVendorController::class, 'getSettingsTab'])->name('admin.vendor.details.ajax-settings');
     Route::post('admin/vendors/vendor-details/{id}/ajax-settings-update', [AdminVendorController::class, 'settingsUpdate'])->name('admin.vendor.details.ajax-settings-update');
     Route::get('admin/vendors/vendor-details/{id}/ajax-system-admin', [AdminVendorController::class, 'getSystemAdminTab'])->name('admin.vendor.details.ajax-system-admin');
-    Route::put('admin/vendors/update-account-status/{id}', [AdminVendorController::class, 'updateAccountStatus'])->name('admin.vendor.details.ajax-account-status-update');
+    Route::post('admin/vendors/update-account-status/{id}', [AdminVendorController::class, 'updateAccountStatus'])->name('admin.vendor.details.ajax-account-status-update');
+    Route::put('admin/vendors/update-price-point/{id}', [AdminVendorController::class, 'updatePricePoint'])->name('admin.vendor.details.ajax-price-point-update');
     Route::get('admin/vendors/vendor-details/{id}/ajax-wines', [AdminVendorController::class, 'getWineTab'])->name('admin.vendor.details.ajax-wines');
     Route::get('admin/vendors/vendor-details/{id}/ajax-view-wine/{wine_id}', [AdminVendorController::class, 'viewWineDetails'])->name('admin.vendor.details.ajax-view-wine');
     Route::post('admin/vendors/vendor-details/{id}/ajax-update-wine/{wine_id}', [AdminVendorController::class, 'updateWineFee'])->name('admin.vendor.details.ajax-update-wine');

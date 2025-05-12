@@ -180,6 +180,7 @@ if (! function_exists('getCuisines')) {
     function getCuisines()
     {
         return \App\Models\Cuisine::where('status', 1)
+            ->orderBy('name', 'asc')
             ->get();
     }
 }

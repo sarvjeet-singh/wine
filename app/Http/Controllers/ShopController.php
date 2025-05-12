@@ -125,9 +125,16 @@ class ShopController extends Controller
         if (!$wine) {
             return redirect()->back();
         }
-        $sliders = VendorWine::where('vendor_id', $shopid);
         $grape_varietals = array_filter(array_map('trim', explode(',', $wine->grape_varietals)));
         // Apply varietals filter if provided
+
+        $sliders = VendorWine::whereHas('vendor', function ($query) {
+            $query->where('account_status', '1')
+                ->orWhere('account_status', '2');
+        })
+            ->where('id', '!=', $wineid)
+            ->where('delisted', 0)
+            ->where('retail_price', '>', 0.00);
         if (is_array($grape_varietals) && count($grape_varietals) > 0) {
             $sliders->where(function ($q) use ($grape_varietals) {
                 foreach ($grape_varietals as $varietal) {
@@ -135,10 +142,7 @@ class ShopController extends Controller
                 }
             });
         }
-        $sliders = $sliders->where('id', '!=', $wineid)
-            ->orderByRaw('CASE WHEN grape_varietals IS NULL THEN 1 ELSE 0 END, grape_varietals ASC')
-            ->where('delisted', 0)
-            ->where('retail_price', '>', 0.00)
+        $sliders = $sliders->orderByRaw('CASE WHEN grape_varietals IS NULL THEN 1 ELSE 0 END, grape_varietals ASC')
             ->orderBy('id', 'desc')
             ->limit(5)
             ->get();

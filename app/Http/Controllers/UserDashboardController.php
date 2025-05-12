@@ -23,6 +23,8 @@ use Mews\Captcha\Captcha;
 
 use \illuminate\Support\Facades\DB;
 use \illuminate\Support\Facades\Auth;
+use App\Mail\AdminReviewNotificationMail;
+use Illuminate\Support\Facades\Mail;
 
 
 class UserDashboardController extends Controller
@@ -320,6 +322,9 @@ class UserDashboardController extends Controller
         $review->review_description = $request->review_description;
         $review->image = $imagePath;
         $review->save();
+
+        // Send email to admin
+        Mail::to(env('ADMIN_EMAIL'))->send(new AdminReviewNotificationMail($review));
 
         // Redirect back with a success message
         return back()->with('success', 'Review submitted successfully.');

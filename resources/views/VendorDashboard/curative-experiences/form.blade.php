@@ -63,7 +63,7 @@
                                         class="btn wine-btn">Preview</a>
                                 @endif
                                 <div class="form-check form-switch ms-3 d-flex align-items-center">
-                                    <input class="form-check-input me-2" type="checkbox" id="statusToggle" value="1"
+                                    <input class="form-check-input me-2" type="checkbox" @if (isset($experience)) {{ ($experience->is_published == 1 && $experience->status == 'active') ? 'disabled' : '' }} @endif id="statusToggle" value="1"
                                         {{ old('status', isset($experience) ? $experience->is_published == 1 : 0) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="statusToggle"
                                         id="toggleLabel">{{ isset($experience) ? ($experience->is_published == 1 ? 'Publish' : 'Draft') : 'Draft' }}</label>
@@ -319,7 +319,7 @@
 
                                 <!-- List Price + Free -->
 
-                                <div class="col-lg-4 col-12">
+                                <div class="col-lg-3 col-12">
 
                                     <div class="row">
 
@@ -368,7 +368,7 @@
 
                                 <!-- Platform Fee -->
 
-                                <div class="col-lg-4 col-12">
+                                <div class="col-lg-3 col-12">
 
                                     <div class="row">
 
@@ -397,7 +397,7 @@
 
                                 <!-- Platform Price -->
 
-                                <div class="col-lg-4 col-12">
+                                <div class="col-lg-3 col-12">
 
                                     <div class="row">
 
@@ -419,6 +419,39 @@
                                             </div>
 
                                         </div>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Price Type -->
+
+                                <div class="col-lg-3 col-12">
+
+                                    <div class="form-floating">
+
+                                        <select name="price_type" class="form-control">
+
+                                            @php
+
+                                                $selectedPriceType = old(
+                                                    'price_type',
+
+                                                    isset($experience) ? $experience->price_type : '',
+                                                );
+
+                                            @endphp
+
+                                            <option value="">Select Price Type</option>
+                                            <option value="fixed" {{ $selectedPriceType == 'fixed' ? 'selected' : '' }}>
+                                                Fixed</option>
+                                            <option value="variable" {{ $selectedPriceType == 'variable' ? 'selected' : '' }}>
+                                                Variable</option>
+                                            </option>
+
+                                        </select>
+
+                                        <label>Price Type</label>
 
                                     </div>
 

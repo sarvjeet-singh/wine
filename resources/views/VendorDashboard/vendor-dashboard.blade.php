@@ -11,7 +11,7 @@
                         <img src="{{ asset('images/icons/total_booking_icon.png') }}">
                     </div>
                     <div class="box-points">{{ $usersCount }}</div>
-                    <div class="box-text mt-1">Guest Rewards</div>
+                    <div class="box-text mt-1">Total Users/QR code users</div>
                 </div>
             </div>
             <div class="col-sm-3">
@@ -29,7 +29,7 @@
                     <div class="box-image">
                         <img src="{{ asset('images/icons/vendor-reviews-box-icon.png') }}">
                     </div>
-                    <div class="box-points">{{ $reviewData->review_count }}, {{ round($reviewData->average_rating, 1) }}
+                    <div class="box-points">{{ $reviewData->review_count }}/{{ round($reviewData->average_rating, 1) }}
                     </div>
                     <div class="box-text">What People Think</div>
                 </div>
@@ -39,7 +39,7 @@
                     <div class="box-image">
                         <img src="{{ asset('images/icons/enhance-points-box.png') }}">
                     </div>
-                    <div class="box-points">40</div>
+                    <div class="box-points">0</div>
                     <div class="box-text">Engagement Points</div>
                 </div>
             </div>
@@ -147,7 +147,7 @@
                 </div>
                 <div class="modal-footer">
                     <p id="completionNote">
-                        "Once all sections are complete, your account can be upgraded to “Vendor Partner”, with full access to all utilities and a “Dedicated Vendor Page”."
+                        Once all sections are complete, your account can be upgraded to “Vendor Partner”, with full access to all utilities and a “Dedicated Vendor Page”.
                     </p>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>

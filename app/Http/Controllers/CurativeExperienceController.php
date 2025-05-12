@@ -61,6 +61,7 @@ class CurativeExperienceController extends Controller
             'venue_name' => 'nullable|string|max:255',
             'venue_phone' => 'nullable|string|max:255',
             'event_rating' => 'nullable|string|max:255',
+            'price_type' => 'nullable|string|in:fixed,variable',
         ];
 
         if ($request->is_published == 1) {
@@ -83,6 +84,7 @@ class CurativeExperienceController extends Controller
                 'venue_phone' => 'required|string|max:255',
                 'event_rating' => 'required|string|max:255',
                 'description' => 'required|string',
+                'price_type' => 'nullable|string|in:fixed,variable',
             ]);
         } else {
             // When not published, only a few fields are required
@@ -182,7 +184,8 @@ class CurativeExperienceController extends Controller
         if (!$curativeExperience) {
             return redirect()->back()->with('error', 'Experience not found.');
         }
-        if ($curativeExperience->is_published == 1) {
+        $curativeExperience->status = 'inactive';
+        if ($curativeExperience->is_published == 1 && $curativeExperience->status == 'active') {
             unset($request['is_published']);
             $request->validate([
                 'name' => 'required|string|max:255',
@@ -223,6 +226,7 @@ class CurativeExperienceController extends Controller
                 'venue_name' => 'nullable|string|max:255',
                 'venue_phone' => 'nullable|string|max:255',
                 'event_rating' => 'nullable|string|max:255',
+                'price_type' => 'nullable|string|in:fixed,variable',
             ];
 
             if ($request->is_published == 1) {
@@ -245,6 +249,7 @@ class CurativeExperienceController extends Controller
                     'venue_phone' => 'required|string|max:255',
                     'event_rating' => 'required|string|max:255',
                     'description' => 'required|string',
+                    'price_type' => 'nullable|string|in:fixed,variable',
                 ]);
             } else {
                 // When not published, only a few fields are required

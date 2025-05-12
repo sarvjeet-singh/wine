@@ -47,6 +47,13 @@ class EventController extends Controller
         $today = Carbon::today();
         $tomorrow = Carbon::tomorrow();
 
+        $featuredEvents = (clone $query)
+            ->where('is_featured', 'active')
+            ->whereDate('end_date', '>=', $today)
+            ->orderBy('start_date', 'asc')
+            ->limit(5)
+            ->get();
+
         // ✅ Get today's events (start_date <= today AND end_date >= today)
         $todayEvents = (clone $query)
             ->whereDate('start_date', '<=', $today)
@@ -80,7 +87,7 @@ class EventController extends Controller
                     ->orWhereDate('end_date', '>=', now());
             })
             ->count();
-        return view('FrontEnd.events.index', compact('todayEvents', 'tomorrowEvents', 'upcomingEvents', 'vendorCount'));
+        return view('FrontEnd.events.index', compact('todayEvents', 'tomorrowEvents', 'upcomingEvents', 'featuredEvents', 'vendorCount'));
     }
 
     public function getEvents(Request $request)
@@ -102,6 +109,14 @@ class EventController extends Controller
 
             $today = Carbon::today();
             $tomorrow = Carbon::tomorrow();
+
+            $featuredEvents = (clone $query)
+                ->where('is_featured', 'active')
+                ->whereDate('start_date', '<=', $today)
+                ->whereDate('end_date', '>=', $today)
+                ->orderBy('start_date', 'asc')
+                ->limit(5)
+                ->get();
 
             // ✅ Get today's events (start_date <= today AND end_date >= today)
             $todayEvents = (clone $query)
@@ -127,7 +142,7 @@ class EventController extends Controller
                 ->limit(3)
                 ->get();
             return response()->json([
-                'html' => view('FrontEnd.events.partials.unfiltered-events', compact('todayEvents', 'tomorrowEvents', 'upcomingEvents'))->render()
+                'html' => view('FrontEnd.events.partials.unfiltered-events', compact('todayEvents', 'tomorrowEvents', 'upcomingEvents', 'featuredEvents'))->render()
             ]);
         }
 
@@ -424,6 +439,11 @@ class EventController extends Controller
             }
             if ($total > 0) {
                 return redirect()->route('events.payment', $customerOrder->id);
+            }
+            // If total is 0, mark the order as completed
+            Mail::to($customer->email)->send(new EventBookingConfirmationMail($order));
+            if (!empty($order->vendor->vendor_email)) {
+                Mail::to($order->vendor->vendor_email)->send(new VendorNewBookingNotificationMail($order));
             }
             return redirect()->route('order.thankyou', ['id' => $customerOrder->id, 'orderType' => 'event']);
         } catch (\Exception $e) {

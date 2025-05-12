@@ -7,6 +7,8 @@ use App\Models\Vendor;
 use Stripe\Stripe;
 use Stripe\Account;
 use Illuminate\Support\Facades\Log;
+use App\Mail\VendorPayoutReadyMail;
+use Illuminate\Support\Facades\Mail;
 
 class CheckStripePayoutStatus extends Command
 {
@@ -48,6 +50,15 @@ class CheckStripePayoutStatus extends Command
 
                 // Update vendor status in DB
                 $vendor->update(['stripe_onboarding_account_status' => $status]);
+
+                if ($status == 'active') {
+                    // Send email only if it transitioned to active (optional safeguard)
+                    if(!empty($vendor->vendor_email)) {
+                        Mail::to($vendor->vendor_email)->send(new VendorPayoutReadyMail($vendor));
+                    } else {
+                        Mail::to(env('ADMIN_EMAIL'))->send(new VendorPayoutReadyMail($vendor));
+                    }
+                }
 
                 Log::info("Vendor {$vendor->id} status updated to: {$status}");
             } catch (\Exception $e) {

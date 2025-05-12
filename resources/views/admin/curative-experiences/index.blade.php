@@ -52,6 +52,7 @@
                                             <th>Account Status</th>
                                             <th>Experience Type</th>
                                             <th>Experience Name</th>
+                                            <th>Featured</th>
                                             <th>Status</th>
                                             <th>Actions</th>
                                         </tr>
@@ -68,6 +69,15 @@
                                                     <td>{{ $experience->vendor->accountStatus->name }}</td>
                                                     <td>{{ $experience->category->name }}</td>
                                                     <td>{{ $experience->name }}</td>
+                                                    <td>
+                                                        <span
+                                                            class="badge toggle-featured {{ $experience->is_featured === 'active' ? 'bg-success' : 'bg-danger' }} text-white"
+                                                            data-id="{{ $experience->id }}"
+                                                            data-featured="{{ $experience->is_featured }}"
+                                                            style="cursor: pointer;">
+                                                            {{ ucfirst($experience->is_featured) }}
+                                                        </span>
+                                                    </td>
                                                     <td>
                                                         <span
                                                             class="badge toggle-status {{ $experience->status === 'active' ? 'bg-success' : 'bg-danger' }} text-white"
@@ -134,6 +144,69 @@
         $("#filter-btn").click(function(e) {
             e.preventDefault();
             $("#searchForm").submit();
+        });
+        $(document).ready(function() {
+            $(".toggle-featured").click(function() {
+                let featuredBadge = $(this);
+                let experienceId = featuredBadge.data("id");
+                let currentFeatured = featuredBadge.data("status");
+                let newFeatured = currentFeatured === "active" ? "inactive" : "active";
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You want to change the featured event to " + newFeatured + "?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, change it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('admin.curative-experiences.toggleFeatured') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                id: experienceId,
+                                status: currentFeatured
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    // Toggle status & class
+                                    featuredBadge.text(response.status.charAt(0)
+                                        .toUpperCase() + response.status.slice(1));
+                                        featuredBadge.data("status", response.status);
+
+                                    if (response.status === "active") {
+                                        featuredBadge.removeClass("bg-danger").addClass(
+                                            "bg-success");
+                                    } else {
+                                        featuredBadge.removeClass("bg-success").addClass(
+                                            "bg-danger");
+                                    }
+
+                                    // Show success message
+                                    Swal.fire({
+                                        title: "Done!",
+                                        text: "Featured has been updated successfully.",
+                                        icon: "success",
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
+                                } else {
+                                    Swal.fire("Error!",
+                                        "Failed to update featured. Please try again.",
+                                        "error");
+                                }
+                            },
+                            error: function() {
+                                Swal.fire("Error!",
+                                    "An error occurred. Please try again.", "error");
+                            }
+                        });
+                    }
+                });
+            });
         });
         $(document).ready(function() {
             $(".toggle-status").click(function() {
