@@ -29,17 +29,17 @@ class VendorHelper
 
         // Check subscription status
         // Check subscription status
-        $subscription = WinerySubscription::where('vendor_id', $vendorId)
-            ->where('status', 'active')
-            ->where('end_date', '>', Carbon::now())
-            ->exists();
+        // $subscription = WinerySubscription::where('vendor_id', $vendorId)
+        //     ->where('status', 'active')
+        //     ->where('end_date', '>', Carbon::now())
+        //     ->exists();
 
 
-        $messages[] = [
-            'message' => '<b><a target="_blank" href="' . route('subscription.index',$vendorId) . '">Subscription Status</b> (Make sure your subscription is active to stay visible on the platform.)',
-            'completed' => !$subscription ? false : true,
-            'is_optional' => false
-        ];
+        // $messages[] = [
+        //     'message' => '<b><a target="_blank" href="' . route('subscription.index',$vendorId) . '">Subscription Status</b> (Make sure your subscription is active to stay visible on the platform.)',
+        //     'completed' => !$subscription ? false : true,
+        //     'is_optional' => false
+        // ];
 
         // Check vendor details completeness
         $requiredVendorFields = [
@@ -256,17 +256,17 @@ class VendorHelper
         }
 
         // Check subscription status
-        $subscription = WinerySubscription::where('vendor_id', $vendorId)
-            ->where('status', 'active')
-            ->where('end_date', '>', Carbon::now())
-            ->exists();
+        // $subscription = WinerySubscription::where('vendor_id', $vendorId)
+        //     ->where('status', 'active')
+        //     ->where('end_date', '>', Carbon::now())
+        //     ->exists();
 
 
-        $messages[] = [
-            'message' => '<b><a target="_blank" href="' . route('subscription.index',$vendorId) . '">Subscription Status</b> (Make sure your subscription is active to stay visible on the platform.)',
-            'completed' => !$subscription ? false : true,
-            'is_optional' => false
-        ];
+        // $messages[] = [
+        //     'message' => '<b><a target="_blank" href="' . route('subscription.index',$vendorId) . '">Subscription Status</b> (Make sure your subscription is active to stay visible on the platform.)',
+        //     'completed' => !$subscription ? false : true,
+        //     'is_optional' => false
+        // ];
         // return ['status' => false, 'messages' => [['message' => 'No active subscription on your account. Please activate your subscription.', 'completed' => false, 'is_optional' => false]]];
 
 
@@ -410,13 +410,13 @@ class VendorHelper
         }
 
         // Check subscription status
-        $subscription = WinerySubscription::where('vendor_id', $vendorId)
-            ->where('status', 'active')
-            ->where('end_date', '>', Carbon::now())
-            ->exists();
-        if (!$subscription) {
-            return ['status' => false, 'messages' => [['message' => 'No active subscription on your account. Please activate your subscription.', 'completed' => false]]];
-        }
+        // $subscription = WinerySubscription::where('vendor_id', $vendorId)
+        //     ->where('status', 'active')
+        //     ->where('end_date', '>', Carbon::now())
+        //     ->exists();
+        // if (!$subscription) {
+        //     return ['status' => false, 'messages' => [['message' => 'No active subscription on your account. Please activate your subscription.', 'completed' => false]]];
+        // }
 
         // Check vendor details
         $requiredVendorFields = [

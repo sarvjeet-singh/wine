@@ -120,7 +120,7 @@
                                             <div>
                                                 <label for="email" class="form-label fw-bold">Email</label>
                                                 <input type="email" id="email" name="email" class="form-control"
-                                                    placeholder="Enter email" autocomplete="off"
+                                                    placeholder="Enter email" @if (isset($user)) disabled @endif autocomplete="off"
                                                     value="{{ old('email', $user->email ?? '') }}">
                                                 @error('email')
                                                     <div class="error">{{ $message }}</div>

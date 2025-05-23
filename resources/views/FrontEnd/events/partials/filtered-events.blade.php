@@ -1,3 +1,17 @@
+@if (!empty($featuredEvents) && count($featuredEvents) > 0)
+    <div class="row g-4 mb-3">
+        <div class="col-12">
+            <div class="event-head position-relative d-flex align-items-center justify-content-between gap-1 py-2">
+                <h3 class="mb-0 fw-bold">Featured Events</h3>
+            </div>
+        </div>
+        @foreach ($featuredEvents as $featuredEvent)
+            @include('FrontEnd.events.partials.event-card', [
+                'event' => $featuredEvent,
+            ])
+        @endforeach
+    </div>
+@endif
 <div class="row g-4 mb-3">
 
     <div class="col-12">

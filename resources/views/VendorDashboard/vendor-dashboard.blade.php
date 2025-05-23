@@ -131,25 +131,24 @@
         </div>
     </div>
     <!-- Error Modal -->
-    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+    <div class="modal fade error-vd-modal" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
+                <div class="modal-header text-white">
                     <h5 class="modal-title" id="errorModalLabel">Your profile is incomplete</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <p id="errorIntro">
+                <div class="modal-body p-4">
+                    <p id="errorIntro" class="fw-bold text-center">
                         Your profile is incomplete. Please complete the following required sections to get Vendor Partner
                         status:
                     </p>
-                    <ul id="errorMessage" class="mb-0 list-unstyled"></ul>
+                    <ul id="errorMessage" class="mb-0 list-unstyled border-top pt-3"></ul>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer text-center">
                     <p id="completionNote">
-                        Once all sections are complete, your account can be upgraded to “Vendor Partner”, with full access to all utilities and a “Dedicated Vendor Page”.
+                        "Once all sections are complete, your account can be upgraded to “Vendor Partner”, with full access to all utilities and a “Dedicated Vendor Page”."
                     </p>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

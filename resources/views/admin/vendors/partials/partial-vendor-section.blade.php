@@ -133,7 +133,7 @@
                             </option>
                         @endforeach
                     </select>
-                    @error('sub_region')
+                    @error('region')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
@@ -193,8 +193,11 @@
                 <div>
                     <label for="" class="form-label fw-bold">Description</label>
                     <div class="form-floating">
-                        <textarea class="form-control @error('description') is-invalid @enderror" name="description" rows="3"
-                            placeholder="Description" style="height: 100px">{{ !empty($vendor) ? $vendor->description : old('description') }}</textarea>
+                        <textarea maxlength="1000" rows="5" class="form-control @error('description') is-invalid @enderror"
+                            name="description" id="description" placeholder="Description" style="height: 100px" placeholder="Please enter description">{{ old('description', $vendor->description) }}</textarea>
+                        <div class="form-text text-end">
+                            <span id="description-count">0</span>/1000
+                        </div>
                         @error('description')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -430,6 +433,20 @@
 
             // Set the formatted value back to the input
             $this.val(value);
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('description');
+            const counter = document.getElementById('description-count');
+            const max = parseInt(textarea.getAttribute('maxlength'), 10);
+
+            // initialize
+            counter.textContent = textarea.value.length;
+
+            textarea.addEventListener('input', () => {
+                counter.textContent = textarea.value.length;
+            });
         });
     </script>
 @endpush

@@ -166,12 +166,12 @@
                     </ul>
                 </div>
             </li>
-            <li class="nav-item my-1">
+            {{-- <li class="nav-item my-1">
                 <a class="nav-link {{ request()->routeIs('subscription.index') ? 'active' : '' }}"
                     href="{{ route('subscription.index', ['vendorid' => $id]) }}">
                     <i class="fas fa-wrench menu-icon"></i> Subscription Plans
                 </a>
-            </li>
+            </li> --}}
             <!-- Parent Menu 6 -->
             <li class="nav-item my-1">
                 <a class="nav-link" data-bs-toggle="collapse" href="#menu6" role="button"

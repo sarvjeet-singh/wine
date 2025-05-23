@@ -267,7 +267,7 @@ class StripeService
             'transfer_data' => [
                 'destination' => $vendor->stripe_account_id, // Connect account ID
             ],
-            'application_fee_amount' => $order->platform_service_fee * 100,
+            'application_fee_amount' => $order->platform_total * 100,
         ];
 
         $paymentIntent = PaymentIntent::create($paymentIntentData);

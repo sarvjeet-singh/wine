@@ -692,7 +692,7 @@ if (!function_exists('platformFeeCalculator')) {
 }
 
 if (!function_exists('platformFee')) {
-    function platformFee($vendor,  $totalAmount, $eventID = null, $wineryb2b = false)
+    function platformFee($vendor,  $totalAmount = 0.00, $eventID = null, $wineryb2b = false)
     {
         $vendor_type = strtolower($vendor->vendor_type);
         if ($eventID) {

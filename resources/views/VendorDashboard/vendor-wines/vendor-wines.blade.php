@@ -222,6 +222,25 @@
     </style>
 
     <div class="col right-side">
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <!-- <div class="upload-container">
                                 <h3>Upload Your Files</h3>
                                 <div class="dropbox" id="dropbox">
@@ -250,8 +269,9 @@
 
                 <!-- Buttons -->
                 <div class="col-md-3 col-12 text-md-end text-start d-flex justify-content-md-end gap-2">
-                    <button type="button" class="btn wine-btn rounded px-4 open-modal-btn" data-url="add"
-                        data-id="{{ $vendor_id }}">Add Wine</button>
+                    {{-- <button type="button" class="btn wine-btn rounded px-4 open-modal-btn" data-url="add"
+                        data-id="{{ $vendor_id }}">Add Wine</button> --}}
+                    <a class="btn wine-btn rounded px-4" href="{{ route('vendor-wines.add', $vendor_id) }}">Add Wine</a>
                     <input type="file" id="fileInput" multiple style="display: none;">
                     <button type="button" id="dropbox" class="btn wine-btn rounded px-4">Upload</button>
                 </div>
@@ -304,11 +324,7 @@
 
                             <td>
 
-                                <a href="javascript:void(0)" class="open-modal-btn"
-                                    data-url=
-
-                                "edit/{{ $wine->id }}"
-                                    data-id="{{ $vendor_id }}"><i class="fa-regular fa-pen-to-square"></i></a>
+                                <a href="{{ route('vendor-wines.edit', ['id' => $wine->id, 'vendorid' => $vendor_id]) }}"><i class="fa-regular fa-pen-to-square"></i></a>
 
                                 <a class="btn-delete mx-2" data-id="{{ $wine->id }}"
                                     data-vendor_id="{{ $vendor_id }}"
@@ -373,69 +389,69 @@
     <script>
         $(document).ready(function() {
 
-            $(document).on('click', '.open-modal-btn', function() {
+            // $(document).on('click', '.open-modal-btn', function() {
 
-                // Get the URL or data-id to load content (if needed)
+            //     // Get the URL or data-id to load content (if needed)
 
-                var url = $(this).data('url') + '/' + $(this).data('id');
-
-
-
-                // Clear previous modal content
-
-                $('#addWineModal .modal-content').html('');
+            //     var url = $(this).data('url') + '/' + $(this).data('id');
 
 
 
-                // Make the AJAX request
+            //     // Clear previous modal content
 
-                $.ajax({
-
-                    url: url, // URL to fetch the data from
-
-                    type: 'GET',
-
-                    dataType: 'html', // Expect HTML response
-
-                    beforeSend: function() {
-
-                        // Optionally show a loader before sending the request
-
-                        $('#addWineModal .modal-content').html(
-
-                            '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>'
-
-                        );
-
-                    },
-
-                    success: function(response) {
-
-                        // Insert the fetched HTML into the modal's body
-
-                        $('#addWineModal .modal-content').html(response);
+            //     $('#addWineModal .modal-content').html('');
 
 
 
-                        // Show the modal after data is fully loaded
+            //     // Make the AJAX request
 
-                        $('#addWineModal').modal('show');
+            //     $.ajax({
 
-                    },
+            //         url: url, // URL to fetch the data from
 
-                    error: function(xhr) {
+            //         type: 'GET',
 
-                        // Handle error
+            //         dataType: 'html', // Expect HTML response
 
-                        $('#addWineModal .modal-content').html(
+            //         beforeSend: function() {
 
-                            '<p>Error loading data. Please try again later.</p>');
+            //             // Optionally show a loader before sending the request
 
-                    }
+            //             $('#addWineModal .modal-content').html(
 
-                });
+            //                 '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>'
 
-            });
+            //             );
+
+            //         },
+
+            //         success: function(response) {
+
+            //             // Insert the fetched HTML into the modal's body
+
+            //             $('#addWineModal .modal-content').html(response);
+
+
+
+            //             // Show the modal after data is fully loaded
+
+            //             $('#addWineModal').modal('show');
+
+            //         },
+
+            //         error: function(xhr) {
+
+            //             // Handle error
+
+            //             $('#addWineModal .modal-content').html(
+
+            //                 '<p>Error loading data. Please try again later.</p>');
+
+            //         }
+
+            //     });
+
+            // });
 
         });
     </script>
@@ -501,147 +517,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            // Initial setup: add a remove button to all existing fields except the first one and remove any add button
-            $('#dynamic-fields-container .dynamic-field:not(:first)').each(function() {
-                $(this).find('.add-field').remove(); // Remove any existing add button
-                if (!$(this).find('.remove-field').length) {
-                    $(this).find('.d-flex.align-items-center').append(`
-                <button type="button" class="btn btn-outline-danger remove-field"><i class="fa-solid fa-circle-minus"></i></button>
-            `);
-                }
-            });
-
-            // Add new field on click
-            $(document).on('click', '#dynamic-fields-container .add-field', function() {
-                // Get all selected options in existing dropdowns
-                let selectedOptions = [];
-                $('#dynamic-fields-container .dynamic-field select[name="varietal_type[]"]').each(
-                    function() {
-                        let value = $(this).val();
-                        if (value) {
-                            selectedOptions.push(value);
-                        }
-                    });
-
-                // Remove add buttons from all other fields to ensure only the last one has the add button
-                $('#dynamic-fields-container .dynamic-field .add-field').remove();
-
-                let newField = `
-                <div class="dynamic-field">
-                    <div class="d-flex align-items-center gap-2 mt-2">
-                        <button type="button" class="btn btn-outline-success add-field"><i class="fa-solid fa-circle-plus"></i></button>
-                        <div class="w-75">
-                            <select class="form-select" name="varietal_type[]">
-                                <option value="">Select</option>
-                                @if (count(getGrapeVarietals()) > 0)
-                                    @foreach (getGrapeVarietals() as $grapeVarietal)
-                                        <option value="{{ $grapeVarietal->id }}">{{ $grapeVarietal->name }}
-                                        </option>
-                                    @endforeach
-                                @endif
-                            </select>
-                        </div>
-                        <div class="w-75">
-                            <div class="input-group">
-                                <input type="text" class="form-control percent" name="varietal_blend[]" placeholder="Varietal/Blend">
-                                <span class="input-group-text">%</span>
-                            </div>
-                        </div>
-                        
-                    </div>
-                </div>`;
-
-                // Append new field to the container
-                let $newField = $(newField);
-                $('#dynamic-fields-container').append($newField);
-
-                // Remove options from the new dropdown that are already selected in previous fields
-                selectedOptions.forEach(function(value) {
-                    $newField.find(`select[name="varietal_type[]"] option[value="${value}"]`)
-                        .remove();
-                });
-
-                // Add remove buttons to all previous fields and remove any add buttons
-                $('#dynamic-fields-container .dynamic-field:not(:last) .d-flex.align-items-center').each(
-                    function() {
-                        $(this).find('.add-field').remove(); // Remove add buttons
-                        if (!$(this).find('.remove-field').length) {
-                            $(this).prepend(`
-                    <button type="button" class="btn btn-outline-danger remove-field"><i class="fa-solid fa-circle-minus"></i></button>
-                `);
-                        }
-                    });
-            });
-
-            // Remove field on click
-            $(document).on('click', '#dynamic-fields-container .remove-field', function() {
-                $(this).closest('.dynamic-field').remove();
-            });
-        });
-    </script>
-    <script>
-        $(document).on('input', '.percent', function() {
-            var $this = $(this);
-            var value = $(this).val();
-            // Remove all non-numeric characters except the decimal point
-            value = value.replace(/[^0-9.]/g, '');
-
-            // Ensure the value does not start with a decimal point
-            if (value.startsWith('.')) {
-                value = '0' + value;
-            }
-
-            // Split the value into whole and decimal parts
-            var parts = value.split('.');
-
-            // Limit decimal places to two
-            if (parts.length > 2) {
-                value = parts[0] + '.' + parts.slice(1).join('');
-            }
-
-            // If there is a decimal point, limit the number of decimal places to two
-            if (parts.length === 2) {
-                parts[1] = parts[1].slice(0, 2);
-                value = parts.join('.');
-            }
-
-            // Convert value to number and ensure it's within the range 0 to 100
-            var numericValue = parseFloat(value);
-            // if (isNaN(numericValue)) {
-            //     value = '';
-            // } else 
-
-            if (numericValue > 100) {
-                value = '100';
-            } else if (numericValue < 0) {
-                value = '0';
-            }
-
-            // Set the formatted value back to the input
-            $this.val(value);
-        });
-        $(document).on('change', '#image', function(event) {
-            $('#imageRemoved').val('false');
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    $('#imagePreview').attr('src', e.target.result).show();
-                    $('#removeImage').show();
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        $(document).on('click', '#removeImage', function() {
-            $('#image').val(''); // Clear the input value
-            $('#imagePreview').attr('src', '').hide(); // Hide the image preview
-            $(this).hide(); // Hide the remove button
-            $('#imageRemoved').val('true');
-        });
-    </script>
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -783,25 +659,6 @@
                     xhr.send(formData);
                 });
             }
-        });
-    </script>
-    <script>
-        $(document).on('shown.bs.modal', '#addWineModal', function() {
-            const $toggle = $('#statusToggle');
-            const $label = $('#toggleLabel');
-            const $statusInput = $("#wineStatus");
-
-            function updateLabel() {
-                const isChecked = $toggle.is(':checked');
-                $label.text(isChecked ? 'Publish' : 'Draft');
-                $statusInput.val(isChecked ? 1 : 0);
-            }
-
-            // Attach change event (once modal content is visible)
-            $toggle.off('change').on('change', updateLabel);
-
-            // Set initial label
-            updateLabel();
         });
     </script>
 @endsection

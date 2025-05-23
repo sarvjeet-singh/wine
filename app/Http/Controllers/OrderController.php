@@ -217,6 +217,19 @@ class OrderController extends Controller
             $vendor = Vendor::find($booking['vendor_id']);
             $platform_service_fee_percentage = platformFee($vendor, $order_total);
             $platform_service_fee = platformFeeCalculator($vendor, $order_total);
+
+            $vendorTaxPercentage = !empty($vendor->accommodationMetadata->applicable_taxes_amount) ? $vendor->accommodationMetadata->applicable_taxes_amount : ''; // for example, 10%
+            $platformTaxPercentage = !empty($vendor->accommodationMetadata->applicable_taxes_amount) ? $vendor->accommodationMetadata->applicable_taxes_amount : ''; // for example, 10%
+
+            $vendor_tax = ($sub_total * $vendorTaxPercentage) / 100;
+            $platform_tax = ($platform_service_fee * $platformTaxPercentage) / 100;
+
+            $vendor_transaction_fee = round(($sub_total * 0.029) + 0.30, 2);
+            $platform_transaction_fee = round(($platform_service_fee * 0.029), 2);
+
+            $vendor_total = $sub_total + $vendor_tax - $vendor_transaction_fee;
+            $platform_total = $platform_service_fee + $platform_tax - $platform_transaction_fee;
+
             $order += [
                 'customer_id' => Auth::guard('customer')->user()->id,
                 'vendor_id' => $booking['vendor_id'],
@@ -241,6 +254,17 @@ class OrderController extends Controller
                 'platform_service_fee_percentage' => $platform_service_fee_percentage,
                 'platform_service_fee' => $platform_service_fee,
                 'inquiry_id' => $inquiry_id,
+
+
+                // New fields
+                'vendor_tax' => $vendor_tax,
+                'platform_tax' => $platform_tax,
+                'vendor_total' => $vendor_total,
+                'platform_total' => $platform_total,
+                'vendor_transaction_fee' => $vendor_transaction_fee,
+                'platform_transaction_fee' => $platform_transaction_fee,
+                'vendor_tax_percentage' => $vendorTaxPercentage,
+                'platform_tax_percentage' => $platformTaxPercentage,
             ];
             // Create order
             $order = Order::create($order);

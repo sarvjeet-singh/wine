@@ -287,7 +287,7 @@
                                                             <label for="front_License_image" {{-- upload-button --}}
                                                                 class="custom-file-label">
                                                                 <!-- <img src="{{ asset('images/media-gallary/plus-icon.png') }}"
-                                                                                                                                                                                                        width="20"> -->
+                                                                                                                                                                                                                width="20"> -->
                                                                 <a href="{{ route('vendor-media-gallary') }}">
                                                                     <i class="fa-solid fa-arrow-up-from-bracket"></i>
                                                                 </a>
@@ -343,8 +343,11 @@
                             <div class="row mt-3">
                                 <div class="col-12">
                                     <label class="form-label">Description</label>
-                                    <textarea class="form-control @error('description') is-invalid @enderror" name="description"
-                                        placeholder="Please enter description">{{ old('description', $vendor->description) }}</textarea>
+                                    <textarea maxlength="1000" rows="5" class="form-control @error('description') is-invalid @enderror"
+                                        name="description" id="description" placeholder="Please enter description">{{ old('description', $vendor->description) }}</textarea>
+                                    <div class="form-text text-end">
+                                        <span id="description-count">0</span>/1000
+                                    </div>
                                     @error('description')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -1043,6 +1046,20 @@
                     subRegionSelect.empty();
                     subRegionSelect.append('<option value="">Please select a sub-region</option>');
                 }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('description');
+            const counter = document.getElementById('description-count');
+            const max = parseInt(textarea.getAttribute('maxlength'), 10);
+
+            // initialize
+            counter.textContent = textarea.value.length;
+
+            textarea.addEventListener('input', () => {
+                counter.textContent = textarea.value.length;
             });
         });
     </script>

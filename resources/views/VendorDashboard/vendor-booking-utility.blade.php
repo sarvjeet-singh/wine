@@ -193,7 +193,7 @@
 
                                 <div class="row mt-3">
                                     <div class="col-sm-4 col-12">
-                                        <label class="form-label">Host*</label>
+                                        <label class="form-label">Host</label>
                                         <input type="text" name="host"
                                             value="{{ old('host', !empty($vendor->host) ? $vendor->host : '') }}"
                                             class="form-control" id="host" placeholder="Host"

@@ -73,26 +73,6 @@
             @include('UserDashboard.includes.leftNav')
             <div class="col right-side">
                 <div class="row g-3">
-                    @if (Auth::guard('customer')->user()->profile_completed == 0)
-                        <div class="col-12">
-                            <div class="d-flex flex-column align-items-end text-center"
-                                style="height: 100%;">
-                                <button id="checkActivationBtn" class="btn btn-primary wine-btn rounded-2 px-3">
-                                    <i class="fa-solid fa-user"></i>
-                                    <span>Complete Your Profile</span>
-                                </button>
-                            </div>
-                        </div>
-                    @endif
-                    @if (Auth::guard('customer')->user()->profile_completed == 1)
-                        <div class="col-12">
-                            <div class="d-flex flex-column align-items-start text-center"
-                                style="height: 100%;">
-                                <i class="fa fa-check-circle text-success mb-1"></i>
-                                <span>Profile Fully Completed</span>
-                            </div>
-                        </div>
-                    @endif
                     <!-- <div class="col-lg-4 col-6">
                         <div class="top-boxes">
                             <div class="box-image">
@@ -146,13 +126,35 @@
                     </div>
                 </div>
                 <!-- User Profile Box Start -->
-                <div class="row mt-5">
-                    @if (empty(Auth::user()->profile_image))
+                <div class="row mt-4">
+                   <!--  @if (empty(Auth::user()->profile_image))
                         <div class="col-12">
                             <h5 class="fw-bold mb-3 theme-color">Please upload a profile headshot so your testimonials &
                                 reviews can be publicly posted.</h5>
                         </div>
-                    @endif
+                    @endif -->
+                    <div class="col-12 mb-3">
+                         @if (Auth::guard('customer')->user()->profile_completed == 0)
+                            <div class="col-12">
+                                <div class="d-flex flex-column align-items-end text-center"
+                                    style="height: 100%;">
+                                    <button id="checkActivationBtn" class="btn btn-success rounded-2 px-3">
+                                        <i class="fa-solid fa-user"></i>
+                                        <span>Complete Your Profile</span>
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
+                        @if (Auth::guard('customer')->user()->profile_completed == 1)
+                            <div class="col-12">
+                                <div class="d-flex flex-column align-items-start text-center"
+                                    style="height: 100%;">
+                                    <i class="fa fa-check-circle text-success mb-1"></i>
+                                    <span>Profile Fully Completed</span>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
                     <div class="col-sm-12">
                         <div class="information-box">
                             <div class="information-box-head grey-head">
@@ -271,12 +273,12 @@
 
                 <!-- User Guest Registry Start -->
                 <div class="row mt-5">
-                    @if (Auth::user()->form_guest_registry_filled == 0)
+                    <!-- @if (Auth::user()->form_guest_registry_filled == 0)
                         <div class="col-12">
                             <h5 class="fw-bold mb-3 theme-color">Please complete the Guest Registry to process transactions
                                 and access your Bottle Bucks credits.</h5>
                         </div>
-                    @endif
+                    @endif -->
                     <div class="col-sm-12">
                         <div class="information-box guest-reg-sec">
                             <div class="information-box-head grey-head">
@@ -364,7 +366,7 @@
                                     <div class="row mt-5">
                                         <div class="col-sm-12 text-sm-start text-center">
                                             <a href="{{ route('user-guest-registry') }}" class="btn wine-btn">Add
-                                                Government ID Proof</a>
+                                                Government ID</a>
                                         </div>
                                     </div>
                                 @endif

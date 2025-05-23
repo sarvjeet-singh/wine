@@ -26,6 +26,14 @@ class CustomerOrder extends Model
         'listed_price',
         'platform_fee_percentage',
         'platform_service_fee',
+        'vendor_tax',
+        'platform_tax',
+        'vendor_total',
+        'platform_total',
+        'vendor_transaction_fee',
+        'platform_transaction_fee',
+        'vendor_tax_percentage',
+        'platform_tax_percentage',
     ];
 
     public function eventOrderDetail()

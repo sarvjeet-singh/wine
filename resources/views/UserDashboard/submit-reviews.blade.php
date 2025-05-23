@@ -141,6 +141,20 @@
                                         {{ session('success') }}
                                     </div>
                                 @endif
+                                @if (session('error'))
+                                    <div class="alert alert-danger">
+                                        {{ session('error') }}
+                                    </div>
+                                @endif
+                                @if($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
                                 <form method="post" action="{{ route('user-reviews-submit') }}" enctype="multipart/form-data">
                                     @csrf
                                     <input type="hidden" name="rating" value="0" id="rating">

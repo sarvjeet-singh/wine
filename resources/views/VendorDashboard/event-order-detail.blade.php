@@ -343,7 +343,7 @@
 
                                         <p class="fw-bold mb-0">Sub-Totals:</p>
 
-                                        <p class="fw-bold mb-0">${{ number_format($order->sub_total, 2, '.', '') }}</p>
+                                        <p class="fw-bold mb-0">${{ number_format($order->vendor_price, 2, '.', '') }}</p>
 
                                     </div>
                                     @if ($order->wallet_used != 0)
@@ -360,7 +360,15 @@
 
                                         <p class="fw-bold mb-0">Taxes:</p>
 
-                                        <p class="fw-bold mb-0">${{ number_format($order->tax, 2, '.', '') }}</p>
+                                        <p class="fw-bold mb-0">${{ number_format($order->vendor_tax, 2, '.', '') }}</p>
+
+                                    </div>
+
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+
+                                        <p class="fw-bold mb-0">Transaction Fee:</p>
+
+                                        <p class="fw-bold mb-0">${{ number_format($order->vendor_transaction_fee, 2, '.', '') }}</p>
 
                                     </div>
 
@@ -370,7 +378,7 @@
 
                                         <p class="fw-bold mb-0 fs-5">
 
-                                            ${{ number_format($order->total, 2, '.', '') }}</p>
+                                            ${{ number_format($order->vendor_total, 2, '.', '') }}</p>
 
                                     </div>
 

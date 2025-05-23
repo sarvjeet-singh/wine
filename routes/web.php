@@ -402,18 +402,23 @@ Route::group(['middleware' => ['auth:vendor', 'checkPasswordUpdated', 'check.ven
     Route::get('/vendor/social-media/{vendorid?}', [VendorController::class, 'vendorSocialMedia'])->name('vendor-social-media');
     Route::get('/vendor/referrals/{vendorid?}', [VendorController::class, 'vendorReferrals'])->name('vendor-referrals');
 
-    // Subscription Routes
-    Route::get('/vendor/subscription/list/{vendorid?}', [SubscriptionController::class, 'index'])->name('subscription.index');
-    Route::get('/vendor/subscribe/{vendorid?}', [SubscriptionController::class, 'createCheckoutSession']);
-    Route::get('/vendor/subscription/success/{vendorid?}', [SubscriptionController::class, 'success'])->name('subscription.success');
-    Route::get('/vendor/subscription/cancel/{vendorid?}', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
-    Route::post('/vendor/subscription/create-payment-intent/{vendorid?}', [SubscriptionController::class, 'createPaymentIntent'])->name('subscription.createPaymentIntent');
-    Route::post('/vendor/subscription/update-status/{vendorid?}', [SubscriptionController::class, 'updateStatus'])->name('subscription.updateStatus');
+    // Subscription Routes starts
+    // Route::get('/vendor/subscription/list/{vendorid?}', [SubscriptionController::class, 'index'])->name('subscription.index');
+    // Route::get('/vendor/subscribe/{vendorid?}', [SubscriptionController::class, 'createCheckoutSession']);
+    // Route::get('/vendor/subscription/success/{vendorid?}', [SubscriptionController::class, 'success'])->name('subscription.success');
+    // Route::get('/vendor/subscription/cancel/{vendorid?}', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    // Route::post('/vendor/subscription/create-payment-intent/{vendorid?}', [SubscriptionController::class, 'createPaymentIntent'])->name('subscription.createPaymentIntent');
+    // Route::post('/vendor/subscription/update-status/{vendorid?}', [SubscriptionController::class, 'updateStatus'])->name('subscription.updateStatus');
     // Cancel subscription route
-    Route::post('/vendor/subscription/cancel-subscription/{vendorid?}', [SubscriptionController::class, 'cancelSubscription'])->name('subscription.cancel');
-    Route::get('/vendor/subscription/get-subscription/{vendorid?}', [SubscriptionController::class, 'showSubscriptionDetail'])->name('subscription.detail');
+    // Route::post('/vendor/subscription/cancel-subscription/{vendorid?}', [SubscriptionController::class, 'cancelSubscription'])->name('subscription.cancel');
+    // Route::get('/vendor/subscription/get-subscription/{vendorid?}', [SubscriptionController::class, 'showSubscriptionDetail'])->name('subscription.detail');
+    // Subscription Routes ends
+    
     Route::get('/vendor/stripe-details/{vendorid?}', [VendorStripeDetailController::class, 'show'])->name('stripe.details.show');
     Route::post('/vendor/check-activation/{vendorid?}', [VendorController::class, 'checkActivation'])->name('vendor.activation.check');
+    
+    
+    
     // Route::post('/vendor/update-stripe-details/{vendorid?}', [VendorStripeDetailController::class, 'update'])->name('stripe.details.update');
 
     // Route::post('/subscribe', [SubscriptionController::class, 'createSubscription'])->name('create.subscription');
@@ -524,7 +529,7 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::post('curative-experiences/toggle-featured', [AdminCurativeExperienceController::class, 'toggleFeatured'])->name('curative-experiences.toggleFeatured');
         Route::post('curative-experiences/bulk-status-update', [AdminCurativeExperienceController::class, 'bulkStatusUpdate'])->name('curative-experiences.bulkStatusUpdate');
         Route::resource('curative-experiences', AdminCurativeExperienceController::class)->names('curative-experiences');
-        Route::resource('vendor/subscriptions', AdminVendorSubscriptionController::class)->names('vendor.subscriptions');
+        // Route::resource('vendor/subscriptions', AdminVendorSubscriptionController::class)->names('vendor.subscriptions');
     });
     Route::post('/check-vendor-combination', [AdminVendorController::class, 'checkVendorCombination'])->name('check.vendor.combination');
     Route::get('/admin/filter/search', [AdminVendorController::class, 'filterSearch'])->name('admin.vendors.search');

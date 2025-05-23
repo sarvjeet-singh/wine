@@ -63,7 +63,9 @@
                                         class="btn wine-btn">Preview</a>
                                 @endif
                                 <div class="form-check form-switch ms-3 d-flex align-items-center">
-                                    <input class="form-check-input me-2" type="checkbox" @if (isset($experience)) {{ ($experience->is_published == 1 && $experience->status == 'active') ? 'disabled' : '' }} @endif id="statusToggle" value="1"
+                                    <input class="form-check-input me-2" type="checkbox"
+                                        @if (isset($experience)) {{ $experience->is_published == 1 && $experience->status == 'active' ? 'disabled' : '' }} @endif
+                                        id="statusToggle" value="1"
                                         {{ old('status', isset($experience) ? $experience->is_published == 1 : 0) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="statusToggle"
                                         id="toggleLabel">{{ isset($experience) ? ($experience->is_published == 1 ? 'Publish' : 'Draft') : 'Draft' }}</label>
@@ -428,31 +430,18 @@
 
                                 <div class="col-lg-3 col-12">
 
-                                    <div class="form-floating">
+                                    <div class="form-check">
+                                        @php
+                                            $isVariable =
+                                                old('price_type', isset($experience) ? $experience->price_type : '') ==
+                                                '1';
+                                        @endphp
 
-                                        <select name="price_type" class="form-control">
+                                        <input type="checkbox" class="form-check-input" id="price_type_variable"
+                                            name="price_type" value="1" {{ $isVariable ? 'checked' : '' }}>
 
-                                            @php
-
-                                                $selectedPriceType = old(
-                                                    'price_type',
-
-                                                    isset($experience) ? $experience->price_type : '',
-                                                );
-
-                                            @endphp
-
-                                            <option value="">Select Price Type</option>
-                                            <option value="fixed" {{ $selectedPriceType == 'fixed' ? 'selected' : '' }}>
-                                                Fixed</option>
-                                            <option value="variable" {{ $selectedPriceType == 'variable' ? 'selected' : '' }}>
-                                                Variable</option>
-                                            </option>
-
-                                        </select>
-
-                                        <label>Price Type</label>
-
+                                        <label class="form-check-label" for="price_type_variable">Is Variable
+                                            Price?</label>
                                     </div>
 
                                 </div>

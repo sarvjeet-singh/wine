@@ -36,6 +36,9 @@ class CurativeExperienceController extends Controller
 
     public function store(Request $request, $vendorid)
     {
+        if(!isset($request->price_type)) {
+            $request['price_type'] = 0;
+        }
         $baseRules = [
             'is_published' => 'required|boolean',
             'category_id' => 'exists:curative_experience_categories,id',
@@ -61,7 +64,7 @@ class CurativeExperienceController extends Controller
             'venue_name' => 'nullable|string|max:255',
             'venue_phone' => 'nullable|string|max:255',
             'event_rating' => 'nullable|string|max:255',
-            'price_type' => 'nullable|string|in:fixed,variable',
+            'price_type' => 'nullable|string|in:0,1',
         ];
 
         if ($request->is_published == 1) {
@@ -84,7 +87,7 @@ class CurativeExperienceController extends Controller
                 'venue_phone' => 'required|string|max:255',
                 'event_rating' => 'required|string|max:255',
                 'description' => 'required|string',
-                'price_type' => 'nullable|string|in:fixed,variable',
+                'price_type' => 'nullable|in:0,1',
             ]);
         } else {
             // When not published, only a few fields are required
@@ -174,13 +177,16 @@ class CurativeExperienceController extends Controller
             $experience->youtube_url = $experience->image;
             $experience->image = null;
         }
-        // print_r($experience); die;
+        
         return view('VendorDashboard.curative-experiences.form', compact('experience', 'categories', 'vendor', 'genres'));
     }
 
     public function update(Request $request, $id, $vendorid)
     {
         $curativeExperience = CurativeExperience::find($id);
+        if(!isset($request->price_type)) {
+            $request['price_type'] = 0;
+        }
         if (!$curativeExperience) {
             return redirect()->back()->with('error', 'Experience not found.');
         }
@@ -226,7 +232,7 @@ class CurativeExperienceController extends Controller
                 'venue_name' => 'nullable|string|max:255',
                 'venue_phone' => 'nullable|string|max:255',
                 'event_rating' => 'nullable|string|max:255',
-                'price_type' => 'nullable|string|in:fixed,variable',
+                'price_type' => 'nullable|in:0,1',
             ];
 
             if ($request->is_published == 1) {
@@ -249,7 +255,7 @@ class CurativeExperienceController extends Controller
                     'venue_phone' => 'required|string|max:255',
                     'event_rating' => 'required|string|max:255',
                     'description' => 'required|string',
-                    'price_type' => 'nullable|string|in:fixed,variable',
+                    'price_type' => 'nullable|in:0,1',
                 ]);
             } else {
                 // When not published, only a few fields are required

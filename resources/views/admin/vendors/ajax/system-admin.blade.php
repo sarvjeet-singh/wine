@@ -154,46 +154,70 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        let messages = '';
+                        let selectedStatus = $('input[name="account_status"]:checked')
+                            .val();
 
-                        if (response.message && Array.isArray(response.message)) {
-                            messages = response.message.map(item => {
-                                let color = item.completed ? 'green' : item
-                                    .is_optional ? 'orange' : 'red';
-                                let icon = item.completed ? '✅' : item.is_optional ?
-                                    '⚠️' : '❌';
+                        if (selectedStatus === '1') {
+                            let messages = '';
 
-                                return `<li style="color: ${color};">
-            ${icon} ${item.message}
-        </li>`;
-                            }).join('');
+                            if (response.message && Array.isArray(response.message)) {
+                                messages = response.message.map(item => {
+                                    let color = item.completed ? 'green' : item
+                                        .is_optional ? 'orange' : 'red';
+                                    let icon = item.completed ? '✅' : item
+                                        .is_optional ? '⚠️' : '❌';
+                                    return `<li style="color: ${color};">${icon} ${item.message}</li>`;
+                                }).join('');
+                            } else {
+                                messages =
+                                    `<li style="color: green;">✅ Vendor is eligible for activation</li>`;
+                            }
+
+                            $('#errorMessage').html(messages);
+
+                            if (response.success) {
+                                $('#errorModalLabel').text(
+                                    'Your profile is complete ✅');
+                                $("#errorIntro").text('Your profile is complete now!');
+                                $("#completionNote").text(
+                                    'All sections are completed, your profile will be upgraded to Vendor Partner status.'
+                                );
+                                $('#checkActivationBtn').remove();
+                                $(".modal-header").removeClass("bg-danger").addClass(
+                                    "bg-success");
+                            } else {
+                                $('#errorModalLabel').text(
+                                    'Your profile is incomplete ❌');
+                            }
+
+                            $('#errorModal').modal('show');
                         } else {
-                            messages =
-                                `<li style="color: green;">✅ Vendor is eligible for activation</li>`;
+                            if (response.status === "true") {
+                                showToast("Success", response.message, "success");
+                            } else {
+                                showToast("Error", response.message, "error");
+                            }
                         }
-
-                        $('#errorMessage').html(messages);
-
-                        if (response.success) {
-                            $('#errorModalLabel').text('Your profile is complete ✅');
-                            $("#errorIntro").text('Your profile is complete now!');
-                            $("#completionNote").text(
-                                'All sections are completed, your profile will be upgraded to Vendor Partner status.'
-                            );
-                            $('#checkActivationBtn').remove();
-                            $(".modal-header").removeClass("bg-danger").addClass("bg-success");
-                        } else {
-                            $('#errorModalLabel').text('Your profile is incomplete ❌');
-                        }
-
-                        $('#errorModal').modal('show');
                     },
                     error: function() {
-                        $('#errorMessage').html(
-                            "<li style='color: red;'>❌ Something went wrong. Please try again.</li>"
-                        );
-                        $('#errorModalLabel').text('Error ❌');
-                        $('#errorModal').modal('show');
+                        let selectedStatus = $('input[name="account_status"]:checked')
+                            .val();
+
+                        if (selectedStatus === '1') {
+                            $('#errorMessage').html(
+                                "<li style='color: red;'>❌ Something went wrong. Please try again.</li>"
+                            );
+                            $('#errorModalLabel').text('Error ❌');
+                            $("#errorIntro").text('An unexpected error occurred.');
+                            $("#completionNote").text(
+                                'Please try again later or contact support.');
+                            $(".modal-header").removeClass("bg-success").addClass(
+                                "bg-danger");
+                            $('#errorModal').modal('show');
+                        } else {
+                            showToast("Error",
+                                "Something went wrong. Please try again.", "error");
+                        }
                     }
                 });
             }
@@ -261,7 +285,7 @@
         function toggleAlert() {
             var selectedValue = $('input[name="account_status"]:checked').val();
             if (selectedValue == 1) {
-                $('#platformFeeAlert').removeClass('d-none');
+                checkPlatformFees();
             } else {
                 $('#platformFeeAlert').addClass('d-none');
             }
@@ -279,5 +303,73 @@
         $('#errorModal').on('hidden.bs.modal', function() {
             location.reload();
         });
+    });
+</script>
+<script>
+    if (typeof vendorData === 'undefined') {
+        var vendorData = {
+            vendorType: "{{ $vendor->vendor_type }}",
+            eventPlatformFee: "{{ $vendor->event_platform_fee }}",
+            accommodationPlatformFee: "{{ $vendor->accommodation_platform_fee }}",
+            accommodationEventPlatformFee: "{{ $vendor->accommodation_event_platform_fee }}",
+            wineryB2BPlatformFee: "{{ $vendor->winery_b2b_platform_fee }}",
+            wineryB2CPlatformFee: "{{ $vendor->winery_b2c_platform_fee }}",
+            excursionPlatformFee: "{{ $vendor->excursion_platform_fee }}"
+        };
+    } else {
+        // Optionally update it instead of skipping
+        Object.assign(vendorData, {
+            vendorType: "{{ $vendor->vendor_type }}",
+            eventPlatformFee: "{{ $vendor->event_platform_fee }}",
+            accommodationPlatformFee: "{{ $vendor->accommodation_platform_fee }}",
+            accommodationEventPlatformFee: "{{ $vendor->accommodation_event_platform_fee }}",
+            wineryB2BPlatformFee: "{{ $vendor->winery_b2b_platform_fee }}",
+            wineryB2CPlatformFee: "{{ $vendor->winery_b2c_platform_fee }}",
+            excursionPlatformFee: "{{ $vendor->excursion_platform_fee }}"
+        });
+    }
+
+    function checkPlatformFees() {
+        const type = vendorData.vendorType;
+
+        let missingFee = false;
+
+        switch (type) {
+            case 'winery':
+                missingFee = !vendorData.wineryB2BPlatformFee ||
+                    !vendorData.wineryB2CPlatformFee ||
+                    !vendorData.eventPlatformFee;
+                break;
+
+            case 'excursion':
+                missingFee = !vendorData.excursionPlatformFee ||
+                    !vendorData.eventPlatformFee;
+                break;
+
+            case 'licensed':
+            case 'non-licensed':
+                missingFee = !vendorData.eventPlatformFee;
+                break;
+
+            case 'accommodation':
+                missingFee = !vendorData.accommodationPlatformFee ||
+                    !vendorData.accommodationEventPlatformFee ||
+                    !vendorData.eventPlatformFee;
+                break;
+
+            default:
+                missingFee = true;
+        }
+
+        if (missingFee) {
+            $('#platformFeeAlert').removeClass('d-none');
+        } else {
+            $('#platformFeeAlert').addClass('d-none');
+        }
+    }
+    $(document).ready(function() {
+        if ($('input[name="account_status"]:checked').val() === '1') {
+            checkPlatformFees();
+        }
     });
 </script>

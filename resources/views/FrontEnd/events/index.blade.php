@@ -209,6 +209,8 @@
                 $('.date-filter').prop('checked', false);
                 $('#dateRangePicker').val('');
                 $('#dateRangePickerContainer').hide();
+                startDate = null;
+                endDate = null;
                 triggerFilter();
             });
             $('#clearSearchFilters').on('click', function(e) {
@@ -247,7 +249,7 @@
                 mode: "range",
                 dateFormat: "Y-m-d",
                 minDate: "today",
-                maxDate: new Date().fp_incr(30), // Limit to 1 month
+                // maxDate: new Date().fp_incr(30), // Limit to 1 month
                 onChange: function(selectedDates, dateStr) {
                     if (selectedDates.length === 2) {
                         startDate = formatDate(selectedDates[0]);

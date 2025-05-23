@@ -70,12 +70,12 @@
                 <span class="link_name">Manage Review & Testimonial</span>
             </a>
         </li>
-        <li class="position-relative">
+        {{-- <li class="position-relative">
             <a href="{{ route('admin.plans.index') }}">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
                 <span class="link_name">Manage Stripe Plans</span>
             </a>
-        </li>
+        </li> --}}
         {{-- <li class="position-relative">
             <a href="{{route('admin.taxes.index')}}">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
@@ -95,7 +95,7 @@
                 </li>
             </ul>
         </li>
-        <li class="position-relative parent-menu">
+        {{-- <li class="position-relative parent-menu">
             <a href="#">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">
                 <span class="link_name">Manage Subscriptions</span>
@@ -105,7 +105,7 @@
                 <li class="mb-2"><a href="{{ route('admin.vendor.subscriptions.index') }}">Vendor Subscriptions</a></li>
                 </li>
             </ul>
-        </li>
+        </li> --}}
         <li class="position-relative">
             <a href="{{ route('admin.wallet.index') }}">
                 <img src="{{ asset('asset/admin/images/icons/faq-icon.png') }}">

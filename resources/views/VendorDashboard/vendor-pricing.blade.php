@@ -31,8 +31,12 @@
                             action="{{ route('vendor-pricing-update', ['vendorid' => $vendor->id]) }}" method="post">
                             @csrf
                             <div class="row mt-3">
-                                <div class="col-sm-6 col-12">
-                                    <label class="form-label">Spring</label>
+                                <div
+                                    class="event-head position-relative d-flex align-items-center justify-content-between gap-1 py-2">
+                                    <h5 class="mb-0 fw-bold">Spring</h5>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <label class="form-label">List Price</label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
                                         <input type="text" class="form-control @error('spring') is-invalid @enderror"
@@ -44,8 +48,29 @@
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
-                                <div class="col-sm-6 col-12">
-                                    <label class="form-label">Summer</label>
+                                <div class="col-sm-4 col-12">
+                                    <label class="form-label">Platform Fees</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control" id="spring_platform_fee" disabled>
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <label class="form-label">Platform Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control" id="spring_platform_price" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div
+                                    class="event-head position-relative d-flex align-items-center justify-content-between gap-1 py-2">
+                                    <h5 class="mb-0 fw-bold">Summer</h5>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <label class="form-label">List Price</label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
                                         <input type="text" class="form-control @error('summer') is-invalid @enderror"
@@ -57,10 +82,28 @@
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
+                                <div class="col-sm-4 col-12">
+                                    <label class="form-label">Platform Fees</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control" id="summer_platform_fee" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <label class="form-label">Platform Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control" id="summer_platform_price" disabled>
+                                    </div>
+                                </div>
                             </div>
                             <div class="row mt-3">
-                                <div class="col-sm-6 col-12">
-                                    <label class="form-label">Fall</label>
+                                <div
+                                    class="event-head position-relative d-flex align-items-center justify-content-between gap-1 py-2">
+                                    <h5 class="mb-0 fw-bold">Fall</h5>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <label class="form-label">List Price</label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
                                         <input type="text" class="form-control @error('fall') is-invalid @enderror"
@@ -72,8 +115,28 @@
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
-                                <div class="col-sm-6 col-12">
-                                    <label class="form-label">Winter</label>
+                                <div class="col-sm-4 col-12">
+                                    <label class="form-label">Platform Fees</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control" id="fall_platform_fee" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <label class="form-label">Platform Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control" id="fall_platform_price" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div
+                                    class="event-head position-relative d-flex align-items-center justify-content-between gap-1 py-2">
+                                    <h5 class="mb-0 fw-bold">Winter</h5>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <label class="form-label">List Price</label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
                                         <input type="text" class="form-control @error('winter') is-invalid @enderror"
@@ -85,11 +148,26 @@
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
+                                <div class="col-sm-4 col-12">
+                                    <label class="form-label">Platform Fees</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control" id="winter_platform_fee" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-12">
+                                    <label class="form-label">Platform Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control" id="winter_platform_price" disabled>
+                                    </div>
+                                </div>
                             </div>
                             <div class="row mt-3">
                                 <div class="col-sm-6 col-12">
-                                    <input type="checkbox" class="custom-checkbox" id="sale-pricing" name="special_price"
-                                        value="1" @if (old('special_price', $vendor->pricing->special_price ?? false)) checked @endif>
+                                    <input type="checkbox" class="custom-checkbox" id="sale-pricing"
+                                        name="special_price" value="1"
+                                        @if (old('special_price', $vendor->pricing->special_price ?? false)) checked @endif>
                                     <label class="form-label" for="sale-pricing">Special Price <span
                                             class="theme-color">(Discount)</span></label>
                                     <div class="input-group">
@@ -282,5 +360,39 @@
                 }
             }).trigger("change");
         });
+        var platformFee = {{ platformFee($vendor) }};
     </script>
+    <script>
+        const platformFeePercentage = {{ platformFee($vendor) ?? 0 }};
+        const seasons = ['summer', 'winter', 'spring', 'fall'];
+
+        function calculatePlatformValues(season) {
+            const listPriceInput = document.getElementById(`${season}`);
+            const feeInput = document.getElementById(`${season}_platform_fee`);
+            const priceInput = document.getElementById(`${season}_platform_price`);
+
+            const listPrice = parseFloat(listPriceInput?.value);
+
+            if (!listPrice || listPrice <= 0) {
+                if (feeInput) feeInput.value = '';
+                if (priceInput) priceInput.value = '';
+                return;
+            }
+
+            const fee = parseFloat(((platformFeePercentage / 100) * listPrice).toFixed(2));
+            const finalPrice = parseFloat((listPrice + fee).toFixed(2));
+
+            if (feeInput) feeInput.value = fee.toFixed(2);
+            if (priceInput) priceInput.value = finalPrice.toFixed(2);
+        }
+
+        seasons.forEach(season => {
+            const listPriceInput = document.getElementById(`${season}`);
+            if (listPriceInput) {
+                listPriceInput.addEventListener('input', () => calculatePlatformValues(season));
+                calculatePlatformValues(season); // Run on page load
+            }
+        });
+    </script>
+
 @endsection

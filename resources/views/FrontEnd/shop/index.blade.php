@@ -160,7 +160,7 @@
                 class="wine-filtar-bar d-flex align-items-center justify-content-end gap-2 mb-4">
 
                 <!-- Search Input -->
-                <div>
+                {{-- <div>
 
                     <input type="search" id="search" class="form-control" name="search" placeholder="Winery Search"
                         value="{{ request('search') }}">
@@ -172,11 +172,11 @@
                     <input type="search" id="wine_search" class="form-control" name="wine_search" placeholder="Wine Search"
                         value="{{ request('wine_search') }}">
 
-                </div>
+                </div> --}}
 
                 <!-- Sub Category Dropdown -->
 
-                <div>
+                {{-- <div>
 
                     <select class="form-select" name="sub_category" aria-label="Default select example">
 
@@ -197,7 +197,7 @@
 
                     </select>
 
-                </div>
+                </div> --}}
 
 
 

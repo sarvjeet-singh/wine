@@ -363,6 +363,21 @@ class EventController extends Controller
         }
         $tax = $subtotal * ($applicable_taxes_amount / 100);
         $total = $subtotal + $tax;
+
+
+        $vendorTaxPercentage = $applicable_taxes_amount; // for example, 10%
+        $platformTaxPercentage = $applicable_taxes_amount; // for example, 10%
+
+        $vendor_tax = ($event->admittance * $vendorTaxPercentage) / 100;
+        $platform_tax = ($platform_fee * $platformTaxPercentage) / 100;
+
+        $vendor_transaction_fee = round(($event->admittance * 0.029) + 0.30, 2);
+        $platform_transaction_fee = round(($platform_fee * 0.029), 2);
+
+        $vendor_total = $event->admittance + $vendor_tax - $vendor_transaction_fee;
+        $platform_total = $platform_fee + $platform_tax - $platform_transaction_fee;
+
+
         DB::beginTransaction();
         try {
             // Step 1: Create Customer Order
@@ -381,6 +396,16 @@ class EventController extends Controller
                 'payment_method' => 'Credit Card', // Change dynamically
                 'payment_status' => 'pending',
                 'order_status' => 'pending',
+
+                // New fields
+                'vendor_tax' => $vendor_tax,
+                'platform_tax' => $platform_tax,
+                'vendor_total' => $vendor_total,
+                'platform_total' => $platform_total,
+                'vendor_transaction_fee' => $vendor_transaction_fee,
+                'platform_transaction_fee' => $platform_transaction_fee,
+                'vendor_tax_percentage' => $vendorTaxPercentage,
+                'platform_tax_percentage' => $platformTaxPercentage,
             ]);
 
             // Step 2: Create Event Order Details

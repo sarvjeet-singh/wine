@@ -70,7 +70,6 @@ class VendorWineController extends Controller
             'sub_region' => 'nullable|string',
             'varietal_blend.*' => 'nullable|string',
             'varietal_type.*' => 'nullable|string',
-            // 'vintage_brand_name' => 'required|string',
             'vintage_date' => 'nullable|digits:4|integer|between:1900,' . date('Y'),
             'description' => 'nullable|string',
             'abv' => 'nullable|numeric',
@@ -85,24 +84,22 @@ class VendorWineController extends Controller
             'price' => 'nullable|numeric',
             'cellar' => 'nullable|string',
             'inventory' => 'nullable|integer',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust image validation as needed
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'pdf' => 'nullable|mimes:pdf|max:5120',
             'status' => 'nullable|boolean',
         ]);
-        $rs_value = null;
 
+        $rs_value = null;
         if (!empty($request->input('rs')) && !empty($request->input('rs_values'))) {
             $rs = $request->input('rs');
             $rs_values = $request->input('rs_values');
-            $rs_value = $rs_values[$rs];
+            $rs_value = $rs_values[$rs] ?? null;
         }
 
-
-        // Process varietal_blend and varietal_type
         $varietalBlends = $request->input('varietal_blend');
         $varietalTypes = $request->input('varietal_type');
         $grapeVarietals = $this->getVarietalNames($varietalTypes ?? []);
-        // Combine into JSON format
+
         $varietalData = [];
         foreach ($varietalBlends as $index => $blend) {
             if (!empty($blend) || !empty($varietalTypes[$index])) {
@@ -113,23 +110,23 @@ class VendorWineController extends Controller
             }
         }
 
-        // Handle file upload
         $imagePath = null;
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imagePath = $image->store('images', 'public'); // Store image in public storage
+            $imagePath = $image->store('images', 'public');
         }
+
         $pdfPath = null;
         if ($request->hasFile('pdf')) {
-            $pdfPath = $request->file('pdf')->store('pdfs', 'public'); // Store in storage/app/public/pdfs
+            $pdfPath = $request->file('pdf')->store('pdfs', 'public');
         }
-        // Create new VendorWine entry
+
         $vendorWine = new VendorWine();
         $vendorWine->vendor_id = $vendor_id;
         $vendorWine->winery_name = $request->input('winery_name');
         $vendorWine->region = $request->input('region') ?? null;
         $vendorWine->sub_region = $request->input('sub_region') ?? null;
-        $vendorWine->varietal_blend = json_encode($varietalData) ?? null; // Store JSON data
+        $vendorWine->varietal_blend = json_encode($varietalData) ?? null;
         $vendorWine->grape_varietals = $grapeVarietals ?? null;
         $vendorWine->vintage_date = $request->input('vintage_date') ?? null;
         $vendorWine->description = $request->input('description') ?? null;
@@ -155,9 +152,9 @@ class VendorWineController extends Controller
             $vendorWine->price = $calculations['final_price'];
         }
 
-        // Save the model
         $vendorWine->save();
-        return response()->json(['success' => true, 'message' => 'Wine added successfully']);
+
+        return redirect()->route('vendor-wines.index', $vendor_id)->with('success', 'Wine added successfully.');
     }
 
     public function update(Request $request, $id)
@@ -288,7 +285,7 @@ class VendorWineController extends Controller
 
         $wine->update($data);
 
-        return response()->json(['success' => true, 'message' => 'Wine updated successfully']);
+        return redirect()->route('vendor-wines.index', $wine->vendor_id)->with('success', 'Wine updated successfully.');
     }
 
 

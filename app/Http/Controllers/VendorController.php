@@ -852,12 +852,13 @@ class VendorController extends Controller
 			->where('review_status', 'approved')
 			->selectRaw('COUNT(*) as review_count, AVG(rating) as average_rating')
 			->first();
-		$hasActiveSubscription = WinerySubscription::where('vendor_id', $vendorid)
-			->where('status', 'active')
-			->where('end_date', '>', Carbon::now())
-			->exists();
+		// $hasActiveSubscription = WinerySubscription::where('vendor_id', $vendorid)
+		// 	->where('status', 'active')
+		// 	->where('end_date', '>', Carbon::now())
+		// 	->exists();
 		$VendorMediaGallery = VendorMediaGallery::where('vendor_id', $vendorid)->get();
-		return view('VendorDashboard.vendor-dashboard', compact('vendor', 'VendorMediaGallery', 'usersCount', 'mostCommonLocation', 'reviewData','hasActiveSubscription'));
+		// return view('VendorDashboard.vendor-dashboard', compact('vendor', 'VendorMediaGallery', 'usersCount', 'mostCommonLocation', 'reviewData','hasActiveSubscription'));
+		return view('VendorDashboard.vendor-dashboard', compact('vendor', 'VendorMediaGallery', 'usersCount', 'mostCommonLocation', 'reviewData'));
 
 		// Check if vendor is not found
 		if (!$vendor) {

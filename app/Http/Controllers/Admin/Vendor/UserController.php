@@ -123,7 +123,7 @@ class UserController extends Controller
         $request->validate([
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            //'email' => 'required|email|unique:users,email,' . $user->id,
             'contact_number' => 'required|string|max:20',
             'vendor_id' => 'required_if:master_user,0|array|min:1',
             'master_user' => 'nullable|boolean',
@@ -152,7 +152,7 @@ class UserController extends Controller
             $user->update([
                 'firstname' => $request->firstname,
                 'lastname' => $request->lastname,
-                'email' => $request->email,
+                //'email' => $request->email,
                 'contact_number' => $request->contact_number,
                 'master_user' => $request->master_user ?? 0,
                 'password' => !empty($request->password) ? bcrypt($request->password) : $user->password,

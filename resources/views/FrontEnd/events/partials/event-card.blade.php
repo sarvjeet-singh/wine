@@ -52,7 +52,7 @@
                             @php
                                 $platform_fee = $event->vendor->event_platform_fee ?? '0.00';
                             @endphp
-                            {{ !empty($event->price_type == 'variable') ? 'Starts at' : '' }}
+                            {{ !empty($event->price_type == 1) ? 'Variable Pricing' : '' }}
                             {{ !empty($event->admittance) ? '$' . number_format($event->admittance + ($event->admittance * $platform_fee) / 100, 2, '.', '') : '' }}{{ $event->extension }}
                         </p>
                     @endif
